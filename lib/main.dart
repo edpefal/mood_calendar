@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'features/mood/data/models/mood_model.dart';
+import 'features/mood/data/repositories/mood_repository_impl.dart';
+import 'features/mood/domain/usecases/save_mood_usecase.dart';
+import 'features/mood/domain/usecases/get_moods_usecase.dart';
+import 'features/mood/presentation/bloc/mood_cubit.dart';
 import 'features/mood/presentation/screens/mood_screen.dart';
 
 void main() async {
@@ -17,7 +22,18 @@ void main() async {
   // Abrir la caja de MoodModel
   await Hive.openBox<MoodModel>('moods');
 
-  runApp(const MyApp());
+  final moodBox = Hive.box<MoodModel>('moods');
+  final repository = MoodRepositoryImpl(moodBox);
+
+  runApp(
+    BlocProvider(
+      create: (_) => MoodCubit(
+        saveMood: SaveMoodUseCase(repository),
+        getMoods: GetMoodsUseCase(repository),
+      ),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
