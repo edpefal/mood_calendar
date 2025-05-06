@@ -4,9 +4,12 @@ import '../widgets/mood_selector.dart';
 import '../../data/models/mood_model.dart';
 import '../../domain/entities/mood_entry.dart';
 import '../bloc/mood_cubit.dart';
+import 'calendar_screen.dart';
+import 'package:hive/hive.dart';
 
 class MoodScreen extends StatefulWidget {
-  const MoodScreen({super.key});
+  final DateTime? selectedDate;
+  const MoodScreen({super.key, this.selectedDate});
 
   @override
   State<MoodScreen> createState() => _MoodScreenState();
@@ -15,6 +18,35 @@ class MoodScreen extends StatefulWidget {
 class _MoodScreenState extends State<MoodScreen> {
   MoodOption? selectedMood = MoodSelector.moods.first;
   final TextEditingController _noteController = TextEditingController();
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMoodForDate();
+  }
+
+  Future<void> _loadMoodForDate() async {
+    final date = widget.selectedDate ?? DateTime.now();
+    final moodBox = Hive.box<MoodModel>('moods');
+    final moodModel = moodBox.get(date.toIso8601String());
+    if (moodModel != null) {
+      setState(() {
+        selectedMood = MoodSelector.moods.firstWhere(
+          (m) => m.emoji == moodModel.mood,
+          orElse: () => MoodSelector.moods.first,
+        );
+        _noteController.text = moodModel.note ?? '';
+        isLoading = false;
+      });
+    } else {
+      setState(() {
+        selectedMood = MoodSelector.moods.first;
+        _noteController.clear();
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -23,8 +55,9 @@ class _MoodScreenState extends State<MoodScreen> {
   }
 
   void _saveMood() {
+    final date = widget.selectedDate ?? DateTime.now();
     final moodEntry = MoodEntry(
-      date: DateTime.now(),
+      date: date,
       mood: selectedMood!.emoji,
       note: _noteController.text.isEmpty ? null : _noteController.text,
       intensity: 3,
@@ -34,17 +67,20 @@ class _MoodScreenState extends State<MoodScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
     return BlocConsumer<MoodCubit, MoodState>(
       listener: (context, state) {
         state.maybeWhen(
           saved: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Estado de ánimo guardado')),
+            context.read<MoodCubit>().fetchAll();
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const CalendarScreen()),
             );
-            setState(() {
-              selectedMood = MoodSelector.moods.first;
-              _noteController.clear();
-            });
           },
           error: (msg) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -57,7 +93,11 @@ class _MoodScreenState extends State<MoodScreen> {
       builder: (context, state) {
         return Scaffold(
           appBar: AppBar(
-            title: const Text('Registrar Estado de Ánimo'),
+            title: Text(
+              widget.selectedDate != null
+                  ? 'Edit Mood (${widget.selectedDate!.day}/${widget.selectedDate!.month}/${widget.selectedDate!.year})'
+                  : 'Registrar Estado de Ánimo',
+            ),
           ),
           body: state.maybeWhen(
             loading: () => const Center(child: CircularProgressIndicator()),

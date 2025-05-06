@@ -8,6 +8,7 @@ import 'features/mood/domain/usecases/save_mood_usecase.dart';
 import 'features/mood/domain/usecases/get_moods_usecase.dart';
 import 'features/mood/presentation/bloc/mood_cubit.dart';
 import 'features/mood/presentation/screens/mood_screen.dart';
+import 'features/mood/presentation/screens/calendar_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
