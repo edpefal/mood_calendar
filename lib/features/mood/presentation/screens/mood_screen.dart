@@ -19,10 +19,13 @@ class _MoodScreenState extends State<MoodScreen> {
   MoodOption? selectedMood = MoodSelector.moods.first;
   final TextEditingController _noteController = TextEditingController();
   bool isLoading = true;
+  late PageController _pageController;
+  int _currentPage = 0;
 
   @override
   void initState() {
     super.initState();
+    _pageController = PageController(initialPage: 0);
     _loadMoodForDate();
   }
 
@@ -31,17 +34,20 @@ class _MoodScreenState extends State<MoodScreen> {
     final moodBox = Hive.box<MoodModel>('moods');
     final moodModel = moodBox.get(date.toIso8601String());
     if (moodModel != null) {
+      final idx =
+          MoodSelector.moods.indexWhere((m) => m.emoji == moodModel.mood);
       setState(() {
-        selectedMood = MoodSelector.moods.firstWhere(
-          (m) => m.emoji == moodModel.mood,
-          orElse: () => MoodSelector.moods.first,
-        );
+        selectedMood = MoodSelector.moods[idx >= 0 ? idx : 0];
+        _currentPage = idx >= 0 ? idx : 0;
+        _pageController = PageController(initialPage: _currentPage);
         _noteController.text = moodModel.note ?? '';
         isLoading = false;
       });
     } else {
       setState(() {
         selectedMood = MoodSelector.moods.first;
+        _currentPage = 0;
+        _pageController = PageController(initialPage: 0);
         _noteController.clear();
         isLoading = false;
       });
@@ -51,6 +57,7 @@ class _MoodScreenState extends State<MoodScreen> {
   @override
   void dispose() {
     _noteController.dispose();
+    _pageController.dispose();
     super.dispose();
   }
 
@@ -92,52 +99,182 @@ class _MoodScreenState extends State<MoodScreen> {
       },
       builder: (context, state) {
         return Scaffold(
-          appBar: AppBar(
-            title: Text(
-              widget.selectedDate != null
-                  ? 'Edit Mood (${widget.selectedDate!.day}/${widget.selectedDate!.month}/${widget.selectedDate!.year})'
-                  : 'Registrar Estado de Ánimo',
-            ),
-          ),
-          body: state.maybeWhen(
-            loading: () => const Center(child: CircularProgressIndicator()),
-            orElse: () => SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  MoodSelector(
-                    selectedMood: selectedMood,
-                    onMoodSelected: (mood) {
-                      setState(() {
-                        selectedMood = mood;
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 32),
-                  TextField(
-                    controller: _noteController,
-                    maxLines: 3,
-                    decoration: const InputDecoration(
-                      labelText: 'Nota (opcional)',
-                      border: OutlineInputBorder(),
-                      hintText: '¿Quieres agregar algo más?',
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                  ElevatedButton(
-                    onPressed: _saveMood,
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      backgroundColor:
-                          selectedMood?.color ?? Theme.of(context).primaryColor,
-                    ),
-                    child: const Text(
-                      'Guardar',
-                      style: TextStyle(fontSize: 18, color: Colors.white),
-                    ),
-                  ),
+          backgroundColor: Colors.transparent,
+          body: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color(0xFFE8EAF6),
+                  Color(0xFFF3E5F5),
+                  Color(0xFFE1BEE7),
                 ],
+              ),
+            ),
+            child: SafeArea(
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Header
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Record Mood',
+                          style:
+                              Theme.of(context).textTheme.titleLarge?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.calendar_today,
+                              color: Color(0xFF5F3DC4)),
+                          onPressed: () {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => const CalendarScreen()),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'How are you feeling today?',
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                    const SizedBox(height: 16),
+                    // Mood Card
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          color: Colors.amber[50],
+                          borderRadius: BorderRadius.circular(24),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.amber.withOpacity(0.15),
+                              blurRadius: 24,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: PageView.builder(
+                                controller: _pageController,
+                                itemCount: MoodSelector.moods.length,
+                                onPageChanged: (index) {
+                                  setState(() {
+                                    _currentPage = index;
+                                    selectedMood = MoodSelector.moods[index];
+                                  });
+                                },
+                                itemBuilder: (context, index) {
+                                  final mood = MoodSelector.moods[index];
+                                  return Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        mood.emoji,
+                                        style: const TextStyle(fontSize: 96),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        mood.label,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium,
+                                      ),
+                                    ],
+                                  );
+                                },
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: List.generate(
+                                MoodSelector.moods.length,
+                                (index) => Container(
+                                  width: 8,
+                                  height: 8,
+                                  margin:
+                                      const EdgeInsets.symmetric(horizontal: 4),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: _currentPage == index
+                                        ? const Color(0xFF5F3DC4)
+                                        : Colors.grey[300],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    // Note input
+                    TextField(
+                      controller: _noteController,
+                      maxLines: 3,
+                      decoration: InputDecoration(
+                        hintText: 'Write a note...',
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide.none,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 12),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    // Save button
+                    GestureDetector(
+                      onTap: _saveMood,
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(vertical: 18),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF5F3DC4), Color(0xFF6C63FF)],
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                          ),
+                        ),
+                        child: const Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.check, color: Colors.white),
+                              SizedBox(width: 8),
+                              Text(
+                                'Save',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
