@@ -72,6 +72,47 @@ class _MoodScreenState extends State<MoodScreen> {
     context.read<MoodCubit>().save(moodEntry);
   }
 
+  LinearGradient _backgroundGradientForMood(MoodOption mood) {
+    switch (mood.label.toLowerCase()) {
+      case 'feliz':
+        return const LinearGradient(
+          colors: [Color(0xFFB2FFB2), Color(0xFF4CAF50)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        );
+      case 'tranquilo':
+        return const LinearGradient(
+          colors: [Color(0xFFB3E5FC), Color(0xFF1976D2)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        );
+      case 'neutral':
+        return const LinearGradient(
+          colors: [Color(0xFFE0E0E0), Color(0xFF757575)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        );
+      case 'triste':
+        return const LinearGradient(
+          colors: [Color(0xFFFFE0B2), Color(0xFFFF9800)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        );
+      case 'enojado':
+        return const LinearGradient(
+          colors: [Color(0xFFFFCDD2), Color(0xFFD32F2F)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        );
+      default:
+        return const LinearGradient(
+          colors: [Color(0xFFE8EAF6), Color(0xFFF3E5F5)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
@@ -100,17 +141,10 @@ class _MoodScreenState extends State<MoodScreen> {
       builder: (context, state) {
         return Scaffold(
           backgroundColor: Colors.transparent,
-          body: Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFFE8EAF6),
-                  Color(0xFFF3E5F5),
-                  Color(0xFFE1BEE7),
-                ],
-              ),
+          body: AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            decoration: BoxDecoration(
+              gradient: _backgroundGradientForMood(selectedMood!),
             ),
             child: SafeArea(
               child: Padding(
@@ -151,74 +185,60 @@ class _MoodScreenState extends State<MoodScreen> {
                     const SizedBox(height: 16),
                     // Mood Card
                     Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.all(24),
-                        decoration: BoxDecoration(
-                          color: Colors.amber[50],
-                          borderRadius: BorderRadius.circular(24),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.amber.withOpacity(0.15),
-                              blurRadius: 24,
-                              offset: const Offset(0, 8),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: PageView.builder(
+                              controller: _pageController,
+                              itemCount: MoodSelector.moods.length,
+                              onPageChanged: (index) {
+                                setState(() {
+                                  _currentPage = index;
+                                  selectedMood = MoodSelector.moods[index];
+                                });
+                              },
+                              itemBuilder: (context, index) {
+                                final mood = MoodSelector.moods[index];
+                                return Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      mood.emoji,
+                                      style: const TextStyle(fontSize: 96),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      mood.label,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium,
+                                    ),
+                                  ],
+                                );
+                              },
                             ),
-                          ],
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Expanded(
-                              child: PageView.builder(
-                                controller: _pageController,
-                                itemCount: MoodSelector.moods.length,
-                                onPageChanged: (index) {
-                                  setState(() {
-                                    _currentPage = index;
-                                    selectedMood = MoodSelector.moods[index];
-                                  });
-                                },
-                                itemBuilder: (context, index) {
-                                  final mood = MoodSelector.moods[index];
-                                  return Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        mood.emoji,
-                                        style: const TextStyle(fontSize: 96),
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        mood.label,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleMedium,
-                                      ),
-                                    ],
-                                  );
-                                },
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: List.generate(
-                                MoodSelector.moods.length,
-                                (index) => Container(
-                                  width: 8,
-                                  height: 8,
-                                  margin:
-                                      const EdgeInsets.symmetric(horizontal: 4),
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: _currentPage == index
-                                        ? const Color(0xFF5F3DC4)
-                                        : Colors.grey[300],
-                                  ),
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: List.generate(
+                              MoodSelector.moods.length,
+                              (index) => Container(
+                                width: 8,
+                                height: 8,
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 4),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: _currentPage == index
+                                      ? const Color(0xFF5F3DC4)
+                                      : Colors.grey[300],
                                 ),
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(height: 16),
