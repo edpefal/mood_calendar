@@ -76,37 +76,37 @@ class _MoodScreenState extends State<MoodScreen> {
     switch (mood.label.toLowerCase()) {
       case 'feliz':
         return const LinearGradient(
-          colors: [Color(0xFFB2FFB2), Color(0xFF4CAF50)],
+          colors: [Color(0xFFE8F5E9), Color(0xFFC8E6C9)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         );
       case 'tranquilo':
         return const LinearGradient(
-          colors: [Color(0xFFB3E5FC), Color(0xFF1976D2)],
+          colors: [Color(0xFFE3F2FD), Color(0xFFBBDEFB)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         );
       case 'neutral':
         return const LinearGradient(
-          colors: [Color(0xFFE0E0E0), Color(0xFF757575)],
+          colors: [Color(0xFFF5F5F5), Color(0xFFEEEEEE)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         );
       case 'triste':
         return const LinearGradient(
-          colors: [Color(0xFFFFE0B2), Color(0xFFFF9800)],
+          colors: [Color(0xFFFFF3E0), Color(0xFFFFE0B2)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         );
       case 'enojado':
         return const LinearGradient(
-          colors: [Color(0xFFFFCDD2), Color(0xFFD32F2F)],
+          colors: [Color(0xFFFFEBEE), Color(0xFFFFCDD2)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         );
       default:
         return const LinearGradient(
-          colors: [Color(0xFFE8EAF6), Color(0xFFF3E5F5)],
+          colors: [Color(0xFFF3E5F5), Color(0xFFE1BEE7)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         );
