@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/mood_cubit.dart';
 import '../../domain/entities/mood_entry.dart';
-import '../widgets/mood_selector.dart';
 import 'mood_screen.dart';
 
 class CalendarScreen extends StatelessWidget {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../widgets/mood_selector.dart';
+import 'package:lottie/lottie.dart';
 import '../../data/models/mood_model.dart';
 import '../../domain/entities/mood_entry.dart';
 import '../bloc/mood_cubit.dart';
@@ -15,43 +15,19 @@ class MoodScreen extends StatefulWidget {
   State<MoodScreen> createState() => _MoodScreenState();
 }
 
-class _MoodScreenState extends State<MoodScreen> {
-  MoodOption? selectedMood = MoodSelector.moods.first;
+class _MoodScreenState extends State<MoodScreen>
+    with SingleTickerProviderStateMixin {
+  MoodOption selectedMood = moods.first;
+  int _currentPage = 0;
   final TextEditingController _noteController = TextEditingController();
   bool isLoading = true;
   late PageController _pageController;
-  int _currentPage = 0;
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: 0);
     _loadMoodForDate();
-  }
-
-  Future<void> _loadMoodForDate() async {
-    final date = widget.selectedDate ?? DateTime.now();
-    final moodBox = Hive.box<MoodModel>('moods');
-    final moodModel = moodBox.get(date.toIso8601String());
-    if (moodModel != null) {
-      final idx =
-          MoodSelector.moods.indexWhere((m) => m.emoji == moodModel.mood);
-      setState(() {
-        selectedMood = MoodSelector.moods[idx >= 0 ? idx : 0];
-        _currentPage = idx >= 0 ? idx : 0;
-        _pageController = PageController(initialPage: _currentPage);
-        _noteController.text = moodModel.note ?? '';
-        isLoading = false;
-      });
-    } else {
-      setState(() {
-        selectedMood = MoodSelector.moods.first;
-        _currentPage = 0;
-        _pageController = PageController(initialPage: 0);
-        _noteController.clear();
-        isLoading = false;
-      });
-    }
   }
 
   @override
@@ -61,11 +37,42 @@ class _MoodScreenState extends State<MoodScreen> {
     super.dispose();
   }
 
+  Future<void> _loadMoodForDate() async {
+    final date = widget.selectedDate ?? DateTime.now();
+    final moodBox = Hive.box<MoodModel>('moods');
+    final moodModel = moodBox.get(date.toIso8601String());
+    if (moodModel != null) {
+      final idx = moods.indexWhere((m) => m.animationPath == moodModel.mood);
+      setState(() {
+        selectedMood = moods[idx >= 0 ? idx : 0];
+        _currentPage = idx >= 0 ? idx : 0;
+        _noteController.text = moodModel.note ?? '';
+        isLoading = false;
+      });
+      _pageController = PageController(initialPage: _currentPage);
+    } else {
+      setState(() {
+        selectedMood = moods.first;
+        _currentPage = 0;
+        _noteController.clear();
+        isLoading = false;
+      });
+      _pageController = PageController(initialPage: 0);
+    }
+  }
+
+  void _onPageChanged(int index) {
+    setState(() {
+      _currentPage = index;
+      selectedMood = moods[index];
+    });
+  }
+
   void _saveMood() {
     final date = widget.selectedDate ?? DateTime.now();
     final moodEntry = MoodEntry(
       date: date,
-      mood: selectedMood!.emoji,
+      mood: selectedMood.animationPath,
       note: _noteController.text.isEmpty ? null : _noteController.text,
       intensity: 3,
     );
@@ -144,7 +151,7 @@ class _MoodScreenState extends State<MoodScreen> {
           body: AnimatedContainer(
             duration: const Duration(milliseconds: 300),
             decoration: BoxDecoration(
-              gradient: _backgroundGradientForMood(selectedMood!),
+              gradient: _backgroundGradientForMood(selectedMood),
             ),
             child: SafeArea(
               child: Padding(
@@ -184,61 +191,59 @@ class _MoodScreenState extends State<MoodScreen> {
                     ),
                     const SizedBox(height: 16),
                     // Mood Card
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            child: PageView.builder(
-                              controller: _pageController,
-                              itemCount: MoodSelector.moods.length,
-                              onPageChanged: (index) {
-                                setState(() {
-                                  _currentPage = index;
-                                  selectedMood = MoodSelector.moods[index];
-                                });
-                              },
-                              itemBuilder: (context, index) {
-                                final mood = MoodSelector.moods[index];
-                                return Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      mood.emoji,
-                                      style: const TextStyle(fontSize: 96),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      mood.label,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium,
-                                    ),
-                                  ],
-                                );
-                              },
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Row(
+                    SizedBox(
+                      height: 220,
+                      child: PageView.builder(
+                        controller: _pageController,
+                        itemCount: moods.length,
+                        onPageChanged: _onPageChanged,
+                        itemBuilder: (context, index) {
+                          final mood = moods[index];
+                          print(index);
+                          return Column(
                             mainAxisAlignment: MainAxisAlignment.center,
-                            children: List.generate(
-                              MoodSelector.moods.length,
-                              (index) => Container(
-                                width: 8,
-                                height: 8,
-                                margin:
-                                    const EdgeInsets.symmetric(horizontal: 4),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: _currentPage == index
-                                      ? const Color(0xFF5F3DC4)
-                                      : Colors.grey[300],
-                                ),
+                            children: [
+                              Lottie.asset(
+                                mood.animationPath,
+                                key: ValueKey(mood.animationPath),
+                                height: 150,
+                                width: 150,
+                                fit: BoxFit.contain,
+                                frameRate: FrameRate.max,
+                                repeat: true,
+                                animate: true,
+                                errorBuilder: (context, error, stackTrace) {
+                                  print(
+                                      'Error loading Lottie animation: $error');
+                                  return Text('Error: \\${error.toString()}');
+                                },
                               ),
-                            ),
+                              const SizedBox(height: 8),
+                              Text(
+                                mood.label,
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(
+                        moods.length,
+                        (index) => Container(
+                          width: 8,
+                          height: 8,
+                          margin: const EdgeInsets.symmetric(horizontal: 4),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: _currentPage == index
+                                ? const Color(0xFF5F3DC4)
+                                : Colors.grey[300],
                           ),
-                        ],
+                        ),
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -303,3 +308,43 @@ class _MoodScreenState extends State<MoodScreen> {
     );
   }
 }
+
+class MoodOption {
+  final String animationPath;
+  final String label;
+  final Color color;
+
+  const MoodOption({
+    required this.animationPath,
+    required this.label,
+    required this.color,
+  });
+}
+
+const List<MoodOption> moods = [
+  MoodOption(
+    animationPath: 'assets/animations/happy.json',
+    label: 'Feliz',
+    color: Colors.green,
+  ),
+  MoodOption(
+    animationPath: 'assets/animations/calm.json',
+    label: 'Tranquilo',
+    color: Colors.blue,
+  ),
+  MoodOption(
+    animationPath: 'assets/animations/angry.json',
+    label: 'Neutral',
+    color: Colors.grey,
+  ),
+  MoodOption(
+    animationPath: 'assets/animations/sad.json',
+    label: 'Triste',
+    color: Colors.orange,
+  ),
+  MoodOption(
+    animationPath: 'assets/animations/angry.json',
+    label: 'Enojado',
+    color: Colors.red,
+  ),
+];
