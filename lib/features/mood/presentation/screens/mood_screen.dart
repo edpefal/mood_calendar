@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:lottie/lottie.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../data/models/mood_model.dart';
 import '../../domain/entities/mood_entry.dart';
 import '../bloc/mood_cubit.dart';
@@ -81,13 +81,13 @@ class _MoodScreenState extends State<MoodScreen>
 
   LinearGradient _backgroundGradientForMood(MoodOption mood) {
     switch (mood.label.toLowerCase()) {
-      case 'feliz':
+      case 'happy':
         return const LinearGradient(
           colors: [Color(0xFFE8F5E9), Color(0xFFC8E6C9)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         );
-      case 'tranquilo':
+      case 'calm':
         return const LinearGradient(
           colors: [Color(0xFFE3F2FD), Color(0xFFBBDEFB)],
           begin: Alignment.topLeft,
@@ -99,13 +99,13 @@ class _MoodScreenState extends State<MoodScreen>
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         );
-      case 'triste':
+      case 'sad':
         return const LinearGradient(
           colors: [Color(0xFFFFF3E0), Color(0xFFFFE0B2)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         );
-      case 'enojado':
+      case 'angry':
         return const LinearGradient(
           colors: [Color(0xFFFFEBEE), Color(0xFFFFCDD2)],
           begin: Alignment.topLeft,
@@ -154,151 +154,179 @@ class _MoodScreenState extends State<MoodScreen>
               gradient: _backgroundGradientForMood(selectedMood),
             ),
             child: SafeArea(
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    // Header
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Record Mood',
-                          style:
-                              Theme.of(context).textTheme.titleLarge?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.calendar_today,
-                              color: Color(0xFF5F3DC4)),
-                          onPressed: () {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (_) => const CalendarScreen()),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'How are you feeling today?',
-                      style: Theme.of(context).textTheme.bodyLarge,
-                    ),
-                    const SizedBox(height: 16),
-                    // Mood Card
-                    SizedBox(
-                      height: 220,
-                      child: PageView.builder(
-                        controller: _pageController,
-                        itemCount: moods.length,
-                        onPageChanged: _onPageChanged,
-                        itemBuilder: (context, index) {
-                          final mood = moods[index];
-                          print(index);
-                          return Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
+              child: SizedBox.expand(
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // Header y pregunta
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Lottie.asset(
-                                mood.animationPath,
-                                key: ValueKey(mood.animationPath),
-                                height: 150,
-                                width: 150,
-                                fit: BoxFit.contain,
-                                frameRate: FrameRate.max,
-                                repeat: true,
-                                animate: true,
-                                errorBuilder: (context, error, stackTrace) {
-                                  print(
-                                      'Error loading Lottie animation: $error');
-                                  return Text('Error: \\${error.toString()}');
+                              Text(
+                                _formatDate(
+                                    widget.selectedDate ?? DateTime.now()),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.calendar_today,
+                                    color: Color(0xFF5F3DC4)),
+                                onPressed: () {
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (_) => const CalendarScreen()),
+                                  );
                                 },
                               ),
-                              const SizedBox(height: 8),
-                              Text(
-                                mood.label,
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
                             ],
-                          );
-                        },
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(
-                        moods.length,
-                        (index) => Container(
-                          width: 8,
-                          height: 8,
-                          margin: const EdgeInsets.symmetric(horizontal: 4),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: _currentPage == index
-                                ? const Color(0xFF5F3DC4)
-                                : Colors.grey[300],
                           ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    // Note input
-                    TextField(
-                      controller: _noteController,
-                      maxLines: 3,
-                      decoration: InputDecoration(
-                        hintText: 'Write a note...',
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide.none,
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 12),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    // Save button
-                    GestureDetector(
-                      onTap: _saveMood,
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(vertical: 18),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF5F3DC4), Color(0xFF6C63FF)],
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                          ),
-                        ),
-                        child: const Center(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.check, color: Colors.white),
-                              SizedBox(width: 8),
-                              Text(
-                                'Save',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
+                          const SizedBox(height: 4),
+                          Text(
+                            'How are you feeling today?',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleLarge
+                                ?.copyWith(
                                   fontWeight: FontWeight.bold,
+                                  color: const Color(0xFF5F3DC4),
+                                ),
+                          ),
+                        ],
+                      ),
+                      // Animación y label
+                      Column(
+                        children: [
+                          SizedBox(
+                            height: 220,
+                            child: PageView.builder(
+                              controller: _pageController,
+                              itemCount: moods.length,
+                              onPageChanged: _onPageChanged,
+                              itemBuilder: (context, index) {
+                                final mood = moods[index];
+                                return Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    SvgPicture.asset(
+                                      mood.animationPath,
+                                      height: 150,
+                                      width: 150,
+                                      fit: BoxFit.contain,
+                                      placeholderBuilder: (context) =>
+                                          const CircularProgressIndicator(),
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                        print('Error loading SVG: $error');
+                                        return const Icon(
+                                          Icons.error_outline,
+                                          size: 150,
+                                          color: Colors.red,
+                                        );
+                                      },
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      mood.label,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium,
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: List.generate(
+                              moods.length,
+                              (index) => Container(
+                                width: 8,
+                                height: 8,
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 4),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: _currentPage == index
+                                      ? const Color(0xFF5F3DC4)
+                                      : Colors.grey[300],
                                 ),
                               ),
-                            ],
+                            ),
                           ),
-                        ),
+                        ],
                       ),
-                    ),
-                  ],
+                      // Nota y botón
+                      Column(
+                        children: [
+                          TextField(
+                            controller: _noteController,
+                            maxLines: 3,
+                            decoration: InputDecoration(
+                              hintText: 'Write a note...',
+                              filled: true,
+                              fillColor: Colors.white,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: BorderSide.none,
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 12),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          GestureDetector(
+                            onTap: _saveMood,
+                            child: Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(vertical: 18),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    Color(0xFF5F3DC4),
+                                    Color(0xFF6C63FF)
+                                  ],
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                ),
+                              ),
+                              child: const Center(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.check, color: Colors.white),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      'Save',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -306,6 +334,24 @@ class _MoodScreenState extends State<MoodScreen>
         );
       },
     );
+  }
+
+  String _formatDate(DateTime date) {
+    const months = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
+    ];
+    return '${months[date.month - 1]} ${date.day}, ${date.year}';
   }
 }
 
@@ -323,28 +369,28 @@ class MoodOption {
 
 const List<MoodOption> moods = [
   MoodOption(
-    animationPath: 'assets/animations/happy.json',
-    label: 'Feliz',
+    animationPath: 'assets/icon/happy.svg',
+    label: 'Happy',
     color: Colors.green,
   ),
   MoodOption(
-    animationPath: 'assets/animations/calm.json',
-    label: 'Tranquilo',
+    animationPath: 'assets/icon/calm.svg',
+    label: 'Calm',
     color: Colors.blue,
   ),
   MoodOption(
-    animationPath: 'assets/animations/angry.json',
+    animationPath: 'assets/icon/neutral.svg',
     label: 'Neutral',
     color: Colors.grey,
   ),
   MoodOption(
-    animationPath: 'assets/animations/sad.json',
-    label: 'Triste',
+    animationPath: 'assets/icon/sad.svg',
+    label: 'Sad',
     color: Colors.orange,
   ),
   MoodOption(
-    animationPath: 'assets/animations/angry.json',
-    label: 'Enojado',
+    animationPath: 'assets/icon/angry.svg',
+    label: 'Angry',
     color: Colors.red,
   ),
 ];

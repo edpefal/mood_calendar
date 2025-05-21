@@ -28,10 +28,15 @@ void main() async {
 
   runApp(
     BlocProvider(
-      create: (_) => MoodCubit(
-        saveMood: SaveMoodUseCase(repository),
-        getMoods: GetMoodsUseCase(repository),
-      ),
+      create: (context) {
+        final cubit = MoodCubit(
+          saveMood: SaveMoodUseCase(repository),
+          getMoods: GetMoodsUseCase(repository),
+        );
+        // Cargar los estados de ánimo guardados al iniciar la app
+        cubit.fetchAll();
+        return cubit;
+      },
       child: const MyApp(),
     ),
   );

@@ -14,13 +14,18 @@ class MoodCubit extends Cubit<MoodState> {
   MoodCubit({
     required this.saveMood,
     required this.getMoods,
-  }) : super(const MoodState.initial());
+  }) : super(const MoodState.initial()) {
+    // Cargar los estados de ánimo inmediatamente al crear el cubit
+    fetchAll();
+  }
 
   Future<void> save(MoodEntry entry) async {
     emit(const MoodState.loading());
     try {
       await saveMood(entry);
       emit(const MoodState.saved());
+      // Recargar los estados de ánimo después de guardar
+      await fetchAll();
     } catch (e) {
       emit(MoodState.error(e.toString()));
     }
@@ -30,8 +35,10 @@ class MoodCubit extends Cubit<MoodState> {
     emit(const MoodState.loading());
     try {
       final moods = await getMoods();
+      print('Fetched ${moods.length} moods');
       emit(MoodState.loaded(moods));
     } catch (e) {
+      print('Error fetching moods: $e');
       emit(MoodState.error(e.toString()));
     }
   }

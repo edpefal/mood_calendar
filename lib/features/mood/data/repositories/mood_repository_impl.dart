@@ -10,6 +10,11 @@ class MoodRepositoryImpl implements MoodRepository {
 
   @override
   Future<void> saveMood(MoodEntry entry) async {
+    print('Saving mood for date: ${entry.date}');
+    print('Mood path: ${entry.mood}');
+    print('Note: ${entry.note}');
+    print('Intensity: ${entry.intensity}');
+
     final model = MoodModel(
       date: entry.date,
       mood: entry.mood,
@@ -17,11 +22,19 @@ class MoodRepositoryImpl implements MoodRepository {
       intensity: entry.intensity,
     );
     await moodBox.put(model.date.toIso8601String(), model);
+    print('Mood saved successfully');
+
+    // Print all moods after saving
+    print('All moods after saving:');
+    for (var mood in moodBox.values) {
+      print('Date: ${mood.date}, Mood: ${mood.mood}');
+    }
   }
 
   @override
   Future<List<MoodEntry>> getMoods() async {
-    return moodBox.values
+    print('Getting all moods from box');
+    final moods = moodBox.values
         .map((m) => MoodEntry(
               date: m.date,
               mood: m.mood,
@@ -29,5 +42,11 @@ class MoodRepositoryImpl implements MoodRepository {
               intensity: m.intensity,
             ))
         .toList();
+    print('Found ${moods.length} moods in box');
+    print('Moods in box:');
+    for (var mood in moods) {
+      print('Date: ${mood.date}, Mood: ${mood.mood}');
+    }
+    return moods;
   }
 }
