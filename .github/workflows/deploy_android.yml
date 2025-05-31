@@ -1,0 +1,63 @@
+name: Deploy Flutter App to Google Play Store
+
+on:
+  push:
+    tags:
+      - 'v*.*.*' # Este flujo de trabajo se dispara cuando se hace un "push" de un tag con el formato vX.Y.Z (ej., v1.0.0, v1.0.1-beta)
+
+env:
+  FLUTTER_VERSION: '3.19.0' # Define la versión de Flutter a usar, ajusta según tu proyecto
+  JAVA_VERSION: '17'      # Versión de Java para Android, necesaria para Gradle
+
+jobs:
+  build_and_deploy_android:
+    name: Build and Deploy Android
+    runs-on: ubuntu-latest # Se ejecuta en un runner de Ubuntu, que es compatible con la compilación de Android
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4 # Obtiene el código de tu repositorio
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu' # Una distribución de Java compatible con Gradle
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2 # Acción para configurar el entorno Flutter
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: 'stable' # Puedes cambiar a 'beta' o 'dev' si usas esos canales
+
+      - name: Get Flutter dependencies
+        run: flutter pub get # Instala las dependencias de tu proyecto Flutter
+
+      - name: Build Android App Bundle (AAB)
+        # El App Bundle es el formato recomendado por Google Play para todas las aplicaciones nuevas
+        # y proporciona optimizaciones para el tamaño de la aplicación.
+        run: flutter build appbundle --release # Compila tu aplicación en formato AAB en modo release
+
+      - name: Upload to Google Play Store
+        # Usa la acción de la comunidad 'r0adkll/upload-google-play@v1', que es muy robusta
+        uses: r0adkll/upload-google-play@v1
+        with:
+          # ¡IMPORTANTE! Reemplaza con el **nombre de paquete (package_name)** de tu aplicación Android.
+          # Lo encuentras en el archivo `android/app/build.gradle` (como `namespace` o `applicationId`).
+          # Ejemplo: `com.tuempresa.tuapp`
+          packageName: "com.artlab.mood_calendar"
+          # Ruta al archivo AAB generado por el paso anterior
+          aabFile: build/app/outputs/bundle/release/app-release.aab
+          # El secreto de GitHub que creaste en el Paso 1, que contiene tus credenciales JSON
+          serviceAccountJson: ${{ secrets.PLAY_STORE_CREDENTIALS }}
+          # El "track" en Google Play Console al que deseas subir tu aplicación.
+          # Opciones comunes: 'production', 'internal', 'alpha', 'beta'.
+          track: 'internal'
+          # Opcional: Puedes añadir notas de la versión aquí.
+          # releaseNotes: |-
+          #   es-US: "Primera versión automatizada con GitHub Actions."
+          #   en-GB: "First automated release using GitHub Actions."
+        env:
+          # Es buena práctica referenciar los secretos aquí, aunque la acción los maneje
+          # directamente para evitar que aparezcan en los logs de forma accidental.
+          PLAY_STORE_CREDENTIALS: ${{ secrets.PLAY_STORE_CREDENTIALS }}
