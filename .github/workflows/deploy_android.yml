@@ -30,6 +30,21 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: 'stable' # Puedes cambiar a 'beta' o 'dev' si usas esos canales
 
+      # Create key.properties file
+      - name: Create key.properties
+        run: |
+          mkdir -p android
+          echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
+          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
+          echo "storeFile=upload-keystore.jks" >> android/key.properties
+          echo "storePassword=${{ secrets.STORE_PASSWORD }}" >> android/key.properties
+
+      # Decode and save keystore file
+      - name: Decode Keystore
+        run: |
+          mkdir -p android/app
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/upload-keystore.jks
+
       - name: Get Flutter dependencies
         run: flutter pub get # Instala las dependencias de tu proyecto Flutter
 
