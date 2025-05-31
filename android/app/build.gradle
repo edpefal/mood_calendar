@@ -46,11 +46,11 @@ android {
     }
 
     signingConfigs {
-        if (localPropertiesFile.exists()) {
-            release {
+        release {
+            if (localPropertiesFile.exists() && localProperties.containsKey('keyAlias')) {
                 keyAlias localProperties['keyAlias']
                 keyPassword localProperties['keyPassword']
-                storeFile file(localProperties['storeFile'])
+                storeFile localProperties['storeFile'] ? file(localProperties['storeFile']) : null
                 storePassword localProperties['storePassword']
             }
         }
@@ -58,8 +58,8 @@ android {
 
     buildTypes {
         release {
-            if (localPropertiesFile.exists()) {
-                signingConfig = signingConfigs.release
+            if (localPropertiesFile.exists() && localProperties.containsKey('keyAlias')) {
+                signingConfig signingConfigs.release
             }
         }
     }
