@@ -6,7 +6,7 @@ on:
       - 'v*.*.*' # Este flujo de trabajo se dispara cuando se hace un "push" de un tag con el formato vX.Y.Z (ej., v1.0.0, v1.0.1-beta)
 
 env:
-  FLUTTER_VERSION: '3.22.1' # Define la versión de Flutter a usar, ajusta según tu proyecto
+  FLUTTER_VERSION: '3.32.1' # Define la versión de Flutter a usar, ajusta según tu proyecto
   JAVA_VERSION: '17'      # Versión de Java para Android, necesaria para Gradle
 
 jobs:
