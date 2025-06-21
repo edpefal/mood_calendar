@@ -13,9 +13,12 @@ class CalendarScreen extends StatefulWidget {
 }
 
 class _CalendarScreenState extends State<CalendarScreen> {
+  late DateTime _focusedDay;
+
   @override
   void initState() {
     super.initState();
+    _focusedDay = DateTime.now();
     // Cargar los estados de ánimo guardados cuando se abre la pantalla
     context.read<MoodCubit>().fetchAll();
   }
@@ -26,7 +29,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
       body: SafeArea(
         child: BlocBuilder<MoodCubit, MoodState>(
           builder: (context, state) {
-            final now = DateTime.now();
+            final now = _focusedDay;
             final firstDayOfMonth = DateTime(now.year, now.month, 1);
             final lastDayOfMonth = DateTime(now.year, now.month + 1, 0);
             final daysInMonth = lastDayOfMonth.day;
@@ -51,7 +54,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
               child: Column(
                 children: [
                   const SizedBox(height: 16),
-                  _CalendarHeader(month: now.month, year: now.year),
+                  _CalendarHeader(
+                    month: now.month,
+                    year: now.year,
+                    onPreviousMonth: _onPreviousMonth,
+                    onNextMonth: _onNextMonth,
+                  ),
                   const SizedBox(height: 4),
                   _WeekDaysRow(),
                   const SizedBox(height: 4),
@@ -109,13 +117,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                   if (emoji != null)
                                     SvgPicture.asset(
                                       emoji,
-                                      height: 24,
-                                      width: 24,
+                                      height: 22,
+                                      width: 22,
                                       fit: BoxFit.contain,
                                       placeholderBuilder: (context) =>
                                           const SizedBox(
-                                        height: 24,
-                                        width: 24,
+                                        height: 22,
+                                        width: 22,
                                         child: CircularProgressIndicator(
                                           strokeWidth: 2,
                                         ),
@@ -147,6 +155,18 @@ class _CalendarScreenState extends State<CalendarScreen> {
     );
   }
 
+  void _onPreviousMonth() {
+    setState(() {
+      _focusedDay = DateTime(_focusedDay.year, _focusedDay.month - 1, 1);
+    });
+  }
+
+  void _onNextMonth() {
+    setState(() {
+      _focusedDay = DateTime(_focusedDay.year, _focusedDay.month + 1, 1);
+    });
+  }
+
   static String _dateKey(DateTime date) =>
       '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
 }
@@ -154,7 +174,15 @@ class _CalendarScreenState extends State<CalendarScreen> {
 class _CalendarHeader extends StatelessWidget {
   final int month;
   final int year;
-  const _CalendarHeader({required this.month, required this.year});
+  final VoidCallback onPreviousMonth;
+  final VoidCallback onNextMonth;
+
+  const _CalendarHeader({
+    required this.month,
+    required this.year,
+    required this.onPreviousMonth,
+    required this.onNextMonth,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -173,9 +201,22 @@ class _CalendarHeader extends StatelessWidget {
       'Noviembre',
       'Diciembre',
     ];
-    return Text(
-      '${months[month]} $year',
-      style: Theme.of(context).textTheme.titleLarge,
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        IconButton(
+          icon: const Icon(Icons.chevron_left_rounded),
+          onPressed: onPreviousMonth,
+        ),
+        Text(
+          '${months[month]} $year',
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
+        IconButton(
+          icon: const Icon(Icons.chevron_right_rounded),
+          onPressed: onNextMonth,
+        ),
+      ],
     );
   }
 }
