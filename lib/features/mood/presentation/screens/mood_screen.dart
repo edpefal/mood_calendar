@@ -132,10 +132,14 @@ class _MoodScreenState extends State<MoodScreen>
         state.maybeWhen(
           saved: () {
             context.read<MoodCubit>().fetchAll();
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (_) => const CalendarScreen()),
-            );
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context);
+            } else {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const CalendarScreen()),
+              );
+            }
           },
           error: (msg) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -182,11 +186,16 @@ class _MoodScreenState extends State<MoodScreen>
                                 icon: const Icon(Icons.calendar_today,
                                     color: Color(0xFF5F3DC4)),
                                 onPressed: () {
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (_) => const CalendarScreen()),
-                                  );
+                                  if (Navigator.canPop(context)) {
+                                    Navigator.pop(context);
+                                  } else {
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (_) =>
+                                              const CalendarScreen()),
+                                    );
+                                  }
                                 },
                               ),
                             ],
