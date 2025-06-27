@@ -6,6 +6,7 @@ import '../../domain/entities/mood_entry.dart';
 import '../bloc/mood_cubit.dart';
 import 'calendar_screen.dart';
 import 'package:hive/hive.dart';
+import 'package:mood_calendar/features/ads/ad_service.dart';
 
 class MoodScreen extends StatefulWidget {
   final DateTime? selectedDate;
@@ -22,10 +23,13 @@ class _MoodScreenState extends State<MoodScreen>
   final TextEditingController _noteController = TextEditingController();
   bool isLoading = true;
   late PageController _pageController;
+  late final AdService _adService;
 
   @override
   void initState() {
     super.initState();
+    _adService = AdService();
+    _adService.loadInterstitialAd();
     _pageController = PageController(initialPage: 0);
     _loadMoodForDate();
   }
@@ -69,14 +73,22 @@ class _MoodScreenState extends State<MoodScreen>
   }
 
   void _saveMood() {
-    final date = widget.selectedDate ?? DateTime.now();
-    final moodEntry = MoodEntry(
-      date: date,
-      mood: selectedMood.animationPath,
-      note: _noteController.text.isEmpty ? null : _noteController.text,
-      intensity: 3,
-    );
-    context.read<MoodCubit>().save(moodEntry);
+    final save = () {
+      final date = widget.selectedDate ?? DateTime.now();
+      final moodEntry = MoodEntry(
+        date: date,
+        mood: selectedMood.animationPath,
+        note: _noteController.text.isEmpty ? null : _noteController.text,
+        intensity: 3,
+      );
+      context.read<MoodCubit>().save(moodEntry);
+    };
+
+    if (_adService.shouldShowAd()) {
+      _adService.showInterstitialAd(onAdDismissed: save);
+    } else {
+      save();
+    }
   }
 
   LinearGradient _backgroundGradientForMood(MoodOption mood) {
@@ -280,22 +292,22 @@ class _MoodScreenState extends State<MoodScreen>
                       // Nota y botón
                       Column(
                         children: [
-                          TextField(
-                            controller: _noteController,
-                            maxLines: 3,
-                            decoration: InputDecoration(
-                              hintText: 'Write a note...',
-                              filled: true,
-                              fillColor: Colors.white,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide.none,
-                              ),
-                              contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: 12),
-                            ),
-                          ),
-                          const SizedBox(height: 16),
+                          // TextField(
+                          //   controller: _noteController,
+                          //   maxLines: 3,
+                          //   decoration: InputDecoration(
+                          //     hintText: 'Write a note...',
+                          //     filled: true,
+                          //     fillColor: Colors.white,
+                          //     border: OutlineInputBorder(
+                          //       borderRadius: BorderRadius.circular(16),
+                          //       borderSide: BorderSide.none,
+                          //     ),
+                          //     contentPadding: const EdgeInsets.symmetric(
+                          //         horizontal: 16, vertical: 12),
+                          //   ),
+                          // ),
+                          // const SizedBox(height: 16),
                           GestureDetector(
                             onTap: _saveMood,
                             child: Container(

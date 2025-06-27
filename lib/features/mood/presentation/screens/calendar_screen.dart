@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:mood_calendar/features/ads/ad_service.dart';
 import '../bloc/mood_cubit.dart';
 import '../../domain/entities/mood_entry.dart';
 import 'mood_screen.dart';
@@ -14,11 +16,14 @@ class CalendarScreen extends StatefulWidget {
 
 class _CalendarScreenState extends State<CalendarScreen> {
   late DateTime _focusedDay;
+  late final AdService _adService;
 
   @override
   void initState() {
     super.initState();
     _focusedDay = DateTime.now();
+    _adService = AdService();
+    _adService.loadInterstitialAd();
     // Cargar los estados de ánimo guardados cuando se abre la pantalla
     context.read<MoodCubit>().fetchAll();
   }
@@ -215,18 +220,18 @@ class _CalendarHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final months = [
       '',
-      'Enero',
-      'Febrero',
-      'Marzo',
-      'Abril',
-      'Mayo',
-      'Junio',
-      'Julio',
-      'Agosto',
-      'Septiembre',
-      'Octubre',
-      'Noviembre',
-      'Diciembre',
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
     ];
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,

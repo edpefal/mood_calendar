@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'features/mood/data/models/mood_model.dart';
@@ -12,6 +13,7 @@ import 'features/mood/presentation/screens/calendar_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await MobileAds.instance.initialize();
 
   // Inicializar Hive
   final appDocumentDir = await getApplicationDocumentsDirectory();
@@ -70,6 +72,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: const MoodScreen(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }

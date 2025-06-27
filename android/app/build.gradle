@@ -6,11 +6,17 @@ plugins {
 }
 
 def localProperties = new Properties()
-def localPropertiesFile = rootProject.file("key.properties")
+def localPropertiesFile = rootProject.file("local.properties")
 if (localPropertiesFile.exists()) {
     localPropertiesFile.withReader("UTF-8") { reader ->
         localProperties.load(reader)
     }
+}
+
+def keyProperties = new Properties()
+def keyPropertiesFile = rootProject.file('key.properties')
+if (keyPropertiesFile.exists()) {
+    keyProperties.load(new FileInputStream(keyPropertiesFile))
 }
 
 def flutterVersionCode = localProperties.getProperty("flutter.versionCode")
@@ -51,18 +57,18 @@ android {
 
     signingConfigs {
         release {
-            if (localPropertiesFile.exists() && localProperties.containsKey('keyAlias')) {
-                keyAlias localProperties['keyAlias']
-                keyPassword localProperties['keyPassword']
-                storeFile localProperties['storeFile'] ? file(localProperties['storeFile']) : null
-                storePassword localProperties['storePassword']
+            if (keyPropertiesFile.exists() && keyProperties.containsKey('keyAlias')) {
+                keyAlias keyProperties['keyAlias']
+                keyPassword keyProperties['keyPassword']
+                storeFile keyProperties['storeFile'] ? file(keyProperties['storeFile']) : null
+                storePassword keyProperties['storePassword']
             }
         }
     }
 
     buildTypes {
         release {
-            if (localPropertiesFile.exists() && localProperties.containsKey('keyAlias')) {
+            if (keyPropertiesFile.exists() && keyProperties.containsKey('keyAlias')) {
                 signingConfig signingConfigs.release
             }
         }
