@@ -7,6 +7,7 @@ import '../bloc/mood_cubit.dart';
 import 'calendar_screen.dart';
 import 'package:hive/hive.dart';
 import 'package:mood_calendar/features/ads/ad_service.dart';
+import 'package:flutter/foundation.dart';
 
 class MoodScreen extends StatefulWidget {
   final DateTime? selectedDate;
@@ -28,7 +29,9 @@ class _MoodScreenState extends State<MoodScreen>
   @override
   void initState() {
     super.initState();
+    print('MoodScreen: initState() called');
     _adService = AdService();
+    print('MoodScreen: AdService created, loading interstitial ad...');
     _adService.loadInterstitialAd();
     _pageController = PageController(initialPage: 0);
     _loadMoodForDate();
@@ -73,7 +76,10 @@ class _MoodScreenState extends State<MoodScreen>
   }
 
   void _saveMood() {
+    print('MoodScreen: _saveMood() called');
+
     final save = () {
+      print('MoodScreen: Executing save function');
       final date = widget.selectedDate ?? DateTime.now();
       final moodEntry = MoodEntry(
         date: date,
@@ -84,9 +90,12 @@ class _MoodScreenState extends State<MoodScreen>
       context.read<MoodCubit>().save(moodEntry);
     };
 
+    print('MoodScreen: Checking if should show ad...');
     if (_adService.shouldShowAd()) {
+      print('MoodScreen: Should show ad, calling showInterstitialAd');
       _adService.showInterstitialAd(onAdDismissed: save);
     } else {
+      print('MoodScreen: Should not show ad, calling save directly');
       save();
     }
   }
@@ -223,6 +232,40 @@ class _MoodScreenState extends State<MoodScreen>
                                   color: const Color(0xFF5F3DC4),
                                 ),
                           ),
+                          // Debug info
+                          if (kDebugMode)
+                            Container(
+                              margin: const EdgeInsets.only(top: 8),
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Debug Info:',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                  ),
+                                  Text(
+                                    'Ad Loaded: ${_adService.isAdLoaded}',
+                                    style:
+                                        Theme.of(context).textTheme.bodySmall,
+                                  ),
+                                  Text(
+                                    'Should Show Ad: ${_adService.shouldShowAd()}',
+                                    style:
+                                        Theme.of(context).textTheme.bodySmall,
+                                  ),
+                                ],
+                              ),
+                            ),
                         ],
                       ),
                       // Animación y label

@@ -13,7 +13,10 @@ import 'features/mood/presentation/screens/calendar_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  print('main: Initializing Google Mobile Ads...');
   await MobileAds.instance.initialize();
+  print('main: Google Mobile Ads initialized successfully');
 
   // Inicializar Hive
   final appDocumentDir = await getApplicationDocumentsDirectory();
