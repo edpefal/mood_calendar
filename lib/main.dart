@@ -1,22 +1,71 @@
+import 'dart:async';
+import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
+import 'core/notifications/local_notification_service.dart';
 import 'features/mood/data/models/mood_model.dart';
 import 'features/mood/data/repositories/mood_repository_impl.dart';
 import 'features/mood/domain/usecases/save_mood_usecase.dart';
 import 'features/mood/domain/usecases/get_moods_usecase.dart';
 import 'features/mood/presentation/bloc/mood_cubit.dart';
 import 'features/mood/presentation/screens/mood_screen.dart';
-import 'features/mood/presentation/screens/calendar_screen.dart';
+
+final navigatorKey = GlobalKey<NavigatorState>();
+bool _isHandlingReminderTap = false;
+
+Future<void> _handleReminderTap() {
+  if (_isHandlingReminderTap) {
+    return Future.value();
+  }
+  _isHandlingReminderTap = true;
+  final date = DateTime.now();
+  final targetDate = DateTime(date.year, date.month, date.day);
+  final completer = Completer<void>();
+
+  void navigate() {
+    final navigator = navigatorKey.currentState;
+    if (navigator == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => navigate());
+      return;
+    }
+    navigator.pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (_) => MoodScreen(selectedDate: targetDate),
+      ),
+      (route) => false,
+    );
+    _isHandlingReminderTap = false;
+    if (!completer.isCompleted) {
+      completer.complete();
+    }
+  }
+
+  navigate();
+  return completer.future;
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  print('main: Initializing Google Mobile Ads...');
-  await MobileAds.instance.initialize();
-  print('main: Google Mobile Ads initialized successfully');
+  developer.log('Initializing Google Mobile Ads...', name: 'Main');
+  try {
+    await MobileAds.instance.initialize();
+    developer.log(
+      'Google Mobile Ads initialized successfully',
+      name: 'Main',
+      level: 800,
+    );
+  } catch (e) {
+    developer.log(
+      'Error initializing Google Mobile Ads',
+      name: 'Main',
+      error: e,
+      level: 1000,
+    );
+  }
 
   // Inicializar Hive
   final appDocumentDir = await getApplicationDocumentsDirectory();
@@ -30,6 +79,11 @@ void main() async {
 
   final moodBox = Hive.box<MoodModel>('moods');
   final repository = MoodRepositoryImpl(moodBox);
+  final notificationService = LocalNotificationService(
+    onReminderTap: _handleReminderTap,
+  );
+  await notificationService.initialize();
+  await notificationService.scheduleDailyReminder();
 
   runApp(
     BlocProvider(
@@ -55,6 +109,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Mood Calendar',
+      navigatorKey: navigatorKey,
       theme: ThemeData(
         // This is the theme of your application.
         //
