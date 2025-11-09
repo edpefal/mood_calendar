@@ -82,7 +82,7 @@ void main() async {
   final notificationService = LocalNotificationService(
     onReminderTap: _handleReminderTap,
   );
-  await notificationService.initialize();
+  final launchedFromReminder = await notificationService.initialize();
   await notificationService.scheduleDailyReminder();
 
   runApp(
@@ -99,6 +99,12 @@ void main() async {
       child: const MyApp(),
     ),
   );
+
+  if (launchedFromReminder) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      unawaited(_handleReminderTap());
+    });
+  }
 }
 
 class MyApp extends StatelessWidget {
