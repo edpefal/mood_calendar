@@ -28,7 +28,7 @@ class LocalNotificationService {
       FlutterLocalNotificationsPlugin();
   final NotificationTapCallback _onReminderTap;
 
-  Future<void> initialize() async {
+  Future<bool> initialize() async {
     await _configureTimeZones();
     await _requestPermissions();
 
@@ -59,9 +59,7 @@ class LocalNotificationService {
 
     final launchDetails = await _plugin.getNotificationAppLaunchDetails();
     final payload = launchDetails?.notificationResponse?.payload;
-    if (payload == _dailyReminderPayload) {
-      await _onReminderTap();
-    }
+    return payload == _dailyReminderPayload;
   }
 
   Future<void> scheduleDailyReminder() async {
