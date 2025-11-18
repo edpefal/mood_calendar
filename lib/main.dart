@@ -6,6 +6,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'core/notifications/local_notification_service.dart';
+import 'features/ads/ad_service.dart';
 import 'features/mood/data/models/mood_model.dart';
 import 'features/mood/data/repositories/mood_repository_impl.dart';
 import 'features/mood/domain/usecases/save_mood_usecase.dart';
@@ -58,6 +59,7 @@ void main() async {
       name: 'Main',
       level: 800,
     );
+    AdService().loadInterstitialAd();
   } catch (e) {
     developer.log(
       'Error initializing Google Mobile Ads',
