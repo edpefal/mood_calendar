@@ -4,10 +4,17 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 
 class AdService {
+  AdService._internal();
+
+  static final AdService _instance = AdService._internal();
+
+  factory AdService() => _instance;
+
   InterstitialAd? _interstitialAd;
   int _adLoadAttempts = 0;
   final int maxFailedLoadAttempts = 3;
   bool _isAdLoaded = false;
+  bool _isLoadingAd = false;
 
   // IDs de anuncios - distinción entre desarrollo y producción
   static final String interstitialAdUnitId = _getAdUnitId();
@@ -35,6 +42,17 @@ class AdService {
   }
 
   void loadInterstitialAd() {
+    if (_isAdLoaded) {
+      print('AdService: ✅ Ad already loaded, skipping new load');
+      return;
+    }
+
+    if (_isLoadingAd) {
+      print('AdService: ⏳ Ad is currently loading, skipping duplicate call');
+      return;
+    }
+
+    _isLoadingAd = true;
     final environment = kDebugMode ? 'DESARROLLO (PRUEBA)' : 'PRODUCCIÓN';
     print('AdService: 🔄 Loading interstitial ad...');
     print('AdService: Environment: $environment');
@@ -52,6 +70,7 @@ class AdService {
           _interstitialAd = ad;
           _adLoadAttempts = 0; // Resetear intentos en carga exitosa
           _isAdLoaded = true;
+          _isLoadingAd = false;
         },
         onAdFailedToLoad: (LoadAdError error) {
           print(
@@ -62,6 +81,7 @@ class AdService {
           _adLoadAttempts++;
           _interstitialAd = null;
           _isAdLoaded = false;
+          _isLoadingAd = false;
           if (_adLoadAttempts <= maxFailedLoadAttempts) {
             print(
                 'AdService: 🔄 Retrying to load ad (attempt $_adLoadAttempts/$maxFailedLoadAttempts)');
