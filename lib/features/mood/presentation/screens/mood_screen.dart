@@ -7,7 +7,6 @@ import '../bloc/mood_cubit.dart';
 import 'calendar_screen.dart';
 import 'package:hive/hive.dart';
 import 'package:mood_calendar/features/ads/ad_service.dart';
-import 'package:flutter/foundation.dart';
 
 class MoodScreen extends StatefulWidget {
   final DateTime? selectedDate;
@@ -152,13 +151,23 @@ class _MoodScreenState extends State<MoodScreen>
       listener: (context, state) {
         state.maybeWhen(
           saved: () {
+            final savedDate = widget.selectedDate ?? DateTime.now();
+            final normalizedDate = DateTime(
+              savedDate.year,
+              savedDate.month,
+              savedDate.day,
+            );
             context.read<MoodCubit>().fetchAll();
             if (Navigator.canPop(context)) {
-              Navigator.pop(context);
+              Navigator.pop(context, normalizedDate);
             } else {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) => const CalendarScreen()),
+                MaterialPageRoute(
+                  builder: (_) => CalendarScreen(
+                    recentlySavedDate: normalizedDate,
+                  ),
+                ),
               );
             }
           },
@@ -232,40 +241,6 @@ class _MoodScreenState extends State<MoodScreen>
                                   color: const Color(0xFF5F3DC4),
                                 ),
                           ),
-                          // Debug info
-                          if (kDebugMode)
-                            Container(
-                              margin: const EdgeInsets.only(top: 8),
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Debug Info:',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodySmall
-                                        ?.copyWith(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                  ),
-                                  Text(
-                                    'Ad Loaded: ${_adService.isAdLoaded}',
-                                    style:
-                                        Theme.of(context).textTheme.bodySmall,
-                                  ),
-                                  Text(
-                                    'Should Show Ad: ${_adService.shouldShowAd()}',
-                                    style:
-                                        Theme.of(context).textTheme.bodySmall,
-                                  ),
-                                ],
-                              ),
-                            ),
                         ],
                       ),
                       // Animación y label
