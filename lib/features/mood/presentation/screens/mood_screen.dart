@@ -7,7 +7,6 @@ import '../bloc/mood_cubit.dart';
 import 'calendar_screen.dart';
 import 'package:hive/hive.dart';
 import 'package:mood_calendar/features/ads/ad_service.dart';
-import 'package:flutter/foundation.dart';
 
 class MoodScreen extends StatefulWidget {
   final DateTime? selectedDate;
@@ -152,13 +151,23 @@ class _MoodScreenState extends State<MoodScreen>
       listener: (context, state) {
         state.maybeWhen(
           saved: () {
+            final savedDate = widget.selectedDate ?? DateTime.now();
+            final normalizedDate = DateTime(
+              savedDate.year,
+              savedDate.month,
+              savedDate.day,
+            );
             context.read<MoodCubit>().fetchAll();
             if (Navigator.canPop(context)) {
-              Navigator.pop(context);
+              Navigator.pop(context, normalizedDate);
             } else {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) => const CalendarScreen()),
+                MaterialPageRoute(
+                  builder: (_) => CalendarScreen(
+                    recentlySavedDate: normalizedDate,
+                  ),
+                ),
               );
             }
           },

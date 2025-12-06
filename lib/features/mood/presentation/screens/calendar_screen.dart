@@ -1,22 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:mood_calendar/features/ads/ad_service.dart';
 import '../bloc/mood_cubit.dart';
 import '../../domain/entities/mood_entry.dart';
 import 'mood_screen.dart';
 
 class CalendarScreen extends StatefulWidget {
-  const CalendarScreen({super.key});
+  final DateTime? recentlySavedDate;
+
+  const CalendarScreen({super.key, this.recentlySavedDate});
 
   @override
   State<CalendarScreen> createState() => _CalendarScreenState();
 }
 
-class _CalendarScreenState extends State<CalendarScreen> {
+class _CalendarScreenState extends State<CalendarScreen>
+    with SingleTickerProviderStateMixin {
   late DateTime _focusedDay;
   late final AdService _adService;
+  late AnimationController _animationController;
+  DateTime? _recentlySavedDate;
 
   @override
   void initState() {
@@ -24,8 +28,39 @@ class _CalendarScreenState extends State<CalendarScreen> {
     _focusedDay = DateTime.now();
     _adService = AdService();
     _adService.loadInterstitialAd();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    );
+    _recentlySavedDate = widget.recentlySavedDate;
     // Cargar los estados de ánimo guardados cuando se abre la pantalla
     context.read<MoodCubit>().fetchAll();
+    // Iniciar animación si hay una fecha recién guardada
+    if (_recentlySavedDate != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _startAnimation();
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  void _startAnimation() {
+    if (!mounted) return;
+    _animationController.repeat(reverse: true);
+    Future.delayed(const Duration(seconds: 4), () {
+      if (mounted) {
+        _animationController.stop();
+        _animationController.reset();
+        setState(() {
+          _recentlySavedDate = null;
+        });
+      }
+    });
   }
 
   @override
@@ -94,20 +129,28 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                 date.day > today.day);
                         final key = _dateKey(date);
                         final emoji = moodMap[key];
+                        final isRecentlySaved = _recentlySavedDate != null &&
+                            _dateKey(_recentlySavedDate!) == key;
                         return GestureDetector(
                           onTap: isFutureDate
                               ? null
-                              : () {
-                                  Navigator.push(
+                              : () async {
+                                  final result = await Navigator.push<DateTime>(
                                     context,
                                     MaterialPageRoute(
                                       builder: (_) =>
                                           MoodScreen(selectedDate: date),
                                     ),
-                                  ).then((_) {
-                                    // Refresh moods after returning
-                                    context.read<MoodCubit>().fetchAll();
-                                  });
+                                  );
+                                  // Refresh moods after returning
+                                  context.read<MoodCubit>().fetchAll();
+                                  // Si se guardó un mood, animar el icono
+                                  if (result != null && mounted) {
+                                    setState(() {
+                                      _recentlySavedDate = result;
+                                    });
+                                    _startAnimation();
+                                  }
                                 },
                           child: Container(
                             decoration: BoxDecoration(
@@ -140,28 +183,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                     ),
                                   ),
                                   if (emoji != null)
-                                    SvgPicture.asset(
-                                      emoji,
-                                      height: 22,
-                                      width: 22,
-                                      fit: BoxFit.contain,
-                                      placeholderBuilder: (context) =>
-                                          const SizedBox(
-                                        height: 22,
-                                        width: 22,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                        ),
-                                      ),
-                                      errorBuilder:
-                                          (context, error, stackTrace) {
-                                        print('Error loading SVG: $error');
-                                        return const Icon(
-                                          Icons.error_outline,
-                                          size: 24,
-                                          color: Colors.red,
-                                        );
-                                      },
+                                    _AnimatedMoodIcon(
+                                      animation: _animationController,
+                                      isAnimated: isRecentlySaved,
+                                      emojiPath: emoji,
                                     ),
                                 ],
                               ),
@@ -269,6 +294,56 @@ class _WeekDaysRow extends StatelessWidget {
                 ),
               ))
           .toList(),
+    );
+  }
+}
+
+class _AnimatedMoodIcon extends StatelessWidget {
+  final Animation<double> animation;
+  final bool isAnimated;
+  final String emojiPath;
+
+  const _AnimatedMoodIcon({
+    required this.animation,
+    required this.isAnimated,
+    required this.emojiPath,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: animation,
+      builder: (context, child) {
+        final scale = isAnimated ? 1.0 + (animation.value * 0.9) : 1.0;
+        final rotation = isAnimated ? (animation.value * 0.2) : 0.0;
+
+        return Transform.scale(
+          scale: scale,
+          child: Transform.rotate(
+            angle: rotation,
+            child: SvgPicture.asset(
+              emojiPath,
+              height: 22,
+              width: 22,
+              fit: BoxFit.contain,
+              placeholderBuilder: (context) => const SizedBox(
+                height: 22,
+                width: 22,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                ),
+              ),
+              errorBuilder: (context, error, stackTrace) {
+                return const Icon(
+                  Icons.error_outline,
+                  size: 24,
+                  color: Colors.red,
+                );
+              },
+            ),
+          ),
+        );
+      },
     );
   }
 }
