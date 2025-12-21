@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../../data/models/mood_model.dart';
 import '../../domain/entities/mood_entry.dart';
 import '../bloc/mood_cubit.dart';
+import '../bloc/calendar_cubit.dart';
 import 'calendar_screen.dart';
 import 'package:hive/hive.dart';
 import 'package:mood_calendar/features/ads/ad_service.dart';
@@ -84,7 +85,7 @@ class _MoodScreenState extends State<MoodScreen>
         date: date,
         mood: selectedMood.animationPath,
         note: _noteController.text.isEmpty ? null : _noteController.text,
-        intensity: 3,
+        intensity: _currentPage + 1,
       );
       context.read<MoodCubit>().save(moodEntry);
     };
@@ -158,6 +159,9 @@ class _MoodScreenState extends State<MoodScreen>
               savedDate.day,
             );
             context.read<MoodCubit>().fetchAll();
+            if (context.mounted) {
+              context.read<CalendarCubit>().refreshForDate(normalizedDate);
+            }
             if (Navigator.canPop(context)) {
               Navigator.pop(context, normalizedDate);
             } else {

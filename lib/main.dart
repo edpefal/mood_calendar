@@ -9,8 +9,11 @@ import 'core/notifications/local_notification_service.dart';
 import 'features/ads/ad_service.dart';
 import 'features/mood/data/models/mood_model.dart';
 import 'features/mood/data/repositories/mood_repository_impl.dart';
+import 'features/mood/domain/usecases/get_moods_for_month_usecase.dart';
+import 'features/mood/domain/usecases/get_monthly_mood_summary_usecase.dart';
 import 'features/mood/domain/usecases/save_mood_usecase.dart';
 import 'features/mood/domain/usecases/get_moods_usecase.dart';
+import 'features/mood/presentation/bloc/calendar_cubit.dart';
 import 'features/mood/presentation/bloc/mood_cubit.dart';
 import 'features/mood/presentation/screens/mood_screen.dart';
 
@@ -88,16 +91,27 @@ void main() async {
   await notificationService.scheduleDailyReminder();
 
   runApp(
-    BlocProvider(
-      create: (context) {
-        final cubit = MoodCubit(
-          saveMood: SaveMoodUseCase(repository),
-          getMoods: GetMoodsUseCase(repository),
-        );
-        // Cargar los estados de ánimo guardados al iniciar la app
-        cubit.fetchAll();
-        return cubit;
-      },
+    MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) {
+            final cubit = MoodCubit(
+              saveMood: SaveMoodUseCase(repository),
+              getMoods: GetMoodsUseCase(repository),
+            );
+            cubit.fetchAll();
+            return cubit;
+          },
+        ),
+        BlocProvider(
+          create: (context) => CalendarCubit(
+            initialMonth: DateTime.now(),
+            getMonthlyMoodSummary: GetMonthlyMoodSummaryUseCase(
+              GetMoodsForMonthUseCase(repository),
+            ),
+          ),
+        ),
+      ],
       child: const MyApp(),
     ),
   );

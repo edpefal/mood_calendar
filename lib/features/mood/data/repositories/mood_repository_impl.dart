@@ -1,7 +1,8 @@
+import 'package:hive/hive.dart';
+
 import '../../domain/entities/mood_entry.dart';
 import '../../domain/repositories/mood_repository.dart';
 import '../models/mood_model.dart';
-import 'package:hive/hive.dart';
 
 class MoodRepositoryImpl implements MoodRepository {
   final Box<MoodModel> moodBox;
@@ -34,19 +35,33 @@ class MoodRepositoryImpl implements MoodRepository {
   @override
   Future<List<MoodEntry>> getMoods() async {
     print('Getting all moods from box');
-    final moods = moodBox.values
-        .map((m) => MoodEntry(
-              date: m.date,
-              mood: m.mood,
-              note: m.note,
-              intensity: m.intensity,
-            ))
-        .toList();
+    final moods = moodBox.values.map(_mapModelToEntity).toList();
     print('Found ${moods.length} moods in box');
     print('Moods in box:');
     for (var mood in moods) {
       print('Date: ${mood.date}, Mood: ${mood.mood}');
     }
     return moods;
+  }
+
+  @override
+  Future<List<MoodEntry>> getMoodsForMonth(DateTime month) async {
+    final normalized = DateTime(month.year, month.month);
+    final moods = moodBox.values
+        .where((mood) =>
+            mood.date.year == normalized.year &&
+            mood.date.month == normalized.month)
+        .map(_mapModelToEntity)
+        .toList();
+    return moods;
+  }
+
+  MoodEntry _mapModelToEntity(MoodModel model) {
+    return MoodEntry(
+      date: model.date,
+      mood: model.mood,
+      note: model.note,
+      intensity: model.intensity,
+    );
   }
 }

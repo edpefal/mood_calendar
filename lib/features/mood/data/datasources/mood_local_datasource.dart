@@ -3,6 +3,7 @@ import '../models/mood_model.dart';
 
 abstract class MoodLocalDataSource {
   Future<List<MoodModel>> getMoods();
+  Future<List<MoodModel>> getMoodsForMonth(DateTime month);
   Future<void> saveMood(MoodModel mood);
   Future<void> updateMood(MoodModel mood);
   Future<void> deleteMood(DateTime date);
@@ -17,6 +18,16 @@ class MoodLocalDataSourceImpl implements MoodLocalDataSource {
   @override
   Future<List<MoodModel>> getMoods() async {
     return moodBox.values.toList();
+  }
+
+  @override
+  Future<List<MoodModel>> getMoodsForMonth(DateTime month) async {
+    final normalized = DateTime(month.year, month.month);
+    return moodBox.values
+        .where((mood) =>
+            mood.date.year == normalized.year &&
+            mood.date.month == normalized.month)
+        .toList();
   }
 
   @override
