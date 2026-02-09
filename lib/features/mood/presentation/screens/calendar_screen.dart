@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mood_calendar/features/ads/ad_service.dart';
-import '../bloc/mood_cubit.dart';
-import '../../domain/entities/mood_entry.dart';
+
+import '../bloc/calendar_cubit.dart';
 import 'mood_screen.dart';
+import '../widgets/monthly_mood_summary_card.dart';
 
 class CalendarScreen extends StatefulWidget {
   final DateTime? recentlySavedDate;
@@ -33,8 +34,6 @@ class _CalendarScreenState extends State<CalendarScreen>
       duration: const Duration(milliseconds: 1200),
     );
     _recentlySavedDate = widget.recentlySavedDate;
-    // Cargar los estados de ánimo guardados cuando se abre la pantalla
-    context.read<MoodCubit>().fetchAll();
     // Iniciar animación si hay una fecha recién guardada
     if (_recentlySavedDate != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -67,7 +66,7 @@ class _CalendarScreenState extends State<CalendarScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: BlocBuilder<MoodCubit, MoodState>(
+        child: BlocBuilder<CalendarCubit, CalendarState>(
           builder: (context, state) {
             final now = _focusedDay;
             final today = DateTime.now();
@@ -78,41 +77,43 @@ class _CalendarScreenState extends State<CalendarScreen>
             final daysInMonth = lastDayOfMonth.day;
             final firstWeekday = firstDayOfMonth.weekday;
 
-            // Get moods for the current month
-            List<MoodEntry> moods = [];
-            state.maybeWhen(
-              loaded: (list) => moods = list,
-              orElse: () {},
-            );
-
-            // Map date string (yyyy-MM-dd) to mood emoji
+            final entries = state.summary?.entries ?? [];
             final moodMap = <String, String>{};
-            for (final mood in moods) {
+            for (final mood in entries) {
               final key = _dateKey(mood.date);
               moodMap[key] = mood.mood;
             }
 
             return Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-              child: Column(
-                children: [
-                  const SizedBox(height: 16),
-                  _CalendarHeader(
-                    month: now.month,
-                    year: now.year,
-                    onPreviousMonth: _onPreviousMonth,
-                    onNextMonth: canGoNext ? _onNextMonth : null,
-                  ),
-                  const SizedBox(height: 4),
-                  _WeekDaysRow(),
-                  const SizedBox(height: 4),
-                  Expanded(
-                    child: GridView.builder(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(height: 16),
+                    _CalendarHeader(
+                      month: now.month,
+                      year: now.year,
+                      onPreviousMonth: _onPreviousMonth,
+                      onNextMonth: canGoNext ? _onNextMonth : null,
+                    ),
+                    if (state.isLoading)
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 8),
+                        child: LinearProgressIndicator(minHeight: 3),
+                      ),
+                    const SizedBox(height: 4),
+                    _WeekDaysRow(),
+                    const SizedBox(height: 4),
+                    GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 7,
                         mainAxisSpacing: 8,
                         crossAxisSpacing: 8,
+                        childAspectRatio: 1,
                       ),
                       itemCount: daysInMonth + (firstWeekday - 1),
                       itemBuilder: (context, index) {
@@ -143,7 +144,9 @@ class _CalendarScreenState extends State<CalendarScreen>
                                     ),
                                   );
                                   // Refresh moods after returning
-                                  context.read<MoodCubit>().fetchAll();
+                                  await context
+                                      .read<CalendarCubit>()
+                                      .refreshForDate(result ?? date);
                                   // Si se guardó un mood, animar el icono
                                   if (result != null && mounted) {
                                     setState(() {
@@ -195,8 +198,10 @@ class _CalendarScreenState extends State<CalendarScreen>
                         );
                       },
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 28),
+                    MonthlyMoodSummaryCard(summary: state.summary),
+                  ],
+                ),
               ),
             );
           },
@@ -209,6 +214,7 @@ class _CalendarScreenState extends State<CalendarScreen>
     setState(() {
       _focusedDay = DateTime(_focusedDay.year, _focusedDay.month - 1, 1);
     });
+    context.read<CalendarCubit>().loadMonth(_focusedDay);
   }
 
   void _onNextMonth() {
@@ -222,6 +228,7 @@ class _CalendarScreenState extends State<CalendarScreen>
     setState(() {
       _focusedDay = nextMonth;
     });
+    context.read<CalendarCubit>().loadMonth(_focusedDay);
   }
 
   static String _dateKey(DateTime date) =>
