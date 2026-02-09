@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'core/notifications/local_notification_service.dart';
 import 'features/ads/ad_service.dart';
@@ -83,7 +84,12 @@ void main() async {
   await Hive.openBox<MoodModel>('moods');
 
   final moodBox = Hive.box<MoodModel>('moods');
-  final repository = MoodRepositoryImpl(moodBox);
+  final packageInfo = await PackageInfo.fromPlatform();
+  final appVersion = '${packageInfo.version}+${packageInfo.buildNumber}';
+  final repository = MoodRepositoryImpl(
+    moodBox,
+    getAppVersion: () => appVersion,
+  );
   final notificationService = LocalNotificationService(
     onReminderTap: _handleReminderTap,
   );

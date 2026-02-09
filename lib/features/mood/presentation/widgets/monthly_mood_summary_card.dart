@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../domain/entities/monthly_mood_summary.dart';
 
@@ -12,14 +13,18 @@ class MonthlyMoodSummaryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final summaryData = summary;
     if (summaryData == null || summaryData.entries.isEmpty) {
-      return _EmptyState(message: 'Aún no hay registros este mes. Empieza hoy ■');
+      return _EmptyState(
+          message: 'No entries this month yet. Start today ■');
     }
 
+    // Invert Y so happy (1) draws at top, sad (5) at bottom; fl_chart
+    // hides left titles when minY > maxY, so we keep minY < maxY and
+    // transform data instead.
     final spots = summaryData.entries
         .map(
           (entry) => FlSpot(
             entry.date.day.toDouble(),
-            entry.intensity.toDouble(),
+            (6 - entry.intensity).toDouble(),
           ),
         )
         .toList();
@@ -35,7 +40,7 @@ class MonthlyMoodSummaryCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Resumen de ${_monthName(summaryData.month.month)}',
+              '${_monthName(summaryData.month.month)} Summary',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -54,15 +59,34 @@ class MonthlyMoodSummaryCard extends StatelessWidget {
                     leftTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
-                        reservedSize: 32,
+                        reservedSize: 40,
+                        interval: 1,
                         getTitlesWidget: (value, meta) {
-                          const emojis = ['😞', '🙁', '😐', '🙂', '😄'];
-                          if (value % 1 != 0 || value < 1 || value > 5) {
+                          const moodPaths = [
+                            'assets/icon/happy.svg',
+                            'assets/icon/calm.svg',
+                            'assets/icon/neutral.svg',
+                            'assets/icon/sad.svg',
+                            'assets/icon/angry.svg',
+                          ];
+                          final y = value.round();
+                          if (y < 1 || y > 5) {
                             return const SizedBox.shrink();
                           }
-                          return Text(
-                            emojis[value.toInt() - 1],
-                            style: const TextStyle(fontSize: 12),
+                          // Y 5 = top = happy, Y 1 = bottom = angry
+                          final path = moodPaths[5 - y];
+                          return SvgPicture.asset(
+                            path,
+                            height: 22,
+                            width: 22,
+                            fit: BoxFit.contain,
+                            placeholderBuilder: (context) => const SizedBox(
+                              height: 22,
+                              width: 22,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                            errorBuilder: (context, error, stackTrace) =>
+                                const Icon(Icons.mood, size: 22),
                           );
                         },
                       ),
@@ -80,8 +104,10 @@ class MonthlyMoodSummaryCard extends StatelessWidget {
                         },
                       ),
                     ),
-                    rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    rightTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false)),
+                    topTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false)),
                   ),
                   lineTouchData: LineTouchData(enabled: true),
                   borderData: FlBorderData(show: false),
@@ -96,7 +122,7 @@ class MonthlyMoodSummaryCard extends StatelessWidget {
                         getDotPainter: (spot, percent, barData, index) {
                           final isLast = lastEntry != null &&
                               spot.x == lastEntry.date.day.toDouble() &&
-                              spot.y == lastEntry.intensity.toDouble();
+                              spot.y == (6 - lastEntry.intensity).toDouble();
                           return FlDotCirclePainter(
                             radius: isLast ? 5 : 3,
                             color: isLast ? Colors.deepPurple : Colors.white,
@@ -112,15 +138,24 @@ class MonthlyMoodSummaryCard extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             _SummaryRow(
-              label: 'Promedio del mes',
-              value:
-                  '${_emojiForScore(summaryData.averageScore)} ${summaryData.averageScore.toStringAsFixed(1)}',
+              label: 'Monthly average',
+              value: SvgPicture.asset(
+                _moodPathForScore(summaryData.averageScore),
+                height: 22,
+                width: 22,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) =>
+                    const Icon(Icons.mood, size: 22),
+              ),
             ),
             const SizedBox(height: 8),
             _SummaryRow(
-              label: 'Mejor racha',
-              value:
-                  '${summaryData.bestStreak} día${summaryData.bestStreak == 1 ? '' : 's'} seguidos registrando tu ánimo',
+              label: 'Best streak',
+              value: Text(
+                '${summaryData.bestStreak} day${summaryData.bestStreak == 1 ? '' : 's'} in a row recording your mood',
+                style: Theme.of(context).textTheme.bodyMedium,
+                textAlign: TextAlign.right,
+              ),
             ),
           ],
         ),
@@ -131,18 +166,18 @@ class MonthlyMoodSummaryCard extends StatelessWidget {
   String _monthName(int month) {
     const months = [
       '',
-      'Enero',
-      'Febrero',
-      'Marzo',
-      'Abril',
-      'Mayo',
-      'Junio',
-      'Julio',
-      'Agosto',
-      'Septiembre',
-      'Octubre',
-      'Noviembre',
-      'Diciembre'
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
     ];
     return months[month];
   }
@@ -154,18 +189,18 @@ class MonthlyMoodSummaryCard extends StatelessWidget {
     return beginningNextMonth.subtract(const Duration(days: 1)).day;
   }
 
-  String _emojiForScore(double score) {
-    if (score >= 4.5) return '😄';
-    if (score >= 3.5) return '🙂';
-    if (score >= 2.5) return '😐';
-    if (score >= 1.5) return '🙁';
-    return '😞';
+  String _moodPathForScore(double score) {
+    if (score <= 1.5) return 'assets/icon/happy.svg';
+    if (score <= 2.5) return 'assets/icon/calm.svg';
+    if (score <= 3.5) return 'assets/icon/neutral.svg';
+    if (score <= 4.5) return 'assets/icon/sad.svg';
+    return 'assets/icon/angry.svg';
   }
 }
 
 class _SummaryRow extends StatelessWidget {
   final String label;
-  final String value;
+  final Widget value;
 
   const _SummaryRow({required this.label, required this.value});
 
@@ -182,11 +217,7 @@ class _SummaryRow extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 8),
-        Text(
-          value,
-          style: Theme.of(context).textTheme.bodyMedium,
-          textAlign: TextAlign.right,
-        ),
+        value,
       ],
     );
   }

@@ -13,7 +13,7 @@ class GetMonthlyMoodSummaryUseCase {
     final sortedEntries = [...entries]..sort((a, b) => a.date.compareTo(b.date));
 
     final averageScore = sortedEntries.isEmpty
-        ? 0
+        ? 0.0
         : sortedEntries
                 .map((e) => e.intensity)
                 .fold<int>(0, (sum, value) => sum + value) /

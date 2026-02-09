@@ -86,30 +86,34 @@ class _CalendarScreenState extends State<CalendarScreen>
 
             return Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-              child: Column(
-                children: [
-                  const SizedBox(height: 16),
-                  _CalendarHeader(
-                    month: now.month,
-                    year: now.year,
-                    onPreviousMonth: _onPreviousMonth,
-                    onNextMonth: canGoNext ? _onNextMonth : null,
-                  ),
-                  if (state.isLoading)
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 8),
-                      child: LinearProgressIndicator(minHeight: 3),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(height: 16),
+                    _CalendarHeader(
+                      month: now.month,
+                      year: now.year,
+                      onPreviousMonth: _onPreviousMonth,
+                      onNextMonth: canGoNext ? _onNextMonth : null,
                     ),
-                  const SizedBox(height: 4),
-                  _WeekDaysRow(),
-                  const SizedBox(height: 4),
-                  Expanded(
-                    child: GridView.builder(
+                    if (state.isLoading)
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 8),
+                        child: LinearProgressIndicator(minHeight: 3),
+                      ),
+                    const SizedBox(height: 4),
+                    _WeekDaysRow(),
+                    const SizedBox(height: 4),
+                    GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 7,
                         mainAxisSpacing: 8,
                         crossAxisSpacing: 8,
+                        childAspectRatio: 1,
                       ),
                       itemCount: daysInMonth + (firstWeekday - 1),
                       itemBuilder: (context, index) {
@@ -194,10 +198,10 @@ class _CalendarScreenState extends State<CalendarScreen>
                         );
                       },
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  MonthlyMoodSummaryCard(summary: state.summary),
-                ],
+                    const SizedBox(height: 28),
+                    MonthlyMoodSummaryCard(summary: state.summary),
+                  ],
+                ),
               ),
             );
           },
