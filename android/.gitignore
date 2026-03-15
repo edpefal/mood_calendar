@@ -1,13 +1,22 @@
+# Gradle (el .jar se descarga al ejecutar; gradlew/gradlew.bat sí se versionan)
 gradle-wrapper.jar
 /.gradle
-/captures/
-/gradlew
-/gradlew.bat
-/local.properties
-GeneratedPluginRegistrant.java
+/build
 
-# Remember to never publicly share your keystore.
-# See https://flutter.dev/docs/deployment/android#reference-the-keystore-from-the-app
+# Local config (paths, SDK location)
+/local.properties
+
+# Captures (screenshots, etc.)
+/captures/
+
+# Generados por Flutter
+**/GeneratedPluginRegistrant.java
+
+# NDK / C++
+**/.cxx/
+
+# Keystores y secrets (nunca versionar)
+# Ver https://flutter.dev/docs/deployment/android#reference-the-keystore-from-the-app
 key.properties
 **/*.keystore
 **/*.jks
