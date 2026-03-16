@@ -32,6 +32,46 @@ class _MonthlyMoodSummaryCardState extends State<MonthlyMoodSummaryCard> {
       return _EmptyState(message: 'No entries this month yet. Start today ■');
     }
 
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildChartCard(context, summaryData),
+        const SizedBox(height: 16),
+        _StatCard(
+          title: 'Monthly average',
+          child: Row(
+            children: [
+              SvgPicture.asset(
+                _moodPathForScore(summaryData.averageScore),
+                height: 32,
+                width: 32,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) =>
+                    const Icon(Icons.mood, size: 32),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'Mood that best represents ${_monthName(summaryData.month.month)}',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        _StatCard(
+          title: 'Best streak',
+          child: Text(
+            '${summaryData.bestStreak} day${summaryData.bestStreak == 1 ? '' : 's'} in a row recording your mood',
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildChartCard(BuildContext context, MonthlyMoodSummary summaryData) {
     // Invert Y so happy (1) draws at top, sad (5) at bottom; fl_chart
     // hides left titles when minY > maxY, so we keep minY < maxY and
     // transform data instead.
@@ -43,7 +83,6 @@ class _MonthlyMoodSummaryCardState extends State<MonthlyMoodSummaryCard> {
           ),
         )
         .toList();
-
     final lastEntry = summaryData.lastEntry;
 
     return Card(
@@ -180,27 +219,6 @@ class _MonthlyMoodSummaryCardState extends State<MonthlyMoodSummaryCard> {
                 ],
               ),
             ),
-            const SizedBox(height: 16),
-            _SummaryRow(
-              label: 'Monthly average',
-              value: SvgPicture.asset(
-                _moodPathForScore(summaryData.averageScore),
-                height: 22,
-                width: 22,
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) =>
-                    const Icon(Icons.mood, size: 22),
-              ),
-            ),
-            const SizedBox(height: 8),
-            _SummaryRow(
-              label: 'Best streak',
-              value: Text(
-                '${summaryData.bestStreak} day${summaryData.bestStreak == 1 ? '' : 's'} in a row recording your mood',
-                style: Theme.of(context).textTheme.bodyMedium,
-                textAlign: TextAlign.right,
-              ),
-            ),
           ],
         ),
       ),
@@ -278,27 +296,33 @@ class _MoodTooltipOverlay extends StatelessWidget {
   }
 }
 
-class _SummaryRow extends StatelessWidget {
-  final String label;
-  final Widget value;
+class _StatCard extends StatelessWidget {
+  final String title;
+  final Widget child;
 
-  const _SummaryRow({required this.label, required this.value});
+  const _StatCard({required this.title, required this.child});
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: Text(
-            label,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-          ),
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+            const SizedBox(height: 8),
+            child,
+          ],
         ),
-        const SizedBox(width: 8),
-        value,
-      ],
+      ),
     );
   }
 }
