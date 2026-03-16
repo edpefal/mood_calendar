@@ -269,15 +269,26 @@ class _CalendarHeader extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         IconButton(
-          icon: const Icon(Icons.chevron_left_rounded),
+          iconSize: 36,
+          icon: const Icon(
+            Icons.chevron_left_rounded,
+            color: Color(0xFF5F3DC4),
+          ),
           onPressed: onPreviousMonth,
         ),
         Text(
           '${months[month]} $year',
-          style: Theme.of(context).textTheme.titleLarge,
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              color: const Color(0xFF5F3DC4), fontWeight: FontWeight.w700),
         ),
         IconButton(
-          icon: const Icon(Icons.chevron_right_rounded),
+          iconSize: 36,
+          icon: Icon(
+            Icons.chevron_right_rounded,
+            color: onNextMonth == null
+                ? Colors.grey[400]
+                : const Color(0xFF5F3DC4),
+          ),
           onPressed: onNextMonth,
         ),
       ],
