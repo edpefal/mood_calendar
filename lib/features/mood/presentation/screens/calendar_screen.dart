@@ -130,6 +130,8 @@ class _CalendarScreenState extends State<CalendarScreen>
                                 date.day > today.day);
                         final key = _dateKey(date);
                         final emoji = moodMap[key];
+                        final moodColor =
+                            emoji != null ? _colorForMoodPath(emoji) : null;
                         final isRecentlySaved = _recentlySavedDate != null &&
                             _dateKey(_recentlySavedDate!) == key;
                         return GestureDetector(
@@ -159,16 +161,13 @@ class _CalendarScreenState extends State<CalendarScreen>
                             decoration: BoxDecoration(
                               color: isFutureDate
                                   ? Colors.grey[100]
-                                  : emoji != null
-                                      ? Colors.blue[50]
-                                      : Colors.grey[200],
+                                  : moodColor?.withOpacity(0.15) ??
+                                      Colors.grey[200],
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
                                 color: isFutureDate
                                     ? Colors.grey[200]!
-                                    : emoji != null
-                                        ? Colors.blue
-                                        : Colors.grey[300]!,
+                                    : moodColor ?? Colors.grey[300]!,
                               ),
                             ),
                             child: Center(
@@ -182,7 +181,7 @@ class _CalendarScreenState extends State<CalendarScreen>
                                       fontWeight: FontWeight.bold,
                                       color: isFutureDate
                                           ? Colors.grey[400]
-                                          : null,
+                                          : moodColor ?? null,
                                     ),
                                   ),
                                   if (emoji != null)
@@ -233,6 +232,23 @@ class _CalendarScreenState extends State<CalendarScreen>
 
   static String _dateKey(DateTime date) =>
       '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+
+  Color? _colorForMoodPath(String path) {
+    switch (path) {
+      case 'assets/icon/happy.svg':
+        return Colors.green;
+      case 'assets/icon/calm.svg':
+        return Colors.blue;
+      case 'assets/icon/neutral.svg':
+        return Colors.grey;
+      case 'assets/icon/sad.svg':
+        return Colors.orange;
+      case 'assets/icon/angry.svg':
+        return Colors.red;
+      default:
+        return Colors.blue;
+    }
+  }
 }
 
 class _CalendarHeader extends StatelessWidget {
