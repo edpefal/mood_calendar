@@ -93,34 +93,55 @@ class _MonthlyMoodSummaryCardState extends State<MonthlyMoodSummaryCard> {
 
     return Card(
       elevation: 2,
+      clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '${_monthName(summaryData.month.month)} Summary',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              height: 200,
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  LineChart(
-                    LineChartData(
-                      minX: 1,
-                      maxX: _daysInMonth(summaryData.month).toDouble(),
-                      minY: 1,
-                      maxY: 5,
-                      gridData: FlGridData(show: true, horizontalInterval: 1),
-                      titlesData: FlTitlesData(
-                        leftTitles: AxisTitles(
-                          sideTitles: SideTitles(
+      child: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Color(0xFF5F3DC4),
+              Color(0xFF6C63FF),
+            ],
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '${_monthName(summaryData.month.month)} Summary',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                height: 200,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    LineChart(
+                      LineChartData(
+                        minX: 1,
+                        maxX: _daysInMonth(summaryData.month).toDouble(),
+                        minY: 1,
+                        maxY: 5,
+                        gridData: FlGridData(
+                          show: true,
+                          horizontalInterval: 1,
+                          getDrawingHorizontalLine: (value) => FlLine(
+                            color: Colors.white24,
+                            strokeWidth: 1,
+                          ),
+                          drawVerticalLine: false,
+                        ),
+                        titlesData: FlTitlesData(
+                          leftTitles: AxisTitles(
+                            sideTitles: SideTitles(
                             showTitles: true,
                             reservedSize: 40,
                             interval: 1,
@@ -158,7 +179,10 @@ class _MonthlyMoodSummaryCardState extends State<MonthlyMoodSummaryCard> {
                               }
                               return Text(
                                 value.toInt().toString(),
-                                style: const TextStyle(fontSize: 12),
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.white,
+                                ),
                               );
                             },
                           ),
@@ -193,7 +217,7 @@ class _MonthlyMoodSummaryCardState extends State<MonthlyMoodSummaryCard> {
                         LineChartBarData(
                           spots: spots,
                           isCurved: true,
-                          color: Colors.deepPurple,
+                          color: Colors.white,
                           barWidth: 3,
                           dotData: FlDotData(
                             show: true,
@@ -204,9 +228,9 @@ class _MonthlyMoodSummaryCardState extends State<MonthlyMoodSummaryCard> {
                                       (6 - lastEntry.intensity).toDouble();
                               return FlDotCirclePainter(
                                 radius: isLast ? 5 : 3,
-                                color:
-                                    isLast ? Colors.deepPurple : Colors.white,
-                                strokeColor: Colors.deepPurple,
+                                color: Colors.white,
+                                strokeColor:
+                                    isLast ? Colors.white : Colors.white70,
                                 strokeWidth: isLast ? 3 : 1.5,
                               );
                             },
@@ -215,17 +239,18 @@ class _MonthlyMoodSummaryCardState extends State<MonthlyMoodSummaryCard> {
                       ],
                     ),
                   ),
-                  if (_tooltipLocalOffset != null &&
-                      _tooltipIntensity != null) ...[
-                    _MoodTooltipOverlay(
-                      localOffset: _tooltipLocalOffset!,
-                      moodPath: _moodPaths[_tooltipIntensity! - 1],
-                    ),
+                    if (_tooltipLocalOffset != null &&
+                        _tooltipIntensity != null) ...[
+                      _MoodTooltipOverlay(
+                        localOffset: _tooltipLocalOffset!,
+                        moodPath: _moodPaths[_tooltipIntensity! - 1],
+                      ),
+                    ],
                   ],
-                ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
