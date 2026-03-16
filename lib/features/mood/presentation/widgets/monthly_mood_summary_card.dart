@@ -39,6 +39,7 @@ class _MonthlyMoodSummaryCardState extends State<MonthlyMoodSummaryCard> {
         const SizedBox(height: 16),
         _StatCard(
           title: 'Monthly average',
+          highlight: true,
           child: Row(
             children: [
               SvgPicture.asset(
@@ -53,7 +54,9 @@ class _MonthlyMoodSummaryCardState extends State<MonthlyMoodSummaryCard> {
               Expanded(
                 child: Text(
                   'Mood that best represents ${_monthName(summaryData.month.month)}',
-                  style: Theme.of(context).textTheme.bodyMedium,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Colors.white,
+                      ),
                 ),
               ),
             ],
@@ -62,9 +65,12 @@ class _MonthlyMoodSummaryCardState extends State<MonthlyMoodSummaryCard> {
         const SizedBox(height: 16),
         _StatCard(
           title: 'Best streak',
+          highlight: true,
           child: Text(
             '${summaryData.bestStreak} day${summaryData.bestStreak == 1 ? '' : 's'} in a row recording your mood',
-            style: Theme.of(context).textTheme.bodyMedium,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Colors.white,
+                ),
           ),
         ),
       ],
@@ -299,28 +305,50 @@ class _MoodTooltipOverlay extends StatelessWidget {
 class _StatCard extends StatelessWidget {
   final String title;
   final Widget child;
+  final bool highlight;
 
-  const _StatCard({required this.title, required this.child});
+  const _StatCard({
+    required this.title,
+    required this.child,
+    this.highlight = false,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final borderRadius = BorderRadius.circular(16);
+    final titleStyle = Theme.of(context).textTheme.titleSmall?.copyWith(
+          fontWeight: FontWeight.bold,
+          color: highlight ? Colors.white : null,
+        );
+
     return Card(
       elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
-            const SizedBox(height: 8),
-            child,
-          ],
+      clipBehavior: Clip.antiAlias,
+      color: highlight ? Colors.transparent : null,
+      shape: RoundedRectangleBorder(borderRadius: borderRadius),
+      child: Container(
+        decoration: highlight
+            ? const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Color(0xFF5F3DC4),
+                    Color(0xFF6C63FF),
+                  ],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
+              )
+            : null,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: titleStyle),
+              const SizedBox(height: 8),
+              child,
+            ],
+          ),
         ),
       ),
     );
