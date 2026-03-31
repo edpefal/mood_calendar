@@ -15,7 +15,7 @@ Mood Calendar es una aplicación Flutter para registrar y visualizar el estado d
 - Arquitectura limpia: separación en data, domain y presentation.
 - Gestión de estado con Bloc/Cubit y Freezed.
 - Recordatorios diarios a las 6:00 pm mediante notificaciones locales (Android/iOS) auto-reprogramadas.
-- Monetización opcional con anuncios intersticiales controlados por AdMob que se disparan al guardar un mood.
+- Guardado directo del mood sin anuncios ni interrupciones.
 
 ## Estructura del proyecto
 
@@ -24,7 +24,6 @@ lib/
   core/
     notifications/     # Servicio para recordatorios locales
   features/
-    ads/               # Servicio de anuncios intersticiales (AdMob)
     mood/
       data/            # Modelos Hive, repositorios concretos
       domain/          # Entidades, repositorios abstractos, casos de uso
@@ -32,7 +31,7 @@ lib/
   main.dart
 ```
 
-`main.dart` inicializa Hive, registra el `MoodModel`, crea los cubits (`MoodCubit`, `CalendarCubit`), arma el servicio de notificaciones (`LocalNotificationService`) y precarga el `AdService` antes de renderizar la UI.
+`main.dart` inicializa Hive, registra el `MoodModel`, crea los cubits (`MoodCubit`, `CalendarCubit`) y arma el servicio de notificaciones (`LocalNotificationService`) antes de renderizar la UI.
 
 ## Resumen mensual (gráfica)
 
@@ -43,14 +42,6 @@ El card **"[Month] Summary"** (p. ej. "January Summary") aparece debajo del cale
 - **Best streak:** texto tipo "X day(s) in a row recording your mood".
 - **Datos legacy:** los registros guardados antes de guardar intensidad real tenían `intensity: 3`. Se deriva la intensidad desde el campo `mood` (ruta del ícono) para que la gráfica y el promedio se vean correctos.
 
-## Publicidad (AdMob)
-
-- `lib/features/ads/ad_service.dart` centraliza el uso de `google_mobile_ads` mediante un singleton que carga y muestra un interstitial reutilizable.
-- En modo `kDebugMode` se cargan los IDs de prueba de Google; en *release* se usa `ca-app-pub-6292269650358396/4481436641`. Cambia ese valor y vuelve a compilar si publicarás con tus propios IDs.
-- El `AdService` se inicializa en `main.dart`, precarga un anuncio y vuelve a intentarlo hasta 3 veces. Desde la UI (`MoodScreen` y `CalendarScreen`) solo se pregunta a `shouldShowAd()`: en producción la probabilidad es 50 % cada vez que el usuario guarda un mood, mientras que en debug se muestra siempre para poder testear.
-- Recuerda emparejar el `adUnitId` con los App ID declarados en Android (`android/app/src/main/AndroidManifest.xml`, meta-data `com.google.android.gms.ads.APPLICATION_ID`) y en iOS (`ios/Runner/Info.plist`, clave `GADApplicationIdentifier` más la lista de `SKAdNetworkItems`).
-- Si necesitas desactivar temporalmente los anuncios, retorna `false` desde `shouldShowAd()` o evita llamar `showInterstitialAd()`.
-
 ## Dependencias principales
 
 - [Flutter](https://flutter.dev/)
@@ -60,7 +51,6 @@ El card **"[Month] Summary"** (p. ej. "January Summary") aparece debajo del cale
 - [freezed](https://pub.dev/packages/freezed), [freezed_annotation](https://pub.dev/packages/freezed_annotation), [json_serializable](https://pub.dev/packages/json_serializable), [build_runner](https://pub.dev/packages/build_runner) y [hive_generator](https://pub.dev/packages/hive_generator) para generación de código.
 - [fl_chart](https://pub.dev/packages/fl_chart) para la gráfica mensual.
 - [flutter_svg](https://pub.dev/packages/flutter_svg) para renderizar los íconos SVG de ánimo.
-- [google_mobile_ads](https://pub.dev/packages/google_mobile_ads) para los anuncios intersticiales.
 - [flutter_local_notifications](https://pub.dev/packages/flutter_local_notifications), [timezone](https://pub.dev/packages/timezone) y [flutter_native_timezone](https://pub.dev/packages/flutter_native_timezone) para los recordatorios diarios.
 
 ## Instalación y uso

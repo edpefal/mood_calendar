@@ -7,7 +7,6 @@ import '../bloc/mood_cubit.dart';
 import '../bloc/calendar_cubit.dart';
 import 'calendar_screen.dart';
 import 'package:hive/hive.dart';
-import 'package:mood_calendar/features/ads/ad_service.dart';
 
 class MoodScreen extends StatefulWidget {
   final DateTime? selectedDate;
@@ -24,15 +23,11 @@ class _MoodScreenState extends State<MoodScreen>
   final TextEditingController _noteController = TextEditingController();
   bool isLoading = true;
   late PageController _pageController;
-  late final AdService _adService;
 
   @override
   void initState() {
     super.initState();
     print('MoodScreen: initState() called');
-    _adService = AdService();
-    print('MoodScreen: AdService created, loading interstitial ad...');
-    _adService.loadInterstitialAd();
     _pageController = PageController(initialPage: 0);
     _loadMoodForDate();
   }
@@ -77,27 +72,14 @@ class _MoodScreenState extends State<MoodScreen>
 
   void _saveMood() {
     print('MoodScreen: _saveMood() called');
-
-    final save = () {
-      print('MoodScreen: Executing save function');
-      final date = widget.selectedDate ?? DateTime.now();
-      final moodEntry = MoodEntry(
-        date: date,
-        mood: selectedMood.animationPath,
-        note: _noteController.text.isEmpty ? null : _noteController.text,
-        intensity: _currentPage + 1,
-      );
-      context.read<MoodCubit>().save(moodEntry);
-    };
-
-    print('MoodScreen: Checking if should show ad...');
-    if (_adService.shouldShowAd()) {
-      print('MoodScreen: Should show ad, calling showInterstitialAd');
-      _adService.showInterstitialAd(onAdDismissed: save);
-    } else {
-      print('MoodScreen: Should not show ad, calling save directly');
-      save();
-    }
+    final date = widget.selectedDate ?? DateTime.now();
+    final moodEntry = MoodEntry(
+      date: date,
+      mood: selectedMood.animationPath,
+      note: _noteController.text.isEmpty ? null : _noteController.text,
+      intensity: _currentPage + 1,
+    );
+    context.read<MoodCubit>().save(moodEntry);
   }
 
   LinearGradient _backgroundGradientForMood(MoodOption mood) {
@@ -347,21 +329,13 @@ class _MoodScreenState extends State<MoodScreen>
                                 ),
                               ),
                               child: const Center(
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(Icons.check, color: Colors.white),
-                                    SizedBox(width: 8),
-                                    Text(
-                                      'Save',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
+                                child: Text(
+                                  'Save',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
                             ),

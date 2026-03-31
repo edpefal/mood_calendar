@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:mood_calendar/features/ads/ad_service.dart';
 
 import '../bloc/calendar_cubit.dart';
 import 'mood_screen.dart';
@@ -19,7 +18,6 @@ class CalendarScreen extends StatefulWidget {
 class _CalendarScreenState extends State<CalendarScreen>
     with SingleTickerProviderStateMixin {
   late DateTime _focusedDay;
-  late final AdService _adService;
   late AnimationController _animationController;
   DateTime? _recentlySavedDate;
 
@@ -27,8 +25,6 @@ class _CalendarScreenState extends State<CalendarScreen>
   void initState() {
     super.initState();
     _focusedDay = DateTime.now();
-    _adService = AdService();
-    _adService.loadInterstitialAd();
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1200),
@@ -91,111 +87,132 @@ class _CalendarScreenState extends State<CalendarScreen>
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const SizedBox(height: 16),
-                    _CalendarHeader(
-                      month: now.month,
-                      year: now.year,
-                      onPreviousMonth: _onPreviousMonth,
-                      onNextMonth: canGoNext ? _onNextMonth : null,
-                    ),
-                    if (state.isLoading)
-                      const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 8),
-                        child: LinearProgressIndicator(minHeight: 3),
+                    Card(
+                      elevation: 2,
+                      clipBehavior: Clip.antiAlias,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
                       ),
-                    const SizedBox(height: 4),
-                    _WeekDaysRow(),
-                    const SizedBox(height: 4),
-                    GridView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 7,
-                        mainAxisSpacing: 8,
-                        crossAxisSpacing: 8,
-                        childAspectRatio: 1,
-                      ),
-                      itemCount: daysInMonth + (firstWeekday - 1),
-                      itemBuilder: (context, index) {
-                        if (index < firstWeekday - 1) {
-                          return const SizedBox.shrink();
-                        }
-                        final day = index - (firstWeekday - 2);
-                        final date = DateTime(now.year, now.month, day);
-                        final isFutureDate = date.year > today.year ||
-                            (date.year == today.year &&
-                                date.month > today.month) ||
-                            (date.year == today.year &&
-                                date.month == today.month &&
-                                date.day > today.day);
-                        final key = _dateKey(date);
-                        final emoji = moodMap[key];
-                        final moodColor =
-                            emoji != null ? _colorForMoodPath(emoji) : null;
-                        final isRecentlySaved = _recentlySavedDate != null &&
-                            _dateKey(_recentlySavedDate!) == key;
-                        return GestureDetector(
-                          onTap: isFutureDate
-                              ? null
-                              : () async {
-                                  final result = await Navigator.push<DateTime>(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) =>
-                                          MoodScreen(selectedDate: date),
-                                    ),
-                                  );
-                                  // Refresh moods after returning
-                                  await context
-                                      .read<CalendarCubit>()
-                                      .refreshForDate(result ?? date);
-                                  // Si se guardó un mood, animar el icono
-                                  if (result != null && mounted) {
-                                    setState(() {
-                                      _recentlySavedDate = result;
-                                    });
-                                    _startAnimation();
-                                  }
-                                },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: isFutureDate
-                                  ? Colors.grey[100]
-                                  : moodColor?.withOpacity(0.15) ??
-                                      Colors.grey[200],
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: isFutureDate
-                                    ? Colors.grey[200]!
-                                    : moodColor ?? Colors.grey[300]!,
-                              ),
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            _CalendarHeader(
+                              month: now.month,
+                              year: now.year,
+                              onPreviousMonth: _onPreviousMonth,
+                              onNextMonth: canGoNext ? _onNextMonth : null,
                             ),
-                            child: Center(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    '$day',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
+                            if (state.isLoading)
+                              const Padding(
+                                padding: EdgeInsets.only(top: 12),
+                                child: LinearProgressIndicator(minHeight: 3),
+                              ),
+                            const SizedBox(height: 12),
+                            _WeekDaysRow(),
+                            const SizedBox(height: 12),
+                            GridView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 7,
+                                mainAxisSpacing: 8,
+                                crossAxisSpacing: 8,
+                                childAspectRatio: 1,
+                              ),
+                              itemCount: daysInMonth + (firstWeekday - 1),
+                              itemBuilder: (context, index) {
+                                if (index < firstWeekday - 1) {
+                                  return const SizedBox.shrink();
+                                }
+                                final day = index - (firstWeekday - 2);
+                                final date =
+                                    DateTime(now.year, now.month, day);
+                                final isFutureDate = date.year > today.year ||
+                                    (date.year == today.year &&
+                                        date.month > today.month) ||
+                                    (date.year == today.year &&
+                                        date.month == today.month &&
+                                        date.day > today.day);
+                                final key = _dateKey(date);
+                                final emoji = moodMap[key];
+                                final moodColor = emoji != null
+                                    ? _colorForMoodPath(emoji)
+                                    : null;
+                                final isRecentlySaved =
+                                    _recentlySavedDate != null &&
+                                        _dateKey(_recentlySavedDate!) == key;
+                                return GestureDetector(
+                                  onTap: isFutureDate
+                                      ? null
+                                      : () async {
+                                          final result =
+                                              await Navigator.push<DateTime>(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (_) => MoodScreen(
+                                                selectedDate: date,
+                                              ),
+                                            ),
+                                          );
+                                          // Refresh moods after returning
+                                          await context
+                                              .read<CalendarCubit>()
+                                              .refreshForDate(result ?? date);
+                                          // Si se guardó un mood, animar el icono
+                                          if (result != null && mounted) {
+                                            setState(() {
+                                              _recentlySavedDate = result;
+                                            });
+                                            _startAnimation();
+                                          }
+                                        },
+                                  child: Container(
+                                    decoration: BoxDecoration(
                                       color: isFutureDate
-                                          ? Colors.grey[400]
-                                          : moodColor ?? null,
+                                          ? Colors.grey[100]
+                                          : moodColor?.withOpacity(0.15) ??
+                                              Colors.grey[200],
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: isFutureDate
+                                            ? Colors.grey[200]!
+                                            : moodColor ?? Colors.grey[300]!,
+                                      ),
+                                    ),
+                                    child: Center(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            '$day',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: isFutureDate
+                                                  ? Colors.grey[400]
+                                                  : moodColor ?? null,
+                                            ),
+                                          ),
+                                          if (emoji != null)
+                                            _AnimatedMoodIcon(
+                                              animation: _animationController,
+                                              isAnimated: isRecentlySaved,
+                                              emojiPath: emoji,
+                                            ),
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                  if (emoji != null)
-                                    _AnimatedMoodIcon(
-                                      animation: _animationController,
-                                      isAnimated: isRecentlySaved,
-                                      emojiPath: emoji,
-                                    ),
-                                ],
-                              ),
+                                );
+                              },
                             ),
-                          ),
-                        );
-                      },
+                          ],
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 28),
                     MonthlyMoodSummaryCard(summary: state.summary),

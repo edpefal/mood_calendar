@@ -1,13 +1,10 @@
 import 'dart:async';
-import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'core/notifications/local_notification_service.dart';
-import 'features/ads/ad_service.dart';
 import 'features/mood/data/models/mood_model.dart';
 import 'features/mood/data/repositories/mood_repository_impl.dart';
 import 'features/mood/domain/usecases/get_moods_for_month_usecase.dart';
@@ -54,24 +51,6 @@ Future<void> _handleReminderTap() {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  developer.log('Initializing Google Mobile Ads...', name: 'Main');
-  try {
-    await MobileAds.instance.initialize();
-    developer.log(
-      'Google Mobile Ads initialized successfully',
-      name: 'Main',
-      level: 800,
-    );
-    AdService().loadInterstitialAd();
-  } catch (e) {
-    developer.log(
-      'Error initializing Google Mobile Ads',
-      name: 'Main',
-      error: e,
-      level: 1000,
-    );
-  }
 
   // Inicializar Hive
   final appDocumentDir = await getApplicationDocumentsDirectory();
