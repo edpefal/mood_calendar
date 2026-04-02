@@ -5,28 +5,30 @@ import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
+import '../localization/app_strings.dart';
+import '../settings/domain/repositories/app_settings_repository.dart';
+import '../telemetry/app_telemetry.dart';
+import '../telemetry/app_telemetry_events.dart';
+
 typedef NotificationTapCallback = Future<void> Function();
 
 class LocalNotificationService {
-  LocalNotificationService({required NotificationTapCallback onReminderTap})
-      : _onReminderTap = onReminderTap;
+  LocalNotificationService({
+    required NotificationTapCallback onReminderTap,
+    required AppSettingsRepository appSettingsRepository,
+    required AppTelemetry telemetry,
+  })  : _onReminderTap = onReminderTap,
+        _appSettingsRepository = appSettingsRepository,
+        _telemetry = telemetry;
 
   static const _dailyReminderId = 1001;
   static const _dailyReminderPayload = 'daily_mood_reminder';
   static const _dailyReminderChannelId = 'daily_mood_channel';
-  static const _dailyReminderChannelName = 'Daily Mood Reminder';
-  static const _dailyReminderChannelDescription =
-      'Daily reminder to log how you feel at 6:00 PM';
-  static const AndroidNotificationChannel _dailyReminderChannel =
-      AndroidNotificationChannel(
-    _dailyReminderChannelId,
-    _dailyReminderChannelName,
-    description: _dailyReminderChannelDescription,
-    importance: Importance.high,
-  );
   final FlutterLocalNotificationsPlugin _plugin =
       FlutterLocalNotificationsPlugin();
   final NotificationTapCallback _onReminderTap;
+  final AppSettingsRepository _appSettingsRepository;
+  final AppTelemetry _telemetry;
 
   Future<bool> initialize() async {
     await _configureTimeZones();
@@ -51,6 +53,10 @@ class LocalNotificationService {
       settings,
       onDidReceiveNotificationResponse: (details) async {
         if (details.payload == _dailyReminderPayload) {
+          _telemetry.trackEvent(
+            AppTelemetryEvents.openedFromReminder,
+            properties: {'source': 'notification_tap'},
+          );
           await _onReminderTap();
         }
       },
@@ -59,22 +65,43 @@ class LocalNotificationService {
 
     final launchDetails = await _plugin.getNotificationAppLaunchDetails();
     final payload = launchDetails?.notificationResponse?.payload;
+    if (payload == _dailyReminderPayload) {
+      _telemetry.trackEvent(
+        AppTelemetryEvents.openedFromReminder,
+        properties: {'source': 'app_launch'},
+      );
+    }
     return payload == _dailyReminderPayload;
   }
 
   Future<void> scheduleDailyReminder() async {
     await cancelDailyReminder();
+    final settings = await _appSettingsRepository.getSettings();
+    if (!settings.dailyReminderEnabled) {
+      _telemetry.trackEvent(
+        AppTelemetryEvents.reminderCancelled,
+        properties: {'reason': 'disabled_in_settings'},
+      );
+      return;
+    }
+
     final now = tz.TZDateTime.now(tz.local);
-    var scheduled =
-        tz.TZDateTime(tz.local, now.year, now.month, now.day, _reminderHour);
+    var scheduled = tz.TZDateTime(
+      tz.local,
+      now.year,
+      now.month,
+      now.day,
+      settings.dailyReminderHour,
+      settings.dailyReminderMinute,
+    );
     if (!scheduled.isAfter(now)) {
       scheduled = scheduled.add(const Duration(days: 1));
     }
 
     const androidDetails = AndroidNotificationDetails(
       _dailyReminderChannelId,
-      _dailyReminderChannelName,
-      channelDescription: _dailyReminderChannelDescription,
+      'Recordatorio diario de animo',
+      channelDescription: 'Recordatorio diario para registrar como te sientes',
       importance: Importance.high,
       priority: Priority.high,
       playSound: true,
@@ -88,8 +115,8 @@ class LocalNotificationService {
 
     await _plugin.zonedSchedule(
       _dailyReminderId,
-      'How are you feeling today?',
-      'Tap to record your mood for today.',
+      AppStrings.spanish.reminderNotificationTitle,
+      AppStrings.spanish.reminderNotificationBody,
       scheduled,
       const NotificationDetails(
         android: androidDetails,
@@ -101,9 +128,22 @@ class LocalNotificationService {
       matchDateTimeComponents: DateTimeComponents.time,
       payload: _dailyReminderPayload,
     );
+    _telemetry.trackEvent(
+      AppTelemetryEvents.reminderScheduled,
+      properties: {
+        'hour': settings.dailyReminderHour,
+        'minute': settings.dailyReminderMinute,
+      },
+    );
   }
 
-  Future<void> cancelDailyReminder() => _plugin.cancel(_dailyReminderId);
+  Future<void> cancelDailyReminder() async {
+    await _plugin.cancel(_dailyReminderId);
+    _telemetry.trackEvent(
+      AppTelemetryEvents.reminderCancelled,
+      properties: {'reason': 'rescheduled_or_manual'},
+    );
+  }
 
   Future<void> _configureTimeZones() async {
     if (_timeZoneInitialized) {
@@ -114,7 +154,14 @@ class LocalNotificationService {
     final resolvedName = timeZoneName ?? _fallbackTimeZone;
     try {
       tz.setLocalLocation(tz.getLocation(resolvedName));
-    } catch (error) {
+    } catch (error, stackTrace) {
+      _telemetry.recordError(
+        'apply_timezone_failed',
+        reason: 'invalid_timezone_name',
+        context: {'timezone': resolvedName},
+        error: error,
+        stackTrace: stackTrace,
+      );
       if (kDebugMode) {
         debugPrint('Failed to apply timezone $resolvedName: $error');
       }
@@ -136,6 +183,10 @@ class LocalNotificationService {
           AndroidFlutterLocalNotificationsPlugin>();
       final granted = await androidPlugin?.requestNotificationsPermission();
       if (granted != null && !granted) {
+        _telemetry.recordError(
+          'notification_permission_denied',
+          reason: 'android_runtime_permission',
+        );
         if (kDebugMode) {
           debugPrint('Notification permission not granted on Android.');
         }
@@ -146,7 +197,13 @@ class LocalNotificationService {
   Future<String?> _tryGetLocalTimeZone() async {
     try {
       return await FlutterNativeTimezone.getLocalTimezone();
-    } catch (error) {
+    } catch (error, stackTrace) {
+      _telemetry.recordError(
+        'resolve_timezone_failed',
+        reason: 'native_timezone_lookup',
+        error: error,
+        stackTrace: stackTrace,
+      );
       if (kDebugMode) {
         debugPrint('Failed to resolve local timezone: $error');
       }
@@ -154,7 +211,6 @@ class LocalNotificationService {
     }
   }
 
-  static const _reminderHour = 18;
   static const _fallbackTimeZone = 'UTC';
   static bool _timeZoneInitialized = false;
 
@@ -164,6 +220,13 @@ class LocalNotificationService {
     }
     final androidPlugin = _plugin.resolvePlatformSpecificImplementation<
         AndroidFlutterLocalNotificationsPlugin>();
-    await androidPlugin?.createNotificationChannel(_dailyReminderChannel);
+    await androidPlugin?.createNotificationChannel(
+      AndroidNotificationChannel(
+        _dailyReminderChannelId,
+        AppStrings.spanish.notificationChannelName,
+        description: AppStrings.spanish.notificationChannelDescription,
+        importance: Importance.high,
+      ),
+    );
   }
 }

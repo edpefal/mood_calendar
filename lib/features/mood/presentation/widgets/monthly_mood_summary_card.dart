@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../../../../core/localization/app_strings.dart';
 import '../../domain/entities/monthly_mood_summary.dart';
 
 const List<String> _moodPaths = [
@@ -14,8 +15,15 @@ const List<String> _moodPaths = [
 
 class MonthlyMoodSummaryCard extends StatefulWidget {
   final MonthlyMoodSummary? summary;
+  final bool isLoading;
+  final String? errorMessage;
 
-  const MonthlyMoodSummaryCard({super.key, required this.summary});
+  const MonthlyMoodSummaryCard({
+    super.key,
+    required this.summary,
+    this.isLoading = false,
+    this.errorMessage,
+  });
 
   @override
   State<MonthlyMoodSummaryCard> createState() => _MonthlyMoodSummaryCardState();
@@ -27,9 +35,26 @@ class _MonthlyMoodSummaryCardState extends State<MonthlyMoodSummaryCard> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
     final summaryData = widget.summary;
+    if (widget.isLoading &&
+        (summaryData == null || summaryData.entries.isEmpty)) {
+      return _EmptyState(
+        message: strings.loadingSummary,
+        icon: Icons.hourglass_top_rounded,
+      );
+    }
+    if (widget.errorMessage != null &&
+        (summaryData == null || summaryData.entries.isEmpty)) {
+      return _EmptyState(
+        message: widget.errorMessage!,
+        icon: Icons.error_outline_rounded,
+      );
+    }
     if (summaryData == null || summaryData.entries.isEmpty) {
-      return _EmptyState(message: 'No entries this month yet. Start today ■');
+      return _EmptyState(
+        message: strings.emptySummary,
+      );
     }
 
     return Column(
@@ -38,7 +63,11 @@ class _MonthlyMoodSummaryCardState extends State<MonthlyMoodSummaryCard> {
         _buildChartCard(context, summaryData),
         const SizedBox(height: 16),
         _StatCard(
-          title: 'Monthly average',
+          title: strings.monthlyAverage,
+          semanticsLabel: strings.monthlyAverageSemantics(
+            _moodLabelFromPath(
+                context, _moodPathForScore(summaryData.averageScore)),
+          ),
           highlight: true,
           child: Row(
             children: [
@@ -47,13 +76,17 @@ class _MonthlyMoodSummaryCardState extends State<MonthlyMoodSummaryCard> {
                 height: 32,
                 width: 32,
                 fit: BoxFit.contain,
+                semanticsLabel: _moodLabelFromPath(
+                    context, _moodPathForScore(summaryData.averageScore)),
                 errorBuilder: (context, error, stackTrace) =>
                     const Icon(Icons.mood, size: 32),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  'Mood that best represents ${_monthName(summaryData.month.month)}',
+                  strings.moodRepresentsMonth(
+                    _monthName(context, summaryData.month.month),
+                  ),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: Colors.white,
                       ),
@@ -64,10 +97,11 @@ class _MonthlyMoodSummaryCardState extends State<MonthlyMoodSummaryCard> {
         ),
         const SizedBox(height: 16),
         _StatCard(
-          title: 'Best streak',
+          title: strings.bestStreak,
+          semanticsLabel: strings.bestStreakSemantics(summaryData.bestStreak),
           highlight: true,
           child: Text(
-            '${summaryData.bestStreak} day${summaryData.bestStreak == 1 ? '' : 's'} in a row recording your mood',
+            strings.streakText(summaryData.bestStreak),
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Colors.white,
                 ),
@@ -78,6 +112,7 @@ class _MonthlyMoodSummaryCardState extends State<MonthlyMoodSummaryCard> {
   }
 
   Widget _buildChartCard(BuildContext context, MonthlyMoodSummary summaryData) {
+    final strings = AppStrings.of(context);
     // Invert Y so happy (1) draws at top, sad (5) at bottom; fl_chart
     // hides left titles when minY > maxY, so we keep minY < maxY and
     // transform data instead.
@@ -112,7 +147,8 @@ class _MonthlyMoodSummaryCardState extends State<MonthlyMoodSummaryCard> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '${_monthName(summaryData.month.month)} Summary',
+                strings
+                    .summaryTitle(_monthName(context, summaryData.month.month)),
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -121,132 +157,144 @@ class _MonthlyMoodSummaryCardState extends State<MonthlyMoodSummaryCard> {
               const SizedBox(height: 16),
               SizedBox(
                 height: 200,
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    LineChart(
-                      LineChartData(
-                        minX: 1,
-                        maxX: _daysInMonth(summaryData.month).toDouble(),
-                        minY: 1,
-                        maxY: 5,
-                        gridData: FlGridData(
-                          show: true,
-                          horizontalInterval: 1,
-                          getDrawingHorizontalLine: (value) => FlLine(
-                            color: Colors.white24,
-                            strokeWidth: 1,
-                          ),
-                          drawVerticalLine: false,
-                        ),
-                        titlesData: FlTitlesData(
-                          leftTitles: AxisTitles(
-                            sideTitles: SideTitles(
-                            showTitles: true,
-                            reservedSize: 40,
-                            interval: 1,
-                            getTitlesWidget: (value, meta) {
-                              final y = value.round();
-                              if (y < 1 || y > 5) {
-                                return const SizedBox.shrink();
-                              }
-                              final path = _moodPaths[5 - y];
-                              return SvgPicture.asset(
-                                path,
-                                height: 22,
-                                width: 22,
-                                fit: BoxFit.contain,
-                                placeholderBuilder: (context) => const SizedBox(
-                                  height: 22,
-                                  width: 22,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
+                child: Semantics(
+                  label: strings.monthlyChartSemantics,
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      ExcludeSemantics(
+                        child: LineChart(
+                          LineChartData(
+                            minX: 1,
+                            maxX: _daysInMonth(summaryData.month).toDouble(),
+                            minY: 1,
+                            maxY: 5,
+                            gridData: FlGridData(
+                              show: true,
+                              horizontalInterval: 1,
+                              getDrawingHorizontalLine: (value) => const FlLine(
+                                color: Colors.white24,
+                                strokeWidth: 1,
+                              ),
+                              drawVerticalLine: false,
+                            ),
+                            titlesData: FlTitlesData(
+                              leftTitles: AxisTitles(
+                                sideTitles: SideTitles(
+                                  showTitles: true,
+                                  reservedSize: 40,
+                                  interval: 1,
+                                  getTitlesWidget: (value, meta) {
+                                    final y = value.round();
+                                    if (y < 1 || y > 5) {
+                                      return const SizedBox.shrink();
+                                    }
+                                    final path = _moodPaths[5 - y];
+                                    return SvgPicture.asset(
+                                      path,
+                                      height: 22,
+                                      width: 22,
+                                      fit: BoxFit.contain,
+                                      placeholderBuilder: (context) =>
+                                          const SizedBox(
+                                        height: 22,
+                                        width: 22,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      ),
+                                      errorBuilder:
+                                          (context, error, stackTrace) =>
+                                              const Icon(Icons.mood, size: 22),
+                                    );
+                                  },
                                 ),
-                                errorBuilder: (context, error, stackTrace) =>
-                                    const Icon(Icons.mood, size: 22),
-                              );
-                            },
-                          ),
-                        ),
-                        bottomTitles: AxisTitles(
-                          sideTitles: SideTitles(
-                            showTitles: true,
-                            interval: 7,
-                            getTitlesWidget: (value, meta) {
-                              if (value % 1 != 0) {
-                                return const SizedBox.shrink();
-                              }
-                              return Text(
-                                value.toInt().toString(),
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.white,
+                              ),
+                              bottomTitles: AxisTitles(
+                                sideTitles: SideTitles(
+                                  showTitles: true,
+                                  interval: 7,
+                                  getTitlesWidget: (value, meta) {
+                                    if (value % 1 != 0) {
+                                      return const SizedBox.shrink();
+                                    }
+                                    return Text(
+                                      value.toInt().toString(),
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.white,
+                                      ),
+                                    );
+                                  },
                                 ),
-                              );
-                            },
-                          ),
-                        ),
-                        rightTitles: const AxisTitles(
-                            sideTitles: SideTitles(showTitles: false)),
-                        topTitles: const AxisTitles(
-                            sideTitles: SideTitles(showTitles: false)),
-                      ),
-                      lineTouchData: LineTouchData(
-                        enabled: true,
-                        handleBuiltInTouches: false,
-                        touchCallback: (event, response) {
-                          if (response?.lineBarSpots != null &&
-                              response!.lineBarSpots!.isNotEmpty) {
-                            final spot = response.lineBarSpots!.first;
-                            final intensity = (6 - spot.y).round().clamp(1, 5);
-                            setState(() {
-                              _tooltipLocalOffset = event.localPosition;
-                              _tooltipIntensity = intensity;
-                            });
-                          } else {
-                            setState(() {
-                              _tooltipLocalOffset = null;
-                              _tooltipIntensity = null;
-                            });
-                          }
-                        },
-                      ),
-                      borderData: FlBorderData(show: false),
-                      lineBarsData: [
-                        LineChartBarData(
-                          spots: spots,
-                          isCurved: true,
-                          color: Colors.white,
-                          barWidth: 3,
-                          dotData: FlDotData(
-                            show: true,
-                            getDotPainter: (spot, percent, barData, index) {
-                              final isLast = lastEntry != null &&
-                                  spot.x == lastEntry.date.day.toDouble() &&
-                                  spot.y ==
-                                      (6 - lastEntry.intensity).toDouble();
-                              return FlDotCirclePainter(
-                                radius: isLast ? 5 : 3,
+                              ),
+                              rightTitles: const AxisTitles(
+                                  sideTitles: SideTitles(showTitles: false)),
+                              topTitles: const AxisTitles(
+                                  sideTitles: SideTitles(showTitles: false)),
+                            ),
+                            lineTouchData: LineTouchData(
+                              enabled: true,
+                              handleBuiltInTouches: false,
+                              touchCallback: (event, response) {
+                                if (response?.lineBarSpots != null &&
+                                    response!.lineBarSpots!.isNotEmpty) {
+                                  final spot = response.lineBarSpots!.first;
+                                  final intensity =
+                                      (6 - spot.y).round().clamp(1, 5);
+                                  setState(() {
+                                    _tooltipLocalOffset = event.localPosition;
+                                    _tooltipIntensity = intensity;
+                                  });
+                                } else {
+                                  setState(() {
+                                    _tooltipLocalOffset = null;
+                                    _tooltipIntensity = null;
+                                  });
+                                }
+                              },
+                            ),
+                            borderData: FlBorderData(show: false),
+                            lineBarsData: [
+                              LineChartBarData(
+                                spots: spots,
+                                isCurved: true,
                                 color: Colors.white,
-                                strokeColor:
-                                    isLast ? Colors.white : Colors.white70,
-                                strokeWidth: isLast ? 3 : 1.5,
-                              );
-                            },
+                                barWidth: 3,
+                                dotData: FlDotData(
+                                  show: true,
+                                  getDotPainter:
+                                      (spot, percent, barData, index) {
+                                    final isLast = lastEntry != null &&
+                                        spot.x ==
+                                            lastEntry.date.day.toDouble() &&
+                                        spot.y ==
+                                            (6 - lastEntry.intensity)
+                                                .toDouble();
+                                    return FlDotCirclePainter(
+                                      radius: isLast ? 5 : 3,
+                                      color: Colors.white,
+                                      strokeColor: isLast
+                                          ? Colors.white
+                                          : Colors.white70,
+                                      strokeWidth: isLast ? 3 : 1.5,
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
                           ),
+                        ),
+                      ),
+                      if (_tooltipLocalOffset != null &&
+                          _tooltipIntensity != null) ...[
+                        _MoodTooltipOverlay(
+                          localOffset: _tooltipLocalOffset!,
+                          moodPath: _moodPaths[_tooltipIntensity! - 1],
                         ),
                       ],
-                    ),
-                  ),
-                    if (_tooltipLocalOffset != null &&
-                        _tooltipIntensity != null) ...[
-                      _MoodTooltipOverlay(
-                        localOffset: _tooltipLocalOffset!,
-                        moodPath: _moodPaths[_tooltipIntensity! - 1],
-                      ),
                     ],
-                  ],
+                  ),
                 ),
               ),
             ],
@@ -256,23 +304,9 @@ class _MonthlyMoodSummaryCardState extends State<MonthlyMoodSummaryCard> {
     );
   }
 
-  String _monthName(int month) {
-    const months = [
-      '',
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December'
-    ];
-    return months[month];
+  String _monthName(BuildContext context, int month) {
+    final months = AppStrings.of(context).monthNames;
+    return months[month - 1];
   }
 
   int _daysInMonth(DateTime month) {
@@ -288,6 +322,24 @@ class _MonthlyMoodSummaryCardState extends State<MonthlyMoodSummaryCard> {
     if (score <= 3.5) return 'assets/icon/neutral.svg';
     if (score <= 4.5) return 'assets/icon/sad.svg';
     return 'assets/icon/angry.svg';
+  }
+
+  String _moodLabelFromPath(BuildContext context, String path) {
+    final isEnglish = AppStrings.of(context).isEnglish;
+    switch (path) {
+      case 'assets/icon/happy.svg':
+        return isEnglish ? 'Happy' : 'Feliz';
+      case 'assets/icon/calm.svg':
+        return isEnglish ? 'Calm' : 'Calma';
+      case 'assets/icon/neutral.svg':
+        return isEnglish ? 'Neutral' : 'Neutral';
+      case 'assets/icon/sad.svg':
+        return isEnglish ? 'Sad' : 'Triste';
+      case 'assets/icon/angry.svg':
+        return isEnglish ? 'Angry' : 'Enojado';
+      default:
+        return '';
+    }
   }
 }
 
@@ -331,11 +383,13 @@ class _StatCard extends StatelessWidget {
   final String title;
   final Widget child;
   final bool highlight;
+  final String? semanticsLabel;
 
   const _StatCard({
     required this.title,
     required this.child,
     this.highlight = false,
+    this.semanticsLabel,
   });
 
   @override
@@ -346,33 +400,36 @@ class _StatCard extends StatelessWidget {
           color: highlight ? Colors.white : null,
         );
 
-    return Card(
-      elevation: 2,
-      clipBehavior: Clip.antiAlias,
-      color: highlight ? Colors.transparent : null,
-      shape: RoundedRectangleBorder(borderRadius: borderRadius),
-      child: Container(
-        decoration: highlight
-            ? const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Color(0xFF5F3DC4),
-                    Color(0xFF6C63FF),
-                  ],
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                ),
-              )
-            : null,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title, style: titleStyle),
-              const SizedBox(height: 8),
-              child,
-            ],
+    return Semantics(
+      label: semanticsLabel,
+      child: Card(
+        elevation: 2,
+        clipBehavior: Clip.antiAlias,
+        color: highlight ? Colors.transparent : null,
+        shape: RoundedRectangleBorder(borderRadius: borderRadius),
+        child: Container(
+          decoration: highlight
+              ? const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Color(0xFF5F3DC4),
+                      Color(0xFF6C63FF),
+                    ],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ),
+                )
+              : null,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: titleStyle),
+                const SizedBox(height: 8),
+                child,
+              ],
+            ),
           ),
         ),
       ),
@@ -381,9 +438,13 @@ class _StatCard extends StatelessWidget {
 }
 
 class _EmptyState extends StatelessWidget {
+  final IconData icon;
   final String message;
 
-  const _EmptyState({required this.message});
+  const _EmptyState({
+    required this.message,
+    this.icon = Icons.insights,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -395,7 +456,7 @@ class _EmptyState extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
-            const Icon(Icons.insights, color: Colors.deepPurple),
+            Icon(icon, color: Colors.deepPurple),
             const SizedBox(width: 12),
             Expanded(
               child: Text(

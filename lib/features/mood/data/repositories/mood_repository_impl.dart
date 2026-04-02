@@ -1,51 +1,53 @@
 import 'package:hive/hive.dart';
 
+import '../../../../core/logging/app_logger.dart';
+import '../datasources/mood_storage_keys.dart';
 import '../../domain/entities/mood_entry.dart';
 import '../../domain/repositories/mood_repository.dart';
 import '../models/mood_model.dart';
 
 class MoodRepositoryImpl implements MoodRepository {
   final Box<MoodModel> moodBox;
+  final AppLogger logger;
 
-  MoodRepositoryImpl(this.moodBox);
+  MoodRepositoryImpl(this.moodBox, {required this.logger});
 
   @override
   Future<void> saveMood(MoodEntry entry) async {
-    print('Saving mood for date: ${entry.date}');
-    print('Mood path: ${entry.mood}');
-    print('Note: ${entry.note}');
-    print('Intensity: ${entry.intensity}');
+    await _migrateLegacyEntriesIfNeeded();
+    final normalizedDate = MoodStorageKeys.normalizeDate(entry.date);
+    logger.debug(
+      'Saving mood entry for ${MoodStorageKeys.forDate(entry.date)} with intensity ${entry.intensity}',
+      tag: 'MoodRepository',
+    );
 
     final model = MoodModel(
-      date: entry.date,
+      date: normalizedDate,
       mood: entry.mood,
       note: entry.note,
       intensity: entry.intensity,
     );
-    await moodBox.put(model.date.toIso8601String(), model);
-    print('Mood saved successfully');
-
-    // Print all moods after saving
-    print('All moods after saving:');
-    for (var mood in moodBox.values) {
-      print('Date: ${mood.date}, Mood: ${mood.mood}');
-    }
+    await moodBox.put(MoodStorageKeys.forDate(normalizedDate), model);
+    logger.debug(
+      'Mood saved successfully. Stored entries: ${moodBox.length}',
+      tag: 'MoodRepository',
+    );
   }
 
   @override
   Future<List<MoodEntry>> getMoods() async {
-    print('Getting all moods from box');
+    await _migrateLegacyEntriesIfNeeded();
     final moods = moodBox.values.map(_mapModelToEntity).toList();
-    print('Found ${moods.length} moods in box');
-    print('Moods in box:');
-    for (var mood in moods) {
-      print('Date: ${mood.date}, Mood: ${mood.mood}');
-    }
+    logger.debug(
+      'Loaded ${moods.length} moods from local storage',
+      tag: 'MoodRepository',
+    );
     return moods;
   }
 
   @override
   Future<List<MoodEntry>> getMoodsForMonth(DateTime month) async {
+    await _migrateLegacyEntriesIfNeeded();
     final normalized = DateTime(month.year, month.month);
     final moods = moodBox.values
         .where((mood) =>
@@ -54,6 +56,49 @@ class MoodRepositoryImpl implements MoodRepository {
         .map(_mapModelToEntity)
         .toList();
     return moods;
+  }
+
+  Future<void> _migrateLegacyEntriesIfNeeded() async {
+    final canonicalEntries = <String, MoodModel>{};
+    var needsMigration = false;
+
+    for (final rawEntry in moodBox.toMap().entries) {
+      final rawKey = rawEntry.key.toString();
+      final mood = rawEntry.value;
+      final normalizedDate = MoodStorageKeys.normalizeDate(mood.date);
+      final normalizedKey = MoodStorageKeys.forDate(mood.date);
+      final normalizedMood = MoodModel(
+        date: normalizedDate,
+        mood: mood.mood,
+        note: mood.note,
+        intensity: mood.intensity,
+      );
+
+      if (rawKey != normalizedKey || mood.date != normalizedDate) {
+        needsMigration = true;
+      }
+
+      final existing = canonicalEntries[normalizedKey];
+      if (existing == null || mood.date.isAfter(existing.date)) {
+        if (existing != null) {
+          needsMigration = true;
+        }
+        canonicalEntries[normalizedKey] = normalizedMood;
+      } else {
+        needsMigration = true;
+      }
+    }
+
+    if (!needsMigration) {
+      return;
+    }
+
+    await moodBox.clear();
+    await moodBox.putAll(canonicalEntries);
+    logger.debug(
+      'Migrated mood storage to normalized daily keys. Entries: ${canonicalEntries.length}',
+      tag: 'MoodRepository',
+    );
   }
 
   MoodEntry _mapModelToEntity(MoodModel model) {

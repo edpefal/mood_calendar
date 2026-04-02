@@ -1,4 +1,6 @@
 import 'package:hive/hive.dart';
+
+import 'mood_storage_keys.dart';
 import '../models/mood_model.dart';
 
 abstract class MoodLocalDataSource {
@@ -32,21 +34,39 @@ class MoodLocalDataSourceImpl implements MoodLocalDataSource {
 
   @override
   Future<void> saveMood(MoodModel mood) async {
-    await moodBox.put(mood.date.toIso8601String(), mood);
+    final normalizedDate = MoodStorageKeys.normalizeDate(mood.date);
+    await moodBox.put(
+      MoodStorageKeys.forDate(mood.date),
+      MoodModel(
+        date: normalizedDate,
+        mood: mood.mood,
+        note: mood.note,
+        intensity: mood.intensity,
+      ),
+    );
   }
 
   @override
   Future<void> updateMood(MoodModel mood) async {
-    await moodBox.put(mood.date.toIso8601String(), mood);
+    final normalizedDate = MoodStorageKeys.normalizeDate(mood.date);
+    await moodBox.put(
+      MoodStorageKeys.forDate(mood.date),
+      MoodModel(
+        date: normalizedDate,
+        mood: mood.mood,
+        note: mood.note,
+        intensity: mood.intensity,
+      ),
+    );
   }
 
   @override
   Future<void> deleteMood(DateTime date) async {
-    await moodBox.delete(date.toIso8601String());
+    await moodBox.delete(MoodStorageKeys.forDate(date));
   }
 
   @override
   Future<MoodModel?> getMoodForDate(DateTime date) async {
-    return moodBox.get(date.toIso8601String());
+    return moodBox.get(MoodStorageKeys.forDate(date));
   }
 }
