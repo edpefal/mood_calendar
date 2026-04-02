@@ -1,5 +1,5 @@
-import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../domain/entities/monthly_mood_summary.dart';
 import '../../domain/usecases/get_monthly_mood_summary_usecase.dart';
@@ -41,13 +41,15 @@ class CalendarCubit extends Cubit<CalendarState> {
   CalendarCubit({
     required DateTime initialMonth,
     required this.getMonthlyMoodSummary,
-  }) : super(CalendarState(visibleMonth: DateTime(initialMonth.year, initialMonth.month))) {
+  }) : super(CalendarState(
+            visibleMonth: DateTime(initialMonth.year, initialMonth.month))) {
     loadMonth(initialMonth);
   }
 
   Future<void> loadMonth(DateTime month) async {
     final normalized = DateTime(month.year, month.month);
-    emit(state.copyWith(visibleMonth: normalized, isLoading: true, error: null));
+    emit(
+        state.copyWith(visibleMonth: normalized, isLoading: true, error: null));
     try {
       final summary = await getMonthlyMoodSummary(normalized);
       emit(state.copyWith(summary: summary, isLoading: false));

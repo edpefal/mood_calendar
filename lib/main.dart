@@ -1,12 +1,24 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
+import 'core/logging/logger_app_logger.dart';
+import 'core/localization/app_strings.dart';
+import 'core/navigation/app_navigator.dart';
 import 'core/notifications/local_notification_service.dart';
+import 'core/telemetry/app_telemetry_config.dart';
+import 'core/telemetry/logger_app_telemetry.dart';
+import 'core/settings/data/datasources/app_settings_local_datasource.dart';
+import 'core/settings/data/repositories/app_settings_repository_impl.dart';
+import 'core/settings/domain/repositories/app_settings_repository.dart';
 import 'features/mood/data/models/mood_model.dart';
 import 'features/mood/data/repositories/mood_repository_impl.dart';
+import 'features/mood/data/services/json_mood_history_exporter.dart';
+import 'features/mood/domain/services/mood_history_exporter.dart';
+import 'features/mood/domain/usecases/export_mood_history_usecase.dart';
 import 'features/mood/domain/usecases/get_moods_for_month_usecase.dart';
 import 'features/mood/domain/usecases/get_monthly_mood_summary_usecase.dart';
 import 'features/mood/domain/usecases/save_mood_usecase.dart';
@@ -33,11 +45,9 @@ Future<void> _handleReminderTap() {
       WidgetsBinding.instance.addPostFrameCallback((_) => navigate());
       return;
     }
-    navigator.pushAndRemoveUntil(
-      MaterialPageRoute(
-        builder: (_) => MoodScreen(selectedDate: targetDate),
-      ),
-      (route) => false,
+    AppNavigator.openMoodFromReminder(
+      navigator,
+      selectedDate: targetDate,
     );
     _isHandlingReminderTap = false;
     if (!completer.isCompleted) {
@@ -61,38 +71,71 @@ void main() async {
 
   // Abrir la caja de MoodModel
   await Hive.openBox<MoodModel>('moods');
+  await Hive.openBox<dynamic>(AppSettingsLocalDataSource.boxName);
 
   final moodBox = Hive.box<MoodModel>('moods');
-  final repository = MoodRepositoryImpl(moodBox);
+  final settingsBox = Hive.box<dynamic>(AppSettingsLocalDataSource.boxName);
+  final appLogger = LoggerAppLogger();
+  final telemetry = LoggerAppTelemetry(
+    logger: appLogger,
+    config: AppTelemetryConfig.fromEnvironment(),
+  );
+  final repository = MoodRepositoryImpl(moodBox, logger: appLogger);
+  final moodHistoryExporter = JsonMoodHistoryExporter(
+    repository: repository,
+    logger: appLogger,
+    telemetry: telemetry,
+  );
+  final appSettingsRepository = AppSettingsRepositoryImpl(
+    AppSettingsLocalDataSource(settingsBox),
+  );
   final notificationService = LocalNotificationService(
     onReminderTap: _handleReminderTap,
+    appSettingsRepository: appSettingsRepository,
+    telemetry: telemetry,
   );
   final launchedFromReminder = await notificationService.initialize();
   await notificationService.scheduleDailyReminder();
 
   runApp(
-    MultiBlocProvider(
+    MultiRepositoryProvider(
       providers: [
-        BlocProvider(
-          create: (context) {
-            final cubit = MoodCubit(
-              saveMood: SaveMoodUseCase(repository),
-              getMoods: GetMoodsUseCase(repository),
-            );
-            cubit.fetchAll();
-            return cubit;
-          },
+        RepositoryProvider<AppSettingsRepository>.value(
+          value: appSettingsRepository,
         ),
-        BlocProvider(
-          create: (context) => CalendarCubit(
-            initialMonth: DateTime.now(),
-            getMonthlyMoodSummary: GetMonthlyMoodSummaryUseCase(
-              GetMoodsForMonthUseCase(repository),
-            ),
-          ),
+        RepositoryProvider<MoodHistoryExporter>.value(
+          value: moodHistoryExporter,
+        ),
+        RepositoryProvider<ExportMoodHistoryUseCase>(
+          create: (_) => ExportMoodHistoryUseCase(moodHistoryExporter),
+        ),
+        RepositoryProvider<LocalNotificationService>.value(
+          value: notificationService,
         ),
       ],
-      child: const MyApp(),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) {
+              return MoodCubit(
+                saveMood: SaveMoodUseCase(repository),
+                getMoods: GetMoodsUseCase(repository),
+                logger: appLogger,
+                telemetry: telemetry,
+              );
+            },
+          ),
+          BlocProvider(
+            create: (context) => CalendarCubit(
+              initialMonth: DateTime.now(),
+              getMonthlyMoodSummary: GetMonthlyMoodSummaryUseCase(
+                GetMoodsForMonthUseCase(repository),
+              ),
+            ),
+          ),
+        ],
+        child: const MyApp(),
+      ),
     ),
   );
 
@@ -106,7 +149,6 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     final baseTheme = ThemeData(
@@ -116,8 +158,15 @@ class MyApp extends StatelessWidget {
     final poppinsTextTheme = GoogleFonts.poppinsTextTheme(baseTheme.textTheme);
 
     return MaterialApp(
-      title: 'Mood Calendar',
+      title: AppStrings.spanish.appTitle,
       navigatorKey: navigatorKey,
+      locale: const Locale('es'),
+      supportedLocales: AppStrings.supportedLocales,
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       theme: baseTheme.copyWith(
         textTheme: poppinsTextTheme,
         primaryTextTheme: poppinsTextTheme,
@@ -125,94 +174,6 @@ class MyApp extends StatelessWidget {
       ),
       home: const MoodScreen(),
       debugShowCheckedModeBanner: false,
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }

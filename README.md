@@ -1,114 +1,232 @@
 # Mood Calendar
 
-Mood Calendar es una aplicación Flutter para registrar y visualizar el estado de ánimo diario del usuario, siguiendo principios de Clean Architecture, Bloc y Freezed.
+Mood Calendar es una app Flutter para registrar el estado de animo diario, revisar el calendario mensual y consultar un resumen del mes. El proyecto usa una arquitectura por capas, persistencia local con Hive y estado con Cubit.
 
-## Características
+## Estado actual
 
-- Registro diario del estado de ánimo con nota opcional.
-- Calendario mensual con los días que tienen mood registrado y navegación entre meses.
-- **Resumen mensual (gráfica):** debajo del calendario, un card muestra:
-  - **Gráfica de línea** del ánimo a lo largo del mes (eje X = día, eje Y = nivel de ánimo).
-  - **Eje Y** con los mismos íconos SVG que usa la app (Happy, Calm, Neutral, Sad, Angry), con el más feliz arriba y el más bajo abajo.
-  - **Monthly average:** ícono del ánimo que representa el promedio del mes (sin número).
-  - **Best streak:** cantidad de días seguidos registrando ánimo.
-- Almacenamiento local usando Hive.
-- Arquitectura limpia: separación en data, domain y presentation.
-- Gestión de estado con Bloc/Cubit y Freezed.
-- Recordatorios diarios a las 6:00 pm mediante notificaciones locales (Android/iOS) auto-reprogramadas.
-- Guardado directo del mood sin anuncios ni interrupciones.
+- Registro diario de mood por fecha.
+- Calendario mensual con navegacion entre meses.
+- Resumen mensual con grafica, promedio y mejor racha.
+- Recordatorios diarios configurables.
+- Exportacion local del historial en JSON.
+- Localizacion base para `es` y `en`.
+- Logging y telemetria desacoplados del proveedor.
+- CI con `flutter analyze` y `flutter test`.
 
-## Estructura del proyecto
+## Arquitectura
 
-```
+La app esta organizada en `core/` y `features/`.
+
+```text
 lib/
   core/
-    notifications/     # Servicio para recordatorios locales
+    localization/   # Textos y estructura base de localizacion
+    logging/        # Abstraccion de logger + implementacion con package:logger
+    navigation/     # Navegacion principal entre pantallas
+    notifications/  # Notificaciones locales y manejo de payloads
+    settings/       # Preferencias tipadas de la aplicacion
+    telemetry/      # Eventos y errores relevantes desacoplados del proveedor
   features/
     mood/
-      data/            # Modelos Hive, repositorios concretos
-      domain/          # Entidades, repositorios abstractos, casos de uso
-      presentation/    # UI, widgets y cubits/blocs
+      data/         # Datasources, modelos Hive, repositorios y servicios
+      domain/       # Entidades, contratos, servicios y casos de uso
+      presentation/ # Pantallas, widgets y cubits
   main.dart
 ```
 
-`main.dart` inicializa Hive, registra el `MoodModel`, crea los cubits (`MoodCubit`, `CalendarCubit`) y arma el servicio de notificaciones (`LocalNotificationService`) antes de renderizar la UI.
+### Flujo de datos
 
-## Resumen mensual (gráfica)
+1. La UI interactua con `MoodCubit` y `CalendarCubit`.
+2. Los cubits llaman casos de uso en `features/mood/domain/usecases`.
+3. Los casos de uso delegan en repositorios o servicios del dominio.
+4. Las implementaciones concretas viven en `features/mood/data`.
+5. Hive persiste moods y settings localmente.
 
-El card **"[Month] Summary"** (p. ej. "January Summary") aparece debajo del calendario y solo cuando hay al menos un registro en ese mes.
+Reglas del proyecto:
 
-- **Gráfica:** línea que une los puntos de ánimo por día. Cada punto usa el nivel de intensidad guardado (1 = Happy, 5 = Angry). En el eje vertical se muestran los íconos de la app (Happy arriba, Angry abajo) en lugar de emojis genéricos.
-- **Monthly average:** se muestra solo el ícono del ánimo que corresponde al promedio del mes (según rangos de score).
-- **Best streak:** texto tipo "X day(s) in a row recording your mood".
-- **Datos legacy:** los registros guardados antes de guardar intensidad real tenían `intensity: 3`. Se deriva la intensidad desde el campo `mood` (ruta del ícono) para que la gráfica y el promedio se vean correctos.
+- La capa `presentation` no accede directo a `Hive`.
+- La persistencia de settings pasa por `AppSettingsRepository`.
+- Logging y telemetria van por abstracciones, no por paquetes usados directo en la UI.
+
+## Componentes principales
+
+### Moods
+
+- `MoodRepositoryImpl` guarda los registros diarios normalizados por clave `YYYY-MM-DD`.
+- Los datos legacy se migran automaticamente al leer o guardar.
+- `MoodCubit` maneja carga, guardado, errores y telemetria de eventos clave.
+
+### Calendario y resumen
+
+- `CalendarCubit` calcula el resumen mensual con `GetMonthlyMoodSummaryUseCase`.
+- `MonthlyMoodSummaryCard` muestra:
+  - grafica del mes
+  - animo promedio del mes
+  - mejor racha
+
+### Settings y recordatorios
+
+- `AppSettingsLocalDataSource` centraliza las claves de configuracion.
+- `LocalNotificationService` inicializa permisos, zona horaria y programacion diaria.
+- La hora del recordatorio puede activarse, desactivarse o ajustarse desde la UI.
+
+### Exportacion
+
+- `JsonMoodHistoryExporter` genera un archivo JSON con:
+  - `date`
+  - `mood`
+  - `note`
+  - `intensity`
+- Los archivos se guardan en una carpeta `exports` dentro del directorio de la app.
+
+### Localizacion
+
+- `AppStrings` expone la estructura base de textos.
+- La app arranca actualmente en espanol.
+- La base de `supportedLocales` ya soporta `es` y `en`.
 
 ## Dependencias principales
 
-- [Flutter](https://flutter.dev/)
-- [hive](https://pub.dev/packages/hive) + [hive_flutter](https://pub.dev/packages/hive_flutter) para persistencia local.
-- [path_provider](https://pub.dev/packages/path_provider) para resolver la ruta de almacenamiento.
-- [flutter_bloc](https://pub.dev/packages/flutter_bloc) + [equatable](https://pub.dev/packages/equatable) en la presentación.
-- [freezed](https://pub.dev/packages/freezed), [freezed_annotation](https://pub.dev/packages/freezed_annotation), [json_serializable](https://pub.dev/packages/json_serializable), [build_runner](https://pub.dev/packages/build_runner) y [hive_generator](https://pub.dev/packages/hive_generator) para generación de código.
-- [fl_chart](https://pub.dev/packages/fl_chart) para la gráfica mensual.
-- [flutter_svg](https://pub.dev/packages/flutter_svg) para renderizar los íconos SVG de ánimo.
-- [flutter_local_notifications](https://pub.dev/packages/flutter_local_notifications), [timezone](https://pub.dev/packages/timezone) y [flutter_native_timezone](https://pub.dev/packages/flutter_native_timezone) para los recordatorios diarios.
+- `flutter_bloc`
+- `freezed` y `freezed_annotation`
+- `json_serializable`
+- `hive` y `hive_flutter`
+- `logger`
+- `flutter_local_notifications`
+- `timezone`
+- `flutter_native_timezone`
+- `flutter_svg`
+- `fl_chart`
+- `path_provider`
 
-## Instalación y uso
+## Requisitos
 
-1. **Clona el repositorio:**
-   ```sh
-   git clone <url-del-repo>
-   cd mood_calendar
-   ```
+- Flutter compatible con el SDK declarado en `pubspec.yaml`
+- Dart incluido con tu instalacion de Flutter
+- Xcode o Android Studio segun la plataforma objetivo
 
-2. **Instala las dependencias:**
-   ```sh
-   flutter pub get
-   ```
+## Como correr el proyecto
 
-3. **Genera el código necesario:**
-   ```sh
-   flutter pub run build_runner build --delete-conflicting-outputs
-   ```
+1. Instala dependencias:
 
-4. **Corre la app:**
-   ```sh
-   flutter run
-   ```
+```sh
+flutter pub get
+```
 
-## Recordatorios diarios
+2. Genera codigo si cambias modelos `freezed`, `json_serializable` o adapters:
 
-La aplicación programa una notificación local diaria a las 6:00 pm para recordar al usuario registrar su estado de ánimo.
+```sh
+flutter pub run build_runner build --delete-conflicting-outputs
+```
 
-- `lib/core/notifications/local_notification_service.dart` maneja toda la configuración de `flutter_local_notifications`, permisos por plataforma y sincronización de zona horaria usando `timezone` + `flutter_native_timezone` (con fallback a `UTC`).
-- Cada arranque hace `scheduleDailyReminder()` después de cancelar cualquier recordatorio previo para evitar duplicados.
-- El `payload` `daily_mood_reminder` permite detectar si la app se abrió desde la notificación y navegar directamente a `MoodScreen` con la fecha del día.
-- Ajusta la hora cambiando la constante `_reminderHour` dentro del servicio.
+3. Corre la app:
 
-### Verificación manual
+```sh
+flutter run
+```
 
-1. Instala la app en un dispositivo físico o emulador.
-2. Concede permisos de notificación cuando la app los solicite:
-   - **Android 13+**: acepta el permiso `POST_NOTIFICATIONS`.
-   - **iOS**: acepta la alerta nativa de notificaciones.
-3. Cierra la app y adelanta el reloj del dispositivo a una hora posterior a
-   las 6:00 pm.
-4. Verifica que llegue la notificación «How are you feeling today?».
-5. Toca la notificación y confirma que la app se abre directamente en
-   `MoodScreen` con la fecha actual seleccionada.
-6. Repite en ambos sistemas operativos (Android/iOS) si es posible.
+## Comandos de desarrollo
 
-> Nota: Cada vez que se inicia la app se reprograma el recordatorio para el
-> siguiente día a las 6:00 pm.
+Analisis estatico:
 
-## Notas para desarrollo
+```sh
+flutter analyze
+```
 
-- Si modificas modelos anotados con `@freezed` o `@JsonSerializable`, vuelve a correr el comando de build_runner.
-- Los archivos generados (`*.g.dart`, `*.freezed.dart`) **deben estar versionados** en Git.
-- Para desarrollar más rápido usa `flutter pub run build_runner watch --delete-conflicting-outputs`.
-- Puedes regenerar los íconos del launcher con `flutter pub run flutter_launcher_icons` (usa `assets/icon/app_icon.png`).
-- Sigue la arquitectura y convenciones del proyecto para nuevas features.
+Pruebas:
 
-## Licencia
+```sh
+flutter test
+```
 
-MIT
+Formato:
+
+```sh
+dart format lib test
+```
+
+Modo watch para generacion:
+
+```sh
+flutter pub run build_runner watch --delete-conflicting-outputs
+```
+
+## Convenciones del proyecto
+
+- Los archivos generados `*.g.dart` y `*.freezed.dart` se versionan.
+- Si agregas una nueva configuracion persistente, pasa por `core/settings/`.
+- Si agregas eventos o errores trazables, usa `core/telemetry/`.
+- Si agregas logs, usa la abstraccion de `core/logging/`.
+- Si una pantalla necesita datos, consume cubits o casos de uso, no almacenamiento directo.
+- Mantener `flutter analyze` limpio es parte del criterio de merge.
+
+## Notificaciones
+
+`LocalNotificationService`:
+
+- pide permisos segun plataforma
+- resuelve la zona horaria local
+- programa un recordatorio diario
+- detecta si la app fue abierta desde la notificacion
+- navega a `MoodScreen` con la fecha actual cuando aplica
+
+La configuracion actual se guarda en settings y no en constantes sueltas.
+
+## Telemetria
+
+La telemetria actual usa una implementacion basada en logger, pero quedo abstraida para cambiar de proveedor despues.
+
+Eventos ya registrados:
+
+- guardado de mood
+- apertura desde recordatorio
+- programacion y cancelacion de recordatorios
+- exportacion del historial
+
+Errores relevantes:
+
+- fallos de guardado
+- fallos de carga
+- problemas de notificaciones o zona horaria
+- fallos de exportacion
+
+Configuracion por entorno:
+
+- `ENABLE_APP_TELEMETRY`
+- `ENABLE_ERROR_TELEMETRY`
+
+## CI
+
+El workflow de `.github/workflows/ci.yml` corre en `push`, `pull_request` y `workflow_dispatch`.
+
+Pasos:
+
+- `flutter pub get`
+- `flutter analyze`
+- `flutter test`
+
+## Pruebas existentes
+
+Hay pruebas para:
+
+- repositorio de moods
+- datasource de settings
+- resumen mensual
+- telemetria del `MoodCubit`
+- exportacion JSON del historial
+- widget principal de `MoodScreen`
+
+## Archivos clave
+
+- `lib/main.dart`
+- `lib/features/mood/data/repositories/mood_repository_impl.dart`
+- `lib/features/mood/presentation/bloc/mood_cubit.dart`
+- `lib/features/mood/presentation/bloc/calendar_cubit.dart`
+- `lib/core/notifications/local_notification_service.dart`
+- `lib/core/settings/data/datasources/app_settings_local_datasource.dart`
+- `lib/core/localization/app_strings.dart`
+
+## Notas pendientes
+
+- El Project de GitHub puede quedar temporalmente desalineado del estado de los issues cuando `gh project` falla contra la API.
+- La localizacion ya tiene base para ingles, pero la app arranca en espanol.
