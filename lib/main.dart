@@ -16,9 +16,6 @@ import 'core/settings/data/repositories/app_settings_repository_impl.dart';
 import 'core/settings/domain/repositories/app_settings_repository.dart';
 import 'features/mood/data/models/mood_model.dart';
 import 'features/mood/data/repositories/mood_repository_impl.dart';
-import 'features/mood/data/services/json_mood_history_exporter.dart';
-import 'features/mood/domain/services/mood_history_exporter.dart';
-import 'features/mood/domain/usecases/export_mood_history_usecase.dart';
 import 'features/mood/domain/usecases/get_moods_for_month_usecase.dart';
 import 'features/mood/domain/usecases/get_monthly_mood_summary_usecase.dart';
 import 'features/mood/domain/usecases/save_mood_usecase.dart';
@@ -81,11 +78,6 @@ void main() async {
     config: AppTelemetryConfig.fromEnvironment(),
   );
   final repository = MoodRepositoryImpl(moodBox, logger: appLogger);
-  final moodHistoryExporter = JsonMoodHistoryExporter(
-    repository: repository,
-    logger: appLogger,
-    telemetry: telemetry,
-  );
   final appSettingsRepository = AppSettingsRepositoryImpl(
     AppSettingsLocalDataSource(settingsBox),
   );
@@ -102,12 +94,6 @@ void main() async {
       providers: [
         RepositoryProvider<AppSettingsRepository>.value(
           value: appSettingsRepository,
-        ),
-        RepositoryProvider<MoodHistoryExporter>.value(
-          value: moodHistoryExporter,
-        ),
-        RepositoryProvider<ExportMoodHistoryUseCase>(
-          create: (_) => ExportMoodHistoryUseCase(moodHistoryExporter),
         ),
         RepositoryProvider<LocalNotificationService>.value(
           value: notificationService,
