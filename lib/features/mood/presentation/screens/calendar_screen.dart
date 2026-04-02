@@ -7,7 +7,6 @@ import '../../../../core/notifications/local_notification_service.dart';
 import '../../../../core/navigation/app_navigator.dart';
 import '../../../../core/settings/domain/entities/app_settings.dart';
 import '../../../../core/settings/domain/repositories/app_settings_repository.dart';
-import '../../domain/usecases/export_mood_history_usecase.dart';
 import '../bloc/calendar_cubit.dart';
 import '../widgets/monthly_mood_summary_card.dart';
 
@@ -25,7 +24,6 @@ class _CalendarScreenState extends State<CalendarScreen>
   late DateTime _focusedDay;
   late AnimationController _animationController;
   DateTime? _recentlySavedDate;
-  bool _isExporting = false;
 
   @override
   void initState() {
@@ -112,27 +110,7 @@ class _CalendarScreenState extends State<CalendarScreen>
                               onNextMonth: canGoNext ? _onNextMonth : null,
                               onOpenReminderSettings:
                                   _openReminderSettingsSheet,
-                              onExportHistory: _exportHistory,
-                              isExporting: _isExporting,
                             ),
-                            if (_isExporting)
-                              Padding(
-                                padding: const EdgeInsets.only(top: 12),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    const SizedBox(
-                                      height: 18,
-                                      width: 18,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Text(strings.exportingHistory),
-                                  ],
-                                ),
-                              ),
                             if (state.isLoading)
                               const Padding(
                                 padding: EdgeInsets.only(top: 12),
@@ -319,45 +297,6 @@ class _CalendarScreenState extends State<CalendarScreen>
     );
   }
 
-  Future<void> _exportHistory() async {
-    if (_isExporting) {
-      return;
-    }
-
-    final strings = AppStrings.of(context);
-    setState(() {
-      _isExporting = true;
-    });
-
-    try {
-      final result = await context.read<ExportMoodHistoryUseCase>()();
-      if (!mounted) {
-        return;
-      }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(strings.historyExportedTo(result.fileName)),
-        ),
-      );
-    } catch (_) {
-      if (!mounted) {
-        return;
-      }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(strings.historyExportFailed),
-          backgroundColor: Colors.red,
-        ),
-      );
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isExporting = false;
-        });
-      }
-    }
-  }
-
   static String _dateKey(DateTime date) =>
       '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
 
@@ -453,16 +392,12 @@ class _CalendarHeader extends StatelessWidget {
   final VoidCallback onPreviousMonth;
   final VoidCallback? onNextMonth;
   final VoidCallback onOpenReminderSettings;
-  final VoidCallback onExportHistory;
-  final bool isExporting;
 
   const _CalendarHeader({
     required this.month,
     required this.year,
     required this.onPreviousMonth,
     required this.onOpenReminderSettings,
-    required this.onExportHistory,
-    required this.isExporting,
     this.onNextMonth,
   });
 
@@ -490,20 +425,6 @@ class _CalendarHeader extends StatelessWidget {
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            IconButton(
-              tooltip: strings.exportHistoryTooltip,
-              icon: isExporting
-                  ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(
-                      Icons.ios_share_rounded,
-                      color: Color(0xFF5F3DC4),
-                    ),
-              onPressed: isExporting ? null : onExportHistory,
-            ),
             IconButton(
               tooltip: strings.reminderSettingsTooltip,
               icon: const Icon(
