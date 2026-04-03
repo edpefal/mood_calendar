@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -14,6 +16,9 @@ import 'package:mood_calendar/features/mood/domain/usecases/save_mood_usecase.da
 import 'package:mood_calendar/features/mood/presentation/bloc/calendar_cubit.dart';
 import 'package:mood_calendar/features/mood/presentation/bloc/mood_cubit.dart';
 import 'package:mood_calendar/features/mood/presentation/screens/mood_screen.dart';
+import 'package:mood_calendar/features/premium/domain/entities/premium_snapshot.dart';
+import 'package:mood_calendar/features/premium/domain/repositories/premium_repository.dart';
+import 'package:mood_calendar/features/premium/presentation/bloc/premium_cubit.dart';
 
 void main() {
   testWidgets('Mood screen loads without reading Hive from the UI',
@@ -47,6 +52,9 @@ void main() {
                 GetMoodsForMonthUseCase(repository),
               ),
             ),
+          ),
+          BlocProvider(
+            create: (_) => PremiumCubit(repository: _FakePremiumRepository()),
           ),
         ],
         child: MaterialApp(
@@ -94,7 +102,7 @@ void main() {
     final nextGradient = _currentBackgroundGradient(tester);
     expect(
       nextGradient.colors,
-      const [Color(0xFFE3F2FD), Color(0xFFBBDEFB)],
+      const [Color(0xFFEDE7F6), Color(0xFFD1C4E9)],
     );
   });
 }
@@ -119,6 +127,9 @@ Widget _buildTestApp({
             GetMoodsForMonthUseCase(repository),
           ),
         ),
+      ),
+      BlocProvider(
+        create: (_) => PremiumCubit(repository: _FakePremiumRepository()),
       ),
     ],
     child: MaterialApp(
@@ -166,6 +177,32 @@ class _InMemoryMoodRepository implements MoodRepository {
     });
     _moods.add(entry);
   }
+}
+
+class _FakePremiumRepository implements PremiumRepository {
+  final _controller = StreamController<PremiumSnapshot>.broadcast();
+
+  @override
+  PremiumSnapshot get currentSnapshot => const PremiumSnapshot();
+
+  @override
+  Future<void> buyMood(String moodId) async {}
+
+  @override
+  void dispose() {
+    _controller.close();
+  }
+
+  @override
+  Future<void> initialize() async {
+    _controller.add(const PremiumSnapshot());
+  }
+
+  @override
+  Future<void> restorePurchases() async {}
+
+  @override
+  Stream<PremiumSnapshot> watchSnapshot() => _controller.stream;
 }
 
 class _TestAppLogger implements AppLogger {

@@ -3,10 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../core/localization/app_strings.dart';
-import '../../../../core/notifications/local_notification_service.dart';
 import '../../../../core/navigation/app_navigator.dart';
+import '../../../../core/notifications/local_notification_service.dart';
 import '../../../../core/settings/domain/entities/app_settings.dart';
 import '../../../../core/settings/domain/repositories/app_settings_repository.dart';
+import '../../domain/services/mood_definition_resolver.dart';
 import '../bloc/calendar_cubit.dart';
 import '../widgets/monthly_mood_summary_card.dart';
 
@@ -34,7 +35,6 @@ class _CalendarScreenState extends State<CalendarScreen>
       duration: const Duration(milliseconds: 1200),
     );
     _recentlySavedDate = widget.recentlySavedDate;
-    // Iniciar animación si hay una fecha recién guardada
     if (_recentlySavedDate != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _startAnimation();
@@ -81,8 +81,7 @@ class _CalendarScreenState extends State<CalendarScreen>
             final entries = state.summary?.entries ?? [];
             final moodMap = <String, String>{};
             for (final mood in entries) {
-              final key = _dateKey(mood.date);
-              moodMap[key] = mood.mood;
+              moodMap[_dateKey(mood.date)] = mood.mood;
             }
 
             return Padding(
@@ -153,16 +152,17 @@ class _CalendarScreenState extends State<CalendarScreen>
                                         date.month == today.month &&
                                         date.day > today.day);
                                 final key = _dateKey(date);
-                                final emoji = moodMap[key];
-                                final moodColor = emoji != null
-                                    ? _colorForMoodPath(emoji)
+                                final moodPath = moodMap[key];
+                                final moodColor = moodPath != null
+                                    ? _colorForMoodPath(moodPath)
                                     : null;
-                                final moodLabel = emoji == null
+                                final moodLabel = moodPath == null
                                     ? null
-                                    : _moodLabelForPath(context, emoji);
+                                    : _moodLabelForPath(context, moodPath);
                                 final isRecentlySaved =
                                     _recentlySavedDate != null &&
                                         _dateKey(_recentlySavedDate!) == key;
+
                                 return Semantics(
                                   button: !isFutureDate,
                                   enabled: !isFutureDate,
@@ -231,11 +231,11 @@ class _CalendarScreenState extends State<CalendarScreen>
                                                     : moodColor,
                                               ),
                                             ),
-                                            if (emoji != null)
+                                            if (moodPath != null)
                                               _AnimatedMoodIcon(
                                                 animation: _animationController,
                                                 isAnimated: isRecentlySaved,
-                                                emojiPath: emoji,
+                                                emojiPath: moodPath,
                                                 semanticsLabel: moodLabel!,
                                               ),
                                           ],
@@ -306,38 +306,11 @@ class _CalendarScreenState extends State<CalendarScreen>
   }
 
   String _moodLabelForPath(BuildContext context, String path) {
-    final isEnglish = AppStrings.of(context).isEnglish;
-    switch (path) {
-      case 'assets/icon/happy.svg':
-        return isEnglish ? 'Happy' : 'Feliz';
-      case 'assets/icon/calm.svg':
-        return isEnglish ? 'Calm' : 'Calma';
-      case 'assets/icon/neutral.svg':
-        return 'Neutral';
-      case 'assets/icon/sad.svg':
-        return isEnglish ? 'Sad' : 'Triste';
-      case 'assets/icon/angry.svg':
-        return isEnglish ? 'Angry' : 'Enojado';
-      default:
-        return AppStrings.of(context).moodQuestion;
-    }
+    return MoodDefinitionResolver.byAssetPath(path).label;
   }
 
   Color? _colorForMoodPath(String path) {
-    switch (path) {
-      case 'assets/icon/happy.svg':
-        return Colors.green;
-      case 'assets/icon/calm.svg':
-        return Colors.blue;
-      case 'assets/icon/neutral.svg':
-        return Colors.grey;
-      case 'assets/icon/sad.svg':
-        return Colors.orange;
-      case 'assets/icon/angry.svg':
-        return Colors.red;
-      default:
-        return Colors.blue;
-    }
+    return MoodDefinitionResolver.colorForMoodPath(path);
   }
 }
 
@@ -420,7 +393,9 @@ class _CalendarHeader extends StatelessWidget {
         Text(
           '${months[month]} $year',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              color: const Color(0xFF5F3DC4), fontWeight: FontWeight.w700),
+                color: const Color(0xFF5F3DC4),
+                fontWeight: FontWeight.w700,
+              ),
         ),
         Row(
           mainAxisSize: MainAxisSize.min,
@@ -526,53 +501,52 @@ class _ReminderSettingsSheetState extends State<_ReminderSettingsSheet> {
     if (!mounted) {
       return;
     }
-    Navigator.of(context).pop();
+
+    final timeText = _selectedTime.format(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
           updatedSettings.dailyReminderEnabled
-              ? strings.reminderSavedAt(_selectedTime.format(context))
+              ? strings.reminderSavedAt(timeText)
               : strings.remindersTurnedOff,
         ),
       ),
     );
+    Navigator.of(context).pop();
   }
 
   @override
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
+
     return SafeArea(
       child: Padding(
-        padding: EdgeInsets.fromLTRB(
-          20,
-          12,
-          20,
-          20 + MediaQuery.of(context).viewInsets.bottom,
+        padding: EdgeInsets.only(
+          left: 24,
+          right: 24,
+          top: 16,
+          bottom: MediaQuery.of(context).viewInsets.bottom + 24,
         ),
         child: _isLoading
-            ? const SizedBox(
-                height: 180,
-                child: Center(child: CircularProgressIndicator()),
-              )
+            ? const Center(child: CircularProgressIndicator())
             : Column(
                 mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
                     strings.reminderSheetTitle,
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 12),
                   Text(
                     strings.reminderSheetDescription,
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
-                  const SizedBox(height: 20),
-                  SwitchListTile.adaptive(
+                  const SizedBox(height: 24),
+                  SwitchListTile(
                     contentPadding: EdgeInsets.zero,
-                    secondary: const Icon(Icons.notifications_active_outlined),
                     value: _remindersEnabled,
                     title: Text(strings.reminderEnabledTitle),
                     subtitle: Text(strings.reminderEnabledSubtitle),
@@ -584,31 +558,18 @@ class _ReminderSettingsSheetState extends State<_ReminderSettingsSheet> {
                             });
                           },
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 12),
                   ListTile(
                     contentPadding: EdgeInsets.zero,
-                    enabled: _remindersEnabled && !_isSaving,
-                    minVerticalPadding: 12,
-                    minLeadingWidth: 32,
-                    leading: const Icon(Icons.access_time_rounded),
                     title: Text(strings.reminderTimeTitle),
                     subtitle: Text(_selectedTime.format(context)),
-                    trailing: const Icon(Icons.chevron_right_rounded),
-                    onTap: _remindersEnabled ? _pickTime : null,
+                    trailing: const Icon(Icons.access_time_rounded),
+                    onTap: _isSaving || !_remindersEnabled ? null : _pickTime,
                   ),
-                  const SizedBox(height: 16),
-                  SizedBox(
-                    width: double.infinity,
-                    child: FilledButton(
-                      onPressed: _isSaving ? null : _saveSettings,
-                      child: _isSaving
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : Text(strings.saveReminderSettings),
-                    ),
+                  const SizedBox(height: 24),
+                  FilledButton(
+                    onPressed: _isSaving ? null : _saveSettings,
+                    child: Text(strings.saveReminderSettings),
                   ),
                 ],
               ),
@@ -624,14 +585,16 @@ class _WeekDaysRow extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: days
-          .map((d) => Expanded(
-                child: Center(
-                  child: Text(
-                    d,
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
+          .map(
+            (day) => Expanded(
+              child: Center(
+                child: Text(
+                  day,
+                  style: Theme.of(context).textTheme.bodySmall,
                 ),
-              ))
+              ),
+            ),
+          )
           .toList(),
     );
   }

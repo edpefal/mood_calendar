@@ -4,14 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../core/localization/app_strings.dart';
 import '../../domain/entities/monthly_mood_summary.dart';
-
-const List<String> _moodPaths = [
-  'assets/icon/happy.svg',
-  'assets/icon/calm.svg',
-  'assets/icon/neutral.svg',
-  'assets/icon/sad.svg',
-  'assets/icon/angry.svg',
-];
+import '../../domain/services/mood_definition_resolver.dart';
 
 class MonthlyMoodSummaryCard extends StatefulWidget {
   final MonthlyMoodSummary? summary;
@@ -31,7 +24,7 @@ class MonthlyMoodSummaryCard extends StatefulWidget {
 
 class _MonthlyMoodSummaryCardState extends State<MonthlyMoodSummaryCard> {
   Offset? _tooltipLocalOffset;
-  int? _tooltipIntensity;
+  String? _tooltipMoodPath;
 
   @override
   Widget build(BuildContext context) {
@@ -57,6 +50,10 @@ class _MonthlyMoodSummaryCardState extends State<MonthlyMoodSummaryCard> {
       );
     }
 
+    final representativeMoodPath =
+        summaryData.representativeAverageEntry?.mood ??
+            MoodDefinitionResolver.moodPathForScore(summaryData.averageScore);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -65,19 +62,18 @@ class _MonthlyMoodSummaryCardState extends State<MonthlyMoodSummaryCard> {
         _StatCard(
           title: strings.monthlyAverage,
           semanticsLabel: strings.monthlyAverageSemantics(
-            _moodLabelFromPath(
-                context, _moodPathForScore(summaryData.averageScore)),
+            _moodLabelFromPath(context, representativeMoodPath),
           ),
           highlight: true,
           child: Row(
             children: [
               SvgPicture.asset(
-                _moodPathForScore(summaryData.averageScore),
+                representativeMoodPath,
                 height: 32,
                 width: 32,
                 fit: BoxFit.contain,
-                semanticsLabel: _moodLabelFromPath(
-                    context, _moodPathForScore(summaryData.averageScore)),
+                semanticsLabel:
+                    _moodLabelFromPath(context, representativeMoodPath),
                 errorBuilder: (context, error, stackTrace) =>
                     const Icon(Icons.mood, size: 32),
               ),
@@ -113,9 +109,6 @@ class _MonthlyMoodSummaryCardState extends State<MonthlyMoodSummaryCard> {
 
   Widget _buildChartCard(BuildContext context, MonthlyMoodSummary summaryData) {
     final strings = AppStrings.of(context);
-    // Invert Y so happy (1) draws at top, sad (5) at bottom; fl_chart
-    // hides left titles when minY > maxY, so we keep minY < maxY and
-    // transform data instead.
     final spots = summaryData.entries
         .map(
           (entry) => FlSpot(
@@ -125,6 +118,9 @@ class _MonthlyMoodSummaryCardState extends State<MonthlyMoodSummaryCard> {
         )
         .toList();
     final lastEntry = summaryData.lastEntry;
+    final entriesByDay = {
+      for (final entry in summaryData.entries) entry.date.day: entry,
+    };
 
     return Card(
       elevation: 2,
@@ -147,8 +143,9 @@ class _MonthlyMoodSummaryCardState extends State<MonthlyMoodSummaryCard> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                strings
-                    .summaryTitle(_monthName(context, summaryData.month.month)),
+                strings.summaryTitle(
+                  _monthName(context, summaryData.month.month),
+                ),
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -189,7 +186,10 @@ class _MonthlyMoodSummaryCardState extends State<MonthlyMoodSummaryCard> {
                                     if (y < 1 || y > 5) {
                                       return const SizedBox.shrink();
                                     }
-                                    final path = _moodPaths[5 - y];
+                                    final path =
+                                        MoodDefinitionResolver.byIntensity(
+                                                6 - y)
+                                            .assetPath;
                                     return SvgPicture.asset(
                                       path,
                                       height: 22,
@@ -229,9 +229,11 @@ class _MonthlyMoodSummaryCardState extends State<MonthlyMoodSummaryCard> {
                                 ),
                               ),
                               rightTitles: const AxisTitles(
-                                  sideTitles: SideTitles(showTitles: false)),
+                                sideTitles: SideTitles(showTitles: false),
+                              ),
                               topTitles: const AxisTitles(
-                                  sideTitles: SideTitles(showTitles: false)),
+                                sideTitles: SideTitles(showTitles: false),
+                              ),
                             ),
                             lineTouchData: LineTouchData(
                               enabled: true,
@@ -240,16 +242,15 @@ class _MonthlyMoodSummaryCardState extends State<MonthlyMoodSummaryCard> {
                                 if (response?.lineBarSpots != null &&
                                     response!.lineBarSpots!.isNotEmpty) {
                                   final spot = response.lineBarSpots!.first;
-                                  final intensity =
-                                      (6 - spot.y).round().clamp(1, 5);
                                   setState(() {
                                     _tooltipLocalOffset = event.localPosition;
-                                    _tooltipIntensity = intensity;
+                                    _tooltipMoodPath =
+                                        entriesByDay[spot.x.toInt()]?.mood;
                                   });
                                 } else {
                                   setState(() {
                                     _tooltipLocalOffset = null;
-                                    _tooltipIntensity = null;
+                                    _tooltipMoodPath = null;
                                   });
                                 }
                               },
@@ -287,12 +288,11 @@ class _MonthlyMoodSummaryCardState extends State<MonthlyMoodSummaryCard> {
                         ),
                       ),
                       if (_tooltipLocalOffset != null &&
-                          _tooltipIntensity != null) ...[
+                          _tooltipMoodPath != null)
                         _MoodTooltipOverlay(
                           localOffset: _tooltipLocalOffset!,
-                          moodPath: _moodPaths[_tooltipIntensity! - 1],
+                          moodPath: _tooltipMoodPath!,
                         ),
-                      ],
                     ],
                   ),
                 ),
@@ -310,36 +310,14 @@ class _MonthlyMoodSummaryCardState extends State<MonthlyMoodSummaryCard> {
   }
 
   int _daysInMonth(DateTime month) {
-    final beginningNextMonth = (month.month < 12)
+    final beginningNextMonth = month.month < 12
         ? DateTime(month.year, month.month + 1, 1)
         : DateTime(month.year + 1, 1, 1);
     return beginningNextMonth.subtract(const Duration(days: 1)).day;
   }
 
-  String _moodPathForScore(double score) {
-    if (score <= 1.5) return 'assets/icon/happy.svg';
-    if (score <= 2.5) return 'assets/icon/calm.svg';
-    if (score <= 3.5) return 'assets/icon/neutral.svg';
-    if (score <= 4.5) return 'assets/icon/sad.svg';
-    return 'assets/icon/angry.svg';
-  }
-
   String _moodLabelFromPath(BuildContext context, String path) {
-    final isEnglish = AppStrings.of(context).isEnglish;
-    switch (path) {
-      case 'assets/icon/happy.svg':
-        return isEnglish ? 'Happy' : 'Feliz';
-      case 'assets/icon/calm.svg':
-        return isEnglish ? 'Calm' : 'Calma';
-      case 'assets/icon/neutral.svg':
-        return isEnglish ? 'Neutral' : 'Neutral';
-      case 'assets/icon/sad.svg':
-        return isEnglish ? 'Sad' : 'Triste';
-      case 'assets/icon/angry.svg':
-        return isEnglish ? 'Angry' : 'Enojado';
-      default:
-        return '';
-    }
+    return MoodDefinitionResolver.byAssetPath(path).label;
   }
 }
 

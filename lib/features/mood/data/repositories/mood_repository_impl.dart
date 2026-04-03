@@ -4,6 +4,7 @@ import '../../../../core/logging/app_logger.dart';
 import '../datasources/mood_storage_keys.dart';
 import '../../domain/entities/mood_entry.dart';
 import '../../domain/repositories/mood_repository.dart';
+import '../../domain/services/mood_definition_resolver.dart';
 import '../models/mood_model.dart';
 
 class MoodRepositoryImpl implements MoodRepository {
@@ -49,13 +50,14 @@ class MoodRepositoryImpl implements MoodRepository {
   Future<List<MoodEntry>> getMoodsForMonth(DateTime month) async {
     await _migrateLegacyEntriesIfNeeded();
     final normalized = DateTime(month.year, month.month);
-    final moods = moodBox.values
-        .where((mood) =>
-            mood.date.year == normalized.year &&
-            mood.date.month == normalized.month)
+    return moodBox.values
+        .where(
+          (mood) =>
+              mood.date.year == normalized.year &&
+              mood.date.month == normalized.month,
+        )
         .map(_mapModelToEntity)
         .toList();
-    return moods;
   }
 
   Future<void> _migrateLegacyEntriesIfNeeded() async {
@@ -102,10 +104,9 @@ class MoodRepositoryImpl implements MoodRepository {
   }
 
   MoodEntry _mapModelToEntity(MoodModel model) {
-    // Legacy: entries saved before we stored real intensity had intensity 3.
-    // Derive correct intensity from mood path so graph and average are correct.
     final intensity = model.intensity == 3
-        ? (_intensityFromMoodPath(model.mood) ?? model.intensity)
+        ? (MoodDefinitionResolver.intensityFromMoodPath(model.mood) ??
+            model.intensity)
         : model.intensity;
     return MoodEntry(
       date: model.date,
@@ -113,18 +114,5 @@ class MoodRepositoryImpl implements MoodRepository {
       note: model.note,
       intensity: intensity,
     );
-  }
-
-  /// Maps mood asset path to intensity 1–5 (same order as MoodScreen: Happy→1,
-  /// Calm→2, Neutral→3, Sad→4, Angry→5). Used for legacy data that had 3.
-  static int? _intensityFromMoodPath(String moodPath) {
-    const pathToIntensity = {
-      'assets/icon/happy.svg': 1,
-      'assets/icon/calm.svg': 2,
-      'assets/icon/neutral.svg': 3,
-      'assets/icon/sad.svg': 4,
-      'assets/icon/angry.svg': 5,
-    };
-    return pathToIntensity[moodPath];
   }
 }

@@ -133,6 +133,26 @@ Analisis estatico:
 flutter analyze
 ```
 
+## Mood purchases
+
+La app ahora contempla moods premium vendidos como compras permanentes por
+plataforma.
+
+- Configura los productos no consumibles en App Store Connect y Google Play
+  Console usando los IDs definidos en `lib/features/mood/domain/entities/mood_definition.dart`.
+- Los IDs de la primera versión son:
+  - `mood_shy_unlock`
+  - `mood_brave_unlock`
+  - `mood_confident_unlock`
+  - `mood_romantic_unlock`
+  - `mood_anxious_unlock`
+- Los unlocks se almacenan localmente en Hive como caché de entitlements, pero
+  la restauración depende de la cuenta de tienda del usuario.
+- Antes de release, valida el flujo con cuentas sandbox/test:
+  - compra exitosa de un mood bloqueado
+  - restore purchases después de reinstalar
+  - apertura de la app cuando la tienda no está disponible
+
 Pruebas:
 
 ```sh

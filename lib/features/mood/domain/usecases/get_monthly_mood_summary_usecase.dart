@@ -10,7 +10,8 @@ class GetMonthlyMoodSummaryUseCase {
   Future<MonthlyMoodSummary> call(DateTime month) async {
     final normalizedMonth = DateTime(month.year, month.month);
     final entries = await getMoodsForMonth(normalizedMonth);
-    final sortedEntries = [...entries]..sort((a, b) => a.date.compareTo(b.date));
+    final sortedEntries = [...entries]
+      ..sort((a, b) => a.date.compareTo(b.date));
 
     final averageScore = sortedEntries.isEmpty
         ? 0.0
@@ -21,6 +22,8 @@ class GetMonthlyMoodSummaryUseCase {
 
     final bestStreak = _calculateBestStreak(sortedEntries);
     final lastEntry = sortedEntries.isNotEmpty ? sortedEntries.last : null;
+    final representativeAverageEntry =
+        _resolveRepresentativeAverageEntry(sortedEntries, averageScore);
 
     return MonthlyMoodSummary(
       month: normalizedMonth,
@@ -28,7 +31,32 @@ class GetMonthlyMoodSummaryUseCase {
       averageScore: averageScore,
       bestStreak: bestStreak,
       lastEntry: lastEntry,
+      representativeAverageEntry: representativeAverageEntry,
     );
+  }
+
+  MoodEntry? _resolveRepresentativeAverageEntry(
+    List<MoodEntry> entries,
+    double averageScore,
+  ) {
+    if (entries.isEmpty) {
+      return null;
+    }
+
+    MoodEntry? bestEntry;
+    double? bestDistance;
+
+    for (final entry in entries) {
+      final distance = (entry.intensity - averageScore).abs();
+      if (bestEntry == null ||
+          distance < bestDistance! ||
+          (distance == bestDistance && entry.date.isAfter(bestEntry.date))) {
+        bestEntry = entry;
+        bestDistance = distance;
+      }
+    }
+
+    return bestEntry;
   }
 
   int _calculateBestStreak(List<MoodEntry> entries) {
@@ -40,10 +68,9 @@ class GetMonthlyMoodSummaryUseCase {
     for (int i = 1; i < entries.length; i++) {
       final previousDate = entries[i - 1].date;
       final currentDate = entries[i].date;
-      final isConsecutive =
-          currentDate.difference(previousDate).inDays == 1 &&
-              currentDate.month == previousDate.month &&
-              currentDate.year == previousDate.year;
+      final isConsecutive = currentDate.difference(previousDate).inDays == 1 &&
+          currentDate.month == previousDate.month &&
+          currentDate.year == previousDate.year;
 
       if (isConsecutive) {
         currentStreak++;
