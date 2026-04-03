@@ -6,6 +6,7 @@ class MonthlyMoodSummary {
   final double averageScore;
   final int bestStreak;
   final MoodEntry? lastEntry;
+  final MoodEntry? representativeAverageEntry;
 
   MonthlyMoodSummary({
     required this.month,
@@ -13,5 +14,6 @@ class MonthlyMoodSummary {
     required this.averageScore,
     required this.bestStreak,
     required this.lastEntry,
+    required this.representativeAverageEntry,
   });
 }
