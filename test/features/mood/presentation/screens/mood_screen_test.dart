@@ -1,10 +1,11 @@
-import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
+import 'package:mood_calendar/core/localization/app_strings.dart';
 import 'package:mood_calendar/core/logging/app_logger.dart';
 import 'package:mood_calendar/core/telemetry/app_telemetry.dart';
 import 'package:mood_calendar/features/mood/data/models/mood_model.dart';
@@ -17,10 +18,6 @@ import 'package:mood_calendar/features/mood/domain/usecases/save_mood_usecase.da
 import 'package:mood_calendar/features/mood/presentation/bloc/calendar_cubit.dart';
 import 'package:mood_calendar/features/mood/presentation/bloc/mood_cubit.dart';
 import 'package:mood_calendar/features/mood/presentation/screens/mood_screen.dart';
-import 'package:mood_calendar/features/premium/domain/entities/mood_store_product.dart';
-import 'package:mood_calendar/features/premium/domain/entities/premium_snapshot.dart';
-import 'package:mood_calendar/features/premium/domain/repositories/premium_repository.dart';
-import 'package:mood_calendar/features/premium/presentation/bloc/premium_cubit.dart';
 
 class _FakeMoodRepository implements MoodRepository {
   final savedEntries = <MoodEntry>[];
@@ -38,41 +35,6 @@ class _FakeMoodRepository implements MoodRepository {
   Future<void> saveMood(MoodEntry entry) async {
     savedEntries.add(entry);
   }
-}
-
-class _FakePremiumRepository implements PremiumRepository {
-  _FakePremiumRepository(this._snapshot);
-
-  final _controller = StreamController<PremiumSnapshot>.broadcast();
-  final PremiumSnapshot _snapshot;
-  int restoreCalls = 0;
-  final boughtMoodIds = <String>[];
-
-  @override
-  PremiumSnapshot get currentSnapshot => _snapshot;
-
-  @override
-  Future<void> buyMood(String moodId) async {
-    boughtMoodIds.add(moodId);
-  }
-
-  @override
-  void dispose() {
-    _controller.close();
-  }
-
-  @override
-  Future<void> initialize() async {
-    _controller.add(_snapshot);
-  }
-
-  @override
-  Future<void> restorePurchases() async {
-    restoreCalls++;
-  }
-
-  @override
-  Stream<PremiumSnapshot> watchSnapshot() => _controller.stream;
 }
 
 class _TestAppLogger implements AppLogger {
@@ -145,25 +107,7 @@ void main() {
     }
   });
 
-  testWidgets(
-      'tapping save on a locked mood opens purchase sheet instead of saving',
-      (tester) async {
-    final premiumRepository = _FakePremiumRepository(
-      const PremiumSnapshot(
-        productsByMoodId: {
-          'shy': MoodStoreProduct(
-            moodId: 'shy',
-            productId: 'mood_shy_unlock',
-            title: 'Shy',
-            description: 'Unlock Shy',
-            price: '\$0.99',
-            isAvailable: true,
-          ),
-        },
-        isStoreAvailable: true,
-      ),
-    );
-
+  testWidgets('saving a base mood persists the entry', (tester) async {
     await tester.pumpWidget(
       MultiBlocProvider(
         providers: [
@@ -183,69 +127,33 @@ void main() {
               ),
             ),
           ),
-          BlocProvider(
-            create: (_) => PremiumCubit(repository: premiumRepository),
-          ),
         ],
-        child: const MaterialApp(home: MoodScreen()),
+        child: const MaterialApp(
+          locale: Locale('es'),
+          supportedLocales: AppStrings.supportedLocales,
+          localizationsDelegates: [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          home: MoodScreen(),
+        ),
       ),
     );
 
     await tester.pumpAndSettle();
 
-    for (var i = 0; i < 5; i++) {
+    for (var i = 0; i < 1; i++) {
       await tester.drag(find.byType(PageView), const Offset(-400, 0));
       await tester.pumpAndSettle();
     }
 
-    expect(find.text('Shy'), findsOneWidget);
+    expect(find.text('Calm'), findsOneWidget);
 
-    await tester.tap(find.textContaining('Unlock Shy'));
+    await tester.tap(find.text('Guardar'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Unlock Shy'), findsAtLeastNWidgets(1));
-    expect(
-        find.text('Buy this mood once and use it everywhere in Mood Calendar.'),
-        findsOneWidget);
-    expect(moodRepository.savedEntries, isEmpty);
-    expect(premiumRepository.boughtMoodIds, isEmpty);
-  });
-
-  testWidgets('restore button delegates to premium repository', (tester) async {
-    final premiumRepository = _FakePremiumRepository(const PremiumSnapshot());
-
-    await tester.pumpWidget(
-      MultiBlocProvider(
-        providers: [
-          BlocProvider(
-            create: (_) => MoodCubit(
-              saveMood: SaveMoodUseCase(moodRepository),
-              getMoods: GetMoodsUseCase(moodRepository),
-              logger: const _TestAppLogger(),
-              telemetry: const _TestAppTelemetry(),
-            ),
-          ),
-          BlocProvider(
-            create: (_) => CalendarCubit(
-              initialMonth: DateTime(2026, 4, 1),
-              getMonthlyMoodSummary: GetMonthlyMoodSummaryUseCase(
-                GetMoodsForMonthUseCase(moodRepository),
-              ),
-            ),
-          ),
-          BlocProvider(
-            create: (_) => PremiumCubit(repository: premiumRepository),
-          ),
-        ],
-        child: const MaterialApp(home: MoodScreen()),
-      ),
-    );
-
-    await tester.pumpAndSettle();
-
-    await tester.tap(find.text('Restore'));
-    await tester.pump();
-
-    expect(premiumRepository.restoreCalls, 1);
+    expect(moodRepository.savedEntries, hasLength(1));
+    expect(moodRepository.savedEntries.single.mood, 'assets/icon/calm.svg');
   });
 }

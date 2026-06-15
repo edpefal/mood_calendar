@@ -19,8 +19,7 @@ class MoodDefinitionResolver {
 
   static MoodDefinition byIntensity(int intensity) {
     return allMoodDefinitions.firstWhere(
-      (definition) =>
-          definition.intensity == intensity && !definition.isPremium,
+      (definition) => definition.intensity == intensity,
       orElse: () => freeMoodDefinitions.last,
     );
   }
@@ -48,16 +47,12 @@ class MoodDefinitionResolver {
   static LinearGradient backgroundGradientForMood(MoodDefinition mood) {
     switch (mood.id) {
       case 'happy':
-      case 'brave':
-      case 'confident':
         return const LinearGradient(
           colors: [Color(0xFFE8F5E9), Color(0xFFC8E6C9)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         );
       case 'calm':
-      case 'shy':
-      case 'romantic':
         return const LinearGradient(
           colors: [Color(0xFFEDE7F6), Color(0xFFD1C4E9)],
           begin: Alignment.topLeft,
@@ -70,7 +65,6 @@ class MoodDefinitionResolver {
           end: Alignment.bottomRight,
         );
       case 'sad':
-      case 'anxious':
         return const LinearGradient(
           colors: [Color(0xFFFFF3E0), Color(0xFFFFE0B2)],
           begin: Alignment.topLeft,

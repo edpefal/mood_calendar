@@ -4,9 +4,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../core/localization/app_strings.dart';
 import '../../../../core/navigation/app_navigator.dart';
-import '../../../premium/presentation/bloc/premium_cubit.dart';
-import '../../../premium/presentation/bloc/premium_state.dart';
-import '../../../premium/presentation/widgets/locked_mood_purchase_sheet.dart';
 import '../../domain/entities/mood_definition.dart';
 import '../../domain/entities/mood_entry.dart';
 import '../../domain/services/mood_definition_resolver.dart';
@@ -125,24 +122,8 @@ class _MoodScreenState extends State<MoodScreen>
     });
   }
 
-  bool _isOwned(PremiumState premiumState, MoodDefinition mood) {
-    return premiumState.isOwned(mood);
-  }
-
-  Future<void> _showPurchaseSheet(MoodDefinition mood) {
-    return showModalBottomSheet<void>(
-      context: context,
-      showDragHandle: true,
-      builder: (_) => LockedMoodPurchaseSheet(mood: mood),
-    );
-  }
-
-  void _saveMood(PremiumState premiumState) {
+  void _saveMood() {
     if (_isSaving) {
-      return;
-    }
-    if (!_isOwned(premiumState, selectedMood)) {
-      _showPurchaseSheet(selectedMood);
       return;
     }
     setState(() {
@@ -160,59 +141,42 @@ class _MoodScreenState extends State<MoodScreen>
   @override
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
-    return MultiBlocListener(
-      listeners: [
-        BlocListener<MoodCubit, MoodState>(
-          listener: (context, state) {
-            _hydrateFromState(state);
-            state.maybeWhen(
-              loading: () {
-                if (!mounted) {
-                  return;
-                }
-                setState(() {
-                  _isSaving = !isLoading;
-                });
-              },
-              saved: () {
-                final normalizedDate = _selectedDate;
-                context.read<MoodCubit>().fetchAll();
-                if (context.mounted) {
-                  context.read<CalendarCubit>().refreshForDate(normalizedDate);
-                }
-                AppNavigator.popOrShowCalendar(
-                  context,
-                  recentlySavedDate: normalizedDate,
-                );
-              },
-              error: (_) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(strings.saveMoodError),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-              },
-              orElse: () {},
+    return BlocListener<MoodCubit, MoodState>(
+      listener: (context, state) {
+        _hydrateFromState(state);
+        state.maybeWhen(
+          loading: () {
+            if (!mounted) {
+              return;
+            }
+            setState(() {
+              _isSaving = !isLoading;
+            });
+          },
+          saved: () {
+            final normalizedDate = _selectedDate;
+            context.read<MoodCubit>().fetchAll();
+            if (context.mounted) {
+              context.read<CalendarCubit>().refreshForDate(normalizedDate);
+            }
+            AppNavigator.popOrShowCalendar(
+              context,
+              recentlySavedDate: normalizedDate,
             );
           },
-        ),
-        BlocListener<PremiumCubit, PremiumState>(
-          listenWhen: (previous, current) =>
-              previous.errorMessage != current.errorMessage &&
-              current.errorMessage != null,
-          listener: (context, state) {
+          error: (_) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.errorMessage!),
+                content: Text(strings.saveMoodError),
                 backgroundColor: Colors.red,
               ),
             );
           },
-        ),
-      ],
-      child: BlocBuilder<PremiumCubit, PremiumState>(
-        builder: (context, premiumState) {
+          orElse: () {},
+        );
+      },
+      child: Builder(
+        builder: (context) {
           if (isLoading) {
             return Scaffold(
               body: Center(
@@ -235,12 +199,7 @@ class _MoodScreenState extends State<MoodScreen>
             );
           }
 
-          final selectedProduct = premiumState.productForMood(selectedMood.id);
-          final isLocked = !_isOwned(premiumState, selectedMood);
-          final isBusy = _isSaving || premiumState.isLoading;
-          final primaryButtonLabel = isLocked
-              ? 'Unlock ${selectedMood.label}${selectedProduct != null ? ' • ${selectedProduct.price}' : ''}'
-              : strings.save;
+          final isBusy = _isSaving;
 
           return Scaffold(
             backgroundColor: Colors.transparent,
@@ -248,7 +207,8 @@ class _MoodScreenState extends State<MoodScreen>
               duration: const Duration(milliseconds: 300),
               decoration: BoxDecoration(
                 gradient: MoodDefinitionResolver.backgroundGradientForMood(
-                    selectedMood),
+                  selectedMood,
+                ),
               ),
               child: SafeArea(
                 child: SizedBox.expand(
@@ -276,14 +236,6 @@ class _MoodScreenState extends State<MoodScreen>
                                           fontWeight: FontWeight.bold,
                                         ),
                                   ),
-                                ),
-                                TextButton(
-                                  onPressed: isBusy
-                                      ? null
-                                      : () => context
-                                          .read<PremiumCubit>()
-                                          .restorePurchases(),
-                                  child: const Text('Restore'),
                                 ),
                                 IconButton(
                                   tooltip: strings.openCalendarTooltip,
@@ -326,125 +278,45 @@ class _MoodScreenState extends State<MoodScreen>
                                   onPageChanged: _onPageChanged,
                                   itemBuilder: (context, index) {
                                     final mood = allMoodDefinitions[index];
-                                    final locked =
-                                        !_isOwned(premiumState, mood);
-                                    final product =
-                                        premiumState.productForMood(mood.id);
 
-                                    return GestureDetector(
-                                      onTap: locked
-                                          ? () => _showPurchaseSheet(mood)
-                                          : null,
-                                      child: Semantics(
-                                        label: strings.selectedMood(
-                                          mood.label,
-                                          index,
-                                          allMoodDefinitions.length,
-                                        ),
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Stack(
-                                              alignment: Alignment.center,
-                                              children: [
-                                                Opacity(
-                                                  opacity: locked ? 0.45 : 1,
-                                                  child: SvgPicture.asset(
-                                                    mood.assetPath,
-                                                    height: 150,
-                                                    width: 150,
-                                                    fit: BoxFit.contain,
-                                                    semanticsLabel: mood.label,
-                                                    placeholderBuilder: (context) =>
-                                                        const CircularProgressIndicator(),
-                                                    errorBuilder: (
-                                                      context,
-                                                      error,
-                                                      stackTrace,
-                                                    ) {
-                                                      return const Icon(
-                                                        Icons.error_outline,
-                                                        size: 150,
-                                                        color: Colors.red,
-                                                      );
-                                                    },
-                                                  ),
-                                                ),
-                                                if (locked)
-                                                  Container(
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                      horizontal: 12,
-                                                      vertical: 8,
-                                                    ),
-                                                    decoration: BoxDecoration(
-                                                      color: Colors.black87,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                        20,
-                                                      ),
-                                                    ),
-                                                    child: Text(
-                                                      product?.price ??
-                                                          '\$0.99',
-                                                      style: const TextStyle(
-                                                        color: Colors.white,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                  ),
-                                              ],
-                                            ),
-                                            const SizedBox(height: 8),
-                                            Text(
-                                              mood.label,
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .titleMedium,
-                                            ),
-                                            const SizedBox(height: 8),
-                                            if (locked)
-                                              Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                  horizontal: 12,
-                                                  vertical: 6,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.white
-                                                      .withValues(alpha: 0.8),
-                                                  borderRadius:
-                                                      BorderRadius.circular(24),
-                                                ),
-                                                child: const Row(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  children: [
-                                                    Icon(Icons.lock, size: 14),
-                                                    SizedBox(width: 6),
-                                                    Text('Tap to unlock'),
-                                                  ],
-                                                ),
-                                              )
-                                            else if (mood.isPremium)
-                                              Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                  horizontal: 12,
-                                                  vertical: 6,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.white
-                                                      .withValues(alpha: 0.8),
-                                                  borderRadius:
-                                                      BorderRadius.circular(24),
-                                                ),
-                                                child: const Text('Unlocked'),
-                                              ),
-                                          ],
-                                        ),
+                                    return Semantics(
+                                      label: strings.selectedMood(
+                                        mood.label,
+                                        index,
+                                        allMoodDefinitions.length,
+                                      ),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          SvgPicture.asset(
+                                            mood.assetPath,
+                                            height: 150,
+                                            width: 150,
+                                            fit: BoxFit.contain,
+                                            semanticsLabel: mood.label,
+                                            placeholderBuilder: (context) =>
+                                                const CircularProgressIndicator(),
+                                            errorBuilder: (
+                                              context,
+                                              error,
+                                              stackTrace,
+                                            ) {
+                                              return const Icon(
+                                                Icons.error_outline,
+                                                size: 150,
+                                                color: Colors.red,
+                                              );
+                                            },
+                                          ),
+                                          const SizedBox(height: 8),
+                                          Text(
+                                            mood.label,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleMedium,
+                                          ),
+                                        ],
                                       ),
                                     );
                                   },
@@ -502,7 +374,7 @@ class _MoodScreenState extends State<MoodScreen>
                                   constraints:
                                       const BoxConstraints(minHeight: 56),
                                   child: GestureDetector(
-                                    onTap: () => _saveMood(premiumState),
+                                    onTap: _saveMood,
                                     child: Container(
                                       width: double.infinity,
                                       padding: const EdgeInsets.symmetric(
@@ -535,7 +407,7 @@ class _MoodScreenState extends State<MoodScreen>
                                                 ),
                                               )
                                             : Text(
-                                                primaryButtonLabel,
+                                                strings.save,
                                                 style: const TextStyle(
                                                   color: Colors.white,
                                                   fontSize: 18,
@@ -551,9 +423,7 @@ class _MoodScreenState extends State<MoodScreen>
                             if (isBusy) ...[
                               const SizedBox(height: 12),
                               Text(
-                                _isSaving
-                                    ? strings.savingMood
-                                    : 'Processing...',
+                                strings.savingMood,
                                 style: Theme.of(context).textTheme.bodyMedium,
                               ),
                             ],

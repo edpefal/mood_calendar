@@ -6,9 +6,6 @@ class MoodDefinition {
   final String assetPath;
   final Color color;
   final int intensity;
-  final bool isPremium;
-  final String? productId;
-  final List<String> packIds;
 
   const MoodDefinition({
     required this.id,
@@ -16,9 +13,6 @@ class MoodDefinition {
     required this.assetPath,
     required this.color,
     required this.intensity,
-    this.isPremium = false,
-    this.productId,
-    this.packIds = const [],
   });
 }
 
@@ -60,60 +54,4 @@ const List<MoodDefinition> freeMoodDefinitions = [
   ),
 ];
 
-const List<MoodDefinition> premiumMoodDefinitions = [
-  MoodDefinition(
-    id: 'shy',
-    label: 'Shy',
-    assetPath: 'assets/icon/shy.svg',
-    color: Color(0xFF8E7DBE),
-    intensity: 2,
-    isPremium: true,
-    productId: 'mood_shy_unlock',
-    packIds: ['soft_emotions_pack'],
-  ),
-  MoodDefinition(
-    id: 'brave',
-    label: 'Brave',
-    assetPath: 'assets/icon/brave.svg',
-    color: Color(0xFF00897B),
-    intensity: 1,
-    isPremium: true,
-    productId: 'mood_brave_unlock',
-    packIds: ['confidence_pack'],
-  ),
-  MoodDefinition(
-    id: 'confident',
-    label: 'Confident',
-    assetPath: 'assets/icon/confident.svg',
-    color: Color(0xFF7B1FA2),
-    intensity: 1,
-    isPremium: true,
-    productId: 'mood_confident_unlock',
-    packIds: ['confidence_pack'],
-  ),
-  MoodDefinition(
-    id: 'romantic',
-    label: 'Romantic',
-    assetPath: 'assets/icon/romantic.svg',
-    color: Color(0xFFE91E63),
-    intensity: 2,
-    isPremium: true,
-    productId: 'mood_romantic_unlock',
-    packIds: ['soft_emotions_pack'],
-  ),
-  MoodDefinition(
-    id: 'anxious',
-    label: 'Anxious',
-    assetPath: 'assets/icon/anxious.svg',
-    color: Color(0xFF6D4C41),
-    intensity: 4,
-    isPremium: true,
-    productId: 'mood_anxious_unlock',
-    packIds: ['soft_emotions_pack'],
-  ),
-];
-
-const List<MoodDefinition> allMoodDefinitions = [
-  ...freeMoodDefinitions,
-  ...premiumMoodDefinitions,
-];
+const List<MoodDefinition> allMoodDefinitions = freeMoodDefinitions;

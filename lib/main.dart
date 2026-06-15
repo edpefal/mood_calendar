@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'core/localization/app_strings.dart';
@@ -26,10 +25,6 @@ import 'features/mood/domain/usecases/save_mood_usecase.dart';
 import 'features/mood/presentation/bloc/calendar_cubit.dart';
 import 'features/mood/presentation/bloc/mood_cubit.dart';
 import 'features/mood/presentation/screens/mood_screen.dart';
-import 'features/premium/data/datasources/premium_local_datasource.dart';
-import 'features/premium/data/datasources/premium_purchase_datasource.dart';
-import 'features/premium/data/repositories/premium_repository_impl.dart';
-import 'features/premium/presentation/bloc/premium_cubit.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 bool _isHandlingReminderTap = false;
@@ -73,11 +68,9 @@ void main() async {
 
   await Hive.openBox<MoodModel>('moods');
   await Hive.openBox<dynamic>(AppSettingsLocalDataSource.boxName);
-  await Hive.openBox<dynamic>('premium_entitlements');
 
   final moodBox = Hive.box<MoodModel>('moods');
   final settingsBox = Hive.box<dynamic>(AppSettingsLocalDataSource.boxName);
-  final premiumEntitlementsBox = Hive.box<dynamic>('premium_entitlements');
 
   final appLogger = LoggerAppLogger();
   final telemetry = LoggerAppTelemetry(
@@ -87,10 +80,6 @@ void main() async {
   final repository = MoodRepositoryImpl(moodBox, logger: appLogger);
   final appSettingsRepository = AppSettingsRepositoryImpl(
     AppSettingsLocalDataSource(settingsBox),
-  );
-  final premiumRepository = PremiumRepositoryImpl(
-    localDataSource: PremiumLocalDataSource(premiumEntitlementsBox),
-    purchaseDataSource: StorePremiumPurchaseDataSource(InAppPurchase.instance),
   );
   final notificationService = LocalNotificationService(
     onReminderTap: _handleReminderTap,
@@ -109,7 +98,6 @@ void main() async {
         RepositoryProvider<LocalNotificationService>.value(
           value: notificationService,
         ),
-        RepositoryProvider.value(value: premiumRepository),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -127,11 +115,6 @@ void main() async {
               getMonthlyMoodSummary: GetMonthlyMoodSummaryUseCase(
                 GetMoodsForMonthUseCase(repository),
               ),
-            ),
-          ),
-          BlocProvider(
-            create: (context) => PremiumCubit(
-              repository: context.read<PremiumRepositoryImpl>(),
             ),
           ),
         ],

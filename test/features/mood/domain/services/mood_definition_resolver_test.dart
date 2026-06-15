@@ -4,11 +4,10 @@ import 'package:mood_calendar/features/mood/domain/services/mood_definition_reso
 
 void main() {
   group('MoodDefinitionResolver', () {
-    test('resolves premium mood by asset path', () {
-      final mood = MoodDefinitionResolver.byAssetPath('assets/icon/shy.svg');
+    test('resolves base mood by asset path', () {
+      final mood = MoodDefinitionResolver.byAssetPath('assets/icon/calm.svg');
 
-      expect(mood.id, 'shy');
-      expect(mood.isPremium, isTrue);
+      expect(mood.id, 'calm');
       expect(mood.intensity, 2);
     });
 
