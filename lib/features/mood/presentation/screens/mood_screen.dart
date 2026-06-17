@@ -228,7 +228,7 @@ class _MoodScreenState extends State<MoodScreen>
                               children: [
                                 Expanded(
                                   child: Text(
-                                    _formatDate(_selectedDate),
+                                    _formatDate(context, _selectedDate),
                                     style: Theme.of(context)
                                         .textTheme
                                         .titleLarge
@@ -350,7 +350,7 @@ class _MoodScreenState extends State<MoodScreen>
                               controller: _noteController,
                               maxLines: 3,
                               decoration: InputDecoration(
-                                hintText: 'Write a note...',
+                                hintText: AppStrings.of(context).noteHint,
                                 filled: true,
                                 fillColor: Colors.white,
                                 border: OutlineInputBorder(
@@ -441,8 +441,8 @@ class _MoodScreenState extends State<MoodScreen>
     );
   }
 
-  String _formatDate(DateTime date) {
-    final months = AppStrings.spanish.monthNames;
+  String _formatDate(BuildContext context, DateTime date) {
+    final months = AppStrings.of(context).monthNames;
     return '${months[date.month - 1]} ${date.day}, ${date.year}';
   }
 }

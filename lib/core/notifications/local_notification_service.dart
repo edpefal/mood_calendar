@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'dart:ui';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_native_timezone/flutter_native_timezone.dart';
@@ -115,8 +117,8 @@ class LocalNotificationService {
 
     await _plugin.zonedSchedule(
       _dailyReminderId,
-      AppStrings.spanish.reminderNotificationTitle,
-      AppStrings.spanish.reminderNotificationBody,
+      AppStrings.forLocale(const Locale('es')).reminderNotificationTitle,
+      AppStrings.forLocale(const Locale('es')).reminderNotificationBody,
       scheduled,
       const NotificationDetails(
         android: androidDetails,
@@ -223,8 +225,9 @@ class LocalNotificationService {
     await androidPlugin?.createNotificationChannel(
       AndroidNotificationChannel(
         _dailyReminderChannelId,
-        AppStrings.spanish.notificationChannelName,
-        description: AppStrings.spanish.notificationChannelDescription,
+        AppStrings.forLocale(const Locale('es')).notificationChannelName,
+        description:
+            AppStrings.forLocale(const Locale('es')).notificationChannelDescription,
         importance: Importance.high,
       ),
     );

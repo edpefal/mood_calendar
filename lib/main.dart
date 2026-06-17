@@ -142,9 +142,8 @@ class MyApp extends StatelessWidget {
     final poppinsTextTheme = GoogleFonts.poppinsTextTheme(baseTheme.textTheme);
 
     return MaterialApp(
-      title: AppStrings.spanish.appTitle,
+      title: AppStrings.forLocale(const Locale('es')).appTitle,
       navigatorKey: navigatorKey,
-      locale: const Locale('es'),
       supportedLocales: AppStrings.supportedLocales,
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
