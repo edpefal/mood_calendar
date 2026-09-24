@@ -94,6 +94,5 @@ El repo tiene branch protection: los PRs requieren que pase el check "Analyze an
 
 ## Notas
 
-- `fl_chart` está en `pubspec.yaml` pero ya no se usa (la gráfica mensual fue eliminada) — se puede remover en un cleanup futuro
 - No hay tests actualmente
 - No hay backend ni autenticación; todos los datos son locales (Hive)
