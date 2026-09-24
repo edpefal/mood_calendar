@@ -79,6 +79,19 @@ refactor(localization): migrate AppStrings to per-language subclasses
 chore: update flutter_local_notifications to 17.1.2
 ```
 
+## Workflow de desarrollo
+
+Siempre trabajar en ramas y abrir PR — nunca push directo a `main`:
+
+```bash
+git checkout -b feat/nombre-del-cambio
+# ... implementar ...
+git push -u origin feat/nombre-del-cambio
+gh pr create
+```
+
+El repo tiene branch protection: los PRs requieren que pase el check "Analyze and Test" antes de hacer merge.
+
 ## Notas
 
 - `fl_chart` está en `pubspec.yaml` pero ya no se usa (la gráfica mensual fue eliminada) — se puede remover en un cleanup futuro
