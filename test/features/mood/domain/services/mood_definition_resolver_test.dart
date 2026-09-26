@@ -11,10 +11,10 @@ void main() {
       expect(mood.intensity, 2);
     });
 
-    test('keeps free mood fallback for unknown paths', () {
+    test('keeps base mood fallback for unknown paths', () {
       final mood = MoodDefinitionResolver.byAssetPath('missing.svg');
 
-      expect(mood, freeMoodDefinitions.first);
+      expect(mood, baseMoodDefinitions.first);
     });
 
     test('returns legacy intensity from known mood path', () {

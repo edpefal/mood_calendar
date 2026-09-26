@@ -47,10 +47,10 @@ class AppStringsDe extends AppStrings {
   String get emptySummary =>
       'Diesen Monat noch keine Einträge. Beginne mit dem Erfassen, um deine Übersicht zu sehen.';
   @override
-  String get monthlyAverage => 'Monatsdurchschnitt';
+  String get monthlyAverage => 'Häufigste Stimmung';
   @override
   String moodRepresentsMonth(String monthName) =>
-      'Stimmung, die $monthName am besten widerspiegelt';
+      'Stimmung, die du im $monthName am häufigsten erfasst hast';
   @override
   String get bestStreak => 'Beste Serie';
   @override
@@ -114,7 +114,7 @@ class AppStringsDe extends AppStrings {
   String get monthlyChartSemantics => 'Monatliche Stimmungsgrafik';
   @override
   String monthlyAverageSemantics(String moodLabel) =>
-      'Monatsdurchschnittliche Stimmung: $moodLabel';
+      'Häufigste Stimmung: $moodLabel';
   @override
   String bestStreakSemantics(int days) => 'Beste Serie: $days Tage';
 
@@ -140,4 +140,62 @@ class AppStringsDe extends AppStrings {
 
   @override
   String get noteHint => 'Notiz schreiben...';
+
+  // Shop / Paywall
+  @override
+  String get storeTitle => 'Stimmungs-Shop';
+  @override
+  String get openStoreTooltip => 'Shop öffnen';
+  @override
+  String get storeMoodsSectionTitle => 'Premium-Stimmungen';
+  @override
+  String get storePacksSectionTitle => 'Pakete';
+  @override
+  String get storeLoading => 'Shop wird geladen...';
+  @override
+  String get storeLoadError =>
+      'Wir konnten den Shop gerade nicht laden. Bitte versuche es erneut.';
+  @override
+  String get storeEmptyMoods =>
+      'Derzeit sind keine Premium-Stimmungen verfügbar.';
+  @override
+  String get storeEmptyPacks => 'Derzeit sind keine Pakete verfügbar.';
+  @override
+  String get moodUnlockedLabel => 'Freigeschaltet';
+  @override
+  String buyMoodButtonLabel(String moodLabel, String price) =>
+      '$moodLabel kaufen · $price';
+  @override
+  String packIncludesMoods(String moodLabels) => 'Enthält: $moodLabels';
+  @override
+  String buyPackButtonLabel(String packLabel, String price) =>
+      '$packLabel kaufen · $price';
+  @override
+  String get restorePurchasesButtonLabel => 'Käufe wiederherstellen';
+  @override
+  String get restoringPurchases => 'Deine Käufe werden wiederhergestellt...';
+  @override
+  String get restoreSuccessMessage => 'Deine Käufe wurden wiederhergestellt.';
+  @override
+  String get purchaseSuccessMessage => 'Kauf abgeschlossen. Viel Spaß!';
+  @override
+  String get purchaseCancelledMessage => 'Kauf abgebrochen.';
+  @override
+  String get purchaseNetworkErrorMessage =>
+      'Keine Internetverbindung. Bitte versuche es erneut.';
+  @override
+  String get purchaseProductUnavailableMessage =>
+      'Dieser Artikel ist gerade nicht verfügbar.';
+  @override
+  String get purchaseUnknownErrorMessage =>
+      'Bei deinem Kauf ist etwas schiefgelaufen. Bitte versuche es erneut.';
+  @override
+  String get packOverlapWarningTitle => 'Einige davon hast du schon';
+  @override
+  String packOverlapWarningMessage(String moodLabels) =>
+      'Du besitzt bereits $moodLabels, kannst dieses Paket aber trotzdem zum vollen Preis kaufen.';
+  @override
+  String get continueLabel => 'Weiter';
+  @override
+  String get cancelLabel => 'Abbrechen';
 }

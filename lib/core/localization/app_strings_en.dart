@@ -44,10 +44,10 @@ class AppStringsEn extends AppStrings {
   String get emptySummary =>
       'No entries this month yet. Start recording to see your summary.';
   @override
-  String get monthlyAverage => 'Monthly average';
+  String get monthlyAverage => 'Most frequent mood';
   @override
   String moodRepresentsMonth(String monthName) =>
-      'Mood that best represents $monthName';
+      'Mood you logged most often in $monthName';
   @override
   String get bestStreak => 'Best streak';
   @override
@@ -110,7 +110,7 @@ class AppStringsEn extends AppStrings {
   String get monthlyChartSemantics => 'Monthly mood chart';
   @override
   String monthlyAverageSemantics(String moodLabel) =>
-      'Monthly average mood: $moodLabel';
+      'Most frequent mood: $moodLabel';
   @override
   String bestStreakSemantics(int days) => 'Best streak: $days days';
 
@@ -136,4 +136,61 @@ class AppStringsEn extends AppStrings {
 
   @override
   String get noteHint => 'Write a note...';
+
+  // Store / paywall
+  @override
+  String get storeTitle => 'Mood Store';
+  @override
+  String get openStoreTooltip => 'Open store';
+  @override
+  String get storeMoodsSectionTitle => 'Premium moods';
+  @override
+  String get storePacksSectionTitle => 'Packs';
+  @override
+  String get storeLoading => 'Loading the store...';
+  @override
+  String get storeLoadError =>
+      'We could not load the store right now. Please try again.';
+  @override
+  String get storeEmptyMoods => 'No premium moods available right now.';
+  @override
+  String get storeEmptyPacks => 'No packs available right now.';
+  @override
+  String get moodUnlockedLabel => 'Unlocked';
+  @override
+  String buyMoodButtonLabel(String moodLabel, String price) =>
+      'Buy $moodLabel · $price';
+  @override
+  String packIncludesMoods(String moodLabels) => 'Includes: $moodLabels';
+  @override
+  String buyPackButtonLabel(String packLabel, String price) =>
+      'Buy $packLabel · $price';
+  @override
+  String get restorePurchasesButtonLabel => 'Restore purchases';
+  @override
+  String get restoringPurchases => 'Restoring your purchases...';
+  @override
+  String get restoreSuccessMessage => 'Your purchases were restored.';
+  @override
+  String get purchaseSuccessMessage => 'Purchase complete. Enjoy!';
+  @override
+  String get purchaseCancelledMessage => 'Purchase cancelled.';
+  @override
+  String get purchaseNetworkErrorMessage =>
+      'No internet connection. Please try again.';
+  @override
+  String get purchaseProductUnavailableMessage =>
+      'This item is not available right now.';
+  @override
+  String get purchaseUnknownErrorMessage =>
+      'Something went wrong with your purchase. Please try again.';
+  @override
+  String get packOverlapWarningTitle => 'You already have some of these';
+  @override
+  String packOverlapWarningMessage(String moodLabels) =>
+      'You already own $moodLabels, but you can still buy this pack at its full price.';
+  @override
+  String get continueLabel => 'Continue';
+  @override
+  String get cancelLabel => 'Cancel';
 }

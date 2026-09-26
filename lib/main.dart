@@ -25,6 +25,11 @@ import 'features/mood/domain/usecases/save_mood_usecase.dart';
 import 'features/mood/presentation/bloc/calendar_cubit.dart';
 import 'features/mood/presentation/bloc/mood_cubit.dart';
 import 'features/mood/presentation/screens/mood_screen.dart';
+import 'features/purchases/data/datasources/revenue_cat_datasource.dart';
+import 'features/purchases/data/repositories/mood_entitlements_repository_impl.dart';
+import 'features/purchases/data/repositories/noop_mood_entitlements_repository.dart';
+import 'features/purchases/domain/repositories/mood_entitlements_repository.dart';
+import 'features/purchases/presentation/bloc/purchases_cubit.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 bool _isHandlingReminderTap = false;
@@ -89,6 +94,27 @@ void main() async {
   final launchedFromReminder = await notificationService.initialize();
   await notificationService.scheduleDailyReminder();
 
+  const revenueCatApiKey = String.fromEnvironment('REVENUECAT_IOS_API_KEY');
+  final MoodEntitlementsRepository moodEntitlementsRepository;
+  if (revenueCatApiKey.isNotEmpty) {
+    await RevenueCatDatasource.configure(revenueCatApiKey);
+    moodEntitlementsRepository = MoodEntitlementsRepositoryImpl(
+      RevenueCatDatasource(),
+    );
+  } else {
+    // Never touch purchases_flutter before Purchases.configure() — doing so
+    // crashes natively with an uncatchable Swift fatalError. Fall back to a
+    // no-op repository (all premium moods locked) instead of taking down
+    // the whole app when the key is missing, e.g. launching from VS Code's
+    // "Run" button without a launch.json that sets --dart-define.
+    appLogger.error(
+      'REVENUECAT_IOS_API_KEY was not provided via --dart-define; '
+      'purchases will not work.',
+      tag: 'main',
+    );
+    moodEntitlementsRepository = const NoopMoodEntitlementsRepository();
+  }
+
   runApp(
     MultiRepositoryProvider(
       providers: [
@@ -116,6 +142,9 @@ void main() async {
                 GetMoodsForMonthUseCase(repository),
               ),
             ),
+          ),
+          BlocProvider(
+            create: (context) => PurchasesCubit(moodEntitlementsRepository),
           ),
         ],
         child: const MyApp(),

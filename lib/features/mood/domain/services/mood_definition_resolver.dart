@@ -6,21 +6,21 @@ class MoodDefinitionResolver {
   static MoodDefinition byId(String id) {
     return allMoodDefinitions.firstWhere(
       (definition) => definition.id == id,
-      orElse: () => freeMoodDefinitions.first,
+      orElse: () => baseMoodDefinitions.first,
     );
   }
 
   static MoodDefinition byAssetPath(String assetPath) {
     return allMoodDefinitions.firstWhere(
       (definition) => definition.assetPath == assetPath,
-      orElse: () => freeMoodDefinitions.first,
+      orElse: () => baseMoodDefinitions.first,
     );
   }
 
   static MoodDefinition byIntensity(int intensity) {
     return allMoodDefinitions.firstWhere(
       (definition) => definition.intensity == intensity,
-      orElse: () => freeMoodDefinitions.last,
+      orElse: () => baseMoodDefinitions.last,
     );
   }
 
@@ -31,14 +31,6 @@ class MoodDefinitionResolver {
       return null;
     }
     return match.first.intensity;
-  }
-
-  static String moodPathForScore(double score) {
-    if (score <= 1.5) return byIntensity(1).assetPath;
-    if (score <= 2.5) return byIntensity(2).assetPath;
-    if (score <= 3.5) return byIntensity(3).assetPath;
-    if (score <= 4.5) return byIntensity(4).assetPath;
-    return byIntensity(5).assetPath;
   }
 
   static Color colorForMoodPath(String assetPath) =>

@@ -13,46 +13,42 @@ class GetMonthlyMoodSummaryUseCase {
     final sortedEntries = [...entries]
       ..sort((a, b) => a.date.compareTo(b.date));
 
-    final averageScore = sortedEntries.isEmpty
-        ? 0.0
-        : sortedEntries
-                .map((e) => e.intensity)
-                .fold<int>(0, (sum, value) => sum + value) /
-            sortedEntries.length;
-
     final bestStreak = _calculateBestStreak(sortedEntries);
     final lastEntry = sortedEntries.isNotEmpty ? sortedEntries.last : null;
-    final representativeAverageEntry =
-        _resolveRepresentativeAverageEntry(sortedEntries, averageScore);
+    final mostCommonMoodEntry = _resolveMostCommonMoodEntry(sortedEntries);
 
     return MonthlyMoodSummary(
       month: normalizedMonth,
       entries: sortedEntries,
-      averageScore: averageScore,
+      mostCommonMoodEntry: mostCommonMoodEntry,
       bestStreak: bestStreak,
       lastEntry: lastEntry,
-      representativeAverageEntry: representativeAverageEntry,
     );
   }
 
-  MoodEntry? _resolveRepresentativeAverageEntry(
-    List<MoodEntry> entries,
-    double averageScore,
-  ) {
+  MoodEntry? _resolveMostCommonMoodEntry(List<MoodEntry> entries) {
     if (entries.isEmpty) {
       return null;
     }
 
-    MoodEntry? bestEntry;
-    double? bestDistance;
-
+    final countByMood = <String, int>{};
     for (final entry in entries) {
-      final distance = (entry.intensity - averageScore).abs();
-      if (bestEntry == null ||
-          distance < bestDistance! ||
-          (distance == bestDistance && entry.date.isAfter(bestEntry.date))) {
+      countByMood[entry.mood] = (countByMood[entry.mood] ?? 0) + 1;
+    }
+    final maxCount =
+        countByMood.values.fold<int>(0, (max, count) => count > max ? count : max);
+    final tiedMoods = countByMood.entries
+        .where((e) => e.value == maxCount)
+        .map((e) => e.key)
+        .toSet();
+
+    MoodEntry? bestEntry;
+    for (final entry in entries) {
+      if (!tiedMoods.contains(entry.mood)) {
+        continue;
+      }
+      if (bestEntry == null || entry.date.isAfter(bestEntry.date)) {
         bestEntry = entry;
-        bestDistance = distance;
       }
     }
 

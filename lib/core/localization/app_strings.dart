@@ -88,4 +88,30 @@ abstract class AppStrings {
   List<String> get monthNames;
   List<String> get weekdayInitials;
   String get noteHint;
+
+  // Tienda / paywall
+  String get storeTitle;
+  String get openStoreTooltip;
+  String get storeMoodsSectionTitle;
+  String get storePacksSectionTitle;
+  String get storeLoading;
+  String get storeLoadError;
+  String get storeEmptyMoods;
+  String get storeEmptyPacks;
+  String get moodUnlockedLabel;
+  String buyMoodButtonLabel(String moodLabel, String price);
+  String packIncludesMoods(String moodLabels);
+  String buyPackButtonLabel(String packLabel, String price);
+  String get restorePurchasesButtonLabel;
+  String get restoringPurchases;
+  String get restoreSuccessMessage;
+  String get purchaseSuccessMessage;
+  String get purchaseCancelledMessage;
+  String get purchaseNetworkErrorMessage;
+  String get purchaseProductUnavailableMessage;
+  String get purchaseUnknownErrorMessage;
+  String get packOverlapWarningTitle;
+  String packOverlapWarningMessage(String moodLabels);
+  String get continueLabel;
+  String get cancelLabel;
 }
