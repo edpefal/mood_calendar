@@ -5,8 +5,9 @@ import 'package:mood_calendar/features/mood/domain/usecases/get_monthly_mood_sum
 import 'package:mood_calendar/features/mood/domain/usecases/get_moods_for_month_usecase.dart';
 
 void main() {
-  test('builds a sorted summary with average, best streak and last entry',
-      () async {
+  test(
+      'builds a sorted summary with most common mood (tie broken by latest date), '
+      'best streak and last entry', () async {
     final repository = _InMemoryMoodRepository(
       moods: [
         MoodEntry(
@@ -39,12 +40,87 @@ void main() {
 
     expect(summary.month, DateTime(2026, 4));
     expect(summary.entries.map((entry) => entry.date.day), [10, 11, 12, 15]);
-    expect(summary.averageScore, 2.5);
+    // All 4 moods appear once (tied at count 1); tie-break picks the most
+    // recent entry among the tied moods.
+    expect(summary.mostCommonMoodEntry?.mood, 'assets/icon/neutral.svg');
+    expect(summary.mostCommonMoodEntry?.date.day, 15);
     expect(summary.bestStreak, 3);
     expect(summary.lastEntry?.date.day, 15);
   });
 
-  test('returns zeroed summary when the month has no entries', () async {
+  test(
+      'picks the mood with the highest count when there is no tie',
+      () async {
+    final repository = _InMemoryMoodRepository(
+      moods: [
+        MoodEntry(
+          date: DateTime(2026, 5, 1),
+          mood: 'assets/icon/happy.svg',
+          intensity: 1,
+        ),
+        MoodEntry(
+          date: DateTime(2026, 5, 2),
+          mood: 'assets/icon/happy.svg',
+          intensity: 1,
+        ),
+        MoodEntry(
+          date: DateTime(2026, 5, 3),
+          mood: 'assets/icon/sad.svg',
+          intensity: 4,
+        ),
+      ],
+    );
+    final useCase = GetMonthlyMoodSummaryUseCase(
+      GetMoodsForMonthUseCase(repository),
+    );
+
+    final summary = await useCase(DateTime(2026, 5, 1));
+
+    expect(summary.mostCommonMoodEntry?.mood, 'assets/icon/happy.svg');
+    // Among the two tied 'happy' entries, the most recent (day 2) wins.
+    expect(summary.mostCommonMoodEntry?.date.day, 2);
+  });
+
+  test(
+      'breaks a tie between two moods with the same max count by picking '
+      'the most recently dated entry', () async {
+    final repository = _InMemoryMoodRepository(
+      moods: [
+        MoodEntry(
+          date: DateTime(2026, 6, 1),
+          mood: 'assets/icon/happy.svg',
+          intensity: 1,
+        ),
+        MoodEntry(
+          date: DateTime(2026, 6, 2),
+          mood: 'assets/icon/sad.svg',
+          intensity: 4,
+        ),
+        MoodEntry(
+          date: DateTime(2026, 6, 3),
+          mood: 'assets/icon/happy.svg',
+          intensity: 1,
+        ),
+        MoodEntry(
+          date: DateTime(2026, 6, 4),
+          mood: 'assets/icon/sad.svg',
+          intensity: 4,
+        ),
+      ],
+    );
+    final useCase = GetMonthlyMoodSummaryUseCase(
+      GetMoodsForMonthUseCase(repository),
+    );
+
+    final summary = await useCase(DateTime(2026, 6, 1));
+
+    // 'happy' and 'sad' are both tied at count 2; 'sad' has the most
+    // recent entry (day 4), so it wins the tie-break.
+    expect(summary.mostCommonMoodEntry?.mood, 'assets/icon/sad.svg');
+    expect(summary.mostCommonMoodEntry?.date.day, 4);
+  });
+
+  test('returns an empty summary when the month has no entries', () async {
     final repository = _InMemoryMoodRepository(moods: const []);
     final useCase = GetMonthlyMoodSummaryUseCase(
       GetMoodsForMonthUseCase(repository),
@@ -53,7 +129,7 @@ void main() {
     final summary = await useCase(DateTime(2026, 4, 1));
 
     expect(summary.entries, isEmpty);
-    expect(summary.averageScore, 0);
+    expect(summary.mostCommonMoodEntry, isNull);
     expect(summary.bestStreak, 0);
     expect(summary.lastEntry, isNull);
   });

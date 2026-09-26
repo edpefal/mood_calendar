@@ -40,9 +40,10 @@ class MonthlyMoodSummaryCard extends StatelessWidget {
       );
     }
 
-    final representativeMoodPath =
-        summaryData.representativeAverageEntry?.mood ??
-            MoodDefinitionResolver.moodPathForScore(summaryData.averageScore);
+    final mostCommonMoodPath = summaryData.mostCommonMoodEntry?.mood;
+    if (mostCommonMoodPath == null) {
+      return _EmptyState(message: strings.emptySummary);
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -50,18 +51,18 @@ class MonthlyMoodSummaryCard extends StatelessWidget {
         _StatCard(
           title: strings.monthlyAverage,
           semanticsLabel: strings.monthlyAverageSemantics(
-            _moodLabelFromPath(context, representativeMoodPath),
+            _moodLabelFromPath(context, mostCommonMoodPath),
           ),
           highlight: true,
           child: Row(
             children: [
               SvgPicture.asset(
-                representativeMoodPath,
+                mostCommonMoodPath,
                 height: 32,
                 width: 32,
                 fit: BoxFit.contain,
                 semanticsLabel:
-                    _moodLabelFromPath(context, representativeMoodPath),
+                    _moodLabelFromPath(context, mostCommonMoodPath),
                 errorBuilder: (context, error, stackTrace) =>
                     const Icon(Icons.mood, size: 32),
               ),

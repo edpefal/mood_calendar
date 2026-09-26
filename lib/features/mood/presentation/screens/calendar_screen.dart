@@ -217,28 +217,32 @@ class _CalendarScreenState extends State<CalendarScreen>
                                         ),
                                       ),
                                       child: Center(
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              '$day',
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                color: isFutureDate
-                                                    ? Colors.grey[500]
-                                                    : moodColor,
+                                        child: FittedBox(
+                                          fit: BoxFit.scaleDown,
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                '$day',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: isFutureDate
+                                                      ? Colors.grey[500]
+                                                      : moodColor,
+                                                ),
                                               ),
-                                            ),
-                                            if (moodPath != null)
-                                              _AnimatedMoodIcon(
-                                                animation: _animationController,
-                                                isAnimated: isRecentlySaved,
-                                                emojiPath: moodPath,
-                                                semanticsLabel: moodLabel!,
-                                              ),
-                                          ],
+                                              if (moodPath != null)
+                                                _AnimatedMoodIcon(
+                                                  animation:
+                                                      _animationController,
+                                                  isAnimated: isRecentlySaved,
+                                                  emojiPath: moodPath,
+                                                  semanticsLabel: moodLabel!,
+                                                ),
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -390,12 +394,16 @@ class _CalendarHeader extends StatelessWidget {
           ),
           onPressed: onPreviousMonth,
         ),
-        Text(
-          '${months[month]} $year',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: const Color(0xFF5F3DC4),
-                fontWeight: FontWeight.w700,
-              ),
+        Expanded(
+          child: Text(
+            '${months[month]} $year',
+            textAlign: TextAlign.center,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  color: const Color(0xFF5F3DC4),
+                  fontWeight: FontWeight.w700,
+                ),
+          ),
         ),
         Row(
           mainAxisSize: MainAxisSize.min,

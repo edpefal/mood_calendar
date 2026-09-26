@@ -4,6 +4,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../core/localization/app_strings.dart';
 import '../../../../core/navigation/app_navigator.dart';
+import '../../../purchases/presentation/bloc/purchases_cubit.dart';
+import '../../../purchases/presentation/screens/mood_store_screen.dart';
+import '../../../purchases/presentation/widgets/mood_purchase_sheet.dart';
 import '../../domain/entities/mood_definition.dart';
 import '../../domain/entities/mood_entry.dart';
 import '../../domain/services/mood_definition_resolver.dart';
@@ -122,8 +125,23 @@ class _MoodScreenState extends State<MoodScreen>
     });
   }
 
+  bool _isMoodLocked(MoodDefinition mood) {
+    if (mood.tier == MoodTier.base) {
+      return false;
+    }
+    return !context.read<PurchasesCubit>().isMoodUnlocked(mood.id);
+  }
+
+  void _openPurchaseFlow(MoodDefinition mood) {
+    showMoodPurchaseSheet(context, moodId: mood.id);
+  }
+
   void _saveMood() {
     if (_isSaving) {
+      return;
+    }
+    if (_isMoodLocked(selectedMood)) {
+      _openPurchaseFlow(selectedMood);
       return;
     }
     setState(() {
@@ -238,6 +256,25 @@ class _MoodScreenState extends State<MoodScreen>
                                   ),
                                 ),
                                 IconButton(
+                                  tooltip: strings.openStoreTooltip,
+                                  icon: const Icon(
+                                    Icons.storefront_outlined,
+                                    color: Color(0xFF5F3DC4),
+                                  ),
+                                  onPressed: () {
+                                    final purchasesCubit =
+                                        context.read<PurchasesCubit>();
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute<void>(
+                                        builder: (_) => BlocProvider.value(
+                                          value: purchasesCubit,
+                                          child: const MoodStoreScreen(),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                                IconButton(
                                   tooltip: strings.openCalendarTooltip,
                                   icon: const Icon(
                                     Icons.calendar_today,
@@ -279,45 +316,79 @@ class _MoodScreenState extends State<MoodScreen>
                                   itemBuilder: (context, index) {
                                     final mood = allMoodDefinitions[index];
 
-                                    return Semantics(
-                                      label: strings.selectedMood(
-                                        mood.label,
-                                        index,
-                                        allMoodDefinitions.length,
-                                      ),
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          SvgPicture.asset(
-                                            mood.assetPath,
-                                            height: 150,
-                                            width: 150,
-                                            fit: BoxFit.contain,
-                                            semanticsLabel: mood.label,
-                                            placeholderBuilder: (context) =>
-                                                const CircularProgressIndicator(),
-                                            errorBuilder: (
-                                              context,
-                                              error,
-                                              stackTrace,
-                                            ) {
-                                              return const Icon(
-                                                Icons.error_outline,
-                                                size: 150,
-                                                color: Colors.red,
-                                              );
-                                            },
-                                          ),
-                                          const SizedBox(height: 8),
-                                          Text(
+                                    return BlocBuilder<PurchasesCubit,
+                                        PurchasesState>(
+                                      buildWhen: (previous, current) =>
+                                          previous.isMoodUnlocked(mood.id) !=
+                                          current.isMoodUnlocked(mood.id),
+                                      builder: (context, purchasesState) {
+                                        final isLocked = !purchasesState
+                                            .isMoodUnlocked(mood.id);
+
+                                        return Semantics(
+                                          label: strings.selectedMood(
                                             mood.label,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .titleMedium,
+                                            index,
+                                            allMoodDefinitions.length,
                                           ),
-                                        ],
-                                      ),
+                                          child: GestureDetector(
+                                            onTap: isLocked
+                                                ? () => _openPurchaseFlow(mood)
+                                                : null,
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Stack(
+                                                  alignment: Alignment.center,
+                                                  children: [
+                                                    Opacity(
+                                                      opacity:
+                                                          isLocked ? 0.4 : 1,
+                                                      child: SvgPicture.asset(
+                                                        mood.assetPath,
+                                                        height: 150,
+                                                        width: 150,
+                                                        fit: BoxFit.contain,
+                                                        semanticsLabel:
+                                                            mood.label,
+                                                        placeholderBuilder:
+                                                            (context) =>
+                                                                const CircularProgressIndicator(),
+                                                        errorBuilder: (
+                                                          context,
+                                                          error,
+                                                          stackTrace,
+                                                        ) {
+                                                          return const Icon(
+                                                            Icons.error_outline,
+                                                            size: 150,
+                                                            color: Colors.red,
+                                                          );
+                                                        },
+                                                      ),
+                                                    ),
+                                                    if (isLocked)
+                                                      const Icon(
+                                                        Icons.lock_rounded,
+                                                        size: 40,
+                                                        color:
+                                                            Color(0xFF5F3DC4),
+                                                      ),
+                                                  ],
+                                                ),
+                                                const SizedBox(height: 8),
+                                                Text(
+                                                  mood.label,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .titleMedium,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      },
                                     );
                                   },
                                 ),

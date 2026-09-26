@@ -18,6 +18,9 @@ import 'package:mood_calendar/features/mood/domain/usecases/save_mood_usecase.da
 import 'package:mood_calendar/features/mood/presentation/bloc/calendar_cubit.dart';
 import 'package:mood_calendar/features/mood/presentation/bloc/mood_cubit.dart';
 import 'package:mood_calendar/features/mood/presentation/screens/mood_screen.dart';
+import 'package:mood_calendar/features/purchases/presentation/bloc/purchases_cubit.dart';
+
+import '../../../../support/fake_mood_entitlements_repository.dart';
 
 class _FakeMoodRepository implements MoodRepository {
   final savedEntries = <MoodEntry>[];
@@ -127,6 +130,9 @@ void main() {
               ),
             ),
           ),
+          BlocProvider(
+            create: (_) => PurchasesCubit(FakeMoodEntitlementsRepository()),
+          ),
         ],
         child: const MaterialApp(
           locale: Locale('es'),
@@ -155,5 +161,122 @@ void main() {
 
     expect(moodRepository.savedEntries, hasLength(1));
     expect(moodRepository.savedEntries.single.mood, 'assets/icon/calm.svg');
+  });
+
+  testWidgets('saving an unlocked premium mood persists the entry',
+      (tester) async {
+    await tester.pumpWidget(
+      MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (_) => MoodCubit(
+              saveMood: SaveMoodUseCase(moodRepository),
+              getMoods: GetMoodsUseCase(moodRepository),
+              logger: const _TestAppLogger(),
+              telemetry: const _TestAppTelemetry(),
+            ),
+          ),
+          BlocProvider(
+            create: (_) => CalendarCubit(
+              initialMonth: DateTime(2026, 4, 1),
+              getMonthlyMoodSummary: GetMonthlyMoodSummaryUseCase(
+                GetMoodsForMonthUseCase(moodRepository),
+              ),
+            ),
+          ),
+          BlocProvider(
+            create: (_) => PurchasesCubit(
+              FakeMoodEntitlementsRepository(unlockedMoodIds: {'anxious'}),
+            ),
+          ),
+        ],
+        child: const MaterialApp(
+          locale: Locale('es'),
+          supportedLocales: AppStrings.supportedLocales,
+          localizationsDelegates: [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          home: MoodScreen(),
+        ),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    // base moods: happy, calm, neutral, sad, angry -> premium starts at index 5 (anxious)
+    for (var i = 0; i < 5; i++) {
+      await tester.drag(find.byType(PageView), const Offset(-400, 0));
+      await tester.pumpAndSettle();
+    }
+
+    expect(find.text('Anxious'), findsOneWidget);
+
+    await tester.tap(find.text('Guardar'));
+    await tester.pumpAndSettle();
+
+    expect(moodRepository.savedEntries, hasLength(1));
+    expect(moodRepository.savedEntries.single.mood, 'assets/icon/anxious.svg');
+  });
+
+  testWidgets(
+      'tapping a locked premium mood opens the purchase flow instead of saving',
+      (tester) async {
+    await tester.pumpWidget(
+      MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (_) => MoodCubit(
+              saveMood: SaveMoodUseCase(moodRepository),
+              getMoods: GetMoodsUseCase(moodRepository),
+              logger: const _TestAppLogger(),
+              telemetry: const _TestAppTelemetry(),
+            ),
+          ),
+          BlocProvider(
+            create: (_) => CalendarCubit(
+              initialMonth: DateTime(2026, 4, 1),
+              getMonthlyMoodSummary: GetMonthlyMoodSummaryUseCase(
+                GetMoodsForMonthUseCase(moodRepository),
+              ),
+            ),
+          ),
+          BlocProvider(
+            create: (_) => PurchasesCubit(FakeMoodEntitlementsRepository()),
+          ),
+        ],
+        child: const MaterialApp(
+          locale: Locale('es'),
+          supportedLocales: AppStrings.supportedLocales,
+          localizationsDelegates: [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          home: MoodScreen(),
+        ),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    for (var i = 0; i < 5; i++) {
+      await tester.drag(find.byType(PageView), const Offset(-400, 0));
+      await tester.pumpAndSettle();
+    }
+
+    expect(find.text('Anxious'), findsOneWidget);
+    expect(find.byIcon(Icons.lock_rounded), findsWidgets);
+
+    await tester.tap(find.text('Guardar'));
+    await tester.pumpAndSettle();
+
+    expect(moodRepository.savedEntries, isEmpty);
+    // The purchase bottom sheet opened instead of saving (the fake
+    // repository returns no offers, so it shows the empty-catalog message).
+    expect(find.text('No hay animos premium disponibles por ahora.'),
+        findsOneWidget);
+    expect(find.text('Cancelar'), findsOneWidget);
   });
 }

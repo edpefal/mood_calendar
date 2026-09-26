@@ -45,10 +45,10 @@ class AppStringsEs extends AppStrings {
   String get emptySummary =>
       'Todavia no hay registros este mes. Empieza a registrar para ver tu resumen.';
   @override
-  String get monthlyAverage => 'Promedio mensual';
+  String get monthlyAverage => 'Animo mas frecuente';
   @override
   String moodRepresentsMonth(String monthName) =>
-      'Animo que mejor representa $monthName';
+      'Animo que mas registraste en $monthName';
   @override
   String get bestStreak => 'Mejor racha';
   @override
@@ -113,7 +113,7 @@ class AppStringsEs extends AppStrings {
   String get monthlyChartSemantics => 'Grafica mensual de estados de animo';
   @override
   String monthlyAverageSemantics(String moodLabel) =>
-      'Promedio mensual del animo: $moodLabel';
+      'Animo mas frecuente: $moodLabel';
   @override
   String bestStreakSemantics(int days) => 'Mejor racha: $days dias';
 
@@ -139,4 +139,61 @@ class AppStringsEs extends AppStrings {
 
   @override
   String get noteHint => 'Escribe una nota...';
+
+  // Tienda / paywall
+  @override
+  String get storeTitle => 'Tienda de animos';
+  @override
+  String get openStoreTooltip => 'Abrir tienda';
+  @override
+  String get storeMoodsSectionTitle => 'Animos premium';
+  @override
+  String get storePacksSectionTitle => 'Packs';
+  @override
+  String get storeLoading => 'Cargando la tienda...';
+  @override
+  String get storeLoadError =>
+      'No pudimos cargar la tienda en este momento. Intentalo de nuevo.';
+  @override
+  String get storeEmptyMoods => 'No hay animos premium disponibles por ahora.';
+  @override
+  String get storeEmptyPacks => 'No hay packs disponibles por ahora.';
+  @override
+  String get moodUnlockedLabel => 'Desbloqueado';
+  @override
+  String buyMoodButtonLabel(String moodLabel, String price) =>
+      'Comprar $moodLabel · $price';
+  @override
+  String packIncludesMoods(String moodLabels) => 'Incluye: $moodLabels';
+  @override
+  String buyPackButtonLabel(String packLabel, String price) =>
+      'Comprar $packLabel · $price';
+  @override
+  String get restorePurchasesButtonLabel => 'Restaurar compras';
+  @override
+  String get restoringPurchases => 'Restaurando tus compras...';
+  @override
+  String get restoreSuccessMessage => 'Tus compras fueron restauradas.';
+  @override
+  String get purchaseSuccessMessage => 'Compra completada. Disfrutalo!';
+  @override
+  String get purchaseCancelledMessage => 'Compra cancelada.';
+  @override
+  String get purchaseNetworkErrorMessage =>
+      'Sin conexion a internet. Intentalo de nuevo.';
+  @override
+  String get purchaseProductUnavailableMessage =>
+      'Este producto no esta disponible en este momento.';
+  @override
+  String get purchaseUnknownErrorMessage =>
+      'Algo salio mal con tu compra. Intentalo de nuevo.';
+  @override
+  String get packOverlapWarningTitle => 'Ya tienes algunos de estos';
+  @override
+  String packOverlapWarningMessage(String moodLabels) =>
+      'Ya tienes $moodLabels, pero igual puedes comprar este pack a su precio completo.';
+  @override
+  String get continueLabel => 'Continuar';
+  @override
+  String get cancelLabel => 'Cancelar';
 }

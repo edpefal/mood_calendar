@@ -14,6 +14,9 @@ import 'package:mood_calendar/features/mood/domain/usecases/save_mood_usecase.da
 import 'package:mood_calendar/features/mood/presentation/bloc/calendar_cubit.dart';
 import 'package:mood_calendar/features/mood/presentation/bloc/mood_cubit.dart';
 import 'package:mood_calendar/features/mood/presentation/screens/mood_screen.dart';
+import 'package:mood_calendar/features/purchases/presentation/bloc/purchases_cubit.dart';
+
+import 'support/fake_mood_entitlements_repository.dart';
 
 void main() {
   testWidgets('Mood screen loads without reading Hive from the UI',
@@ -47,6 +50,9 @@ void main() {
                 GetMoodsForMonthUseCase(repository),
               ),
             ),
+          ),
+          BlocProvider(
+            create: (_) => PurchasesCubit(FakeMoodEntitlementsRepository()),
           ),
         ],
         child: MaterialApp(
@@ -119,6 +125,9 @@ Widget _buildTestApp({
             GetMoodsForMonthUseCase(repository),
           ),
         ),
+      ),
+      BlocProvider(
+        create: (_) => PurchasesCubit(FakeMoodEntitlementsRepository()),
       ),
     ],
     child: MaterialApp(
