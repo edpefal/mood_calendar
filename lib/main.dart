@@ -91,8 +91,6 @@ void main() async {
     appSettingsRepository: appSettingsRepository,
     telemetry: telemetry,
   );
-  final launchedFromReminder = await notificationService.initialize();
-  await notificationService.scheduleDailyReminder();
 
   const revenueCatApiKey = String.fromEnvironment('REVENUECAT_IOS_API_KEY');
   final MoodEntitlementsRepository moodEntitlementsRepository;
@@ -152,11 +150,20 @@ void main() async {
     ),
   );
 
-  if (launchedFromReminder) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      unawaited(_handleReminderTap());
-    });
-  }
+  // Runs after runApp() on purpose: initialize() awaits the native OS
+  // notification-permission dialog, which never resolves until the user
+  // interacts with it. Awaiting it before runApp() left the app stuck on
+  // the launch screen until that dialog was dismissed (see proposal.md).
+  unawaited(
+    notificationService.initialize().then((launchedFromReminder) async {
+      await notificationService.scheduleDailyReminder();
+      if (launchedFromReminder) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          unawaited(_handleReminderTap());
+        });
+      }
+    }),
+  );
 }
 
 class MyApp extends StatelessWidget {
