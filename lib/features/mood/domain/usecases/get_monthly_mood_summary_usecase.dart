@@ -1,5 +1,6 @@
 import '../entities/monthly_mood_summary.dart';
 import '../entities/mood_entry.dart';
+import '../services/mood_streak_calculator.dart';
 import 'get_moods_for_month_usecase.dart';
 
 class GetMonthlyMoodSummaryUseCase {
@@ -13,7 +14,9 @@ class GetMonthlyMoodSummaryUseCase {
     final sortedEntries = [...entries]
       ..sort((a, b) => a.date.compareTo(b.date));
 
-    final bestStreak = _calculateBestStreak(sortedEntries);
+    final bestStreak = MoodStreakCalculator.bestStreak(
+      sortedEntries.map((entry) => entry.date).toList(),
+    );
     final lastEntry = sortedEntries.isNotEmpty ? sortedEntries.last : null;
     final mostCommonMoodEntry = _resolveMostCommonMoodEntry(sortedEntries);
 
@@ -53,34 +56,5 @@ class GetMonthlyMoodSummaryUseCase {
     }
 
     return bestEntry;
-  }
-
-  int _calculateBestStreak(List<MoodEntry> entries) {
-    if (entries.isEmpty) return 0;
-
-    int bestStreak = 1;
-    int currentStreak = 1;
-
-    for (int i = 1; i < entries.length; i++) {
-      final previousDate = entries[i - 1].date;
-      final currentDate = entries[i].date;
-      final isConsecutive = currentDate.difference(previousDate).inDays == 1 &&
-          currentDate.month == previousDate.month &&
-          currentDate.year == previousDate.year;
-
-      if (isConsecutive) {
-        currentStreak++;
-      } else {
-        if (currentStreak > bestStreak) {
-          bestStreak = currentStreak;
-        }
-        currentStreak = 1;
-      }
-    }
-
-    if (currentStreak > bestStreak) {
-      bestStreak = currentStreak;
-    }
-    return bestStreak;
   }
 }

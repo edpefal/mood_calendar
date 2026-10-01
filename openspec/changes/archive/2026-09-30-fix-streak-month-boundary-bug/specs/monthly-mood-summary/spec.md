@@ -1,7 +1,5 @@
-## Purpose
+## MODIFIED Requirements
 
-Da a los usuarios una vista resumida de su mes: cómo se han sentido en general y qué tan consistentes han sido registrando su ánimo.
-## Requirements
 ### Requirement: Resumen mensual de estado de ánimo
 El widget MonthlyMoodSummaryCard SHALL mostrar únicamente:
 - Card del mood más frecuente del mes (moda), con su ícono y el texto descriptivo
@@ -26,4 +24,3 @@ Para el cálculo de la racha, dos entradas SHALL considerarse días consecutivos
 #### Scenario: Racha que cruza un límite de mes o año
 - **WHEN** existen entradas en días calendario consecutivos que caen en meses o años distintos (por ejemplo, 31 de enero y 1 de febrero, o 31 de diciembre y 1 de enero)
 - **THEN** el cálculo de racha los cuenta como consecutivos, igual que si estuvieran dentro del mismo mes
-
