@@ -23,12 +23,16 @@ La app SHALL usar el locale del dispositivo para determinar el idioma de la UI. 
 - **THEN** la app muestra los textos en inglés (primer locale en supportedLocales)
 
 ### Requirement: Placeholder del campo de nota localizado
-El placeholder del campo de texto para notas SHALL mostrarse en el idioma activo del dispositivo. No SHALL estar hardcodeado en ningún idioma.
+El preview inline de solo lectura y el campo de edición dentro del bottom sheet SHALL mostrar cada uno su propio placeholder localizado cuando la nota está vacía. Ambos placeholders SHALL mostrarse en el idioma activo del dispositivo. Ninguno SHALL estar hardcodeado en un solo idioma.
 
-#### Scenario: Campo de nota en español
-- **WHEN** el dispositivo está en español
-- **THEN** el placeholder del campo de nota muestra el texto en español
+#### Scenario: Preview inline vacío en español
+- **WHEN** el dispositivo está en español y la nota está vacía
+- **THEN** el preview inline muestra el placeholder que invita a tocar para agregar una nota, en español
 
-#### Scenario: Campo de nota en idioma no soportado
+#### Scenario: Campo del sheet vacío en español
+- **WHEN** el dispositivo está en español, el usuario abre el bottom sheet y la nota está vacía
+- **THEN** el campo de texto del sheet muestra el placeholder que invita a escribir sobre el día, en español
+
+#### Scenario: Placeholders en idioma no soportado
 - **WHEN** el dispositivo está en un idioma no soportado
-- **THEN** el placeholder del campo de nota muestra el texto en inglés
+- **THEN** tanto el placeholder del preview inline como el del campo del sheet se muestran en inglés

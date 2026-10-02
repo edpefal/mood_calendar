@@ -279,4 +279,93 @@ void main() {
         findsOneWidget);
     expect(find.text('Cancelar'), findsOneWidget);
   });
+
+  Widget buildApp() {
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (_) => MoodCubit(
+            saveMood: SaveMoodUseCase(moodRepository),
+            getMoods: GetMoodsUseCase(moodRepository),
+            logger: const _TestAppLogger(),
+            telemetry: const _TestAppTelemetry(),
+          ),
+        ),
+        BlocProvider(
+          create: (_) => CalendarCubit(
+            initialMonth: DateTime(2026, 4, 1),
+            getMonthlyMoodSummary: GetMonthlyMoodSummaryUseCase(
+              GetMoodsForMonthUseCase(moodRepository),
+            ),
+          ),
+        ),
+        BlocProvider(
+          create: (_) => PurchasesCubit(FakeMoodEntitlementsRepository()),
+        ),
+      ],
+      child: const MaterialApp(
+        locale: Locale('es'),
+        supportedLocales: AppStrings.supportedLocales,
+        localizationsDelegates: [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        home: MoodScreen(),
+      ),
+    );
+  }
+
+  testWidgets(
+      'tapping the inline note preview opens the note editor bottom sheet',
+      (tester) async {
+    await tester.pumpWidget(buildApp());
+    await tester.pumpAndSettle();
+
+    expect(find.text('Toca para agregar una nota'), findsOneWidget);
+    expect(find.text('Nota del día'), findsNothing);
+
+    await tester.tap(find.text('Toca para agregar una nota'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Nota del día'), findsOneWidget);
+    expect(find.text('Listo'), findsOneWidget);
+    expect(find.text('Cuéntame sobre tu día...'), findsOneWidget);
+  });
+
+  testWidgets('note editor sheet enforces the 500 character limit',
+      (tester) async {
+    await tester.pumpWidget(buildApp());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Toca para agregar una nota'));
+    await tester.pumpAndSettle();
+
+    final longText = 'a' * 600;
+    await tester.enterText(find.byType(TextField), longText);
+    await tester.pumpAndSettle();
+
+    final textField = tester.widget<TextField>(find.byType(TextField));
+    expect(textField.controller!.text.length, 500);
+    expect(find.text('500/500'), findsOneWidget);
+  });
+
+  testWidgets(
+      'closing the note editor sheet with Listo preserves the written text',
+      (tester) async {
+    await tester.pumpWidget(buildApp());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Toca para agregar una nota'));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextField), 'Hoy fue un buen día');
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Listo'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Nota del día'), findsNothing);
+    expect(find.text('Hoy fue un buen día'), findsOneWidget);
+  });
 }

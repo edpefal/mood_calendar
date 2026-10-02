@@ -137,7 +137,16 @@ class AppStringsEn extends AppStrings {
       const ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
   @override
-  String get noteHint => 'Write a note...';
+  String get noteInlineHint => 'Tap to add a note';
+
+  @override
+  String get noteSheetTitle => 'Daily note';
+
+  @override
+  String get noteSheetDoneButton => 'Done';
+
+  @override
+  String get noteSheetPlaceholder => 'Tell me about your day...';
 
   // Store / paywall
   @override
