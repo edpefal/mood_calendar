@@ -142,7 +142,16 @@ class AppStringsIt extends AppStrings {
       const ['L', 'M', 'M', 'G', 'V', 'S', 'D'];
 
   @override
-  String get noteHint => 'Scrivi una nota...';
+  String get noteInlineHint => 'Tocca per aggiungere una nota';
+
+  @override
+  String get noteSheetTitle => 'Nota del giorno';
+
+  @override
+  String get noteSheetDoneButton => 'Fine';
+
+  @override
+  String get noteSheetPlaceholder => 'Raccontami della tua giornata...';
 
   // Negozio / paywall
   @override

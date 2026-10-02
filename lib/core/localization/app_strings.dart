@@ -88,7 +88,10 @@ abstract class AppStrings {
   String bestStreakSemantics(int days);
   List<String> get monthNames;
   List<String> get weekdayInitials;
-  String get noteHint;
+  String get noteInlineHint;
+  String get noteSheetTitle;
+  String get noteSheetDoneButton;
+  String get noteSheetPlaceholder;
 
   // Tienda / paywall
   String get storeTitle;

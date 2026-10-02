@@ -13,6 +13,7 @@ import '../../domain/entities/mood_entry.dart';
 import '../../domain/services/mood_definition_resolver.dart';
 import '../bloc/calendar_cubit.dart';
 import '../bloc/mood_cubit.dart';
+import '../widgets/note_editor_sheet.dart';
 
 class MoodScreen extends StatefulWidget {
   final DateTime? selectedDate;
@@ -135,6 +136,14 @@ class _MoodScreenState extends State<MoodScreen>
 
   void _openPurchaseFlow(MoodDefinition mood) {
     showMoodPurchaseSheet(context, moodId: mood.id);
+  }
+
+  void _openNoteEditor() {
+    showNoteEditorSheet(
+      context,
+      controller: _noteController,
+      accentColor: selectedMood.color,
+    );
   }
 
   void _saveMood() {
@@ -418,29 +427,52 @@ class _MoodScreenState extends State<MoodScreen>
                         ),
                         Column(
                           children: [
-                            TextField(
-                              controller: _noteController,
-                              maxLines: 3,
-                              decoration: InputDecoration(
-                                hintText: AppStrings.of(context).noteHint,
-                                filled: true,
-                                fillColor: Colors.white,
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                  borderSide: BorderSide.none,
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                  borderSide: BorderSide(
-                                    color: selectedMood.color,
-                                    width: 2,
+                            AnimatedBuilder(
+                              animation: _noteController,
+                              builder: (context, _) {
+                                final note = _noteController.text;
+                                return Semantics(
+                                  button: true,
+                                  label: strings.noteInlineHint,
+                                  child: GestureDetector(
+                                    onTap: _openNoteEditor,
+                                    child: InputDecorator(
+                                      decoration: InputDecoration(
+                                        filled: true,
+                                        fillColor: Colors.white,
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(16),
+                                          borderSide: BorderSide.none,
+                                        ),
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                          vertical: 12,
+                                        ),
+                                      ),
+                                      child: Text(
+                                        note.isEmpty
+                                            ? strings.noteInlineHint
+                                            : note,
+                                        maxLines: 3,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: note.isEmpty
+                                            ? Theme.of(context)
+                                                .textTheme
+                                                .bodyLarge
+                                                ?.copyWith(
+                                                  color: Theme.of(context)
+                                                      .hintColor,
+                                                )
+                                            : Theme.of(context)
+                                                .textTheme
+                                                .bodyLarge,
+                                      ),
+                                    ),
                                   ),
-                                ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 12,
-                                ),
-                              ),
+                                );
+                              },
                             ),
                             const SizedBox(height: 16),
                             GradientPillButton(
