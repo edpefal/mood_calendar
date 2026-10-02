@@ -7,9 +7,11 @@ import '../../../../core/navigation/app_navigator.dart';
 import '../../../../core/notifications/local_notification_service.dart';
 import '../../../../core/settings/domain/entities/app_settings.dart';
 import '../../../../core/settings/domain/repositories/app_settings_repository.dart';
+import '../../../../core/widgets/gradient_pill_button.dart';
 import '../../domain/services/mood_definition_resolver.dart';
 import '../bloc/calendar_cubit.dart';
 import '../widgets/monthly_mood_summary_card.dart';
+import 'mood_screen.dart';
 
 class CalendarScreen extends StatefulWidget {
   final DateTime? recentlySavedDate;
@@ -62,6 +64,16 @@ class _CalendarScreenState extends State<CalendarScreen>
     });
   }
 
+  void _goBack() {
+    if (Navigator.canPop(context)) {
+      Navigator.of(context).pop();
+      return;
+    }
+    Navigator.of(context).pushReplacement<void, void>(
+      MaterialPageRoute<void>(builder: (_) => const MoodScreen()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
@@ -91,6 +103,17 @@ class _CalendarScreenState extends State<CalendarScreen>
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const SizedBox(height: 16),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: IconButton(
+                        tooltip: strings.backToTodayTooltip,
+                        icon: const Icon(
+                          Icons.arrow_back,
+                          color: Color(0xFF5F3DC4),
+                        ),
+                        onPressed: _goBack,
+                      ),
+                    ),
                     Card(
                       elevation: 2,
                       clipBehavior: Clip.antiAlias,
@@ -575,9 +598,10 @@ class _ReminderSettingsSheetState extends State<_ReminderSettingsSheet> {
                     onTap: _isSaving || !_remindersEnabled ? null : _pickTime,
                   ),
                   const SizedBox(height: 24),
-                  FilledButton(
+                  GradientPillButton(
+                    label: strings.saveReminderSettings,
                     onPressed: _isSaving ? null : _saveSettings,
-                    child: Text(strings.saveReminderSettings),
+                    loading: _isSaving,
                   ),
                 ],
               ),

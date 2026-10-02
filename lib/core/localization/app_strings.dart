@@ -63,6 +63,7 @@ abstract class AppStrings {
   String summaryTitle(String monthName);
   String get reminderSettingsTooltip;
   String get openCalendarTooltip;
+  String get backToTodayTooltip;
   String get previousMonthTooltip;
   String get nextMonthTooltip;
   String get reminderSheetTitle;

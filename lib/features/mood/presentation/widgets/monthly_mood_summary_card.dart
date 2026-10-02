@@ -45,6 +45,14 @@ class MonthlyMoodSummaryCard extends StatelessWidget {
       return _EmptyState(message: strings.emptySummary);
     }
 
+    final mostCommonMood = MoodDefinitionResolver.byAssetPath(
+      mostCommonMoodPath,
+    );
+    final moodGradient = MoodDefinitionResolver.backgroundGradientForMood(
+      mostCommonMood,
+    );
+    final moodTextColor = (mostCommonMood.color as MaterialColor).shade700;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -53,7 +61,8 @@ class MonthlyMoodSummaryCard extends StatelessWidget {
           semanticsLabel: strings.monthlyAverageSemantics(
             _moodLabelFromPath(context, mostCommonMoodPath),
           ),
-          highlight: true,
+          gradient: moodGradient,
+          textColor: moodTextColor,
           child: Row(
             children: [
               SvgPicture.asset(
@@ -64,7 +73,7 @@ class MonthlyMoodSummaryCard extends StatelessWidget {
                 semanticsLabel:
                     _moodLabelFromPath(context, mostCommonMoodPath),
                 errorBuilder: (context, error, stackTrace) =>
-                    const Icon(Icons.mood, size: 32),
+                    Icon(Icons.mood, size: 32, color: moodTextColor),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -73,7 +82,7 @@ class MonthlyMoodSummaryCard extends StatelessWidget {
                     _monthName(context, summaryData.month.month),
                   ),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Colors.white,
+                        color: moodTextColor,
                       ),
                 ),
               ),
@@ -85,11 +94,23 @@ class MonthlyMoodSummaryCard extends StatelessWidget {
           title: strings.bestStreak,
           semanticsLabel: strings.bestStreakSemantics(summaryData.bestStreak),
           highlight: true,
-          child: Text(
-            strings.streakText(summaryData.bestStreak),
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Colors.white,
+          child: Row(
+            children: [
+              const Icon(
+                Icons.local_fire_department_rounded,
+                size: 32,
+                color: Colors.white,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  strings.streakText(summaryData.bestStreak),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Colors.white,
+                      ),
                 ),
+              ),
+            ],
           ),
         ),
       ],
@@ -111,20 +132,37 @@ class _StatCard extends StatelessWidget {
   final Widget child;
   final bool highlight;
   final String? semanticsLabel;
+  final Gradient? gradient;
+  final Color? textColor;
 
   const _StatCard({
     required this.title,
     required this.child,
     this.highlight = false,
     this.semanticsLabel,
+    this.gradient,
+    this.textColor,
   });
 
   @override
   Widget build(BuildContext context) {
     final borderRadius = BorderRadius.circular(16);
+    final effectiveGradient = gradient ??
+        (highlight
+            ? const LinearGradient(
+                colors: [
+                  Color(0xFF5F3DC4),
+                  Color(0xFF6C63FF),
+                ],
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+              )
+            : null);
+    final effectiveTextColor =
+        textColor ?? (highlight ? Colors.white : null);
     final titleStyle = Theme.of(context).textTheme.titleSmall?.copyWith(
           fontWeight: FontWeight.bold,
-          color: highlight ? Colors.white : null,
+          color: effectiveTextColor,
         );
 
     return Semantics(
@@ -132,20 +170,11 @@ class _StatCard extends StatelessWidget {
       child: Card(
         elevation: 2,
         clipBehavior: Clip.antiAlias,
-        color: highlight ? Colors.transparent : null,
+        color: effectiveGradient != null ? Colors.transparent : null,
         shape: RoundedRectangleBorder(borderRadius: borderRadius),
         child: Container(
-          decoration: highlight
-              ? const BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Color(0xFF5F3DC4),
-                      Color(0xFF6C63FF),
-                    ],
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                  ),
-                )
+          decoration: effectiveGradient != null
+              ? BoxDecoration(gradient: effectiveGradient)
               : null,
           child: Padding(
             padding: const EdgeInsets.all(16),

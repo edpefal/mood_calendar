@@ -63,6 +63,8 @@ class AppStringsFr extends AppStrings {
   @override
   String get openCalendarTooltip => 'Ouvrir le calendrier';
   @override
+  String get backToTodayTooltip => 'Retour à aujourd\'hui';
+  @override
   String get previousMonthTooltip => 'Mois précédent';
   @override
   String get nextMonthTooltip => 'Mois suivant';

@@ -61,6 +61,8 @@ class AppStringsEs extends AppStrings {
   @override
   String get openCalendarTooltip => 'Abrir calendario';
   @override
+  String get backToTodayTooltip => 'Volver a hoy';
+  @override
   String get previousMonthTooltip => 'Mes anterior';
   @override
   String get nextMonthTooltip => 'Mes siguiente';

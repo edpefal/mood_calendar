@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/localization/app_strings.dart';
+import '../../../../core/widgets/gradient_pill_button.dart';
 import '../../../mood/domain/services/mood_definition_resolver.dart';
 import '../../domain/entities/mood_pack.dart';
 import '../bloc/purchases_cubit.dart';
@@ -98,19 +99,12 @@ class _PackPurchaseSheetContent extends StatelessWidget {
                   ),
                 ],
                 const SizedBox(height: 24),
-                FilledButton(
+                GradientPillButton(
+                  label: strings.buyPackButtonLabel(pack.label, pack.displayPrice),
+                  loading: isPurchasing,
                   onPressed: isPurchasing
                       ? null
                       : () => context.read<PurchasesCubit>().purchasePack(pack.id),
-                  child: isPurchasing
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : Text(
-                          strings.buyPackButtonLabel(pack.label, pack.displayPrice),
-                        ),
                 ),
                 const SizedBox(height: 8),
                 TextButton(
