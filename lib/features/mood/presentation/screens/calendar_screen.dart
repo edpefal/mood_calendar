@@ -88,7 +88,9 @@ class _CalendarScreenState extends State<CalendarScreen>
             final firstDayOfMonth = DateTime(now.year, now.month, 1);
             final lastDayOfMonth = DateTime(now.year, now.month + 1, 0);
             final daysInMonth = lastDayOfMonth.day;
-            final firstWeekday = firstDayOfMonth.weekday;
+            // Sunday-indexed (0=Sunday..6=Saturday) to match the Sunday-first
+            // week header; DateTime.weekday is Monday-indexed (1=Monday..7=Sunday).
+            final firstWeekday = firstDayOfMonth.weekday % 7;
 
             final entries = state.summary?.entries ?? [];
             final moodMap = <String, String>{};
@@ -161,12 +163,12 @@ class _CalendarScreenState extends State<CalendarScreen>
                                 crossAxisSpacing: 8,
                                 childAspectRatio: 1,
                               ),
-                              itemCount: daysInMonth + (firstWeekday - 1),
+                              itemCount: daysInMonth + firstWeekday,
                               itemBuilder: (context, index) {
-                                if (index < firstWeekday - 1) {
+                                if (index < firstWeekday) {
                                   return const SizedBox.shrink();
                                 }
-                                final day = index - (firstWeekday - 2);
+                                final day = index - firstWeekday + 1;
                                 final date = DateTime(now.year, now.month, day);
                                 final isFutureDate = date.year > today.year ||
                                     (date.year == today.year &&
