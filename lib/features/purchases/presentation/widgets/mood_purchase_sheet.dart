@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../core/localization/app_strings.dart';
+import '../../../../core/widgets/gradient_pill_button.dart';
 import '../../../mood/domain/services/mood_definition_resolver.dart';
 import '../bloc/purchases_cubit.dart';
 
@@ -68,25 +69,15 @@ class _MoodPurchaseSheetContent extends StatelessWidget {
                 if (offer == null)
                   Text(strings.storeEmptyMoods)
                 else
-                  SizedBox(
-                    width: double.infinity,
-                    child: FilledButton(
-                      onPressed: isPurchasing
-                          ? null
-                          : () => context.read<PurchasesCubit>().purchaseMood(moodId),
-                      child: isPurchasing
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : Text(
-                              strings.buyMoodButtonLabel(
-                                mood.label,
-                                offer.displayPrice,
-                              ),
-                            ),
+                  GradientPillButton(
+                    label: strings.buyMoodButtonLabel(
+                      mood.label,
+                      offer.displayPrice,
                     ),
+                    loading: isPurchasing,
+                    onPressed: isPurchasing
+                        ? null
+                        : () => context.read<PurchasesCubit>().purchaseMood(moodId),
                   ),
                 const SizedBox(height: 8),
                 TextButton(

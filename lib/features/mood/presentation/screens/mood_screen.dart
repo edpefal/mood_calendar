@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../core/localization/app_strings.dart';
 import '../../../../core/navigation/app_navigator.dart';
+import '../../../../core/widgets/gradient_pill_button.dart';
 import '../../../purchases/presentation/bloc/purchases_cubit.dart';
 import '../../../purchases/presentation/screens/mood_store_screen.dart';
 import '../../../purchases/presentation/widgets/mood_purchase_sheet.dart';
@@ -428,6 +429,13 @@ class _MoodScreenState extends State<MoodScreen>
                                   borderRadius: BorderRadius.circular(16),
                                   borderSide: BorderSide.none,
                                 ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide: BorderSide(
+                                    color: selectedMood.color,
+                                    width: 2,
+                                  ),
+                                ),
                                 contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 16,
                                   vertical: 12,
@@ -435,61 +443,11 @@ class _MoodScreenState extends State<MoodScreen>
                               ),
                             ),
                             const SizedBox(height: 16),
-                            AbsorbPointer(
-                              absorbing: isBusy,
-                              child: Semantics(
-                                button: true,
-                                enabled: !isBusy,
-                                label: strings.saveMoodButtonLabel,
-                                child: ConstrainedBox(
-                                  constraints:
-                                      const BoxConstraints(minHeight: 56),
-                                  child: GestureDetector(
-                                    onTap: _saveMood,
-                                    child: Container(
-                                      width: double.infinity,
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 18,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(20),
-                                        gradient: const LinearGradient(
-                                          colors: [
-                                            Color(0xFF5F3DC4),
-                                            Color(0xFF6C63FF),
-                                          ],
-                                          begin: Alignment.centerLeft,
-                                          end: Alignment.centerRight,
-                                        ),
-                                      ),
-                                      child: Center(
-                                        child: isBusy
-                                            ? const SizedBox(
-                                                height: 24,
-                                                width: 24,
-                                                child:
-                                                    CircularProgressIndicator(
-                                                  strokeWidth: 2.5,
-                                                  valueColor:
-                                                      AlwaysStoppedAnimation<
-                                                          Color>(
-                                                    Colors.white,
-                                                  ),
-                                                ),
-                                              )
-                                            : Text(
-                                                strings.save,
-                                                style: const TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
+                            GradientPillButton(
+                              label: strings.save,
+                              semanticsLabel: strings.saveMoodButtonLabel,
+                              loading: isBusy,
+                              onPressed: _saveMood,
                             ),
                             if (isBusy) ...[
                               const SizedBox(height: 12),

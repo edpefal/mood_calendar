@@ -37,43 +37,11 @@ class MoodDefinitionResolver {
       byAssetPath(assetPath).color;
 
   static LinearGradient backgroundGradientForMood(MoodDefinition mood) {
-    switch (mood.id) {
-      case 'happy':
-        return const LinearGradient(
-          colors: [Color(0xFFE8F5E9), Color(0xFFC8E6C9)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        );
-      case 'calm':
-        return const LinearGradient(
-          colors: [Color(0xFFEDE7F6), Color(0xFFD1C4E9)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        );
-      case 'neutral':
-        return const LinearGradient(
-          colors: [Color(0xFFF5F5F5), Color(0xFFEEEEEE)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        );
-      case 'sad':
-        return const LinearGradient(
-          colors: [Color(0xFFFFF3E0), Color(0xFFFFE0B2)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        );
-      case 'angry':
-        return const LinearGradient(
-          colors: [Color(0xFFFFEBEE), Color(0xFFFFCDD2)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        );
-      default:
-        return const LinearGradient(
-          colors: [Color(0xFFF3E5F5), Color(0xFFE1BEE7)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        );
-    }
+    final swatch = mood.color as MaterialColor;
+    return LinearGradient(
+      colors: [swatch.shade50, swatch.shade200],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    );
   }
 }

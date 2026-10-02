@@ -91,7 +91,7 @@ void main() {
     final initialGradient = _currentBackgroundGradient(tester);
     expect(
       initialGradient.colors,
-      const [Color(0xFFE8F5E9), Color(0xFFC8E6C9)],
+      [Colors.green.shade50, Colors.green.shade200],
     );
 
     await tester.drag(find.byType(PageView), const Offset(-400, 0));
@@ -100,7 +100,7 @@ void main() {
     final nextGradient = _currentBackgroundGradient(tester);
     expect(
       nextGradient.colors,
-      const [Color(0xFFEDE7F6), Color(0xFFD1C4E9)],
+      [Colors.blue.shade50, Colors.blue.shade200],
     );
   });
 }

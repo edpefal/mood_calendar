@@ -44,10 +44,13 @@ Backlog activo del proyecto, actualizado contra el estado actual del repo.
 ## Prioridad media
 
 - Mejorar accesibilidad general.
-  Conviene revisar labels semánticos, tamaños táctiles, contraste y comportamiento con text scaling en picker, calendario, sheet de compras y settings.
+  Conviene revisar labels semánticos, tamaños táctiles, contraste y comportamiento con text scaling en picker, calendario, sheet de compras y settings. (El botón de volver de `CalendarScreen` ya tiene label vía `tooltip` desde `unify-mood-color-design-system`.)
 
-- Consolidar estrategia de localización.
-  La base para `es` y `en` existe, pero la app arranca fija en español. Hace falta decidir si seguirá así o si se adoptará selección automática/manual de idioma.
+- Regenerar `assets/icon/brave.svg`.
+  Es un outlier: 1MB, 787 paths, 2048×2048 sin el `viewBox="0 0 512 512"` del resto del set — generado con VTracer (auto-trazado) a partir de una imagen de Gemini, a diferencia de los demás íconos (~3KB, vector limpio). Pesado de renderizar y visualmente inconsistente con el resto del set. Regenerar con el mismo proceso que produjo los otros 9 íconos.
+
+- Localizar notificaciones y título de la app.
+  La UI ya usa el locale del dispositivo (en, es, de, fr, it; fallback inglés), pero `LocalNotificationService` y el `title` de `MaterialApp` siguen fijos en español (`AppStrings.forLocale(const Locale('es'))`) por falta de `BuildContext` en background. Persistir el locale del dispositivo (o resolverlo con `PlatformDispatcher.instance.locale`) para usarlo ahí. Opcional: selector manual de idioma.
 
 - Añadir edición, borrado y consulta más cómoda de entradas.
   El flujo principal cubre registro y resumen, pero sigue faltando una experiencia explícita para editar, eliminar o revisar notas históricas con menos fricción.

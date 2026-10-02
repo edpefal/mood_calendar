@@ -1,33 +1,48 @@
 # Mood Calendar
 
-Flutter app para registrar y revisar estados de ánimo diarios. iOS como plataforma principal.
+Flutter app para registrar y revisar estados de ánimo diarios, con un catálogo de moods gratuitos + moods premium de pago (RevenueCat). iOS como plataforma principal (deployment target **iOS 15.0**).
 
 ## Stack
 
-- **Flutter** 3.x, Dart SDK `>=3.4.4 <4.0.0`
+- **Flutter** 3.x (CI usa 3.32.1), Dart SDK `>=3.4.4 <4.0.0`
 - **Estado**: flutter_bloc + Cubit
 - **Persistencia**: Hive (local, sin backend)
+- **Compras in-app**: purchases_flutter (RevenueCat), solo iOS por ahora
 - **Generación de código**: freezed, json_serializable, hive_generator → correr con `flutter pub run build_runner build`
 - **Notificaciones**: flutter_local_notifications + timezone
 - **UI**: flutter_svg (emojis SVG), google_fonts (Poppins), lottie
 
 ## Arquitectura
 
-Clean Architecture con una sola feature (`mood`):
+Clean Architecture con dos features (`mood` y `purchases`):
 
 ```
 lib/
 ├── core/
 │   ├── localization/     # AppStrings (abstracta) + subclases por idioma
+│   ├── logging/          # AppLogger
 │   ├── notifications/    # LocalNotificationService
 │   ├── settings/         # AppSettings (Hive)
-│   ├── telemetry/        # AppTelemetry (logging)
+│   ├── telemetry/        # AppTelemetry
+│   ├── widgets/          # widgets compartidos (GradientPillButton)
 │   └── navigation/
-└── features/mood/
-    ├── data/             # datasources (Hive), models, repositories
-    ├── domain/           # entities, usecases, repositories (interfaces)
-    └── presentation/     # screens, widgets, bloc (Cubits)
+└── features/
+    ├── mood/
+    │   ├── data/         # datasources (Hive), models, repositories, services (export JSON)
+    │   ├── domain/       # entities, usecases, repositories, services (resolver, streak calculator)
+    │   └── presentation/ # screens, widgets, bloc (Cubits)
+    └── purchases/        # RevenueCat datasource, MoodEntitlementsRepository (+ Noop), PurchasesCubit, MoodStoreScreen, purchase sheets
 ```
+
+`lib/features/ads/` y `lib/features/premium/` son carpetas vacías residuales (sin archivos `.dart`); la monetización vive en `purchases/`.
+
+## Documentación de dominio y decisiones
+
+- `CONTEXT.md` — glosario del dominio (Mood vs Mood Entry, Tier, Unlocked, Purchase, Pack, Intensity, Most Common Mood). Respetar sus términos y los "_Avoid_".
+- `docs/adr/` — ADR 0001 (intensity no es valencia), ADR 0002 (composición de Pack congelada).
+- `docs/risks.md` — riesgos aceptados de IAP (sin validación de recibos en backend, etc.).
+- `backlog.md` — backlog activo.
+- `openspec/` — workflow spec-driven: `openspec/specs/` contiene los specs vigentes (`branded-launch-screen`, `ios-simulator-ui-testing`, `localization-architecture`, `monthly-mood-summary`, `mood-store`, `premium-moods`) y `openspec/changes/archive/` el historial de changes con su proposal/design/tasks. Consultarlo antes de tocar un área con historia.
 
 ## Localización
 
@@ -35,24 +50,69 @@ Clase abstracta `AppStrings` con subclases concretas por idioma. Para añadir un
 1. Añadir getter abstracto en `app_strings.dart`
 2. Implementar en **todos** los archivos: `app_strings_en.dart`, `app_strings_es.dart`, `app_strings_de.dart`, `app_strings_fr.dart`, `app_strings_it.dart`
 
-Idiomas soportados: inglés (en, **fallback**), español (es), alemán (de), francés (fr), italiano (it).
+Idiomas soportados: inglés (en, **fallback**), español (es), alemán (de), francés (fr), italiano (it). La UI usa el locale del dispositivo (no hay locale hardcodeado).
 
-Las notificaciones usan español fijo (`AppStrings.forLocale(const Locale('es'))`) por falta de contexto en background — pendiente de mejora.
+Las notificaciones (`LocalNotificationService`) y el `title` de `MaterialApp` usan español fijo (`AppStrings.forLocale(const Locale('es'))`) por falta de contexto en background — pendiente de mejora.
 
 ## Estados de ánimo
 
-5 moods definidos en `mood_definition.dart` con intensidades 1–5:
-`happy(1) → calm(2) → neutral(3) → sad(4) → angry(5)`
+10 moods en `mood_definition.dart`, cada uno con `tier` (`MoodTier.base` | `MoodTier.premium`):
 
-Los assets SVG están en `assets/icon/`. El resolver está en `MoodDefinitionResolver`.
+- **Base** (gratis): `happy(1)`, `calm(2)`, `neutral(3)`, `sad(4)`, `angry(5)`
+- **Premium** (compra individual o vía Pack): `anxious(6)`, `brave(7)`, `confident(8)`, `romantic(9)`, `shy(10)`
+
+Reglas importantes:
+- **`intensity` es solo un identificador interno, NO una escala de valencia** (ADR 0001). No ordenar, comparar ni promediar moods por intensity.
+- El resumen mensual muestra el **mood más frecuente** (moda, desempate por registro más reciente) y la **mejor racha**; no hay promedio ni gráfica.
+- Racha: días consecutivos = diferencia de exactamente 1 día calendario, aunque cruce mes/año (`MoodStreakCalculator`).
+- `unlocked` solo controla crear/editar entradas nuevas; nunca reescribe `Mood Entry` históricas.
+- `MoodDefinition.color` **debe ser un `MaterialColor`** (`Colors.green`, etc.): `MoodDefinitionResolver.backgroundGradientForMood` deriva el gradiente pastel con `.shade50`/`.shade200`.
+
+Los assets SVG están en `assets/icon/` (`brave.svg` es un outlier pesado pendiente de regenerar, ver `backlog.md`). El resolver está en `MoodDefinitionResolver`.
+
+## Compras in-app (RevenueCat)
+
+- 6 productos no consumibles en App Store Connect: `mood_anxious_unlock`, `mood_brave_unlock`, `mood_confident_unlock`, `mood_romantic_unlock`, `mood_shy_unlock`, `pack_confianza_unlock`.
+- Un entitlement por mood premium; un Pack otorga varios entitlements. Composición y precio de packs se configuran en RevenueCat, no en código, y un Pack publicado nunca cambia de composición (ADR 0002).
+- `lib/main.dart` configura RevenueCat solo si recibe `REVENUECAT_IOS_API_KEY` vía `--dart-define`; si no, usa `NoopMoodEntitlementsRepository` (todas las compras fallan con "producto no disponible"). No tocar `purchases_flutter` antes de `Purchases.configure()`.
+- El MCP de RevenueCat (`mcp__revenuecat__*`) está disponible para consultar estado real de productos/entitlements — preferirlo a notas viejas en specs.
+
+## Arranque de la app
+
+`runApp()` se llama **antes** de inicializar notificaciones (que espera el diálogo nativo de permisos) y de tareas lentas. Nunca volver a hacer `await` de diálogos del sistema o SDKs de terceros antes de `runApp()`: dejó la app congelada en el launch screen y causó un rechazo de Apple (Guideline 2.1(a)).
+
+## Sistema de diseño
+
+- Color de marca: púrpura `#5F3DC4` → `#6C63FF` (gradiente); launch screen con fondo `#8C52FF` coincidiendo con el ícono.
+- Botón primario estándar: `GradientPillButton` (`lib/core/widgets/`) — usarlo en vez de `FilledButton`/`OutlinedButton` de Material.
+- Fondos/cards ligados a un mood usan `MoodDefinitionResolver.backgroundGradientForMood(mood)`.
+- Títulos de AppBar en bold + color de marca; headers de sección en bold sin color de marca. Íconos de navegación con tinte púrpura.
+- Todo control interactivo debe tener label de `Semantics`.
 
 ## Comandos útiles
 
 ```bash
 flutter analyze                          # lint
+flutter test                             # tests unitarios/widget
 flutter pub run build_runner build       # regenerar código freezed/hive
-flutter run                              # correr en simulador
+flutter run --dart-define=REVENUECAT_IOS_API_KEY=<key>   # correr en simulador con compras reales (sandbox)
 ```
+
+## Build de release de iOS (archive/IPA)
+
+**Todo build de archive/release de iOS debe incluir `--dart-define=REVENUECAT_IOS_API_KEY=<key>`:**
+
+```bash
+flutter build ipa --dart-define=REVENUECAT_IOS_API_KEY=<key>
+```
+
+Si se archiva desde Xcode en vez de `flutter build ipa`, agregar el mismo `--dart-define` en los Build Settings del scheme de Release (`Other Flutter Build Flags` / "Additional Run Args" según la versión de Xcode) antes de archivar.
+
+Si falta este flag, la app usa `NoopMoodEntitlementsRepository` — esto causó un rechazo de Apple (Guideline 2.1(b)) por un error visible en la pantalla de tienda. Ver `openspec/changes/archive/2026-10-01-fix-app-review-iap-rejection/` para el contexto completo del incidente.
+
+**Verificación antes de subir un build a revisión**: confirmar visualmente que la pantalla de tienda (`MoodStoreScreen`) carga el catálogo de moods premium normalmente (no vacío, no con mensaje de error) antes de generar el archive final. Probar también en un dispositivo/simulador **iPad** (Apple revisa en iPad Air) y que la UI aparezca antes del diálogo de permisos de notificaciones.
+
+La API key pública (SDK key) de RevenueCat para iOS no es secreta — está pensada para ir embebida en el cliente — pero igual se pasa siempre vía `--dart-define`/variable de entorno, nunca hardcodeada en el repo, por consistencia. Pedir la key actual al responsable del proyecto en RevenueCat (dashboard → Project settings → API keys) si no la tenés a mano.
 
 ## Conventional Commits
 
@@ -69,7 +129,7 @@ Usar el formato `<tipo>(<scope>): <descripción>` en todos los commits:
 | `test` | Tests |
 | `perf` | Mejora de rendimiento |
 
-Scopes sugeridos: `localization`, `mood`, `calendar`, `notifications`, `settings`, `ui`
+Scopes sugeridos: `localization`, `mood`, `calendar`, `notifications`, `settings`, `ui`, `purchases`, `ios`
 
 Ejemplos:
 ```
@@ -90,9 +150,19 @@ git push -u origin feat/nombre-del-cambio
 gh pr create
 ```
 
-El repo tiene branch protection: los PRs requieren que pase el check "Analyze and Test" antes de hacer merge.
+El repo tiene branch protection: los PRs requieren que pase el check "Analyze and Test" (`.github/workflows/ci.yml`: `flutter analyze` + `flutter test`) antes de hacer merge.
+
+Cambios no triviales siguen el flujo OpenSpec: proponer (`/opsx:propose`) → implementar (`/opsx:apply`) → archivar (`/opsx:archive`), sincronizando los specs de `openspec/specs/` cuando cambian requisitos de comportamiento. Changes puramente operativos/visuales declaran `skip_specs: true`.
+
+## Testing
+
+- Tests unitarios y de widget en `test/` (repositorio, resolver, streak calculator, summary usecase, `MoodCubit`, `MoodScreen`, settings, exportador JSON). `test/support/fake_mood_entitlements_repository.dart` es el fake de compras para tests.
+- No hay tests de notificaciones/recordatorios ni de navegación por notificación (pendiente en `backlog.md`).
+
+### Testing de UI/UX en el simulador de iOS
+
+El agente puede validar cambios de UI/UX de forma ad-hoc en el simulador (screenshots, taps, árbol de accesibilidad, diálogos nativos del sistema) usando `idb`. Ver `docs/ios-simulator-ui-testing.md` para el workflow completo. No es una suite de tests ni corre en CI.
 
 ## Notas
 
-- No hay tests actualmente
-- No hay backend ni autenticación; todos los datos son locales (Hive)
+- No hay backend ni autenticación; todos los datos son locales (Hive). Los unlocks de compras se cachean localmente; no hay validación de recibos en servidor (ver `docs/risks.md`).

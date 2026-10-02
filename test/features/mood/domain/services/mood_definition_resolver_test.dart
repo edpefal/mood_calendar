@@ -23,5 +23,15 @@ void main() {
 
       expect(intensity, 5);
     });
+
+    test('backgroundGradientForMood returns 2 distinct colors for every mood',
+        () {
+      for (final mood in allMoodDefinitions) {
+        final gradient = MoodDefinitionResolver.backgroundGradientForMood(mood);
+
+        expect(gradient.colors.length, 2);
+        expect(gradient.colors[0], isNot(equals(gradient.colors[1])));
+      }
+    });
   });
 }
