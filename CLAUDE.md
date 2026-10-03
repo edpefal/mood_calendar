@@ -100,19 +100,19 @@ flutter run --dart-define=REVENUECAT_IOS_API_KEY=<key>   # correr en simulador c
 
 ## Build de release de iOS (archive/IPA)
 
-**Todo build de archive/release de iOS debe incluir `--dart-define=REVENUECAT_IOS_API_KEY=<key>`:**
+**⚠️ Checklist obligatorio cada vez que se genera una nueva versión/build de release — no saltear ningún paso:**
 
-```bash
-flutter build ipa --dart-define=REVENUECAT_IOS_API_KEY=<key>
-```
+1. **Conseguir la API key pública (SDK key) de RevenueCat para iOS** antes de buildear. Vía MCP: `mcp__revenuecat__list-projects` → `mcp__revenuecat__list-apps` (proyecto "Mood Calendar", app `app_store`) → `mcp__revenuecat__list-app-public-api-keys`. No es secreta (va embebida en el cliente), pero igual nunca se hardcodea en el repo — siempre vía `--dart-define`/variable de entorno.
+2. **Incluir `--dart-define=REVENUECAT_IOS_API_KEY=<key>` en el build de archive**, sin excepción:
+   ```bash
+   flutter build ipa --dart-define=REVENUECAT_IOS_API_KEY=<key>
+   ```
+   Si se archiva desde Xcode en vez de `flutter build ipa`, agregar el mismo `--dart-define` en los Build Settings del scheme de Release (`Other Flutter Build Flags` / "Additional Run Args" según la versión de Xcode) antes de archivar.
+3. **Antes de archivar, probar en simulador con esa misma key** (`flutter run --dart-define=REVENUECAT_IOS_API_KEY=<key>`) y confirmar visualmente que `MoodStoreScreen` carga el catálogo de moods premium normalmente — no vacío, no con mensaje de error.
+4. **Repetir la verificación en un simulador/dispositivo iPad**, no solo iPhone (Apple revisa en iPad Air), y confirmar que la UI aparece antes del diálogo de permisos de notificaciones.
+5. Solo después de 3 y 4 generar el archive final y subirlo.
 
-Si se archiva desde Xcode en vez de `flutter build ipa`, agregar el mismo `--dart-define` en los Build Settings del scheme de Release (`Other Flutter Build Flags` / "Additional Run Args" según la versión de Xcode) antes de archivar.
-
-Si falta este flag, la app usa `NoopMoodEntitlementsRepository` — esto causó un rechazo de Apple (Guideline 2.1(b)) por un error visible en la pantalla de tienda. Ver `openspec/changes/archive/2026-10-01-fix-app-review-iap-rejection/` para el contexto completo del incidente.
-
-**Verificación antes de subir un build a revisión**: confirmar visualmente que la pantalla de tienda (`MoodStoreScreen`) carga el catálogo de moods premium normalmente (no vacío, no con mensaje de error) antes de generar el archive final. Probar también en un dispositivo/simulador **iPad** (Apple revisa en iPad Air) y que la UI aparezca antes del diálogo de permisos de notificaciones.
-
-La API key pública (SDK key) de RevenueCat para iOS no es secreta — está pensada para ir embebida en el cliente — pero igual se pasa siempre vía `--dart-define`/variable de entorno, nunca hardcodeada en el repo, por consistencia. Pedir la key actual al responsable del proyecto en RevenueCat (dashboard → Project settings → API keys) si no la tenés a mano.
+**Por qué es obligatorio**: si falta el `--dart-define`, la app cae a `NoopMoodEntitlementsRepository` (todas las compras fallan con "producto no disponible" de inmediato) — esto ya causó un rechazo real de Apple (Guideline 2.1(b)) por un error visible en la pantalla de tienda durante la revisión. Ver `openspec/changes/archive/2026-10-01-fix-app-review-iap-rejection/` para el contexto completo del incidente. El build de archive/release **nunca** pasó por `flutter run` normal (que si pedís la key manualmente sí la lleva) — es fácil olvidar el flag justo en el paso de archivar, que es exactamente lo que pasó la vez anterior.
 
 ## Conventional Commits
 
