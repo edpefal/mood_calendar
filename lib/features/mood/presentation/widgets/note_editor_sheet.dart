@@ -38,13 +38,18 @@ class _NoteEditorSheetContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
 
+    final mediaQuery = MediaQuery.of(context);
+    final keyboardInset = mediaQuery.viewInsets.bottom;
+
     return Padding(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-      ),
+      padding: EdgeInsets.only(bottom: keyboardInset),
       child: SafeArea(
         child: SizedBox(
-          height: MediaQuery.of(context).size.height * 0.85,
+          // Subtract the keyboard inset (rather than just padding it below)
+          // so the sheet shrinks instead of being pushed up past the safe
+          // area when the keyboard opens — otherwise the title row ends up
+          // under the status bar/notch.
+          height: mediaQuery.size.height * 0.85 - keyboardInset,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Column(
