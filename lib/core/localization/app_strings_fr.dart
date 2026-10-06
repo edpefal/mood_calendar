@@ -89,6 +89,10 @@ class AppStringsFr extends AppStrings {
   @override
   String get remindersTurnedOff => 'Les rappels quotidiens sont désactivés.';
   @override
+  String get rateAppTitle => 'Noter Mood Calendar';
+  @override
+  String get rateAppSemanticLabel => 'Noter Mood Calendar sur l\'App Store';
+  @override
   String get exportHistoryTooltip => 'Exporter l\'historique';
   @override
   String get exportingHistory => 'Exportation de ton historique...';

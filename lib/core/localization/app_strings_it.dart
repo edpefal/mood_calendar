@@ -89,6 +89,10 @@ class AppStringsIt extends AppStrings {
   @override
   String get remindersTurnedOff => 'I promemoria giornalieri sono disattivati.';
   @override
+  String get rateAppTitle => 'Valuta Mood Calendar';
+  @override
+  String get rateAppSemanticLabel => 'Valuta Mood Calendar sull\'App Store';
+  @override
   String get exportHistoryTooltip => 'Esporta cronologia';
   @override
   String get exportingHistory => 'Esportazione della tua cronologia...';

@@ -11,13 +11,16 @@ import 'core/localization/app_strings.dart';
 import 'core/logging/logger_app_logger.dart';
 import 'core/navigation/app_navigator.dart';
 import 'core/notifications/local_notification_service.dart';
+import 'core/rating/review_requester.dart';
 import 'core/settings/data/datasources/app_settings_local_datasource.dart';
+import 'core/settings/data/datasources/rating_prompt_local_datasource.dart';
 import 'core/settings/data/repositories/app_settings_repository_impl.dart';
 import 'core/settings/domain/repositories/app_settings_repository.dart';
 import 'core/telemetry/app_telemetry_config.dart';
 import 'core/telemetry/logger_app_telemetry.dart';
 import 'features/mood/data/models/mood_model.dart';
 import 'features/mood/data/repositories/mood_repository_impl.dart';
+import 'features/mood/data/services/rating_prompt_service.dart';
 import 'features/mood/domain/usecases/get_moods_for_month_usecase.dart';
 import 'features/mood/domain/usecases/get_monthly_mood_summary_usecase.dart';
 import 'features/mood/domain/usecases/get_moods_usecase.dart';
@@ -91,6 +94,12 @@ void main() async {
     appSettingsRepository: appSettingsRepository,
     telemetry: telemetry,
   );
+  final ratingPromptService = RatingPromptService(
+    getMoods: GetMoodsUseCase(repository),
+    stateDataSource: RatingPromptLocalDataSource(settingsBox),
+    reviewRequester: InAppReviewRequester(),
+    telemetry: telemetry,
+  );
 
   const revenueCatApiKey = String.fromEnvironment('REVENUECAT_IOS_API_KEY');
   final MoodEntitlementsRepository moodEntitlementsRepository;
@@ -121,6 +130,9 @@ void main() async {
         ),
         RepositoryProvider<LocalNotificationService>.value(
           value: notificationService,
+        ),
+        RepositoryProvider<RatingPromptService>.value(
+          value: ratingPromptService,
         ),
       ],
       child: MultiBlocProvider(

@@ -74,6 +74,8 @@ abstract class AppStrings {
   String get saveReminderSettings;
   String reminderSavedAt(String formattedTime);
   String get remindersTurnedOff;
+  String get rateAppTitle;
+  String get rateAppSemanticLabel;
   String get exportHistoryTooltip;
   String get exportingHistory;
   String historyExportedTo(String fileName);

@@ -9,6 +9,7 @@ import 'package:mood_calendar/core/localization/app_strings.dart';
 import 'package:mood_calendar/core/logging/app_logger.dart';
 import 'package:mood_calendar/core/telemetry/app_telemetry.dart';
 import 'package:mood_calendar/features/mood/data/models/mood_model.dart';
+import 'package:mood_calendar/features/mood/data/services/rating_prompt_service.dart';
 import 'package:mood_calendar/features/mood/domain/entities/mood_entry.dart';
 import 'package:mood_calendar/features/mood/domain/repositories/mood_repository.dart';
 import 'package:mood_calendar/features/mood/domain/usecases/get_moods_for_month_usecase.dart';
@@ -60,6 +61,18 @@ class _TestAppLogger implements AppLogger {
   }) {}
 }
 
+class _FakeRatingPromptService implements RatingPromptService {
+  int maybeRequestCalls = 0;
+
+  @override
+  Future<void> maybeRequestAfterSave() async {
+    maybeRequestCalls++;
+  }
+
+  @override
+  Future<void> openStoreListing() async {}
+}
+
 class _TestAppTelemetry implements AppTelemetry {
   const _TestAppTelemetry();
 
@@ -83,6 +96,7 @@ void main() {
   late Directory tempDir;
   late Box<MoodModel> moodBox;
   late _FakeMoodRepository moodRepository;
+  late _FakeRatingPromptService ratingPromptService;
 
   setUpAll(() async {
     tempDir = await Directory.systemTemp.createTemp('mood_screen_test');
@@ -96,6 +110,7 @@ void main() {
     moodBox = await Hive.openBox<MoodModel>('moods');
     await moodBox.clear();
     moodRepository = _FakeMoodRepository();
+    ratingPromptService = _FakeRatingPromptService();
   });
 
   tearDown(() async {
@@ -133,6 +148,9 @@ void main() {
           BlocProvider(
             create: (_) => PurchasesCubit(FakeMoodEntitlementsRepository()),
           ),
+          RepositoryProvider<RatingPromptService>.value(
+            value: ratingPromptService,
+          ),
         ],
         child: const MaterialApp(
           locale: Locale('es'),
@@ -161,6 +179,7 @@ void main() {
 
     expect(moodRepository.savedEntries, hasLength(1));
     expect(moodRepository.savedEntries.single.mood, 'assets/icon/calm.svg');
+    expect(ratingPromptService.maybeRequestCalls, 1);
   });
 
   testWidgets('saving an unlocked premium mood persists the entry',
@@ -188,6 +207,9 @@ void main() {
             create: (_) => PurchasesCubit(
               FakeMoodEntitlementsRepository(unlockedMoodIds: {'anxious'}),
             ),
+          ),
+          RepositoryProvider<RatingPromptService>.value(
+            value: ratingPromptService,
           ),
         ],
         child: const MaterialApp(
@@ -244,6 +266,9 @@ void main() {
           ),
           BlocProvider(
             create: (_) => PurchasesCubit(FakeMoodEntitlementsRepository()),
+          ),
+          RepositoryProvider<RatingPromptService>.value(
+            value: ratingPromptService,
           ),
         ],
         child: const MaterialApp(

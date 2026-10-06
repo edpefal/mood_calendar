@@ -88,6 +88,10 @@ class AppStringsDe extends AppStrings {
   @override
   String get remindersTurnedOff => 'Tägliche Erinnerungen sind ausgeschaltet.';
   @override
+  String get rateAppTitle => 'Mood Calendar bewerten';
+  @override
+  String get rateAppSemanticLabel => 'Mood Calendar im App Store bewerten';
+  @override
   String get exportHistoryTooltip => 'Verlauf exportieren';
   @override
   String get exportingHistory => 'Dein Verlauf wird exportiert...';
