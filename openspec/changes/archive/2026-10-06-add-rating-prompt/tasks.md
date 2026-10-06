@@ -31,8 +31,8 @@
 - [x] 6.1 `flutter analyze` y `flutter test` en verde
 - [x] 6.2 En el simulador con `idb`: registrar 3 días distintos y confirmar que el diálogo nativo aparece en el calendario tras el tercer guardado, y que no reaparece en el cuarto
 - [x] 6.3 En el simulador: abrir la hoja de recordatorios, tocar la fila y confirmar que se invoca la apertura (log) y que el conteo de intentos no cambia
-- [ ] 6.4 Antes de subir cualquier build con este cambio, seguir el checklist de release de `CLAUDE.md` (key de RevenueCat con `--dart-define`, `MoodStoreScreen` cargando en iPhone e iPad)
+- [x] 6.4 Antes de subir cualquier build con este cambio, seguir el checklist de release de `CLAUDE.md` (key de RevenueCat con `--dart-define`, `MoodStoreScreen` cargando en iPhone e iPad)
 
 ## 7. Cierre
 
-- [ ] 7.1 Al archivar, actualizar en `CLAUDE.md` la lista de specs vigentes (agregar `rating-prompt`) y la nota del flujo de guardado si cambió
+- [x] 7.1 Al archivar, actualizar en `CLAUDE.md` la lista de specs vigentes (agregar `rating-prompt`) y la nota del flujo de guardado si cambió
