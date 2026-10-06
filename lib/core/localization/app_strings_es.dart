@@ -87,6 +87,10 @@ class AppStringsEs extends AppStrings {
   String get remindersTurnedOff =>
       'Los recordatorios diarios estan desactivados.';
   @override
+  String get rateAppTitle => 'Calificar Mood Calendar';
+  @override
+  String get rateAppSemanticLabel => 'Calificar Mood Calendar en el App Store';
+  @override
   String get exportHistoryTooltip => 'Exportar historial';
   @override
   String get exportingHistory => 'Exportando tu historial...';

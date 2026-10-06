@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -8,6 +10,7 @@ import '../../../../core/notifications/local_notification_service.dart';
 import '../../../../core/settings/domain/entities/app_settings.dart';
 import '../../../../core/settings/domain/repositories/app_settings_repository.dart';
 import '../../../../core/widgets/gradient_pill_button.dart';
+import '../../data/services/rating_prompt_service.dart';
 import '../../domain/services/mood_definition_resolver.dart';
 import '../bloc/calendar_cubit.dart';
 import '../widgets/monthly_mood_summary_card.dart';
@@ -40,6 +43,7 @@ class _CalendarScreenState extends State<CalendarScreen>
     if (_recentlySavedDate != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _startAnimation();
+        _requestRatingAfterSave();
       });
     }
   }
@@ -61,6 +65,17 @@ class _CalendarScreenState extends State<CalendarScreen>
           _recentlySavedDate = null;
         });
       }
+    });
+  }
+
+  void _requestRatingAfterSave() {
+    if (!mounted) return;
+    final ratingPromptService = context.read<RatingPromptService>();
+    // Let the route transition settle so the system dialog doesn't pop up
+    // mid-animation, and skip it if another screen was opened meanwhile.
+    Future.delayed(const Duration(milliseconds: 600), () {
+      if (!mounted || ModalRoute.of(context)?.isCurrent != true) return;
+      unawaited(ratingPromptService.maybeRequestAfterSave());
     });
   }
 
@@ -221,6 +236,7 @@ class _CalendarScreenState extends State<CalendarScreen>
                                                 _recentlySavedDate = result;
                                               });
                                               _startAnimation();
+                                              _requestRatingAfterSave();
                                             }
                                           },
                                     child: Container(
@@ -478,6 +494,13 @@ class _ReminderSettingsSheetState extends State<_ReminderSettingsSheet> {
   LocalNotificationService get _notificationService =>
       context.read<LocalNotificationService>();
 
+  RatingPromptService get _ratingPromptService =>
+      context.read<RatingPromptService>();
+
+  void _openRateApp() {
+    unawaited(_ratingPromptService.openStoreListing());
+  }
+
   @override
   void initState() {
     super.initState();
@@ -604,6 +627,23 @@ class _ReminderSettingsSheetState extends State<_ReminderSettingsSheet> {
                     label: strings.saveReminderSettings,
                     onPressed: _isSaving ? null : _saveSettings,
                     loading: _isSaving,
+                  ),
+                  const SizedBox(height: 8),
+                  const Divider(),
+                  Semantics(
+                    button: true,
+                    label: strings.rateAppSemanticLabel,
+                    onTap: _openRateApp,
+                    excludeSemantics: true,
+                    child: ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: const Icon(
+                        Icons.star_rounded,
+                        color: Color(0xFF5F3DC4),
+                      ),
+                      title: Text(strings.rateAppTitle),
+                      onTap: _openRateApp,
+                    ),
                   ),
                 ],
               ),
