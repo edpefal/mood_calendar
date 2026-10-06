@@ -100,19 +100,25 @@ flutter run --dart-define=REVENUECAT_IOS_API_KEY=<key>   # correr en simulador c
 
 ## Build de release de iOS (archive/IPA)
 
-**⚠️ Checklist obligatorio cada vez que se genera una nueva versión/build de release — no saltear ningún paso:**
+**La única forma soportada de generar un build para subir al App Store es `scripts/build_ios_release.sh`. No correr `flutter build ipa` a mano.**
 
-1. **Conseguir la API key pública (SDK key) de RevenueCat para iOS** antes de buildear. Vía MCP: `mcp__revenuecat__list-projects` → `mcp__revenuecat__list-apps` (proyecto "Mood Calendar", app `app_store`) → `mcp__revenuecat__list-app-public-api-keys`. No es secreta (va embebida en el cliente), pero igual nunca se hardcodea en el repo — siempre vía `--dart-define`/variable de entorno.
-2. **Incluir `--dart-define=REVENUECAT_IOS_API_KEY=<key>` en el build de archive**, sin excepción:
-   ```bash
-   flutter build ipa --dart-define=REVENUECAT_IOS_API_KEY=<key>
-   ```
-   Si se archiva desde Xcode en vez de `flutter build ipa`, agregar el mismo `--dart-define` en los Build Settings del scheme de Release (`Other Flutter Build Flags` / "Additional Run Args" según la versión de Xcode) antes de archivar.
-3. **Antes de archivar, probar en simulador con esa misma key** (`flutter run --dart-define=REVENUECAT_IOS_API_KEY=<key>`) y confirmar visualmente que `MoodStoreScreen` carga el catálogo de moods premium normalmente — no vacío, no con mensaje de error.
-4. **Repetir la verificación en un simulador/dispositivo iPad**, no solo iPhone (Apple revisa en iPad Air), y confirmar que la UI aparece antes del diálogo de permisos de notificaciones.
-5. Solo después de 3 y 4 generar el archive final y subirlo.
+```bash
+REVENUECAT_IOS_API_KEY=<key> STORE_VERIFIED=1 scripts/build_ios_release.sh
+```
 
-**Por qué es obligatorio**: si falta el `--dart-define`, la app cae a `NoopMoodEntitlementsRepository` (todas las compras fallan con "producto no disponible" de inmediato) — esto ya causó un rechazo real de Apple (Guideline 2.1(b)) por un error visible en la pantalla de tienda durante la revisión. Ver `openspec/changes/archive/2026-10-01-fix-app-review-iap-rejection/` para el contexto completo del incidente. El build de archive/release **nunca** pasó por `flutter run` normal (que si pedís la key manualmente sí la lleva) — es fácil olvidar el flag justo en el paso de archivar, que es exactamente lo que pasó la vez anterior.
+El script se niega a correr sin la key, siempre pasa `--dart-define=REVENUECAT_IOS_API_KEY=<key>` y, al terminar (`scripts/verify_ios_archive_key.sh`), comprueba que la key quedó embebida en el binario compilado: falla si no está. Acepta flags extra de `flutter build ipa`.
+
+Un hook de Claude Code (`.claude/settings.json` → `.claude/hooks/require-release-script.sh`) bloquea `flutter build ipa` y `flutter build ios` de release ejecutados directo en una sesión. Los builds de simulador, debug y profile no se bloquean. Si se archiva desde Xcode (no recomendado) hay que poner el mismo `--dart-define` en los Build Settings del scheme de Release y correr después `REVENUECAT_IOS_API_KEY=<key> scripts/verify_ios_archive_key.sh`.
+
+**Pasos manuales previos — el script no puede hacerlos por vos:**
+
+1. **Conseguir la API key pública (SDK key) de RevenueCat para iOS.** Vía MCP: `mcp__revenuecat__list-projects` → `mcp__revenuecat__list-apps` (proyecto "Mood Calendar", app `app_store`) → `mcp__revenuecat__list-app-public-api-keys`. No es secreta (va embebida en el cliente), pero nunca se hardcodea en el repo: siempre por variable de entorno.
+2. **Probar en simulador con esa misma key** (`flutter run --dart-define=REVENUECAT_IOS_API_KEY=<key>`) y confirmar que `MoodStoreScreen` carga el catálogo de moods premium (no vacío, sin mensaje de error). Repetirlo en un simulador/dispositivo **iPad** (Apple revisa en iPad Air) y confirmar que la UI aparece antes del diálogo de permisos de notificaciones.
+3. Solo después correr el script con `STORE_VERIFIED=1`, que afirma que el paso 2 está hecho.
+
+**Simuladores compartidos**: las apps `com.artlab.*` (Mood Calendar, Photo Wardrobe, Reevo) comparten vendor. En un simulador que tenga otras de esas apps instaladas, el SDK de RevenueCat puede reutilizar el ID anónimo de otra app y mostrar productos ajenos o "no packages found". Si la tienda sale vacía o con productos que no son de Mood Calendar, repetir la prueba en un simulador limpio (`xcrun simctl create ...`) antes de sospechar de la configuración; la del dashboard se puede confirmar con el MCP de RevenueCat.
+
+**Por qué es obligatorio**: si falta el `--dart-define`, la app cae a `NoopMoodEntitlementsRepository` (todas las compras fallan con "producto no disponible" de inmediato). Eso ya causó un rechazo real de Apple (Guideline 2.1(b)) por un error visible en la pantalla de tienda durante la revisión; ver `openspec/changes/archive/2026-10-01-fix-app-review-iap-rejection/`. Olvidar el flag justo al archivar es fácil, y por eso el script y el hook existen.
 
 ## Conventional Commits
 
