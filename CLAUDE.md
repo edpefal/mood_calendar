@@ -169,6 +169,30 @@ Cambios no triviales siguen el flujo OpenSpec: proponer (`/opsx:propose`) → im
 
 El agente puede validar cambios de UI/UX de forma ad-hoc en el simulador (screenshots, taps, árbol de accesibilidad, diálogos nativos del sistema) usando `idb`. Ver `docs/ios-simulator-ui-testing.md` para el workflow completo. No es una suite de tests ni corre en CI.
 
+### Screenshots de App Store
+
+`tool/screenshots/main.dart` es un entrypoint **solo para capturas** (no se envía en la app): en cada arranque borra los datos locales y siembra el mes anterior completo (racha de 14 días) más una nota en el día de hoy, deja todos los moods premium desbloqueados y no inicializa notificaciones (evita el diálogo de permisos). Con `--dart-define=REVENUECAT_IOS_API_KEY=<key>` usa el catálogo real de RevenueCat en vez del repositorio "todo desbloqueado" (necesario para la pantalla de la tienda).
+
+**Siempre en simuladores propios y limpios**, nunca en los del día a día: el entrypoint **borra** los moods y ajustes de la app instalada, y compartir simulador con otras apps `com.artlab.*` contamina el catálogo de RevenueCat (ver "Simuladores compartidos"). Para recrearlos:
+
+```bash
+RT=$(xcrun simctl list runtimes | grep -o 'com.apple.CoreSimulator.SimRuntime.iOS-[0-9-]*' | tail -1)
+IPHONE=$(xcrun simctl create "MC Shots iPhone" com.apple.CoreSimulator.SimDeviceType.iPhone-17-Pro-Max $RT)  # 1320×2868
+IPAD=$(xcrun simctl create "MC Shots iPad" com.apple.CoreSimulator.SimDeviceType.iPad-Pro-13-inch-M5-16GB $RT)  # 2064×2752
+for d in $IPHONE $IPAD; do xcrun simctl boot $d; done
+xcrun simctl status_bar $IPHONE override --time 9:41 --batteryState charged --batteryLevel 100 --cellularMode active --cellularBars 4 --wifiBars 3
+xcrun simctl status_bar $IPAD override --time 9:41 --batteryState charged --batteryLevel 100 --cellularMode notSupported --wifiBars 3
+flutter run -t tool/screenshots/main.dart -d $IPHONE   # idem con -d $IPAD
+```
+
+Esas resoluciones corresponden a los tamaños de 6.9" y 13" que Apple lista para screenshots (confirmarlo en App Store Connect al subirlos); `xcrun simctl delete <udid>` borra los simuladores al terminar. Notas del flujo de captura:
+
+- Tras compilar, `flutter run` puede quedarse esperando en un simulador recién creado (indexa atajos del sistema en el primer arranque). Si la app no abre sola: `xcrun simctl launch <udid> com.artlab.moodcalendar`.
+- Para cambiar de idioma: `xcrun simctl terminate` y `xcrun simctl launch <udid> com.artlab.moodcalendar -AppleLanguages "(es)" -AppleLocale es_ES`. Los textos de la app (ya con acentos) y el calendario siguen ese idioma; los nombres de los moods (`Happy`, `Romantic`…) no están localizados.
+- Los botones se encuentran por posición con `idb ui describe-all` (las etiquetas cambian por idioma): en la pantalla principal, el botón de más a la derecha es el calendario y el anterior la tienda; en el calendario, el primer grupo de 2–3 botones juntos es [mes anterior, recordatorios, mes siguiente]. El mes actual no tiene botón "siguiente".
+- El calendario del mes anterior es el que tiene datos; hay que tocar "mes anterior" una vez.
+- Los slides finales (titular + marco de dispositivo sobre la captura) se componen aparte, de HTML a PNG con Chrome headless; esos scripts y el set de 60 slides generado (`aso/screenshots/`) no están en el repo.
+
 ## Notas
 
 - No hay backend ni autenticación; todos los datos son locales (Hive). Los unlocks de compras se cachean localmente; no hay validación de recibos en servidor (ver `docs/risks.md`).
