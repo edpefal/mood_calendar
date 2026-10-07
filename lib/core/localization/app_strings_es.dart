@@ -6,35 +6,35 @@ class AppStringsEs extends AppStrings {
   const AppStringsEs() : super(const Locale('es'));
 
   @override
-  String get appTitle => 'Calendario de animo';
+  String get appTitle => 'Calendario de ánimo';
   @override
-  String get notificationChannelName => 'Recordatorio diario de animo';
+  String get notificationChannelName => 'Recordatorio diario de ánimo';
   @override
   String get notificationChannelDescription =>
-      'Recordatorio diario para registrar como te sientes';
+      'Recordatorio diario para registrar cómo te sientes';
   @override
-  String get reminderNotificationTitle => 'Como te sientes hoy?';
+  String get reminderNotificationTitle => '¿Cómo te sientes hoy?';
   @override
-  String get reminderNotificationBody => 'Toca para registrar tu animo de hoy.';
+  String get reminderNotificationBody => 'Toca para registrar tu ánimo de hoy.';
   @override
-  String get moodLoading => 'Cargando tu animo para este dia...';
+  String get moodLoading => 'Cargando tu ánimo para este día...';
   @override
-  String get moodQuestion => 'Como te sientes hoy?';
+  String get moodQuestion => '¿Cómo te sientes hoy?';
   @override
   String selectedMood(String moodLabel, int index, int total) =>
-      'Opcion de animo $moodLabel, ${index + 1} de $total';
+      'Opción de ánimo $moodLabel, ${index + 1} de $total';
   @override
   String get save => 'Guardar';
   @override
-  String get saveMoodButtonLabel => 'Guardar registro de animo';
+  String get saveMoodButtonLabel => 'Guardar registro de ánimo';
   @override
-  String get savingMood => 'Guardando tu animo...';
+  String get savingMood => 'Guardando tu ánimo...';
   @override
   String get saveMoodError =>
-      'No pudimos guardar tu animo en este momento. Intentalo de nuevo.';
+      'No pudimos guardar tu ánimo en este momento. Inténtalo de nuevo.';
   @override
   String get loadingMonthError =>
-      'No pudimos cargar este mes. Intentalo de nuevo.';
+      'No pudimos cargar este mes. Inténtalo de nuevo.';
   @override
   String get retry => 'Reintentar';
   @override
@@ -43,21 +43,21 @@ class AppStringsEs extends AppStrings {
   String get loadingSummary => 'Cargando resumen mensual...';
   @override
   String get emptySummary =>
-      'Todavia no hay registros este mes. Empieza a registrar para ver tu resumen.';
+      'Todavía no hay registros este mes. Empieza a registrar para ver tu resumen.';
   @override
-  String get monthlyAverage => 'Animo mas frecuente';
+  String get monthlyAverage => 'Ánimo más frecuente';
   @override
   String moodRepresentsMonth(String monthName) =>
-      'Animo que mas registraste en $monthName';
+      'Ánimo que más registraste en $monthName';
   @override
   String get bestStreak => 'Mejor racha';
   @override
   String streakText(int days) =>
-      '$days dia${days == 1 ? '' : 's'} seguidos registrando tu animo';
+      '$days día${days == 1 ? '' : 's'} seguidos registrando tu ánimo';
   @override
   String summaryTitle(String monthName) => 'Resumen de $monthName';
   @override
-  String get reminderSettingsTooltip => 'Configuracion de recordatorios';
+  String get reminderSettingsTooltip => 'Configuración de recordatorios';
   @override
   String get openCalendarTooltip => 'Abrir calendario';
   @override
@@ -70,22 +70,22 @@ class AppStringsEs extends AppStrings {
   String get reminderSheetTitle => 'Recordatorios diarios';
   @override
   String get reminderSheetDescription =>
-      'Elige si los recordatorios estan activos y la hora que mejor se adapta a tu rutina.';
+      'Elige si los recordatorios están activos y la hora que mejor se adapta a tu rutina.';
   @override
   String get reminderEnabledTitle => 'Activar recordatorios diarios';
   @override
   String get reminderEnabledSubtitle =>
-      'Activa o desactiva la notificacion diaria';
+      'Activa o desactiva la notificación diaria';
   @override
   String get reminderTimeTitle => 'Hora del recordatorio';
   @override
-  String get saveReminderSettings => 'Guardar configuracion de recordatorios';
+  String get saveReminderSettings => 'Guardar configuración de recordatorios';
   @override
   String reminderSavedAt(String formattedTime) =>
       'Recordatorio diario configurado para las $formattedTime.';
   @override
   String get remindersTurnedOff =>
-      'Los recordatorios diarios estan desactivados.';
+      'Los recordatorios diarios están desactivados.';
   @override
   String get rateAppTitle => 'Calificar Mood Calendar';
   @override
@@ -99,7 +99,7 @@ class AppStringsEs extends AppStrings {
       'Historial exportado en $fileName.';
   @override
   String get historyExportFailed =>
-      'No pudimos exportar tu historial en este momento. Intentalo de nuevo.';
+      'No pudimos exportar tu historial en este momento. Inténtalo de nuevo.';
   @override
   String calendarDayLabel({
     required String formattedDate,
@@ -110,18 +110,18 @@ class AppStringsEs extends AppStrings {
       return '$formattedDate, fecha futura no disponible';
     }
     if (moodLabel == null) {
-      return '$formattedDate, sin animo registrado';
+      return '$formattedDate, sin ánimo registrado';
     }
-    return '$formattedDate, animo registrado: $moodLabel';
+    return '$formattedDate, ánimo registrado: $moodLabel';
   }
 
   @override
-  String get monthlyChartSemantics => 'Grafica mensual de estados de animo';
+  String get monthlyChartSemantics => 'Gráfica mensual de estados de ánimo';
   @override
   String monthlyAverageSemantics(String moodLabel) =>
-      'Animo mas frecuente: $moodLabel';
+      'Ánimo más frecuente: $moodLabel';
   @override
-  String bestStreakSemantics(int days) => 'Mejor racha: $days dias';
+  String bestStreakSemantics(int days) => 'Mejor racha: $days días';
 
   @override
   List<String> get monthNames => const [
@@ -157,20 +157,20 @@ class AppStringsEs extends AppStrings {
 
   // Tienda / paywall
   @override
-  String get storeTitle => 'Tienda de animos';
+  String get storeTitle => 'Tienda de ánimos';
   @override
   String get openStoreTooltip => 'Abrir tienda';
   @override
-  String get storeMoodsSectionTitle => 'Animos premium';
+  String get storeMoodsSectionTitle => 'Ánimos premium';
   @override
   String get storePacksSectionTitle => 'Packs';
   @override
   String get storeLoading => 'Cargando la tienda...';
   @override
   String get storeLoadError =>
-      'No pudimos cargar la tienda en este momento. Intentalo de nuevo.';
+      'No pudimos cargar la tienda en este momento. Inténtalo de nuevo.';
   @override
-  String get storeEmptyMoods => 'No hay animos premium disponibles por ahora.';
+  String get storeEmptyMoods => 'No hay ánimos premium disponibles por ahora.';
   @override
   String get storeEmptyPacks => 'No hay packs disponibles por ahora.';
   @override
@@ -190,18 +190,18 @@ class AppStringsEs extends AppStrings {
   @override
   String get restoreSuccessMessage => 'Tus compras fueron restauradas.';
   @override
-  String get purchaseSuccessMessage => 'Compra completada. Disfrutalo!';
+  String get purchaseSuccessMessage => 'Compra completada. ¡Disfrútalo!';
   @override
   String get purchaseCancelledMessage => 'Compra cancelada.';
   @override
   String get purchaseNetworkErrorMessage =>
-      'Sin conexion a internet. Intentalo de nuevo.';
+      'Sin conexión a internet. Inténtalo de nuevo.';
   @override
   String get purchaseProductUnavailableMessage =>
-      'Este producto no esta disponible en este momento.';
+      'Este producto no está disponible en este momento.';
   @override
   String get purchaseUnknownErrorMessage =>
-      'Algo salio mal con tu compra. Intentalo de nuevo.';
+      'Algo salió mal con tu compra. Inténtalo de nuevo.';
   @override
   String get packOverlapWarningTitle => 'Ya tienes algunos de estos';
   @override

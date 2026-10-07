@@ -300,7 +300,7 @@ void main() {
     expect(moodRepository.savedEntries, isEmpty);
     // The purchase bottom sheet opened instead of saving (the fake
     // repository returns no offers, so it shows the empty-catalog message).
-    expect(find.text('No hay animos premium disponibles por ahora.'),
+    expect(find.text('No hay ánimos premium disponibles por ahora.'),
         findsOneWidget);
     expect(find.text('Cancelar'), findsOneWidget);
   });

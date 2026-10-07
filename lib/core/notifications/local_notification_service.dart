@@ -102,8 +102,8 @@ class LocalNotificationService {
 
     const androidDetails = AndroidNotificationDetails(
       _dailyReminderChannelId,
-      'Recordatorio diario de animo',
-      channelDescription: 'Recordatorio diario para registrar como te sientes',
+      'Recordatorio diario de ánimo',
+      channelDescription: 'Recordatorio diario para registrar cómo te sientes',
       importance: Importance.high,
       priority: Priority.high,
       playSound: true,

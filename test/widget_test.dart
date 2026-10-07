@@ -71,7 +71,7 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
 
-    expect(find.text('Como te sientes hoy?'), findsOneWidget);
+    expect(find.text('¿Cómo te sientes hoy?'), findsOneWidget);
     expect(find.text('Abril 1, 2026'), findsOneWidget);
     expect(find.text('Guardar'), findsOneWidget);
     expect(find.byType(PageView), findsOneWidget);
