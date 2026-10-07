@@ -27,7 +27,14 @@ Backlog activo del proyecto, actualizado contra el estado actual del repo.
 
 - La app ya incorpora moods adicionales en el selector principal.
 
+- Ficha de App Store localizada a es/de/fr/it, subtitle y keywords nuevos, categoría primaria Lifestyle, aviso para calificar la app (versión 1.8.3) y script/hook que obligan a pasar por `scripts/build_ios_release.sh` al generar builds de iOS.
+
+- Set nuevo de 6 screenshots por idioma (iPhone + iPad) generado con `tool/screenshots/` y subido a la versión 1.8.4 en App Store Connect (aún sin build ni enviar a revisión).
+
 ## Alta prioridad
+
+- Terminar y publicar la versión 1.8.4.
+  Está creada en App Store Connect con los screenshots cargados, pero falta: subir la versión en `pubspec.yaml`, generar el build con `scripts/build_ios_release.sh` (checklist de `CLAUDE.md`), escribir el promotional text y el What's New (están vacíos en los 5 idiomas; no se heredan de la versión anterior), asociar el build y enviar a revisión. Se pospone hasta meter más features. Opcional: recapturar los slides en español, que muestran los textos anteriores a la corrección de acentos.
 
 - Documentar mejor la arquitectura real del proyecto.
   El README debe describir con precisión `features/mood`, settings, notificaciones y telemetría. Hace falta una guía de onboarding que refleje el flujo real de dependencias, estado y persistencia.
@@ -52,6 +59,12 @@ Backlog activo del proyecto, actualizado contra el estado actual del repo.
 - Localizar notificaciones y título de la app.
   La UI ya usa el locale del dispositivo (en, es, de, fr, it; fallback inglés), pero `LocalNotificationService` y el `title` de `MaterialApp` siguen fijos en español (`AppStrings.forLocale(const Locale('es'))`) por falta de `BuildContext` en background. Persistir el locale del dispositivo (o resolverlo con `PlatformDispatcher.instance.locale`) para usarlo ahí. Opcional: selector manual de idioma.
 
+- Localizar los nombres de los moods.
+  Las etiquetas (`Happy`, `Calm`, `Romantic`, `Brave`…) vienen de `mood_definition.dart` y salen en inglés en todos los idiomas, incluso en screenshots y en la tienda.
+
+- Fijar un `appUserID` explícito en `Purchases.configure()` (sin decidir).
+  Las apps `com.artlab.*` comparten vendor y, en un mismo simulador, RevenueCat puede reutilizar el ID anónimo de otra app y mostrar productos ajenos. Un ID propio evitaría esa contaminación.
+
 - Añadir edición, borrado y consulta más cómoda de entradas.
   El flujo principal cubre registro y resumen, pero sigue faltando una experiencia explícita para editar, eliminar o revisar notas históricas con menos fricción.
 
@@ -71,6 +84,17 @@ Backlog activo del proyecto, actualizado contra el estado actual del repo.
 
 - Evaluar nuevas taxonomías de moods.
   Vale la pena decidir si el selector crecerá con más moods, agrupaciones o categorías según el uso real.
+
+## ASO pendiente
+
+Sale de `aso/aso_report.md` (auditoría del 2026-10-02). Lo ya hecho está en "Completado recientemente".
+
+- Medir el efecto del cambio de categoría a Lifestyle: comparar impresiones y descargas durante 2 a 4 semanas.
+- Seguir el volumen de calificaciones tras la 1.8.3 (meta del reporte: 25+ con 4.5 o más; al 2026-10-07 seguían US 1×1★, MX 1×5★, ES ninguna) y revisar si llegan reseñas nuevas para responderlas.
+- App Preview de 15 a 25 s sin depender del sonido: registrar un mood, el calendario llenándose y la racha.
+- Product Page Optimization: pruebas A/B de orden de screenshots e ícono.
+- Custom Product Pages por audiencia, junto con Apple Search Ads para términos de nicho.
+- In-App Events de temporada (por ejemplo un check-in de Año Nuevo o la semana de salud mental).
 
 ## Orden sugerido de ejecución
 
