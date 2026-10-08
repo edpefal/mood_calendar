@@ -108,14 +108,21 @@ class _MoodScreenState extends State<MoodScreen>
       return;
     }
 
+    final hadClients = _pageController.hasClients;
     setState(() {
       selectedMood = allMoodDefinitions[targetPage];
       _currentPage = targetPage;
       _noteController.text = entry?.note ?? '';
       isLoading = false;
+      if (!hadClients) {
+        // El PageView aún no existe (se muestra el loader), así que no hay a
+        // dónde saltar: se recrea el controlador con la página correcta.
+        _pageController.dispose();
+        _pageController = PageController(initialPage: targetPage);
+      }
     });
 
-    if (_pageController.hasClients) {
+    if (hadClients) {
       _pageController.jumpToPage(targetPage);
     }
   }
