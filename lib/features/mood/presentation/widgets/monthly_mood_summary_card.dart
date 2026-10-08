@@ -123,7 +123,8 @@ class MonthlyMoodSummaryCard extends StatelessWidget {
   }
 
   String _moodLabelFromPath(BuildContext context, String path) {
-    return MoodDefinitionResolver.byAssetPath(path).label;
+    return AppStrings.of(context)
+        .moodName(MoodDefinitionResolver.byAssetPath(path).id);
   }
 }
 

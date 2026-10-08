@@ -173,7 +173,7 @@ void main() {
       await tester.pumpAndSettle();
     }
 
-    expect(find.text('Calm'), findsOneWidget);
+    expect(find.text('Tranquilo'), findsOneWidget);
 
     await tester.tap(find.text('Guardar'));
     await tester.pumpAndSettle();
@@ -234,7 +234,7 @@ void main() {
       await tester.pumpAndSettle();
     }
 
-    expect(find.text('Anxious'), findsOneWidget);
+    expect(find.text('Ansioso'), findsOneWidget);
 
     await tester.tap(find.text('Guardar'));
     await tester.pumpAndSettle();
@@ -292,7 +292,7 @@ void main() {
       await tester.pumpAndSettle();
     }
 
-    expect(find.text('Anxious'), findsOneWidget);
+    expect(find.text('Ansioso'), findsOneWidget);
     expect(find.byIcon(Icons.lock_rounded), findsWidgets);
 
     await tester.tap(find.text('Guardar'));

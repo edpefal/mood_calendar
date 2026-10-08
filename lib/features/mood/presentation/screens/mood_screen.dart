@@ -315,7 +315,7 @@ class _MoodScreenState extends State<MoodScreen>
                               height: 260,
                               child: Semantics(
                                 label: strings.selectedMood(
-                                  selectedMood.label,
+                                  strings.moodName(selectedMood.id),
                                   _currentPage,
                                   allMoodDefinitions.length,
                                 ),
@@ -337,7 +337,7 @@ class _MoodScreenState extends State<MoodScreen>
 
                                         return Semantics(
                                           label: strings.selectedMood(
-                                            mood.label,
+                                            strings.moodName(mood.id),
                                             index,
                                             allMoodDefinitions.length,
                                           ),
@@ -361,7 +361,7 @@ class _MoodScreenState extends State<MoodScreen>
                                                         width: 150,
                                                         fit: BoxFit.contain,
                                                         semanticsLabel:
-                                                            mood.label,
+                                                            strings.moodName(mood.id),
                                                         placeholderBuilder:
                                                             (context) =>
                                                                 const CircularProgressIndicator(),
@@ -389,7 +389,7 @@ class _MoodScreenState extends State<MoodScreen>
                                                 ),
                                                 const SizedBox(height: 8),
                                                 Text(
-                                                  mood.label,
+                                                  strings.moodName(mood.id),
                                                   style: Theme.of(context)
                                                       .textTheme
                                                       .titleMedium,
