@@ -34,8 +34,10 @@ abstract class AppStrings {
         return const AppStringsFr();
       case 'it':
         return const AppStringsIt();
-      default:
+      case 'es':
         return const AppStringsEs();
+      default:
+        return const AppStringsEn();
     }
   }
 

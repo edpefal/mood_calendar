@@ -52,7 +52,7 @@ Clase abstracta `AppStrings` con subclases concretas por idioma. Para añadir un
 
 Idiomas soportados: inglés (en, **fallback**), español (es), alemán (de), francés (fr), italiano (it). La UI usa el locale del dispositivo (no hay locale hardcodeado).
 
-Las notificaciones (`LocalNotificationService`) y el `title` de `MaterialApp` usan español fijo (`AppStrings.forLocale(const Locale('es'))`) por falta de contexto en background — pendiente de mejora.
+Las notificaciones (`LocalNotificationService`) resuelven el idioma con `PlatformDispatcher.instance.locale` (inyectable vía `localeResolver`) cada vez que programan el recordatorio, y el `title` de `MaterialApp` usa `onGenerateTitle`. Un recordatorio ya programado cambia de idioma en el siguiente arranque. `AppStrings.forLocale` cae a inglés para locales no soportados.
 
 ## Estados de ánimo
 

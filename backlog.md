@@ -31,6 +31,8 @@ Backlog activo del proyecto, actualizado contra el estado actual del repo.
 
 - Set nuevo de 6 screenshots por idioma (iPhone + iPad) generado con `tool/screenshots/` y subido a la versión 1.8.4 en App Store Connect (aún sin build ni enviar a revisión).
 
+- Notificaciones de recordatorio y `title` de la app ya siguen el idioma del dispositivo (fallback inglés).
+
 ## Alta prioridad
 
 - Terminar y publicar la versión 1.8.4.
@@ -55,9 +57,6 @@ Backlog activo del proyecto, actualizado contra el estado actual del repo.
 
 - Regenerar `assets/icon/brave.svg`.
   Es un outlier: 1MB, 787 paths, 2048×2048 sin el `viewBox="0 0 512 512"` del resto del set — generado con VTracer (auto-trazado) a partir de una imagen de Gemini, a diferencia de los demás íconos (~3KB, vector limpio). Pesado de renderizar y visualmente inconsistente con el resto del set. Regenerar con el mismo proceso que produjo los otros 9 íconos.
-
-- Localizar notificaciones y título de la app.
-  La UI ya usa el locale del dispositivo (en, es, de, fr, it; fallback inglés), pero `LocalNotificationService` y el `title` de `MaterialApp` siguen fijos en español (`AppStrings.forLocale(const Locale('es'))`) por falta de `BuildContext` en background. Persistir el locale del dispositivo (o resolverlo con `PlatformDispatcher.instance.locale`) para usarlo ahí. Opcional: selector manual de idioma.
 
 - Localizar los nombres de los moods.
   Las etiquetas (`Happy`, `Calm`, `Romantic`, `Brave`…) vienen de `mood_definition.dart` y salen en inglés en todos los idiomas, incluso en screenshots y en la tienda.
