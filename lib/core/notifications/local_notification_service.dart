@@ -19,9 +19,12 @@ class LocalNotificationService {
     required NotificationTapCallback onReminderTap,
     required AppSettingsRepository appSettingsRepository,
     required AppTelemetry telemetry,
+    Locale Function()? localeResolver,
   })  : _onReminderTap = onReminderTap,
         _appSettingsRepository = appSettingsRepository,
-        _telemetry = telemetry;
+        _telemetry = telemetry,
+        _localeResolver =
+            localeResolver ?? (() => PlatformDispatcher.instance.locale);
 
   static const _dailyReminderId = 1001;
   static const _dailyReminderPayload = 'daily_mood_reminder';
@@ -31,6 +34,12 @@ class LocalNotificationService {
   final NotificationTapCallback _onReminderTap;
   final AppSettingsRepository _appSettingsRepository;
   final AppTelemetry _telemetry;
+  final Locale Function() _localeResolver;
+
+  /// Strings in the device language, resolved on each use: this service has
+  /// no BuildContext and the locale may change between launches.
+  @visibleForTesting
+  AppStrings get strings => AppStrings.forLocale(_localeResolver());
 
   Future<bool> initialize() async {
     await _configureTimeZones();
@@ -100,10 +109,11 @@ class LocalNotificationService {
       scheduled = scheduled.add(const Duration(days: 1));
     }
 
-    const androidDetails = AndroidNotificationDetails(
+    final strings = this.strings;
+    final androidDetails = AndroidNotificationDetails(
       _dailyReminderChannelId,
-      'Recordatorio diario de ánimo',
-      channelDescription: 'Recordatorio diario para registrar cómo te sientes',
+      strings.notificationChannelName,
+      channelDescription: strings.notificationChannelDescription,
       importance: Importance.high,
       priority: Priority.high,
       playSound: true,
@@ -117,10 +127,10 @@ class LocalNotificationService {
 
     await _plugin.zonedSchedule(
       _dailyReminderId,
-      AppStrings.forLocale(const Locale('es')).reminderNotificationTitle,
-      AppStrings.forLocale(const Locale('es')).reminderNotificationBody,
+      strings.reminderNotificationTitle,
+      strings.reminderNotificationBody,
       scheduled,
-      const NotificationDetails(
+      NotificationDetails(
         android: androidDetails,
         iOS: darwinDetails,
       ),
@@ -222,12 +232,12 @@ class LocalNotificationService {
     }
     final androidPlugin = _plugin.resolvePlatformSpecificImplementation<
         AndroidFlutterLocalNotificationsPlugin>();
+    final strings = this.strings;
     await androidPlugin?.createNotificationChannel(
       AndroidNotificationChannel(
         _dailyReminderChannelId,
-        AppStrings.forLocale(const Locale('es')).notificationChannelName,
-        description:
-            AppStrings.forLocale(const Locale('es')).notificationChannelDescription,
+        strings.notificationChannelName,
+        description: strings.notificationChannelDescription,
         importance: Importance.high,
       ),
     );

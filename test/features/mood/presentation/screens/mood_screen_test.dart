@@ -9,6 +9,7 @@ import 'package:mood_calendar/core/localization/app_strings.dart';
 import 'package:mood_calendar/core/logging/app_logger.dart';
 import 'package:mood_calendar/core/telemetry/app_telemetry.dart';
 import 'package:mood_calendar/features/mood/data/models/mood_model.dart';
+import 'package:mood_calendar/main.dart';
 import 'package:mood_calendar/features/mood/data/services/rating_prompt_service.dart';
 import 'package:mood_calendar/features/mood/domain/entities/mood_entry.dart';
 import 'package:mood_calendar/features/mood/domain/repositories/mood_repository.dart';
@@ -392,5 +393,43 @@ void main() {
 
     expect(find.text('Nota del día'), findsNothing);
     expect(find.text('Hoy fue un buen día'), findsOneWidget);
+  });
+
+  testWidgets('app title follows the device language', (tester) async {
+    tester.platformDispatcher.localesTestValue = const [Locale('de')];
+    addTearDown(tester.platformDispatcher.clearLocalesTestValue);
+
+    await tester.pumpWidget(
+      MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (_) => MoodCubit(
+              saveMood: SaveMoodUseCase(moodRepository),
+              getMoods: GetMoodsUseCase(moodRepository),
+              logger: const _TestAppLogger(),
+              telemetry: const _TestAppTelemetry(),
+            ),
+          ),
+          BlocProvider(
+            create: (_) => CalendarCubit(
+              initialMonth: DateTime(2026, 4, 1),
+              getMonthlyMoodSummary: GetMonthlyMoodSummaryUseCase(
+                GetMoodsForMonthUseCase(moodRepository),
+              ),
+            ),
+          ),
+          BlocProvider(
+            create: (_) => PurchasesCubit(FakeMoodEntitlementsRepository()),
+          ),
+          RepositoryProvider<RatingPromptService>.value(
+            value: ratingPromptService,
+          ),
+        ],
+        child: const MyApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(tester.widget<Title>(find.byType(Title)).title, 'Stimmungskalender');
   });
 }
