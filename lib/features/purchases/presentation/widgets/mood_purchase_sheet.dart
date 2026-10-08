@@ -62,7 +62,7 @@ class _MoodPurchaseSheetContent extends StatelessWidget {
                 SvgPicture.asset(mood.assetPath, height: 96, width: 96),
                 const SizedBox(height: 12),
                 Text(
-                  mood.label,
+                  strings.moodName(mood.id),
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: 24),
@@ -71,7 +71,7 @@ class _MoodPurchaseSheetContent extends StatelessWidget {
                 else
                   GradientPillButton(
                     label: strings.buyMoodButtonLabel(
-                      mood.label,
+                      strings.moodName(mood.id),
                       offer.displayPrice,
                     ),
                     loading: isPurchasing,

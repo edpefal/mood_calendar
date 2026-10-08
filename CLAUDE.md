@@ -188,7 +188,7 @@ flutter run -t tool/screenshots/main.dart -d $IPHONE   # idem con -d $IPAD
 Esas resoluciones corresponden a los tamaños de 6.9" y 13" que Apple lista para screenshots (confirmarlo en App Store Connect al subirlos); `xcrun simctl delete <udid>` borra los simuladores al terminar. Notas del flujo de captura:
 
 - Tras compilar, `flutter run` puede quedarse esperando en un simulador recién creado (indexa atajos del sistema en el primer arranque). Si la app no abre sola: `xcrun simctl launch <udid> com.artlab.moodcalendar`.
-- Para cambiar de idioma: `xcrun simctl terminate` y `xcrun simctl launch <udid> com.artlab.moodcalendar -AppleLanguages "(es)" -AppleLocale es_ES`. Los textos de la app (ya con acentos) y el calendario siguen ese idioma; los nombres de los moods (`Happy`, `Romantic`…) no están localizados.
+- Para cambiar de idioma: `xcrun simctl terminate` y `xcrun simctl launch <udid> com.artlab.moodcalendar -AppleLanguages "(es)" -AppleLocale es_ES`. Los textos de la app (ya con acentos), el calendario y los nombres de los moods (`AppStrings.moodName`) siguen ese idioma.
 - `capture.py` necesita un `idb_companion` conectado al simulador (`idb_companion --udid <udid> &` y `idb connect <udid>`). Encuentra los botones por posición con `idb ui describe-all` porque las etiquetas cambian por idioma: en la pantalla principal el botón de más a la derecha es el calendario y el anterior la tienda; en el calendario, el primer grupo de 2–3 botones juntos es [mes anterior, recordatorios, mes siguiente] (el mes actual no tiene "siguiente"). El calendario con datos es el del mes anterior.
 - Flujo con los scripts de `tool/screenshots/` (requieren `idb`, Pillow y Google Chrome en macOS):
 

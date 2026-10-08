@@ -130,7 +130,7 @@ class _MoodOfferTile extends StatelessWidget {
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         leading: SvgPicture.asset(mood.assetPath, height: 40, width: 40),
-        title: Text(mood.label),
+        title: Text(strings.moodName(mood.id)),
         trailing: isUnlocked
             ? Chip(label: Text(strings.moodUnlockedLabel))
             : SizedBox(
@@ -180,13 +180,13 @@ class _MoodPackTile extends StatelessWidget {
                       mood.assetPath,
                       height: 20,
                       width: 20,
-                      semanticsLabel: mood.label,
+                      semanticsLabel: strings.moodName(mood.id),
                       errorBuilder: (context, error, stackTrace) =>
                           const Icon(Icons.mood, size: 20),
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      mood.label,
+                      strings.moodName(mood.id),
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ],

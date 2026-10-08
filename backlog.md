@@ -33,6 +33,8 @@ Backlog activo del proyecto, actualizado contra el estado actual del repo.
 
 - Notificaciones de recordatorio y `title` de la app ya siguen el idioma del dispositivo (fallback inglés).
 
+- Los nombres de los moods se muestran en el idioma del dispositivo (`AppStrings.moodName`).
+
 ## Alta prioridad
 
 - Terminar y publicar la versión 1.8.4.
@@ -57,9 +59,6 @@ Backlog activo del proyecto, actualizado contra el estado actual del repo.
 
 - Regenerar `assets/icon/brave.svg`.
   Es un outlier: 1MB, 787 paths, 2048×2048 sin el `viewBox="0 0 512 512"` del resto del set — generado con VTracer (auto-trazado) a partir de una imagen de Gemini, a diferencia de los demás íconos (~3KB, vector limpio). Pesado de renderizar y visualmente inconsistente con el resto del set. Regenerar con el mismo proceso que produjo los otros 9 íconos.
-
-- Localizar los nombres de los moods.
-  Las etiquetas (`Happy`, `Calm`, `Romantic`, `Brave`…) vienen de `mood_definition.dart` y salen en inglés en todos los idiomas, incluso en screenshots y en la tienda.
 
 - Fijar un `appUserID` explícito en `Purchases.configure()` (sin decidir).
   Las apps `com.artlab.*` comparten vendor y, en un mismo simulador, RevenueCat puede reutilizar el ID anónimo de otra app y mostrar productos ajenos. Un ID propio evitaría esa contaminación.

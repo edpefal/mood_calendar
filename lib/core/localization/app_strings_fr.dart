@@ -214,4 +214,18 @@ class AppStringsFr extends AppStrings {
   String get continueLabel => 'Continuer';
   @override
   String get cancelLabel => 'Annuler';
+
+  @override
+  Map<String, String> get moodNames => const {
+        'happy': 'Heureux',
+        'calm': 'Calme',
+        'neutral': 'Neutre',
+        'sad': 'Triste',
+        'angry': 'En colère',
+        'anxious': 'Anxieux',
+        'brave': 'Courageux',
+        'confident': 'Confiant',
+        'romantic': 'Romantique',
+        'shy': 'Timide',
+      };
 }

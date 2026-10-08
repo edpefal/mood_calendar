@@ -42,6 +42,14 @@ abstract class AppStrings {
   }
 
   String get appTitle;
+
+  /// Localized Mood names keyed by `MoodDefinition.id`.
+  Map<String, String> get moodNames;
+
+  /// Name of the Mood [moodId] in this language, falling back to English.
+  String moodName(String moodId) =>
+      moodNames[moodId] ?? const AppStringsEn().moodNames[moodId] ?? moodId;
+
   String get notificationChannelName;
   String get notificationChannelDescription;
   String get reminderNotificationTitle;

@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/localization/app_strings.dart';
 import '../../../../core/widgets/gradient_pill_button.dart';
-import '../../../mood/domain/services/mood_definition_resolver.dart';
 import '../../domain/entities/mood_pack.dart';
 import '../bloc/purchases_cubit.dart';
 
@@ -69,7 +68,7 @@ class _PackPurchaseSheetContent extends StatelessWidget {
               children: [
                 Text(pack.label, style: Theme.of(context).textTheme.titleLarge),
                 const SizedBox(height: 8),
-                Text(strings.packIncludesMoods(_moodLabels(pack.moodIds))),
+                Text(strings.packIncludesMoods(_moodLabels(strings, pack.moodIds))),
                 if (overlappingMoodIds.isNotEmpty) ...[
                   const SizedBox(height: 16),
                   Container(
@@ -91,7 +90,7 @@ class _PackPurchaseSheetContent extends StatelessWidget {
                         const SizedBox(height: 4),
                         Text(
                           strings.packOverlapWarningMessage(
-                            _moodLabels(overlappingMoodIds),
+                            _moodLabels(strings, overlappingMoodIds),
                           ),
                         ),
                       ],
@@ -119,8 +118,8 @@ class _PackPurchaseSheetContent extends StatelessWidget {
     );
   }
 
-  String _moodLabels(List<String> moodIds) => moodIds
-      .map((id) => MoodDefinitionResolver.byId(id).label)
+  String _moodLabels(AppStrings strings, List<String> moodIds) => moodIds
+      .map(strings.moodName)
       .join(', ');
 
   String? _messageFor(AppStrings strings, PurchaseActionStatus status) {
