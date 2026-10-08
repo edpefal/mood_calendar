@@ -30,6 +30,11 @@ class PurchasesCubit extends Cubit<PurchasesState> {
 
   bool isMoodUnlocked(String moodId) => state.isMoodUnlocked(moodId);
 
+  /// Lectura síncrona del repositorio. A diferencia de [isMoodUnlocked], no
+  /// depende de que el stream ya haya emitido al estado, por lo que sirve
+  /// justo después de crear el cubit.
+  bool isMoodUnlockedNow(String moodId) => repository.isUnlocked(moodId);
+
   Future<void> loadCatalog() async {
     emit(state.copyWith(isLoadingCatalog: true, catalogError: null));
     try {

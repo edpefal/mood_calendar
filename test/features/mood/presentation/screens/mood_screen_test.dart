@@ -483,4 +483,152 @@ void main() {
 
     expect(tester.widget<Title>(find.byType(Title)).title, 'Stimmungskalender');
   });
+
+  group('ordering by usage', () {
+    MoodEntry entry(String moodId, DateTime date) => MoodEntry(
+          date: date,
+          mood: 'assets/icon/$moodId.svg',
+          intensity: 1,
+        );
+
+    Widget buildOrderedApp({
+      FakeMoodEntitlementsRepository? entitlements,
+      DateTime? selectedDate,
+    }) {
+      return MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (_) => MoodCubit(
+              saveMood: SaveMoodUseCase(moodRepository),
+              getMoods: GetMoodsUseCase(moodRepository),
+              logger: const _TestAppLogger(),
+              telemetry: const _TestAppTelemetry(),
+            ),
+          ),
+          BlocProvider(
+            create: (_) => CalendarCubit(
+              initialMonth: DateTime(2026, 4, 1),
+              getMonthlyMoodSummary: GetMonthlyMoodSummaryUseCase(
+                GetMoodsForMonthUseCase(moodRepository),
+              ),
+            ),
+          ),
+          BlocProvider(
+            create: (_) =>
+                PurchasesCubit(entitlements ?? FakeMoodEntitlementsRepository()),
+          ),
+          RepositoryProvider<RatingPromptService>.value(
+            value: ratingPromptService,
+          ),
+        ],
+        child: MaterialApp(
+          locale: const Locale('es'),
+          supportedLocales: AppStrings.supportedLocales,
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          home: MoodScreen(selectedDate: selectedDate),
+        ),
+      );
+    }
+
+    Future<void> swipeNext(WidgetTester tester) async {
+      await tester.drag(find.byType(PageView), const Offset(-400, 0));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('without history keeps the catalog order', (tester) async {
+      await tester.pumpWidget(buildOrderedApp());
+      await tester.pumpAndSettle();
+
+      expect(find.text('Feliz'), findsOneWidget);
+      await swipeNext(tester);
+      expect(find.text('Tranquilo'), findsOneWidget);
+    });
+
+    testWidgets('with history shows the most used mood first and preselects it',
+        (tester) async {
+      moodRepository.savedEntries.addAll([
+        entry('sad', DateTime(2026, 3, 1)),
+        entry('sad', DateTime(2026, 3, 2)),
+        entry('calm', DateTime(2026, 3, 3)),
+      ]);
+
+      await tester.pumpWidget(
+        buildOrderedApp(selectedDate: DateTime(2026, 3, 10)),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Triste'), findsOneWidget);
+      await swipeNext(tester);
+      expect(find.text('Tranquilo'), findsOneWidget);
+
+      await tester.tap(find.text('Guardar'));
+      await tester.pumpAndSettle();
+      expect(moodRepository.savedEntries.last.mood, 'assets/icon/calm.svg');
+    });
+
+    testWidgets('editing an entry positions the carousel on its mood',
+        (tester) async {
+      moodRepository.savedEntries.addAll([
+        entry('sad', DateTime(2026, 3, 1)),
+        entry('sad', DateTime(2026, 3, 2)),
+        entry('angry', DateTime(2026, 3, 10)),
+      ]);
+
+      await tester.pumpWidget(
+        buildOrderedApp(selectedDate: DateTime(2026, 3, 10)),
+      );
+      await tester.pumpAndSettle();
+
+      // angry is catalog index 4 but sits second once ordered by usage.
+      expect(find.text('Enojado'), findsOneWidget);
+      expect(find.text('Triste'), findsNothing);
+    });
+
+    testWidgets('the order does not change when a mood is unlocked while open',
+        (tester) async {
+      final entitlements = FakeMoodEntitlementsRepository();
+      moodRepository.savedEntries.addAll([
+        entry('anxious', DateTime(2026, 3, 1)),
+        entry('anxious', DateTime(2026, 3, 2)),
+      ]);
+
+      await tester.pumpWidget(
+        buildOrderedApp(
+          entitlements: entitlements,
+          selectedDate: DateTime(2026, 3, 10),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Feliz'), findsOneWidget);
+
+      await entitlements.purchaseMood('anxious');
+      await tester.pumpAndSettle();
+
+      expect(find.text('Feliz'), findsOneWidget);
+      expect(find.text('Ansioso'), findsNothing);
+    });
+
+    testWidgets('a purchased mood with history is ordered with unlocked moods',
+        (tester) async {
+      moodRepository.savedEntries.addAll([
+        entry('anxious', DateTime(2026, 3, 1)),
+        entry('anxious', DateTime(2026, 3, 2)),
+      ]);
+
+      await tester.pumpWidget(
+        buildOrderedApp(
+          entitlements:
+              FakeMoodEntitlementsRepository(unlockedMoodIds: {'anxious'}),
+          selectedDate: DateTime(2026, 3, 10),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Ansioso'), findsOneWidget);
+    });
+  });
 }
