@@ -11,6 +11,7 @@ import '../../../purchases/presentation/widgets/mood_purchase_sheet.dart';
 import '../../domain/entities/mood_definition.dart';
 import '../../domain/entities/mood_entry.dart';
 import '../../domain/services/mood_definition_resolver.dart';
+import '../../domain/services/mood_picker_order.dart';
 import '../bloc/calendar_cubit.dart';
 import '../bloc/mood_cubit.dart';
 import '../widgets/note_editor_sheet.dart';
@@ -26,6 +27,11 @@ class MoodScreen extends StatefulWidget {
 
 class _MoodScreenState extends State<MoodScreen>
     with SingleTickerProviderStateMixin {
+  // Se fija una sola vez, con la primera carga del historial, para que el
+  // carrusel no se reacomode mientras la pantalla está abierta.
+  List<MoodDefinition>? _fixedOrderedMoods;
+  List<MoodDefinition> get _orderedMoods =>
+      _fixedOrderedMoods ?? allMoodDefinitions;
   MoodDefinition selectedMood = allMoodDefinitions.first;
   int _currentPage = 0;
   final TextEditingController _noteController = TextEditingController();
@@ -69,6 +75,10 @@ class _MoodScreenState extends State<MoodScreen>
           return;
         }
         _isSaving = false;
+        _fixedOrderedMoods ??= MoodPickerOrder.sort(
+          entries,
+          isUnlocked: context.read<PurchasesCubit>().isMoodUnlockedNow,
+        );
         _applyMoodEntry(_findMoodEntryForDate(entries, _selectedDate));
       },
       error: (_) {
@@ -101,7 +111,7 @@ class _MoodScreenState extends State<MoodScreen>
   void _applyMoodEntry(MoodEntry? entry) {
     final moodIndex = entry == null
         ? 0
-        : allMoodDefinitions.indexWhere((mood) => mood.assetPath == entry.mood);
+        : _orderedMoods.indexWhere((mood) => mood.assetPath == entry.mood);
     final targetPage = moodIndex >= 0 ? moodIndex : 0;
 
     if (!mounted) {
@@ -110,7 +120,7 @@ class _MoodScreenState extends State<MoodScreen>
 
     final hadClients = _pageController.hasClients;
     setState(() {
-      selectedMood = allMoodDefinitions[targetPage];
+      selectedMood = _orderedMoods[targetPage];
       _currentPage = targetPage;
       _noteController.text = entry?.note ?? '';
       isLoading = false;
@@ -130,7 +140,7 @@ class _MoodScreenState extends State<MoodScreen>
   void _onPageChanged(int index) {
     setState(() {
       _currentPage = index;
-      selectedMood = allMoodDefinitions[index];
+      selectedMood = _orderedMoods[index];
     });
   }
 
@@ -324,14 +334,14 @@ class _MoodScreenState extends State<MoodScreen>
                                 label: strings.selectedMood(
                                   strings.moodName(selectedMood.id),
                                   _currentPage,
-                                  allMoodDefinitions.length,
+                                  _orderedMoods.length,
                                 ),
                                 child: PageView.builder(
                                   controller: _pageController,
-                                  itemCount: allMoodDefinitions.length,
+                                  itemCount: _orderedMoods.length,
                                   onPageChanged: _onPageChanged,
                                   itemBuilder: (context, index) {
-                                    final mood = allMoodDefinitions[index];
+                                    final mood = _orderedMoods[index];
 
                                     return BlocBuilder<PurchasesCubit,
                                         PurchasesState>(
@@ -346,7 +356,7 @@ class _MoodScreenState extends State<MoodScreen>
                                           label: strings.selectedMood(
                                             strings.moodName(mood.id),
                                             index,
-                                            allMoodDefinitions.length,
+                                            _orderedMoods.length,
                                           ),
                                           child: GestureDetector(
                                             onTap: isLocked
@@ -415,7 +425,7 @@ class _MoodScreenState extends State<MoodScreen>
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: List.generate(
-                                allMoodDefinitions.length,
+                                _orderedMoods.length,
                                 (index) => Container(
                                   width: 8,
                                   height: 8,
