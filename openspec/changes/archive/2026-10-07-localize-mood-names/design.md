@@ -16,7 +16,7 @@
 
 ## Decisions
 
-1. **Método `String moodName(String moodId)` en `AppStrings`**, no 10 getters. Cada subclase implementa un `switch` sobre el id con `default: return fallback` (inglés). Alternativa: 10 getters abstractos (`moodHappy`...): más verboso y cada mood premium futuro obliga a tocar la API base; el `switch` mantiene el contrato en un punto. Para garantizar cobertura, un test recorre `allMoodDefinitions` x 5 idiomas.
+1. **Método `String moodName(String moodId)` en `AppStrings`**, no 10 getters. Implementado como mapa `moodNames` por idioma más un `moodName` concreto en la base con fallback a inglés y, si no existe, al id (así `core/` no importa el dominio de moods; antes se pensó en un `switch` por subclase). Alternativa: 10 getters abstractos (`moodHappy`...): más verboso y cada mood premium futuro obliga a tocar la API base; el `switch` mantiene el contrato en un punto. Para garantizar cobertura, un test recorre `allMoodDefinitions` x 5 idiomas.
 2. **`MoodDefinition.label` se mantiene** como nombre interno inglés y fallback del `default`; evita tocar `noop`/repos y `const`. Su uso en widgets se sustituye por `strings.moodName(mood.id)`.
 3. **Helper de UI**: `_moodLabelForPath` en calendario y resumen pasa a `AppStrings.of(context).moodName(byAssetPath(path).id)`.
 4. **Traducciones propuestas** (revisar con hablante nativo; formas masculinas/neutras):

@@ -20,4 +20,4 @@
 
 - [x] 4.1 Probar en simulador en es/de/fr (nombres largos, selector, tienda, iPad) sin overflow — verificado: selector en iPhone con alemán y francés ("Selbstbewusst", "En colère"); tienda e iPad no probados
 - [x] 4.2 Actualizar CLAUDE.md (quitar la nota de que los nombres no están localizados y la mención en el flujo de screenshots) y `backlog.md` si aplica
-- [ ] 4.3 Sincronizar specs (`localization-architecture`, `mood-store`) al archivar
+- [x] 4.3 Sincronizar specs (`localization-architecture`, `mood-store`) al archivar
