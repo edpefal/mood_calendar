@@ -1,3 +1,7 @@
+## Purpose
+
+Define cómo la app elige y muestra sus textos según el idioma del dispositivo: arquitectura de `AppStrings`, idiomas soportados, fallback a inglés y qué superficies (UI, notificaciones, nombres de moods) deben estar localizadas.
+
 ## Requirements
 
 ### Requirement: Arquitectura de localización por subclases
