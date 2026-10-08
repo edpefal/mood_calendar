@@ -395,6 +395,57 @@ void main() {
     expect(find.text('Hoy fue un buen día'), findsOneWidget);
   });
 
+  testWidgets('opening a date with an entry positions the carousel on its mood',
+      (tester) async {
+    moodRepository.savedEntries.add(
+      MoodEntry(
+        date: DateTime(2026, 3, 10),
+        mood: 'assets/icon/angry.svg',
+        intensity: 5,
+      ),
+    );
+
+    await tester.pumpWidget(
+      MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (_) => MoodCubit(
+              saveMood: SaveMoodUseCase(moodRepository),
+              getMoods: GetMoodsUseCase(moodRepository),
+              logger: const _TestAppLogger(),
+              telemetry: const _TestAppTelemetry(),
+            ),
+          ),
+          BlocProvider(
+            create: (_) => CalendarCubit(
+              initialMonth: DateTime(2026, 3, 1),
+              getMonthlyMoodSummary: GetMonthlyMoodSummaryUseCase(
+                GetMoodsForMonthUseCase(moodRepository),
+              ),
+            ),
+          ),
+          BlocProvider(
+            create: (_) => PurchasesCubit(FakeMoodEntitlementsRepository()),
+          ),
+        ],
+        child: MaterialApp(
+          locale: const Locale('es'),
+          supportedLocales: AppStrings.supportedLocales,
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          home: MoodScreen(selectedDate: DateTime(2026, 3, 10)),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Enojado'), findsOneWidget);
+    expect(find.text('Feliz'), findsNothing);
+  });
+
   testWidgets('app title follows the device language', (tester) async {
     tester.platformDispatcher.localesTestValue = const [Locale('de')];
     addTearDown(tester.platformDispatcher.clearLocalesTestValue);
