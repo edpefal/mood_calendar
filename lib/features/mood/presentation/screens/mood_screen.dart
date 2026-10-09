@@ -207,6 +207,7 @@ class _MoodScreenState extends State<MoodScreen>
             AppNavigator.popOrShowCalendar(
               context,
               recentlySavedDate: normalizedDate,
+              viewedDate: normalizedDate,
             );
           },
           error: (_) {
@@ -308,7 +309,10 @@ class _MoodScreenState extends State<MoodScreen>
                                     color: Color(0xFF5F3DC4),
                                   ),
                                   onPressed: () {
-                                    AppNavigator.popOrShowCalendar(context);
+                                    AppNavigator.popOrShowCalendar(
+                                      context,
+                                      viewedDate: _selectedDate,
+                                    );
                                   },
                                 ),
                               ],

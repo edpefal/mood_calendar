@@ -63,6 +63,8 @@ class AppStringsEs extends AppStrings {
   @override
   String get backToTodayTooltip => 'Volver a hoy';
   @override
+  String get backToMoodPickerTooltip => 'Volver a la selección de ánimo';
+  @override
   String get previousMonthTooltip => 'Mes anterior';
   @override
   String get nextMonthTooltip => 'Mes siguiente';

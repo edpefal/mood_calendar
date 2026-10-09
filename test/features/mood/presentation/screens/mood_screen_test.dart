@@ -631,4 +631,153 @@ void main() {
       expect(find.text('Ansioso'), findsOneWidget);
     });
   });
+
+  group('returning from the calendar', () {
+    final strings = AppStrings.forLocale(const Locale('es'));
+    final now = DateTime.now();
+    final previousMonth = DateTime(now.year, now.month - 1);
+
+    String headerFor(DateTime date) =>
+        '${strings.monthNames[date.month - 1]} ${date.day}, ${date.year}';
+
+    Widget buildAppWithHome(Widget home) {
+      return MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (_) => MoodCubit(
+              saveMood: SaveMoodUseCase(moodRepository),
+              getMoods: GetMoodsUseCase(moodRepository),
+              logger: const _TestAppLogger(),
+              telemetry: const _TestAppTelemetry(),
+            ),
+          ),
+          BlocProvider(
+            create: (_) => CalendarCubit(
+              initialMonth: DateTime(now.year, now.month),
+              getMonthlyMoodSummary: GetMonthlyMoodSummaryUseCase(
+                GetMoodsForMonthUseCase(moodRepository),
+              ),
+            ),
+          ),
+          BlocProvider(
+            create: (_) => PurchasesCubit(FakeMoodEntitlementsRepository()),
+          ),
+          RepositoryProvider<RatingPromptService>.value(
+            value: ratingPromptService,
+          ),
+        ],
+        child: MaterialApp(
+          locale: const Locale('es'),
+          supportedLocales: AppStrings.supportedLocales,
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          home: home,
+        ),
+      );
+    }
+
+    Future<void> openCalendar(WidgetTester tester) async {
+      await tester.tap(find.byTooltip(strings.openCalendarTooltip));
+      await tester.pumpAndSettle();
+    }
+
+    Future<void> goToPreviousMonth(WidgetTester tester) async {
+      await tester.tap(find.byTooltip(strings.previousMonthTooltip));
+      await tester.pumpAndSettle();
+    }
+
+    Future<void> saveDay(WidgetTester tester, int day, {int swipes = 0}) async {
+      await tester.tap(find.text('$day'));
+      await tester.pumpAndSettle();
+      for (var i = 0; i < swipes; i++) {
+        await tester.drag(find.byType(PageView), const Offset(-400, 0));
+        await tester.pumpAndSettle();
+      }
+      await tester.tap(find.text(strings.save));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('after editing another date, back opens that date',
+        (tester) async {
+      await tester.pumpWidget(buildAppWithHome(const MoodScreen()));
+      await tester.pumpAndSettle();
+      await openCalendar(tester);
+      await goToPreviousMonth(tester);
+
+      // 4 swipes -> angry, so the entry is distinguishable from the default.
+      await saveDay(tester, 15, swipes: 4);
+
+      await tester.tap(find.byTooltip(strings.backToMoodPickerTooltip));
+      await tester.pumpAndSettle();
+
+      expect(find.text(headerFor(DateTime(previousMonth.year, previousMonth.month, 15))),
+          findsOneWidget);
+      expect(find.text('Enojado'), findsOneWidget);
+    });
+
+    testWidgets('without opening any day, back opens today', (tester) async {
+      await tester.pumpWidget(buildAppWithHome(const MoodScreen()));
+      await tester.pumpAndSettle();
+      await openCalendar(tester);
+
+      expect(find.byTooltip(strings.backToTodayTooltip), findsOneWidget);
+      expect(find.byTooltip(strings.backToMoodPickerTooltip), findsNothing);
+
+      await tester.tap(find.byTooltip(strings.backToTodayTooltip));
+      await tester.pumpAndSettle();
+
+      expect(find.text(headerFor(now)), findsOneWidget);
+    });
+
+    testWidgets('after editing several dates, back opens the last one',
+        (tester) async {
+      await tester.pumpWidget(buildAppWithHome(const MoodScreen()));
+      await tester.pumpAndSettle();
+      await openCalendar(tester);
+      await goToPreviousMonth(tester);
+
+      await saveDay(tester, 15);
+      await saveDay(tester, 16);
+
+      await tester.tap(find.byTooltip(strings.backToMoodPickerTooltip));
+      await tester.pumpAndSettle();
+
+      expect(find.text(headerFor(DateTime(previousMonth.year, previousMonth.month, 16))),
+          findsOneWidget);
+    });
+
+    testWidgets('calendar opened from another date returns to that date',
+        (tester) async {
+      final reminderDate = DateTime(previousMonth.year, previousMonth.month, 10);
+      await tester.pumpWidget(
+        buildAppWithHome(MoodScreen(selectedDate: reminderDate)),
+      );
+      await tester.pumpAndSettle();
+      await openCalendar(tester);
+
+      expect(find.byTooltip(strings.backToMoodPickerTooltip), findsOneWidget);
+
+      await tester.tap(find.byTooltip(strings.backToMoodPickerTooltip));
+      await tester.pumpAndSettle();
+
+      expect(find.text(headerFor(reminderDate)), findsOneWidget);
+    });
+
+    testWidgets('saving today and going back keeps opening today',
+        (tester) async {
+      await tester.pumpWidget(buildAppWithHome(const MoodScreen()));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(strings.save));
+      await tester.pumpAndSettle();
+
+      expect(find.byTooltip(strings.backToTodayTooltip), findsOneWidget);
+      await tester.tap(find.byTooltip(strings.backToTodayTooltip));
+      await tester.pumpAndSettle();
+
+      expect(find.text(headerFor(now)), findsOneWidget);
+    });
+  });
 }
