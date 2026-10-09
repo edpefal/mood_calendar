@@ -101,12 +101,15 @@ class AppStringsDe extends AppStrings {
   @override
   String get settingsSaveFailed => 'Die Einstellungen konnten nicht gespeichert werden. Bitte versuche es erneut.';
   @override
-  String get exportHistoryTooltip => 'Verlauf exportieren';
+  String get settingsDataSection => 'Deine Daten';
+  @override
+  String get exportHistoryTitle => 'Verlauf exportieren';
+  @override
+  String get exportHistorySemanticLabel => 'Exportiere deinen Stimmungsverlauf als Datei';
+  @override
+  String get exportHistoryEmpty => 'Es gibt noch keinen Verlauf zum Exportieren.';
   @override
   String get exportingHistory => 'Dein Verlauf wird exportiert...';
-  @override
-  String historyExportedTo(String fileName) =>
-      'Verlauf nach $fileName exportiert.';
   @override
   String get historyExportFailed =>
       'Wir konnten deinen Verlauf gerade nicht exportieren. Bitte versuche es erneut.';

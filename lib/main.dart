@@ -22,6 +22,8 @@ import 'core/telemetry/logger_app_telemetry.dart';
 import 'features/mood/data/models/mood_model.dart';
 import 'features/mood/data/repositories/mood_repository_impl.dart';
 import 'features/mood/data/services/rating_prompt_service.dart';
+import 'features/mood/data/services/json_mood_history_exporter.dart';
+import 'features/mood/domain/usecases/export_mood_history_usecase.dart';
 import 'features/mood/domain/usecases/get_moods_for_month_usecase.dart';
 import 'features/mood/domain/usecases/get_monthly_mood_summary_usecase.dart';
 import 'features/mood/domain/usecases/get_moods_usecase.dart';
@@ -95,6 +97,13 @@ void main() async {
     appSettingsRepository: appSettingsRepository,
     telemetry: telemetry,
   );
+  final exportMoodHistory = ExportMoodHistoryUseCase(
+    JsonMoodHistoryExporter(
+      repository: repository,
+      logger: appLogger,
+      telemetry: telemetry,
+    ),
+  );
   final ratingPromptService = RatingPromptService(
     getMoods: GetMoodsUseCase(repository),
     stateDataSource: RatingPromptLocalDataSource(settingsBox),
@@ -135,6 +144,9 @@ void main() async {
         ),
         RepositoryProvider<RatingPromptService>.value(
           value: ratingPromptService,
+        ),
+        RepositoryProvider<ExportMoodHistoryUseCase>.value(
+          value: exportMoodHistory,
         ),
       ],
       child: MultiBlocProvider(

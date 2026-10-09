@@ -101,12 +101,15 @@ class AppStringsFr extends AppStrings {
   @override
   String get settingsSaveFailed => 'Impossible d\'enregistrer les réglages. Réessaie.';
   @override
-  String get exportHistoryTooltip => 'Exporter l\'historique';
+  String get settingsDataSection => 'Tes données';
+  @override
+  String get exportHistoryTitle => 'Exporter l\'historique';
+  @override
+  String get exportHistorySemanticLabel => 'Exporter ton historique d\'humeur dans un fichier';
+  @override
+  String get exportHistoryEmpty => 'Il n\'y a pas encore d\'historique à exporter.';
   @override
   String get exportingHistory => 'Exportation de ton historique...';
-  @override
-  String historyExportedTo(String fileName) =>
-      'Historique exporté vers $fileName.';
   @override
   String get historyExportFailed =>
       'Nous n\'avons pas pu exporter ton historique pour le moment. Réessaie.';

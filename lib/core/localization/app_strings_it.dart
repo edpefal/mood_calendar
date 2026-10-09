@@ -101,12 +101,15 @@ class AppStringsIt extends AppStrings {
   @override
   String get settingsSaveFailed => 'Impossibile salvare le impostazioni. Riprova.';
   @override
-  String get exportHistoryTooltip => 'Esporta cronologia';
+  String get settingsDataSection => 'I tuoi dati';
+  @override
+  String get exportHistoryTitle => 'Esporta cronologia';
+  @override
+  String get exportHistorySemanticLabel => 'Esporta la cronologia dell\'umore come file';
+  @override
+  String get exportHistoryEmpty => 'Non c\'è ancora nessuna cronologia da esportare.';
   @override
   String get exportingHistory => 'Esportazione della tua cronologia...';
-  @override
-  String historyExportedTo(String fileName) =>
-      'Cronologia esportata in $fileName.';
   @override
   String get historyExportFailed =>
       'Non siamo riusciti a esportare la tua cronologia in questo momento. Riprova.';
