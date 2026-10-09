@@ -91,9 +91,11 @@ abstract class AppStrings {
   String get appVersionTitle;
   String get privacyLinkFailed;
   String get settingsSaveFailed;
-  String get exportHistoryTooltip;
+  String get settingsDataSection;
+  String get exportHistoryTitle;
+  String get exportHistorySemanticLabel;
+  String get exportHistoryEmpty;
   String get exportingHistory;
-  String historyExportedTo(String fileName);
   String get historyExportFailed;
   String calendarDayLabel({
     required String formattedDate,

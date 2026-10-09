@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/localization/app_strings.dart';
@@ -10,6 +11,7 @@ import '../../../../core/logging/app_logger.dart';
 import '../../../../core/notifications/local_notification_service.dart';
 import '../../../../core/settings/domain/repositories/app_settings_repository.dart';
 import '../../../mood/data/services/rating_prompt_service.dart';
+import '../../../mood/domain/usecases/export_mood_history_usecase.dart';
 import '../bloc/settings_cubit.dart';
 import '../bloc/settings_state.dart';
 
@@ -21,6 +23,19 @@ const _brandColor = Color(0xFF5F3DC4);
 /// Opens [url] outside the app; returns whether it could be opened.
 typedef UrlOpener = Future<bool> Function(Uri url);
 
+/// Opens the system share sheet with the file at [filePath]. [origin] is where
+/// the sheet is anchored; iPad shows it as a popover and needs it.
+typedef FileSharer = Future<void> Function(String filePath, Rect origin);
+
+Future<void> _shareWithSystemSheet(String filePath, Rect origin) async {
+  await SharePlus.instance.share(
+    ShareParams(
+      files: [XFile(filePath, mimeType: 'application/json')],
+      sharePositionOrigin: origin,
+    ),
+  );
+}
+
 Future<bool> _openInBrowser(Uri url) =>
     launchUrl(url, mode: LaunchMode.externalApplication);
 
@@ -30,10 +45,12 @@ Future<String> _loadPackageVersion() async {
 }
 
 class SettingsScreen extends StatelessWidget {
-  const SettingsScreen({super.key, UrlOpener? openUrl})
-      : _openUrl = openUrl ?? _openInBrowser;
+  const SettingsScreen({super.key, UrlOpener? openUrl, FileSharer? shareFile})
+      : _openUrl = openUrl ?? _openInBrowser,
+        _shareFile = shareFile ?? _shareWithSystemSheet;
 
   final UrlOpener _openUrl;
+  final FileSharer _shareFile;
 
   /// Route that builds the [SettingsCubit] from the app-wide services.
   static Route<void> route() {
@@ -138,6 +155,11 @@ class SettingsScreen extends StatelessWidget {
                 const SizedBox(height: 16),
                 const Divider(),
                 const SizedBox(height: 8),
+                _SectionHeader(strings.settingsDataSection),
+                _ExportHistoryRow(shareFile: _shareFile),
+                const SizedBox(height: 8),
+                const Divider(),
+                const SizedBox(height: 8),
                 _SectionHeader(strings.settingsAboutSection),
                 _LinkRow(
                   icon: Icons.star_rounded,
@@ -189,6 +211,80 @@ class _SectionHeader extends StatelessWidget {
         style: Theme.of(context).textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
             ),
+      ),
+    );
+  }
+}
+
+class _ExportHistoryRow extends StatefulWidget {
+  const _ExportHistoryRow({required this.shareFile});
+
+  final FileSharer shareFile;
+
+  @override
+  State<_ExportHistoryRow> createState() => _ExportHistoryRowState();
+}
+
+class _ExportHistoryRowState extends State<_ExportHistoryRow> {
+  bool _isExporting = false;
+
+  Rect _anchorRect() {
+    final box = context.findRenderObject();
+    if (box is! RenderBox || !box.hasSize) return Rect.zero;
+    return box.localToGlobal(Offset.zero) & box.size;
+  }
+
+  Future<void> _export() async {
+    if (_isExporting) return;
+    final strings = AppStrings.of(context);
+    final exportHistory = context.read<ExportMoodHistoryUseCase>();
+    final messenger = ScaffoldMessenger.of(context);
+    final anchor = _anchorRect();
+    setState(() => _isExporting = true);
+    try {
+      final result = await exportHistory();
+      if (result.entryCount == 0) {
+        messenger.showSnackBar(
+          SnackBar(content: Text(strings.exportHistoryEmpty)),
+        );
+        return;
+      }
+      await widget.shareFile(result.filePath, anchor);
+    } catch (_) {
+      messenger.showSnackBar(
+        SnackBar(content: Text(strings.historyExportFailed)),
+      );
+    } finally {
+      if (mounted) setState(() => _isExporting = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
+    return Semantics(
+      button: true,
+      enabled: !_isExporting,
+      label: _isExporting
+          ? strings.exportingHistory
+          : strings.exportHistorySemanticLabel,
+      onTap: _isExporting ? null : () => unawaited(_export()),
+      excludeSemantics: true,
+      child: ListTile(
+        contentPadding: EdgeInsets.zero,
+        leading: const Icon(Icons.ios_share_rounded, color: _brandColor),
+        title: Text(
+          _isExporting ? strings.exportingHistory : strings.exportHistoryTitle,
+        ),
+        trailing: _isExporting
+            ? const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            : null,
+        enabled: !_isExporting,
+        onTap: _isExporting ? null : () => unawaited(_export()),
       ),
     );
   }

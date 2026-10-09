@@ -23,7 +23,7 @@ Backlog activo del proyecto, actualizado contra el estado actual del repo.
 
 - Los recordatorios diarios se configuran desde la pantalla de Settings (engrane en la pantalla principal), con autoguardado; también están ahí calificar la app, la política de privacidad y la versión.
 
-- Ya existe exportación local del historial en JSON.
+- El historial se exporta a JSON versionado (`formatVersion: 1`, sin `intensity`) y se comparte con la hoja del sistema desde Settings > Tus datos.
 
 - La app ya incorpora moods adicionales en el selector principal.
 
