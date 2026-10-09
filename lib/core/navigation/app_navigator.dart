@@ -32,6 +32,7 @@ class AppNavigator {
   static void popOrShowCalendar(
     BuildContext context, {
     DateTime? recentlySavedDate,
+    DateTime? viewedDate,
   }) {
     if (Navigator.canPop(context)) {
       Navigator.pop(context, recentlySavedDate);
@@ -40,7 +41,10 @@ class AppNavigator {
 
     Navigator.of(context).pushReplacement<void, DateTime?>(
       _route(
-        (_) => CalendarScreen(recentlySavedDate: recentlySavedDate),
+        (_) => CalendarScreen(
+          recentlySavedDate: recentlySavedDate,
+          viewedDate: viewedDate,
+        ),
       ),
     );
   }

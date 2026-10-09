@@ -19,7 +19,11 @@ import 'mood_screen.dart';
 class CalendarScreen extends StatefulWidget {
   final DateTime? recentlySavedDate;
 
-  const CalendarScreen({super.key, this.recentlySavedDate});
+  /// Fecha del selector desde el que se abrió el calendario. Es el destino
+  /// inicial del botón de volver si no se toca ningún día.
+  final DateTime? viewedDate;
+
+  const CalendarScreen({super.key, this.recentlySavedDate, this.viewedDate});
 
   @override
   State<CalendarScreen> createState() => _CalendarScreenState();
@@ -30,11 +34,15 @@ class _CalendarScreenState extends State<CalendarScreen>
   late DateTime _focusedDay;
   late AnimationController _animationController;
   DateTime? _recentlySavedDate;
+  late DateTime _lastViewedDate;
 
   @override
   void initState() {
     super.initState();
     _focusedDay = DateTime.now();
+    _lastViewedDate = _dateOnly(
+      widget.viewedDate ?? widget.recentlySavedDate ?? _focusedDay,
+    );
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1200),
@@ -79,13 +87,20 @@ class _CalendarScreenState extends State<CalendarScreen>
     });
   }
 
+  DateTime _dateOnly(DateTime date) => DateTime(date.year, date.month, date.day);
+
+  bool get _isLastViewedDateToday =>
+      _lastViewedDate == _dateOnly(DateTime.now());
+
   void _goBack() {
     if (Navigator.canPop(context)) {
       Navigator.of(context).pop();
       return;
     }
     Navigator.of(context).pushReplacement<void, void>(
-      MaterialPageRoute<void>(builder: (_) => const MoodScreen()),
+      MaterialPageRoute<void>(
+        builder: (_) => MoodScreen(selectedDate: _lastViewedDate),
+      ),
     );
   }
 
@@ -123,7 +138,9 @@ class _CalendarScreenState extends State<CalendarScreen>
                     Align(
                       alignment: Alignment.centerLeft,
                       child: IconButton(
-                        tooltip: strings.backToTodayTooltip,
+                        tooltip: _isLastViewedDateToday
+                            ? strings.backToTodayTooltip
+                            : strings.backToMoodPickerTooltip,
                         icon: const Icon(
                           Icons.arrow_back,
                           color: Color(0xFF5F3DC4),
@@ -220,6 +237,7 @@ class _CalendarScreenState extends State<CalendarScreen>
                                         : () async {
                                             final calendarCubit =
                                                 context.read<CalendarCubit>();
+                                            _lastViewedDate = _dateOnly(date);
                                             final result = await AppNavigator
                                                 .pushMoodScreen(
                                               context,

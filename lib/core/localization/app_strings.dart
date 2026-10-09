@@ -74,6 +74,7 @@ abstract class AppStrings {
   String get reminderSettingsTooltip;
   String get openCalendarTooltip;
   String get backToTodayTooltip;
+  String get backToMoodPickerTooltip;
   String get previousMonthTooltip;
   String get nextMonthTooltip;
   String get reminderSheetTitle;
