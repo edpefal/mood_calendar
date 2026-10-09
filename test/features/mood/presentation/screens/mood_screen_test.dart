@@ -7,6 +7,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:mood_calendar/core/localization/app_strings.dart';
 import 'package:mood_calendar/core/logging/app_logger.dart';
+import 'package:mood_calendar/core/notifications/local_notification_service.dart';
+import 'package:mood_calendar/core/settings/domain/entities/app_settings.dart';
+import 'package:mood_calendar/core/settings/domain/repositories/app_settings_repository.dart';
 import 'package:mood_calendar/core/telemetry/app_telemetry.dart';
 import 'package:mood_calendar/features/mood/data/models/mood_model.dart';
 import 'package:mood_calendar/main.dart';
@@ -21,6 +24,7 @@ import 'package:mood_calendar/features/mood/presentation/bloc/calendar_cubit.dar
 import 'package:mood_calendar/features/mood/presentation/bloc/mood_cubit.dart';
 import 'package:mood_calendar/features/mood/presentation/screens/mood_screen.dart';
 import 'package:mood_calendar/features/purchases/presentation/bloc/purchases_cubit.dart';
+import 'package:mood_calendar/features/settings/presentation/screens/settings_screen.dart';
 
 import '../../../../support/fake_mood_entitlements_repository.dart';
 
@@ -780,4 +784,116 @@ void main() {
       expect(find.text(headerFor(now)), findsOneWidget);
     });
   });
+
+  group('settings entry point', () {
+    final strings = AppStrings.forLocale(const Locale('es'));
+
+    Widget buildApp() {
+      final settingsRepository = _FakeSettingsRepository();
+      return MultiRepositoryProvider(
+        providers: [
+          RepositoryProvider<AppLogger>.value(value: const _TestAppLogger()),
+          RepositoryProvider<AppSettingsRepository>.value(
+            value: settingsRepository,
+          ),
+          RepositoryProvider<LocalNotificationService>.value(
+            value: LocalNotificationService(
+              onReminderTap: () async {},
+              appSettingsRepository: settingsRepository,
+              telemetry: const _TestAppTelemetry(),
+            ),
+          ),
+          RepositoryProvider<RatingPromptService>.value(
+            value: ratingPromptService,
+          ),
+        ],
+        child: MultiBlocProvider(
+          providers: [
+            BlocProvider(
+              create: (_) => MoodCubit(
+                saveMood: SaveMoodUseCase(moodRepository),
+                getMoods: GetMoodsUseCase(moodRepository),
+                logger: const _TestAppLogger(),
+                telemetry: const _TestAppTelemetry(),
+              ),
+            ),
+            BlocProvider(
+              create: (_) => CalendarCubit(
+                initialMonth: DateTime.now(),
+                getMonthlyMoodSummary: GetMonthlyMoodSummaryUseCase(
+                  GetMoodsForMonthUseCase(moodRepository),
+                ),
+              ),
+            ),
+            BlocProvider(
+              create: (_) => PurchasesCubit(FakeMoodEntitlementsRepository()),
+            ),
+          ],
+          child: const MaterialApp(
+            locale: Locale('es'),
+            supportedLocales: AppStrings.supportedLocales,
+            localizationsDelegates: [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            home: MoodScreen(),
+          ),
+        ),
+      );
+    }
+
+    testWidgets('header shows store, calendar and settings in that order',
+        (tester) async {
+      await tester.pumpWidget(buildApp());
+      await tester.pumpAndSettle();
+
+      final store = tester.getCenter(find.byTooltip(strings.openStoreTooltip));
+      final calendar =
+          tester.getCenter(find.byTooltip(strings.openCalendarTooltip));
+      final settings =
+          tester.getCenter(find.byTooltip(strings.openSettingsTooltip));
+
+      expect(store.dx, lessThan(calendar.dx));
+      expect(calendar.dx, lessThan(settings.dx));
+    });
+
+    testWidgets('the gear opens the settings screen and back returns',
+        (tester) async {
+      await tester.pumpWidget(buildApp());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byTooltip(strings.openSettingsTooltip));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(SettingsScreen), findsOneWidget);
+      expect(find.text(strings.settingsTitle), findsOneWidget);
+
+      Navigator.of(tester.element(find.byType(SettingsScreen))).pop();
+      await tester.pumpAndSettle();
+
+      expect(find.byType(SettingsScreen), findsNothing);
+      expect(find.byType(MoodScreen), findsOneWidget);
+    });
+
+    testWidgets('the calendar header no longer has the reminders bell',
+        (tester) async {
+      await tester.pumpWidget(buildApp());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byTooltip(strings.openCalendarTooltip));
+      await tester.pumpAndSettle();
+
+      expect(find.byTooltip(strings.previousMonthTooltip), findsOneWidget);
+      expect(find.byIcon(Icons.notifications_active_outlined), findsNothing);
+    });
+  });
+}
+
+class _FakeSettingsRepository implements AppSettingsRepository {
+  @override
+  Future<AppSettings> getSettings() async => AppSettings.defaults;
+
+  @override
+  Future<void> saveSettings(AppSettings settings) async {}
 }

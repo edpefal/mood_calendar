@@ -56,8 +56,6 @@ class AppStringsEn extends AppStrings {
   @override
   String summaryTitle(String monthName) => '$monthName Summary';
   @override
-  String get reminderSettingsTooltip => 'Reminder settings';
-  @override
   String get openCalendarTooltip => 'Open calendar';
   @override
   String get backToTodayTooltip => 'Back to today';
@@ -79,16 +77,25 @@ class AppStringsEn extends AppStrings {
   @override
   String get reminderTimeTitle => 'Reminder time';
   @override
-  String get saveReminderSettings => 'Save reminder settings';
-  @override
-  String reminderSavedAt(String formattedTime) =>
-      'Daily reminder set for $formattedTime.';
-  @override
-  String get remindersTurnedOff => 'Daily reminders are turned off.';
-  @override
   String get rateAppTitle => 'Rate Mood Calendar';
   @override
   String get rateAppSemanticLabel => 'Rate Mood Calendar on the App Store';
+  @override
+  String get settingsTitle => 'Settings';
+  @override
+  String get openSettingsTooltip => 'Open settings';
+  @override
+  String get settingsAboutSection => 'Help & About';
+  @override
+  String get privacyPolicyTitle => 'Privacy policy';
+  @override
+  String get privacyPolicySemanticLabel => 'Open the privacy policy in your browser';
+  @override
+  String get appVersionTitle => 'Version';
+  @override
+  String get privacyLinkFailed => 'Couldn\'t open the link. Please try again later.';
+  @override
+  String get settingsSaveFailed => 'Couldn\'t save your settings. Please try again.';
   @override
   String get exportHistoryTooltip => 'Export history';
   @override

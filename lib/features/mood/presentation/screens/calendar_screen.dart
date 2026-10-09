@@ -6,10 +6,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../core/localization/app_strings.dart';
 import '../../../../core/navigation/app_navigator.dart';
-import '../../../../core/notifications/local_notification_service.dart';
-import '../../../../core/settings/domain/entities/app_settings.dart';
-import '../../../../core/settings/domain/repositories/app_settings_repository.dart';
-import '../../../../core/widgets/gradient_pill_button.dart';
 import '../../data/services/rating_prompt_service.dart';
 import '../../domain/services/mood_definition_resolver.dart';
 import '../bloc/calendar_cubit.dart';
@@ -164,8 +160,6 @@ class _CalendarScreenState extends State<CalendarScreen>
                               year: now.year,
                               onPreviousMonth: _onPreviousMonth,
                               onNextMonth: canGoNext ? _onNextMonth : null,
-                              onOpenReminderSettings:
-                                  _openReminderSettingsSheet,
                             ),
                             if (state.isLoading)
                               const Padding(
@@ -351,15 +345,6 @@ class _CalendarScreenState extends State<CalendarScreen>
     context.read<CalendarCubit>().loadMonth(_focusedDay);
   }
 
-  Future<void> _openReminderSettingsSheet() async {
-    await showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      showDragHandle: true,
-      builder: (context) => const _ReminderSettingsSheet(),
-    );
-  }
-
   static String _dateKey(DateTime date) =>
       '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
 
@@ -428,13 +413,11 @@ class _CalendarHeader extends StatelessWidget {
   final int year;
   final VoidCallback onPreviousMonth;
   final VoidCallback? onNextMonth;
-  final VoidCallback onOpenReminderSettings;
 
   const _CalendarHeader({
     required this.month,
     required this.year,
     required this.onPreviousMonth,
-    required this.onOpenReminderSettings,
     this.onNextMonth,
   });
 
@@ -465,208 +448,18 @@ class _CalendarHeader extends StatelessWidget {
                 ),
           ),
         ),
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              tooltip: strings.reminderSettingsTooltip,
-              icon: const Icon(
-                Icons.notifications_active_outlined,
-                color: Color(0xFF5F3DC4),
-              ),
-              onPressed: onOpenReminderSettings,
-            ),
-            IconButton(
-              iconSize: 36,
-              tooltip: strings.nextMonthTooltip,
-              icon: Icon(
-                Icons.chevron_right_rounded,
-                color: onNextMonth == null
-                    ? Colors.grey[400]
-                    : const Color(0xFF5F3DC4),
-              ),
-              onPressed: onNextMonth,
-            ),
-          ],
+        IconButton(
+          iconSize: 36,
+          tooltip: strings.nextMonthTooltip,
+          icon: Icon(
+            Icons.chevron_right_rounded,
+            color: onNextMonth == null
+                ? Colors.grey[400]
+                : const Color(0xFF5F3DC4),
+          ),
+          onPressed: onNextMonth,
         ),
       ],
-    );
-  }
-}
-
-class _ReminderSettingsSheet extends StatefulWidget {
-  const _ReminderSettingsSheet();
-
-  @override
-  State<_ReminderSettingsSheet> createState() => _ReminderSettingsSheetState();
-}
-
-class _ReminderSettingsSheetState extends State<_ReminderSettingsSheet> {
-  bool _isLoading = true;
-  bool _isSaving = false;
-  late bool _remindersEnabled;
-  late TimeOfDay _selectedTime;
-
-  AppSettingsRepository get _settingsRepository =>
-      context.read<AppSettingsRepository>();
-
-  LocalNotificationService get _notificationService =>
-      context.read<LocalNotificationService>();
-
-  RatingPromptService get _ratingPromptService =>
-      context.read<RatingPromptService>();
-
-  void _openRateApp() {
-    unawaited(_ratingPromptService.openStoreListing());
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _loadSettings();
-  }
-
-  Future<void> _loadSettings() async {
-    final settings = await _settingsRepository.getSettings();
-    if (!mounted) {
-      return;
-    }
-    setState(() {
-      _remindersEnabled = settings.dailyReminderEnabled;
-      _selectedTime = TimeOfDay(
-        hour: settings.dailyReminderHour,
-        minute: settings.dailyReminderMinute,
-      );
-      _isLoading = false;
-    });
-  }
-
-  Future<void> _pickTime() async {
-    final pickedTime = await showTimePicker(
-      context: context,
-      initialTime: _selectedTime,
-    );
-    if (pickedTime == null || !mounted) {
-      return;
-    }
-    setState(() {
-      _selectedTime = pickedTime;
-    });
-  }
-
-  Future<void> _saveSettings() async {
-    final strings = AppStrings.of(context);
-    setState(() {
-      _isSaving = true;
-    });
-
-    final updatedSettings = AppSettings(
-      dailyReminderEnabled: _remindersEnabled,
-      dailyReminderHour: _selectedTime.hour,
-      dailyReminderMinute: _selectedTime.minute,
-    );
-
-    await _settingsRepository.saveSettings(updatedSettings);
-    if (updatedSettings.dailyReminderEnabled) {
-      await _notificationService.scheduleDailyReminder();
-    } else {
-      await _notificationService.cancelDailyReminder();
-    }
-
-    if (!mounted) {
-      return;
-    }
-
-    final timeText = _selectedTime.format(context);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          updatedSettings.dailyReminderEnabled
-              ? strings.reminderSavedAt(timeText)
-              : strings.remindersTurnedOff,
-        ),
-      ),
-    );
-    Navigator.of(context).pop();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final strings = AppStrings.of(context);
-
-    return SafeArea(
-      child: Padding(
-        padding: EdgeInsets.only(
-          left: 24,
-          right: 24,
-          top: 16,
-          bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-        ),
-        child: _isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    strings.reminderSheetTitle,
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    strings.reminderSheetDescription,
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                  const SizedBox(height: 24),
-                  SwitchListTile(
-                    contentPadding: EdgeInsets.zero,
-                    value: _remindersEnabled,
-                    title: Text(strings.reminderEnabledTitle),
-                    subtitle: Text(strings.reminderEnabledSubtitle),
-                    onChanged: _isSaving
-                        ? null
-                        : (value) {
-                            setState(() {
-                              _remindersEnabled = value;
-                            });
-                          },
-                  ),
-                  const SizedBox(height: 12),
-                  ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    title: Text(strings.reminderTimeTitle),
-                    subtitle: Text(_selectedTime.format(context)),
-                    trailing: const Icon(Icons.access_time_rounded),
-                    onTap: _isSaving || !_remindersEnabled ? null : _pickTime,
-                  ),
-                  const SizedBox(height: 24),
-                  GradientPillButton(
-                    label: strings.saveReminderSettings,
-                    onPressed: _isSaving ? null : _saveSettings,
-                    loading: _isSaving,
-                  ),
-                  const SizedBox(height: 8),
-                  const Divider(),
-                  Semantics(
-                    button: true,
-                    label: strings.rateAppSemanticLabel,
-                    onTap: _openRateApp,
-                    excludeSemantics: true,
-                    child: ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      leading: const Icon(
-                        Icons.star_rounded,
-                        color: Color(0xFF5F3DC4),
-                      ),
-                      title: Text(strings.rateAppTitle),
-                      onTap: _openRateApp,
-                    ),
-                  ),
-                ],
-              ),
-      ),
     );
   }
 }

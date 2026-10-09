@@ -59,8 +59,6 @@ class AppStringsIt extends AppStrings {
   @override
   String summaryTitle(String monthName) => 'Riepilogo di $monthName';
   @override
-  String get reminderSettingsTooltip => 'Impostazioni promemoria';
-  @override
   String get openCalendarTooltip => 'Apri calendario';
   @override
   String get backToTodayTooltip => 'Torna a oggi';
@@ -83,17 +81,25 @@ class AppStringsIt extends AppStrings {
   @override
   String get reminderTimeTitle => 'Orario promemoria';
   @override
-  String get saveReminderSettings =>
-      'Salva impostazioni promemoria';
-  @override
-  String reminderSavedAt(String formattedTime) =>
-      'Promemoria giornaliero impostato per $formattedTime.';
-  @override
-  String get remindersTurnedOff => 'I promemoria giornalieri sono disattivati.';
-  @override
   String get rateAppTitle => 'Valuta Mood Calendar';
   @override
   String get rateAppSemanticLabel => 'Valuta Mood Calendar sull\'App Store';
+  @override
+  String get settingsTitle => 'Impostazioni';
+  @override
+  String get openSettingsTooltip => 'Apri impostazioni';
+  @override
+  String get settingsAboutSection => 'Aiuto e informazioni';
+  @override
+  String get privacyPolicyTitle => 'Informativa sulla privacy';
+  @override
+  String get privacyPolicySemanticLabel => 'Apri l\'informativa sulla privacy nel browser';
+  @override
+  String get appVersionTitle => 'Versione';
+  @override
+  String get privacyLinkFailed => 'Impossibile aprire il link. Riprova più tardi.';
+  @override
+  String get settingsSaveFailed => 'Impossibile salvare le impostazioni. Riprova.';
   @override
   String get exportHistoryTooltip => 'Esporta cronologia';
   @override

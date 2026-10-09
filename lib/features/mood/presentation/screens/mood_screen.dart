@@ -8,6 +8,7 @@ import '../../../../core/widgets/gradient_pill_button.dart';
 import '../../../purchases/presentation/bloc/purchases_cubit.dart';
 import '../../../purchases/presentation/screens/mood_store_screen.dart';
 import '../../../purchases/presentation/widgets/mood_purchase_sheet.dart';
+import '../../../settings/presentation/screens/settings_screen.dart';
 import '../../domain/entities/mood_definition.dart';
 import '../../domain/entities/mood_entry.dart';
 import '../../domain/services/mood_definition_resolver.dart';
@@ -275,6 +276,8 @@ class _MoodScreenState extends State<MoodScreen>
                                 Expanded(
                                   child: Text(
                                     _formatDate(context, _selectedDate),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
                                     style: Theme.of(context)
                                         .textTheme
                                         .titleLarge
@@ -313,6 +316,17 @@ class _MoodScreenState extends State<MoodScreen>
                                       context,
                                       viewedDate: _selectedDate,
                                     );
+                                  },
+                                ),
+                                IconButton(
+                                  tooltip: strings.openSettingsTooltip,
+                                  icon: const Icon(
+                                    Icons.settings_outlined,
+                                    color: Color(0xFF5F3DC4),
+                                  ),
+                                  onPressed: () {
+                                    Navigator.of(context)
+                                        .push(SettingsScreen.route());
                                   },
                                 ),
                               ],

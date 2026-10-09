@@ -8,6 +8,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'core/localization/app_strings.dart';
+import 'core/logging/app_logger.dart';
 import 'core/logging/logger_app_logger.dart';
 import 'core/navigation/app_navigator.dart';
 import 'core/notifications/local_notification_service.dart';
@@ -125,6 +126,7 @@ void main() async {
   runApp(
     MultiRepositoryProvider(
       providers: [
+        RepositoryProvider<AppLogger>.value(value: appLogger),
         RepositoryProvider<AppSettingsRepository>.value(
           value: appSettingsRepository,
         ),
