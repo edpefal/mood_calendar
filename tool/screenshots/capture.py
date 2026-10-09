@@ -67,17 +67,17 @@ def shot(name):
 
 
 def header_buttons():
-    """Home screen header buttons, left to right: [store, calendar]."""
+    """Home screen header buttons, left to right: [store, calendar, settings]."""
     bs = sorted((b for b in buttons() if b[1] < 160), key=lambda b: b[0])
     return bs
 
 
 def calendar_row_buttons():
-    """Calendar card header, left to right: [previous, reminders, next].
+    """Calendar card header, left to right: [previous, next].
 
     Found as the topmost group of 2+ buttons sharing the same y ("back to
-    today" is alone above it; the current month has no "next" button, so the
-    group has 2 buttons there and 3 elsewhere). Works on any screen size.
+    today" is alone above it; the current month has no "next" button, so only
+    past months have this group). Works on any screen size.
     """
     for _ in range(6):  # the route transition may still be running
         groups = []
@@ -95,7 +95,7 @@ def calendar_row_buttons():
 
 def open_calendar_previous_month():
     hb = header_buttons()
-    tap_button(hb[-1])  # calendar is the rightmost header button
+    tap_button(hb[-2])  # calendar is the middle header button, settings the last
     row = calendar_row_buttons()
     tap_button(row[0])  # previous month
 
@@ -127,8 +127,8 @@ open_calendar_previous_month()
 time.sleep(1)
 shot('calendar')
 
-# 4) reminder settings sheet
-row = calendar_row_buttons()
-tap_button(row[1])
+# 4) settings screen (reminders)
+launch()
+tap_button(header_buttons()[-1])  # settings is the rightmost header button
 time.sleep(1.5)
 shot('reminders')

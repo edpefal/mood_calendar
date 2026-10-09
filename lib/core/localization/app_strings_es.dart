@@ -57,8 +57,6 @@ class AppStringsEs extends AppStrings {
   @override
   String summaryTitle(String monthName) => 'Resumen de $monthName';
   @override
-  String get reminderSettingsTooltip => 'Configuración de recordatorios';
-  @override
   String get openCalendarTooltip => 'Abrir calendario';
   @override
   String get backToTodayTooltip => 'Volver a hoy';
@@ -81,17 +79,25 @@ class AppStringsEs extends AppStrings {
   @override
   String get reminderTimeTitle => 'Hora del recordatorio';
   @override
-  String get saveReminderSettings => 'Guardar configuración de recordatorios';
-  @override
-  String reminderSavedAt(String formattedTime) =>
-      'Recordatorio diario configurado para las $formattedTime.';
-  @override
-  String get remindersTurnedOff =>
-      'Los recordatorios diarios están desactivados.';
-  @override
   String get rateAppTitle => 'Calificar Mood Calendar';
   @override
   String get rateAppSemanticLabel => 'Calificar Mood Calendar en el App Store';
+  @override
+  String get settingsTitle => 'Ajustes';
+  @override
+  String get openSettingsTooltip => 'Abrir ajustes';
+  @override
+  String get settingsAboutSection => 'Ayuda y acerca de';
+  @override
+  String get privacyPolicyTitle => 'Política de privacidad';
+  @override
+  String get privacyPolicySemanticLabel => 'Abrir la política de privacidad en el navegador';
+  @override
+  String get appVersionTitle => 'Versión';
+  @override
+  String get privacyLinkFailed => 'No se pudo abrir el enlace. Inténtalo de nuevo más tarde.';
+  @override
+  String get settingsSaveFailed => 'No se pudieron guardar los ajustes. Inténtalo de nuevo.';
   @override
   String get exportHistoryTooltip => 'Exportar historial';
   @override

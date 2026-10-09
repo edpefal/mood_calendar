@@ -71,7 +71,6 @@ abstract class AppStrings {
   String get bestStreak;
   String streakText(int days);
   String summaryTitle(String monthName);
-  String get reminderSettingsTooltip;
   String get openCalendarTooltip;
   String get backToTodayTooltip;
   String get backToMoodPickerTooltip;
@@ -82,11 +81,16 @@ abstract class AppStrings {
   String get reminderEnabledTitle;
   String get reminderEnabledSubtitle;
   String get reminderTimeTitle;
-  String get saveReminderSettings;
-  String reminderSavedAt(String formattedTime);
-  String get remindersTurnedOff;
   String get rateAppTitle;
   String get rateAppSemanticLabel;
+  String get settingsTitle;
+  String get openSettingsTooltip;
+  String get settingsAboutSection;
+  String get privacyPolicyTitle;
+  String get privacyPolicySemanticLabel;
+  String get appVersionTitle;
+  String get privacyLinkFailed;
+  String get settingsSaveFailed;
   String get exportHistoryTooltip;
   String get exportingHistory;
   String historyExportedTo(String fileName);

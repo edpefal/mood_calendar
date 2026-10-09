@@ -14,7 +14,7 @@ Flutter app para registrar y revisar estados de ánimo diarios, con un catálogo
 
 ## Arquitectura
 
-Clean Architecture con dos features (`mood` y `purchases`):
+Clean Architecture con tres features (`mood`, `purchases` y `settings`):
 
 ```
 lib/
@@ -31,7 +31,8 @@ lib/
     │   ├── data/         # datasources (Hive), models, repositories, services (export JSON)
     │   ├── domain/       # entities, usecases, repositories, services (resolver, streak calculator)
     │   └── presentation/ # screens, widgets, bloc (Cubits)
-    └── purchases/        # RevenueCat datasource, MoodEntitlementsRepository (+ Noop), PurchasesCubit, MoodStoreScreen, purchase sheets
+    ├── purchases/        # RevenueCat datasource, MoodEntitlementsRepository (+ Noop), PurchasesCubit, MoodStoreScreen, purchase sheets
+    └── settings/         # solo presentation: SettingsScreen + SettingsCubit (recordatorio diario con autoguardado, calificar, privacidad, versión); la persistencia vive en core/settings/
 ```
 
 `lib/features/ads/` y `lib/features/premium/` son carpetas vacías residuales (sin archivos `.dart`); la monetización vive en `purchases/`.
@@ -42,7 +43,7 @@ lib/
 - `docs/adr/` — ADR 0001 (intensity no es valencia), ADR 0002 (composición de Pack congelada).
 - `docs/risks.md` — riesgos aceptados de IAP (sin validación de recibos en backend, etc.).
 - `backlog.md` — backlog activo.
-- `openspec/` — workflow spec-driven: `openspec/specs/` contiene los specs vigentes (`branded-launch-screen`, `daily-note-capture`, `ios-simulator-ui-testing`, `localization-architecture`, `monthly-mood-summary`, `mood-store`, `premium-moods`, `rating-prompt`) y `openspec/changes/archive/` el historial de changes con su proposal/design/tasks. Consultarlo antes de tocar un área con historia.
+- `openspec/` — workflow spec-driven: `openspec/specs/` contiene los specs vigentes (`branded-launch-screen`, `daily-note-capture`, `ios-simulator-ui-testing`, `localization-architecture`, `monthly-mood-summary`, `mood-store`, `premium-moods`, `rating-prompt`, `settings-screen`) y `openspec/changes/archive/` el historial de changes con su proposal/design/tasks. Consultarlo antes de tocar un área con historia.
 
 ## Localización
 
@@ -189,11 +190,11 @@ Esas resoluciones corresponden a los tamaños de 6.9" y 13" que Apple lista para
 
 - Tras compilar, `flutter run` puede quedarse esperando en un simulador recién creado (indexa atajos del sistema en el primer arranque). Si la app no abre sola: `xcrun simctl launch <udid> com.artlab.moodcalendar`.
 - Para cambiar de idioma: `xcrun simctl terminate` y `xcrun simctl launch <udid> com.artlab.moodcalendar -AppleLanguages "(es)" -AppleLocale es_ES`. Los textos de la app (ya con acentos), el calendario y los nombres de los moods (`AppStrings.moodName`) siguen ese idioma.
-- `capture.py` necesita un `idb_companion` conectado al simulador (`idb_companion --udid <udid> &` y `idb connect <udid>`). Encuentra los botones por posición con `idb ui describe-all` porque las etiquetas cambian por idioma: en la pantalla principal el botón de más a la derecha es el calendario y el anterior la tienda; en el calendario, el primer grupo de 2–3 botones juntos es [mes anterior, recordatorios, mes siguiente] (el mes actual no tiene "siguiente"). El calendario con datos es el del mes anterior.
+- `capture.py` necesita un `idb_companion` conectado al simulador (`idb_companion --udid <udid> &` y `idb connect <udid>`). Encuentra los botones por posición con `idb ui describe-all` porque las etiquetas cambian por idioma: en la pantalla principal los botones del header son [tienda, calendario, ajustes] (el de más a la derecha abre Settings); en el calendario, el primer grupo de 2 botones juntos es [mes anterior, mes siguiente] (el mes actual no tiene "siguiente", así que solo los meses pasados forman el grupo). El calendario con datos es el del mes anterior.
 - Flujo con los scripts de `tool/screenshots/` (requieren `idb`, Pillow y Google Chrome en macOS):
 
   ```bash
-  python3 tool/screenshots/capture.py <udid> <iphone|ipad> <en|es|de|fr|it>   # picker, note, calendar, reminders -> build/screenshots/shots/
+  python3 tool/screenshots/capture.py <udid> <iphone|ipad> <en|es|de|fr|it>   # picker, note, calendar, settings (reminders) -> build/screenshots/shots/
   python3 tool/screenshots/compose.py <iphone|ipad> [idiomas]                  # 6 slides por idioma -> build/screenshots/slides/
   ```
 

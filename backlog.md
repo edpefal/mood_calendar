@@ -21,7 +21,7 @@ Backlog activo del proyecto, actualizado contra el estado actual del repo.
 - Ya existe una capa de settings.
   La configuración de recordatorios vive en `core/settings/`.
 
-- Los recordatorios diarios ya son configurables desde la UI.
+- Los recordatorios diarios se configuran desde la pantalla de Settings (engrane en la pantalla principal), con autoguardado; también están ahí calificar la app, la política de privacidad y la versión.
 
 - Ya existe exportación local del historial en JSON.
 
@@ -44,7 +44,11 @@ Backlog activo del proyecto, actualizado contra el estado actual del repo.
   El README debe describir con precisión `features/mood`, settings, notificaciones y telemetría. Hace falta una guía de onboarding que refleje el flujo real de dependencias, estado y persistencia.
 
 - Añadir cobertura para recordatorios y navegación por notificación.
+  `SettingsCubit` y `SettingsScreen` ya tienen tests, con la programación simulada.
   Hay buena cobertura en repositorio, summary y `MoodScreen`, pero falta validar permisos, programación/cancelación de recordatorios, apertura desde payload y efectos de configuración guardada.
+
+- Avisar cuando el permiso de notificaciones está denegado en el sistema.
+  Activar el recordatorio en Settings guarda el ajuste pero iOS no entrega la notificación; conviene mostrar un aviso con acceso a Ajustes del sistema.
 
 - Endurecer la UX de errores de plataforma.
   Conviene revisar mensajes, reintentos y comportamiento offline para que la UX sea clara cuando fallen notificaciones, exportación o persistencia local.

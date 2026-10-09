@@ -59,8 +59,6 @@ class AppStringsDe extends AppStrings {
   @override
   String summaryTitle(String monthName) => 'Übersicht für $monthName';
   @override
-  String get reminderSettingsTooltip => 'Erinnerungseinstellungen';
-  @override
   String get openCalendarTooltip => 'Kalender öffnen';
   @override
   String get backToTodayTooltip => 'Zurück zu heute';
@@ -83,16 +81,25 @@ class AppStringsDe extends AppStrings {
   @override
   String get reminderTimeTitle => 'Erinnerungszeit';
   @override
-  String get saveReminderSettings => 'Erinnerungseinstellungen speichern';
-  @override
-  String reminderSavedAt(String formattedTime) =>
-      'Tägliche Erinnerung für $formattedTime eingestellt.';
-  @override
-  String get remindersTurnedOff => 'Tägliche Erinnerungen sind ausgeschaltet.';
-  @override
   String get rateAppTitle => 'Mood Calendar bewerten';
   @override
   String get rateAppSemanticLabel => 'Mood Calendar im App Store bewerten';
+  @override
+  String get settingsTitle => 'Einstellungen';
+  @override
+  String get openSettingsTooltip => 'Einstellungen öffnen';
+  @override
+  String get settingsAboutSection => 'Hilfe & Info';
+  @override
+  String get privacyPolicyTitle => 'Datenschutzerklärung';
+  @override
+  String get privacyPolicySemanticLabel => 'Datenschutzerklärung im Browser öffnen';
+  @override
+  String get appVersionTitle => 'Version';
+  @override
+  String get privacyLinkFailed => 'Der Link konnte nicht geöffnet werden. Bitte versuche es später erneut.';
+  @override
+  String get settingsSaveFailed => 'Die Einstellungen konnten nicht gespeichert werden. Bitte versuche es erneut.';
   @override
   String get exportHistoryTooltip => 'Verlauf exportieren';
   @override
