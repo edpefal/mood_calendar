@@ -11,6 +11,8 @@ Flutter app para registrar y revisar estados de ánimo diarios, con un catálogo
 - **Generación de código**: freezed, json_serializable, hive_generator → correr con `flutter pub run build_runner build`
 - **Notificaciones**: flutter_local_notifications + timezone
 - **UI**: flutter_svg (emojis SVG), google_fonts (Poppins), lottie
+- **Utilidades de plataforma**: in_app_review (pedir/abrir calificación), url_launcher (política de privacidad), package_info_plus (versión en Settings), share_plus (hoja de compartir al exportar el historial)
+- **CI/CD**: `.github/workflows/ci.yml` corre `flutter analyze` + `flutter test` en cada push a `main` y en cada PR; `deploy_android.yml` publica a Google Play al empujar un tag `vX.Y.Z`
 
 ## Arquitectura
 
@@ -22,14 +24,15 @@ lib/
 │   ├── localization/     # AppStrings (abstracta) + subclases por idioma
 │   ├── logging/          # AppLogger
 │   ├── notifications/    # LocalNotificationService
-│   ├── settings/         # AppSettings (Hive)
+│   ├── rating/           # ReviewRequester (in_app_review)
+│   ├── settings/         # AppSettings y estado del pedido de calificación (Hive)
 │   ├── telemetry/        # AppTelemetry
 │   ├── widgets/          # widgets compartidos (GradientPillButton)
 │   └── navigation/
 └── features/
     ├── mood/
-    │   ├── data/         # datasources (Hive), models, repositories, services (export JSON)
-    │   ├── domain/       # entities, usecases, repositories, services (resolver, streak calculator)
+    │   ├── data/         # datasources (Hive), models, repositories, services (export JSON, pedido de calificación)
+    │   ├── domain/       # entities, usecases, repositories, services (resolver, streak calculator, orden del selector, política de calificación)
     │   └── presentation/ # screens, widgets, bloc (Cubits)
     ├── purchases/        # RevenueCat datasource, MoodEntitlementsRepository (+ Noop), PurchasesCubit, MoodStoreScreen, purchase sheets
     └── settings/         # solo presentation: SettingsScreen + SettingsCubit (recordatorio diario con autoguardado, exportar historial, calificar, privacidad, versión); la persistencia vive en core/settings/
@@ -42,8 +45,9 @@ lib/
 - `CONTEXT.md` — glosario del dominio (Mood vs Mood Entry, Tier, Unlocked, Purchase, Pack, Intensity, Most Common Mood). Respetar sus términos y los "_Avoid_".
 - `docs/adr/` — ADR 0001 (intensity no es valencia), ADR 0002 (composición de Pack congelada).
 - `docs/risks.md` — riesgos aceptados de IAP (sin validación de recibos en backend, etc.).
+- `docs/brainstorms/` y `docs/plans/` — requisitos y plan de las compras de moods (abril 2026); contexto histórico, no vigente.
 - `backlog.md` — backlog activo.
-- `openspec/` — workflow spec-driven: `openspec/specs/` contiene los specs vigentes (`branded-launch-screen`, `daily-note-capture`, `ios-simulator-ui-testing`, `localization-architecture`, `monthly-mood-summary`, `mood-store`, `premium-moods`, `rating-prompt`, `settings-screen`, `mood-history-export`) y `openspec/changes/archive/` el historial de changes con su proposal/design/tasks. Consultarlo antes de tocar un área con historia.
+- `openspec/` — workflow spec-driven: `openspec/specs/` contiene los specs vigentes (`branded-launch-screen`, `calendar-navigation`, `daily-note-capture`, `ios-simulator-ui-testing`, `localization-architecture`, `monthly-mood-summary`, `mood-history-export`, `mood-store`, `premium-moods`, `rating-prompt`, `settings-screen`) y `openspec/changes/archive/` el historial de changes con su proposal/design/tasks. Consultarlo antes de tocar un área con historia.
 
 ## Localización
 
@@ -71,6 +75,16 @@ Reglas importantes:
 
 Los assets SVG están en `assets/icon/` (`brave.svg` es un outlier pesado pendiente de regenerar, ver `backlog.md`). El resolver está en `MoodDefinitionResolver`.
 
+## Comportamientos con spec
+
+Cada uno tiene su spec en `openspec/specs/`; leerla antes de cambiarlo.
+
+- **Selector de moods** (`premium-moods`): el carrusel muestra primero los moods desbloqueados ordenados por frecuencia de uso y después los premium bloqueados (`MoodPickerOrder`); el orden se calcula al abrir la pantalla y no cambia mientras está abierta. Si la fecha ya tiene entrada, el carrusel se posiciona en su mood. Tocar un mood premium bloqueado abre la compra en vez de guardar.
+- **Volver del calendario** (`calendar-navigation`): abre el selector de la última fecha vista (el último día tocado; si no hubo, la del selector de origen; si no, hoy), no siempre hoy.
+- **Calificación** (`rating-prompt`): pedido automático tras guardar con el 3.er y el 7.º día con entradas (máx. 2 en la vida de la instalación, ≥30 días entre intentos), siempre desde el calendario y nunca tras un guardado fallido. La fila "Calificar" de Settings es manual y no cuenta como intento.
+- **Settings** (`settings-screen`): recordatorio diario con **autoguardado** (sin botón Guardar; los cambios se encolan y, si fallan, se revierten con un mensaje), exportar historial, calificar, política de privacidad y versión. Es el único lugar donde se configura el recordatorio; el calendario ya no tiene la campana.
+- **Exportar historial** (`mood-history-export`): Settings > "Tus datos" genera un JSON v1 (`formatVersion`, `generatedAt`, `entryCount`, `entries[{date, mood, note}]`) y abre la hoja de compartir (anclada a la fila en iPad). `mood` es el id estable (`calm`), nunca la ruta del asset ni `intensity`; un mood desconocido se exporta tal cual en vez de caer en *happy*. El archivo va al directorio temporal y solo se conserva el último.
+
 ## Compras in-app (RevenueCat)
 
 - 6 productos no consumibles en App Store Connect: `mood_anxious_unlock`, `mood_brave_unlock`, `mood_confident_unlock`, `mood_romantic_unlock`, `mood_shy_unlock`, `pack_confianza_unlock`.
@@ -80,7 +94,7 @@ Los assets SVG están en `assets/icon/` (`brave.svg` es un outlier pesado pendie
 
 ## Arranque de la app
 
-`runApp()` se llama **antes** de inicializar notificaciones (que espera el diálogo nativo de permisos) y de tareas lentas. Nunca volver a hacer `await` de diálogos del sistema o SDKs de terceros antes de `runApp()`: dejó la app congelada en el launch screen y causó un rechazo de Apple (Guideline 2.1(a)).
+`runApp()` se llama **antes** de inicializar notificaciones (que espera el diálogo nativo de permisos) y de tareas lentas. Nunca volver a hacer `await` de nada que dependa de interacción del usuario (diálogos del sistema, p. ej. el permiso de notificaciones) antes de `runApp()`: dejó la app congelada en el launch screen y causó un rechazo de Apple (Guideline 2.1(a)). Hive y `Purchases.configure()` sí se esperan antes de `runApp()` a propósito: no esperan al usuario y `configure()` debe terminar antes de construir `MoodEntitlementsRepositoryImpl` (ver `openspec/changes/archive/2026-09-29-fix-launch-blocked-on-notification-permission/`).
 
 ## Sistema de diseño
 
@@ -136,7 +150,7 @@ Usar el formato `<tipo>(<scope>): <descripción>` en todos los commits:
 | `test` | Tests |
 | `perf` | Mejora de rendimiento |
 
-Scopes sugeridos: `localization`, `mood`, `calendar`, `notifications`, `settings`, `ui`, `purchases`, `ios`
+Scopes sugeridos: `localization`, `mood`, `calendar`, `notifications`, `settings`, `ui`, `purchases`, `ios`, `openspec` (archivado y sync de specs)
 
 Ejemplos:
 ```
@@ -172,12 +186,17 @@ Cambios no triviales siguen el flujo OpenSpec: proponer (`/opsx:propose`) → im
 
 ## Testing
 
-- Tests unitarios y de widget en `test/` (repositorio, resolver, streak calculator, summary usecase, `MoodCubit`, `MoodScreen`, settings, exportador JSON). `test/support/fake_mood_entitlements_repository.dart` es el fake de compras para tests.
-- No hay tests de notificaciones/recordatorios ni de navegación por notificación (pendiente en `backlog.md`).
+- Tests unitarios y de widget en `test/` (repositorio, resolver, streak calculator, orden del selector, summary usecase, política y servicio de calificación, exportador JSON, `MoodCubit`, `MoodScreen`, `SettingsCubit` y `SettingsScreen`). `test/support/fake_mood_entitlements_repository.dart` es el fake de compras para tests.
+- Las pantallas con efectos de plataforma reciben esos efectos inyectados para poder probarlos sin plugins: `SettingsScreen` toma `openUrl` y `shareFile`, `SettingsCubit` toma `scheduleReminder`/`cancelReminder`/`loadAppVersion`, el exportador toma `directoryProvider`.
+- Siguen sin cubrirse la programación real de notificaciones (`LocalNotificationService` solo prueba el idioma) ni la navegación por notificación (pendiente en `backlog.md`).
 
 ### Testing de UI/UX en el simulador de iOS
 
-El agente puede validar cambios de UI/UX de forma ad-hoc en el simulador (screenshots, taps, árbol de accesibilidad, diálogos nativos del sistema) usando `idb`. Ver `docs/ios-simulator-ui-testing.md` para el workflow completo. No es una suite de tests ni corre en CI.
+El agente puede validar cambios de UI/UX de forma ad-hoc en el simulador (screenshots, taps, árbol de accesibilidad, diálogos nativos del sistema) usando `idb`. Ver `docs/ios-simulator-ui-testing.md` para el workflow completo. No es una suite de tests ni corre en CI. Notas verificadas:
+
+- Para probar pantallas angostas usar un simulador **iPhone 16e** (390 pt): dos simuladores iPhone SE (3.ª gen) recién creados sobre iOS 26.2 dejaron `simctl launch`/`terminate` colgados sin error.
+- Con el simulador de iPad en horizontal, `simctl io screenshot` sale girado 90° (`sips -r 270` lo endereza) y `idb ui tap` usa las coordenadas del panel vertical: toma las de `idb ui describe-all` tal cual si ya vienen en vertical, o conviértelas `(x, y) → (1024 − y, x)` si vienen en horizontal.
+- Al vigilar `flutter run` en segundo plano, cubrir también las señales de fallo (`No supported devices`, `Error:`, `Exception`); un filtro que solo espera el éxito expira en silencio.
 
 ### Screenshots de App Store
 
