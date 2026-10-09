@@ -38,7 +38,7 @@ Backlog activo del proyecto, actualizado contra el estado actual del repo.
 ## Alta prioridad
 
 - Terminar y publicar la versión 1.8.4.
-  Está creada en App Store Connect con los screenshots cargados, pero falta: subir la versión en `pubspec.yaml`, generar el build con `scripts/build_ios_release.sh` (checklist de `CLAUDE.md`), escribir el promotional text y el What's New (están vacíos en los 5 idiomas; no se heredan de la versión anterior), asociar el build y enviar a revisión. Se pospone hasta meter más features. Opcional: recapturar los slides en español, que muestran los textos anteriores a la corrección de acentos.
+  Está creada en App Store Connect con los screenshots cargados, pero falta: subir la versión en `pubspec.yaml`, generar el build con `scripts/build_ios_release.sh` (checklist de `CLAUDE.md`), escribir el promotional text y el What's New (están vacíos en los 5 idiomas; no se heredan de la versión anterior), asociar el build y enviar a revisión. Se pospone hasta meter más features. Opcional: recapturar los slides en español, que muestran los textos anteriores a la corrección de acentos. Al regenerar los slides, revisar en `compose.py` que el slide 5 (recordatorios) enmarque bien la captura de Settings a pantalla completa (antes era un bottom sheet); quedó pendiente al archivar `add-settings-screen`.
 
 - Documentar mejor la arquitectura real del proyecto.
   El README debe describir con precisión `features/mood`, settings, notificaciones y telemetría. Hace falta una guía de onboarding que refleje el flujo real de dependencias, estado y persistencia.
@@ -46,6 +46,9 @@ Backlog activo del proyecto, actualizado contra el estado actual del repo.
 - Añadir cobertura para recordatorios y navegación por notificación.
   `SettingsCubit` y `SettingsScreen` ya tienen tests, con la programación simulada.
   Hay buena cobertura en repositorio, summary y `MoodScreen`, pero falta validar permisos, programación/cancelación de recordatorios, apertura desde payload y efectos de configuración guardada.
+
+- Cerrar la verificación pendiente de `export-mood-history`.
+  Probar en el simulador el historial vacío y el error de generación (hoy solo cubiertos por tests de widget) y confirmar que la política de privacidad y las respuestas de App Store Connect no contradicen una exportación manual del historial.
 
 - Avisar cuando el permiso de notificaciones está denegado en el sistema.
   Activar el recordatorio en Settings guarda el ajuste pero iOS no entrega la notificación; conviene mostrar un aviso con acceso a Ajustes del sistema.

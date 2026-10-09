@@ -159,6 +159,15 @@ gh pr create
 
 El repo tiene branch protection: los PRs requieren que pase el check "Analyze and Test" (`.github/workflows/ci.yml`: `flutter analyze` + `flutter test`) antes de hacer merge.
 
+**Una vez mergeada una rama, hay que borrarla**, tanto en el remoto como en local (el repo no borra las ramas solo al mergear):
+
+```bash
+git push origin --delete feat/nombre-del-cambio   # o `gh pr merge --delete-branch`
+git branch -d feat/nombre-del-cambio
+```
+
+En PRs apilados (un PR cuya base es la rama de otro PR), primero se mergea el padre, luego se reajusta el hijo con `gh pr edit <n> --base main` y solo después se borra la rama del padre; si no, el hijo pierde su base.
+
 Cambios no triviales siguen el flujo OpenSpec: proponer (`/opsx:propose`) → implementar (`/opsx:apply`) → archivar (`/opsx:archive`), sincronizando los specs de `openspec/specs/` cuando cambian requisitos de comportamiento. Changes puramente operativos/visuales declaran `skip_specs: true`.
 
 ## Testing
