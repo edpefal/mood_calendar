@@ -2,28 +2,27 @@
 
 ## Purpose
 
-Define la pantalla de Settings de Mood Calendar: cómo se llega a ella desde la pantalla principal y qué opciones ofrece (recordatorio diario, calificar la app, política de privacidad y versión), para que los ajustes tengan un lugar estable y descubrible.
+Define la pantalla de Settings de Mood Calendar: cómo se llega a ella desde el bottom bar y qué opciones ofrece (recordatorio diario, calificar la app, política de privacidad y versión), para que los ajustes tengan un lugar estable y descubrible.
 
 ## Requirements
-
 ### Requirement: Acceso a Settings desde la pantalla principal
-La pantalla principal SHALL mostrar un icono de engrane en su header, a la derecha de los iconos de tienda y calendario, que abre la pantalla de Settings. El calendario NO SHALL ofrecer acceso a la configuración de recordatorios.
+Settings SHALL ser la cuarta pestaña del bottom bar, con un icono de engrane, y abrirse al tocarla. La pantalla principal NO SHALL mostrar un engrane en su header. Settings NO SHALL mostrar un botón de regresar. El calendario NO SHALL ofrecer acceso a la configuración de recordatorios.
 
 #### Scenario: Abrir Settings
-- **WHEN** el usuario toca el engrane en la pantalla principal
-- **THEN** se abre la pantalla de Settings
+- **WHEN** el usuario toca la pestaña de ajustes del bottom bar
+- **THEN** se muestra la pantalla de Settings
 
-#### Scenario: Orden de los iconos
-- **WHEN** se muestra el header de la pantalla principal
-- **THEN** los iconos aparecen en el orden tienda, calendario, engrane, de izquierda a derecha
+#### Scenario: Orden de las pestañas
+- **WHEN** se muestra el bottom bar
+- **THEN** la pestaña de ajustes es la última, a la derecha de moods, calendario y tienda
 
 #### Scenario: El calendario no tiene acceso a recordatorios
 - **WHEN** el usuario está en la vista del calendario
 - **THEN** el header no muestra el icono de campana ni ningún control que abra la configuración de recordatorios
 
-#### Scenario: Volver desde Settings
-- **WHEN** el usuario usa el botón de volver de Settings
-- **THEN** regresa a la pantalla principal con la misma fecha seleccionada
+#### Scenario: Salir de Settings
+- **WHEN** el usuario toca otra pestaña del bottom bar
+- **THEN** Settings deja de mostrarse y al volver conserva su estado
 
 ### Requirement: Configuración del recordatorio diario con autoguardado
 Settings SHALL incluir una sección "Recordatorios" con un switch para activar o desactivar el recordatorio diario y una fila para elegir su hora. Cada cambio SHALL guardarse y aplicarse al instante, sin botón de guardar. Al activar el recordatorio o cambiar su hora se SHALL reprogramar la notificación; al desactivarlo se SHALL cancelar. La fila de hora SHALL estar deshabilitada mientras el recordatorio esté desactivado.

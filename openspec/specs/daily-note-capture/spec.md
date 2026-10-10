@@ -5,7 +5,6 @@
 Define cómo el usuario captura la nota diaria asociada a su mood a través de un preview inline de solo lectura que abre un bottom sheet de edición expandida, con un límite de caracteres explícito.
 
 ## Requirements
-
 ### Requirement: Preview inline de solo lectura
 El campo de nota mostrado en la pantalla principal de registro de mood SHALL ser de solo lectura. El usuario NO SHALL poder escribir directamente sobre ese campo; tocarlo SHALL abrir la superficie de edición expandida (bottom sheet).
 
@@ -60,3 +59,14 @@ El bottom sheet de edición de nota SHALL usar el color del mood actualmente sel
 #### Scenario: Mood seleccionado distinto en cada apertura
 - **WHEN** el usuario tiene seleccionado un mood distinto al abrir el bottom sheet
 - **THEN** el acento visual del sheet corresponde al color de ese mood
+
+### Requirement: El editor de nota cubre el bottom bar
+Mientras el bottom sheet de edición de la nota esté abierto, el bottom bar SHALL quedar cubierto por el sheet y no recibir toques, y SHALL volver a estar disponible al cerrarse el sheet.
+
+#### Scenario: Abrir el editor
+- **WHEN** el usuario toca el preview de nota
+- **THEN** el bottom sheet se abre y el bottom bar queda cubierto por el sheet
+
+#### Scenario: Cerrar el editor
+- **WHEN** el usuario cierra el bottom sheet
+- **THEN** el bottom bar vuelve a estar disponible

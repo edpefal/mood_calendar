@@ -27,8 +27,8 @@ lib/
 │   ├── rating/           # ReviewRequester (in_app_review)
 │   ├── settings/         # AppSettings y estado del pedido de calificación (Hive)
 │   ├── telemetry/        # AppTelemetry
-│   ├── widgets/          # widgets compartidos (GradientPillButton)
-│   └── navigation/
+│   ├── widgets/          # widgets compartidos (GradientPillButton, FloatingTabBar)
+│   └── navigation/       # MainShell: raíz de la app con las 4 pestañas y el bottom bar
 └── features/
     ├── mood/
     │   ├── data/         # datasources (Hive), models, repositories, services (export JSON, pedido de calificación)
@@ -47,7 +47,7 @@ lib/
 - `docs/risks.md` — riesgos aceptados de IAP (sin validación de recibos en backend, etc.).
 - `docs/brainstorms/` y `docs/plans/` — requisitos y plan de las compras de moods (abril 2026); contexto histórico, no vigente.
 - `backlog.md` — backlog activo.
-- `openspec/` — workflow spec-driven: `openspec/specs/` contiene los specs vigentes (`branded-launch-screen`, `calendar-navigation`, `daily-note-capture`, `ios-simulator-ui-testing`, `localization-architecture`, `monthly-mood-summary`, `mood-history-export`, `mood-store`, `premium-moods`, `rating-prompt`, `settings-screen`) y `openspec/changes/archive/` el historial de changes con su proposal/design/tasks. Consultarlo antes de tocar un área con historia.
+- `openspec/` — workflow spec-driven: `openspec/specs/` contiene los specs vigentes (`branded-launch-screen`, `bottom-navigation`, `calendar-navigation`, `daily-note-capture`, `ios-simulator-ui-testing`, `localization-architecture`, `monthly-mood-summary`, `mood-history-export`, `mood-store`, `premium-moods`, `rating-prompt`, `settings-screen`) y `openspec/changes/archive/` el historial de changes con su proposal/design/tasks. Consultarlo antes de tocar un área con historia.
 
 ## Localización
 
@@ -80,9 +80,10 @@ Los assets SVG están en `assets/icon/` (`brave.svg` es un outlier pesado pendie
 Cada uno tiene su spec en `openspec/specs/`; leerla antes de cambiarlo.
 
 - **Selector de moods** (`premium-moods`): el carrusel muestra primero los moods desbloqueados ordenados por frecuencia de uso y después los premium bloqueados (`MoodPickerOrder`); el orden se calcula al abrir la pantalla y no cambia mientras está abierta. Si la fecha ya tiene entrada, el carrusel se posiciona en su mood. Tocar un mood premium bloqueado abre la compra en vez de guardar.
-- **Volver del calendario** (`calendar-navigation`): abre el selector de la última fecha vista (el último día tocado; si no hubo, la del selector de origen; si no, hoy), no siempre hoy.
+- **Bottom bar** (`bottom-navigation`): `MainShell` (`lib/core/navigation/`) es el `home` y tiene 4 pestañas en un `IndexedStack`: selector de moods (`sentiment_satisfied_outlined`), calendario, tienda y ajustes. El bar (`FloatingTabBar`) es una cápsula flotante translúcida, con ancho máximo en iPad y una píldora en la pestaña activa. Los modales (editor de nota, hojas de compra) lo cubren. Las pantallas reservan el espacio del bar a través del `padding.bottom` de `MediaQuery` que pone el shell: usar `SafeArea` o `MediaQuery.paddingOf(context).bottom` en pantallas nuevas. El shell posee la pestaña activa y la fecha del selector; guardar un mood cambia a la pestaña del calendario y el recordatorio llama a `MainShellState.showMoodPicker(hoy)` tras cerrar los modales (`handleReminderTap` en `main.dart`). No hay `Navigator.push` entre pestañas.
+- **Fecha del selector** (`calendar-navigation`): las pestañas conservan su estado; la fecha del selector solo cambia al tocar un día del calendario (hoy al iniciar la app). Ya no existe el botón de volver del calendario.
 - **Calificación** (`rating-prompt`): pedido automático tras guardar con el 3.er y el 7.º día con entradas (máx. 2 en la vida de la instalación, ≥30 días entre intentos), siempre desde el calendario y nunca tras un guardado fallido. La fila "Calificar" de Settings es manual y no cuenta como intento.
-- **Settings** (`settings-screen`): recordatorio diario con **autoguardado** (sin botón Guardar; los cambios se encolan y, si fallan, se revierten con un mensaje), exportar historial, calificar, política de privacidad y versión. Es el único lugar donde se configura el recordatorio; el calendario ya no tiene la campana.
+- **Settings** (`settings-screen`): recordatorio diario con **autoguardado** (sin botón Guardar; los cambios se encolan y, si fallan, se revierten con un mensaje), exportar historial, calificar, política de privacidad y versión. Es el único lugar donde se configura el recordatorio; el calendario ya no tiene la campana. Es la cuarta pestaña del bottom bar, no una pantalla apilada.
 - **Exportar historial** (`mood-history-export`): Settings > "Tus datos" genera un JSON v1 (`formatVersion`, `generatedAt`, `entryCount`, `entries[{date, mood, note}]`) y abre la hoja de compartir (anclada a la fila en iPad). `mood` es el id estable (`calm`), nunca la ruta del asset ni `intensity`; un mood desconocido se exporta tal cual en vez de caer en *happy*. El archivo va al directorio temporal y solo se conserva el último.
 
 ## Compras in-app (RevenueCat)
@@ -194,6 +195,7 @@ Cambios no triviales siguen el flujo OpenSpec: proponer (`/opsx:propose`) → im
 
 El agente puede validar cambios de UI/UX de forma ad-hoc en el simulador (screenshots, taps, árbol de accesibilidad, diálogos nativos del sistema) usando `idb`. Ver `docs/ios-simulator-ui-testing.md` para el workflow completo. No es una suite de tests ni corre en CI. Notas verificadas:
 
+- La navegación se prueba con `MainShell` como `home` (ver el grupo `bottom navigation` y `reminder tap` en `mood_screen_test.dart`); `MoodScreen` suelto sigue funcionando sin shell (`onSaved` es opcional). El toque real de la notificación no se pudo reproducir con `simctl push` + `idb` (queda en la pantalla de bloqueo), por eso el manejador `handleReminderTap` se prueba con un widget test.
 - Para probar pantallas angostas usar un simulador **iPhone 16e** (390 pt): dos simuladores iPhone SE (3.ª gen) recién creados sobre iOS 26.2 dejaron `simctl launch`/`terminate` colgados sin error.
 - Con el simulador de iPad en horizontal, `simctl io screenshot` sale girado 90° (`sips -r 270` lo endereza) y `idb ui tap` usa las coordenadas del panel vertical: toma las de `idb ui describe-all` tal cual si ya vienen en vertical, o conviértelas `(x, y) → (1024 − y, x)` si vienen en horizontal.
 - Al vigilar `flutter run` en segundo plano, cubrir también las señales de fallo (`No supported devices`, `Error:`, `Exception`); un filtro que solo espera el éxito expira en silencio.
@@ -218,7 +220,7 @@ Esas resoluciones corresponden a los tamaños de 6.9" y 13" que Apple lista para
 
 - Tras compilar, `flutter run` puede quedarse esperando en un simulador recién creado (indexa atajos del sistema en el primer arranque). Si la app no abre sola: `xcrun simctl launch <udid> com.artlab.moodcalendar`.
 - Para cambiar de idioma: `xcrun simctl terminate` y `xcrun simctl launch <udid> com.artlab.moodcalendar -AppleLanguages "(es)" -AppleLocale es_ES`. Los textos de la app (ya con acentos), el calendario y los nombres de los moods (`AppStrings.moodName`) siguen ese idioma.
-- `capture.py` necesita un `idb_companion` conectado al simulador (`idb_companion --udid <udid> &` y `idb connect <udid>`). Encuentra los botones por posición con `idb ui describe-all` porque las etiquetas cambian por idioma: en la pantalla principal los botones del header son [tienda, calendario, ajustes] (el de más a la derecha abre Settings); en el calendario, el primer grupo de 2 botones juntos es [mes anterior, mes siguiente] (el mes actual no tiene "siguiente", así que solo los meses pasados forman el grupo). El calendario con datos es el del mes anterior.
+- `capture.py` necesita un `idb_companion` conectado al simulador (`idb_companion --udid <udid> &` y `idb connect <udid>`). Encuentra los botones por posición con `idb ui describe-all` porque las etiquetas cambian por idioma: las 4 pestañas del bottom bar son la fila de botones más baja, [selector, calendario, tienda, ajustes]; en el calendario, la fila de botones más alta (sin contar el bar) es [mes anterior, mes siguiente]. El calendario con datos es el del mes anterior.
 - Flujo con los scripts de `tool/screenshots/` (requieren `idb`, Pillow y Google Chrome en macOS):
 
   ```bash
