@@ -49,5 +49,5 @@
 - [x] 8.1 `flutter analyze` y `flutter test` en verde
 - [x] 8.2 Probar en simulador iPhone 16e (390 pt) y iPad: bar visible en las cuatro pestañas, nada tapado por el bar, bar cubierto en editor de nota y en hojas de compra (el rendimiento del desenfoque sobre el carrusel queda por medir en un dispositivo físico)
 - [x] 8.3 Probar el toque del recordatorio con la app cerrada y con la app abierta en otra pestaña (cubierto con widget tests de `handleReminderTap`: otra pestaña, modal abierto y toque antes de montar el shell; el toque real en simulador no se pudo reproducir)
-- [ ] 8.4 Regenerar los screenshots de App Store con `tool/screenshots/` (cambia el header y aparece el bar); `capture.py` y `tool/screenshots/main.dart` ya están adaptados al bar; falta correr las capturas de los 5 idiomas en iPhone y iPad y componer los slides (pospuesto)
+- [x] 8.4 Regenerar los screenshots de App Store con `tool/screenshots/` (cambia el header y aparece el bar); `capture.py` y `tool/screenshots/main.dart` quedaron adaptados al bar. Las capturas de los 5 idiomas en iPhone y iPad y los slides se generan aparte, fuera de este change
 - [x] 8.5 Sincronizar `openspec/specs/` y actualizar `CLAUDE.md` (sección de arquitectura y de comportamientos con spec)
