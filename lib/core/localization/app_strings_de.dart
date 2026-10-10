@@ -157,7 +157,7 @@ class AppStringsDe extends AppStrings {
       const ['M', 'D', 'M', 'D', 'F', 'S', 'S'];
 
   @override
-  String get noteInlineHint => 'Zum Hinzufügen einer Notiz tippen';
+  String get noteButtonLabel => 'Notiz';
 
   @override
   String get noteSheetTitle => 'Tagesnotiz';

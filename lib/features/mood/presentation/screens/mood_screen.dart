@@ -266,33 +266,46 @@ class _MoodScreenState extends State<MoodScreen>
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        SizedBox(
-                          width: double.infinity,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                _formatDate(context, _selectedDate),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleLarge
-                                    ?.copyWith(fontWeight: FontWeight.bold),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    _formatDate(context, _selectedDate),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleLarge
+                                        ?.copyWith(fontWeight: FontWeight.bold),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    strings.moodQuestion,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleLarge
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                          color: const Color(0xFF5F3DC4),
+                                        ),
+                                  ),
+                                ],
                               ),
-                              const SizedBox(height: 4),
-                              Text(
-                                strings.moodQuestion,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleLarge
-                                    ?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: const Color(0xFF5F3DC4),
-                                    ),
+                            ),
+                            const SizedBox(width: 12),
+                            AnimatedBuilder(
+                              animation: _noteController,
+                              builder: (context, _) => _NoteButton(
+                                label: strings.noteButtonLabel,
+                                hasNote: _noteController.text.isNotEmpty,
+                                onTap: _openNoteEditor,
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                         Column(
                           children: [
@@ -412,54 +425,6 @@ class _MoodScreenState extends State<MoodScreen>
                         ),
                         Column(
                           children: [
-                            AnimatedBuilder(
-                              animation: _noteController,
-                              builder: (context, _) {
-                                final note = _noteController.text;
-                                return Semantics(
-                                  button: true,
-                                  label: strings.noteInlineHint,
-                                  child: GestureDetector(
-                                    onTap: _openNoteEditor,
-                                    child: InputDecorator(
-                                      decoration: InputDecoration(
-                                        filled: true,
-                                        fillColor: Colors.white,
-                                        border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(16),
-                                          borderSide: BorderSide.none,
-                                        ),
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                          horizontal: 16,
-                                          vertical: 12,
-                                        ),
-                                      ),
-                                      child: Text(
-                                        note.isEmpty
-                                            ? strings.noteInlineHint
-                                            : note,
-                                        maxLines: 3,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: note.isEmpty
-                                            ? Theme.of(context)
-                                                .textTheme
-                                                .bodyLarge
-                                                ?.copyWith(
-                                                  color: Theme.of(context)
-                                                      .hintColor,
-                                                )
-                                            : Theme.of(context)
-                                                .textTheme
-                                                .bodyLarge,
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                            const SizedBox(height: 16),
                             GradientPillButton(
                               label: strings.save,
                               semanticsLabel: strings.saveMoodButtonLabel,
@@ -490,5 +455,83 @@ class _MoodScreenState extends State<MoodScreen>
   String _formatDate(BuildContext context, DateTime date) {
     final months = AppStrings.of(context).monthNames;
     return '${months[date.month - 1]} ${date.day}, ${date.year}';
+  }
+}
+
+/// Botón de nota del encabezado: icono + etiqueta corta fija. El estado "hay
+/// nota" se comunica con el icono relleno y un punto de color fijo (no depende del mood); la
+/// etiqueta no cambia para que la píldora no cambie de ancho.
+class _NoteButton extends StatelessWidget {
+  const _NoteButton({
+    required this.label,
+    required this.hasNote,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool hasNote;
+  final VoidCallback onTap;
+
+  static const _brandColor = Color(0xFF5F3DC4);
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: label,
+      excludeSemantics: true,
+      onTap: onTap,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 44),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.85),
+            borderRadius: BorderRadius.circular(22),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Icon(
+                    hasNote
+                        ? Icons.sticky_note_2_rounded
+                        : Icons.sticky_note_2_outlined,
+                    size: 20,
+                    color: _brandColor,
+                  ),
+                  if (hasNote)
+                    Positioned(
+                      top: -2,
+                      right: -3,
+                      child: Container(
+                        width: 9,
+                        height: 9,
+                        decoration: BoxDecoration(
+                          color: _brandColor,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 1.5),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      color: _brandColor,
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

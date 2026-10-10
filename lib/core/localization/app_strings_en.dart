@@ -153,7 +153,7 @@ class AppStringsEn extends AppStrings {
       const ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
   @override
-  String get noteInlineHint => 'Tap to add a note';
+  String get noteButtonLabel => 'Note';
 
   @override
   String get noteSheetTitle => 'Daily note';
