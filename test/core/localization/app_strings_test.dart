@@ -24,6 +24,24 @@ void main() {
     });
   });
 
+  group('bottom bar tab labels', () {
+    test('every tab has a distinct non-empty label in every language', () {
+      for (final locale in AppStrings.supportedLocales) {
+        final strings = AppStrings.forLocale(locale);
+        final labels = [
+          strings.openMoodPickerTooltip,
+          strings.openCalendarTooltip,
+          strings.openStoreTooltip,
+          strings.openSettingsTooltip,
+        ];
+        expect(strings.calendarTitle, isNotEmpty, reason: locale.languageCode);
+        expect(labels, everyElement(isNotEmpty), reason: locale.languageCode);
+        expect(labels.toSet(), hasLength(labels.length),
+            reason: locale.languageCode);
+      }
+    });
+  });
+
   group('AppStrings.moodName', () {
     test('every mood has a non-empty name in every supported language', () {
       for (final locale in AppStrings.supportedLocales) {
@@ -40,15 +58,15 @@ void main() {
     });
 
     test('returns the localized name', () {
-      expect(AppStrings.forLocale(const Locale('es')).moodName('happy'),
-          'Feliz');
-      expect(AppStrings.forLocale(const Locale('de')).moodName('brave'),
-          'Mutig');
+      expect(
+          AppStrings.forLocale(const Locale('es')).moodName('happy'), 'Feliz');
+      expect(
+          AppStrings.forLocale(const Locale('de')).moodName('brave'), 'Mutig');
     });
 
     test('falls back to English and then to the id for unknown moods', () {
-      expect(AppStrings.forLocale(const Locale('pt')).moodName('happy'),
-          'Happy');
+      expect(
+          AppStrings.forLocale(const Locale('pt')).moodName('happy'), 'Happy');
       expect(AppStrings.forLocale(const Locale('es')).moodName('unknown'),
           'unknown');
     });

@@ -58,9 +58,9 @@ class AppStringsEn extends AppStrings {
   @override
   String get openCalendarTooltip => 'Open calendar';
   @override
-  String get backToTodayTooltip => 'Back to today';
+  String get calendarTitle => 'Calendar';
   @override
-  String get backToMoodPickerTooltip => 'Back to mood selection';
+  String get openMoodPickerTooltip => 'Open mood selection';
   @override
   String get previousMonthTooltip => 'Previous month';
   @override

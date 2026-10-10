@@ -61,9 +61,9 @@ class AppStringsIt extends AppStrings {
   @override
   String get openCalendarTooltip => 'Apri calendario';
   @override
-  String get backToTodayTooltip => 'Torna a oggi';
+  String get calendarTitle => 'Calendario';
   @override
-  String get backToMoodPickerTooltip => 'Torna alla selezione dell\'umore';
+  String get openMoodPickerTooltip => 'Apri la selezione dell\'umore';
   @override
   String get previousMonthTooltip => 'Mese precedente';
   @override

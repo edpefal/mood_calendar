@@ -20,6 +20,7 @@ class MoodStoreScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         iconTheme: const IconThemeData(color: Color(0xFF5F3DC4)),
         title: Text(
           strings.storeTitle,
@@ -51,7 +52,12 @@ class MoodStoreScreen extends StatelessWidget {
           return RefreshIndicator(
             onRefresh: () => context.read<PurchasesCubit>().loadCatalog(),
             child: ListView(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+              padding: EdgeInsets.fromLTRB(
+                16,
+                16,
+                16,
+                32 + MediaQuery.paddingOf(context).bottom,
+              ),
               children: [
                 Text(
                   strings.storeMoodsSectionTitle,

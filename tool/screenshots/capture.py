@@ -7,6 +7,8 @@ and have an idb companion connected to that simulator (see CLAUDE.md).
 usage: python3 tool/screenshots/capture.py <udid> <device: iphone|ipad> <locale: en|es|de|fr|it>
 Writes build/screenshots/shots/<device>/<locale>/<picker|note|calendar|reminders>.png
 Buttons are found by position (not label) so it works in every language.
+The four tabs of the bottom bar are the bottom-most row of buttons:
+[mood picker, calendar, store, settings].
 """
 import json
 import os
@@ -32,15 +34,22 @@ def launch():
     sh('xcrun', 'simctl', 'launch', UDID, BUNDLE,
        '-AppleLanguages', f'({LOCALE})', '-AppleLocale', APPLE_LOCALE)
     time.sleep(5)
-    for _ in range(20):  # wait until the home header is on screen
-        if len([b for b in buttons() if b[1] < 160]) >= 2:
+    for _ in range(20):  # wait until the bottom bar is on screen
+        if len(tab_buttons()) >= 4:
             break
         time.sleep(1)
     time.sleep(1.5)
 
 
 def elements():
-    return json.loads(sh('idb', 'ui', 'describe-all', '--udid', UDID))
+    # describe-all returns nothing while the app is (re)launching.
+    for _ in range(10):
+        out = sh('idb', 'ui', 'describe-all', '--udid', UDID)
+        try:
+            return json.loads(out)
+        except json.JSONDecodeError:
+            time.sleep(1)
+    raise RuntimeError('idb ui describe-all returned no data')
 
 
 def buttons():
@@ -66,36 +75,42 @@ def shot(name):
     print('captured', DEVICE, LOCALE, name)
 
 
-def header_buttons():
-    """Home screen header buttons, left to right: [store, calendar, settings]."""
-    bs = sorted((b for b in buttons() if b[1] < 160), key=lambda b: b[0])
-    return bs
+def rows(bs):
+    """Group buttons into rows (same y within 8 pt), top to bottom."""
+    groups = []
+    for b in sorted(bs, key=lambda b: b[1]):
+        if groups and b[1] - groups[-1][0][1] <= 8:
+            groups[-1].append(b)
+        else:
+            groups.append([b])
+    return groups
+
+
+def tab_buttons():
+    """Bottom bar tabs, left to right: [mood picker, calendar, store, settings]."""
+    groups = [g for g in rows(buttons()) if len(g) == 4]
+    return sorted(groups[-1], key=lambda b: b[0]) if groups else []
 
 
 def calendar_row_buttons():
     """Calendar card header, left to right: [previous, next].
 
-    Found as the topmost group of 2+ buttons sharing the same y ("back to
-    today" is alone above it; the current month has no "next" button, so only
-    past months have this group). Works on any screen size.
+    It is the topmost row of buttons once the bottom bar row is excluded (the
+    day cells sit below it). The current month has no enabled "next", so the
+    caller only needs the leftmost one.
     """
-    for _ in range(6):  # the route transition may still be running
-        groups = []
-        for b in sorted(buttons(), key=lambda b: b[1]):
-            if groups and b[1] - groups[-1][0][1] <= 8:
-                groups[-1].append(b)
-            else:
-                groups.append([b])
-        for group in groups:
-            if len(group) >= 2:
-                return sorted(group, key=lambda b: b[0])
+    for _ in range(6):  # the tab switch may still be animating
+        tabs = {tuple(b) for b in tab_buttons()}
+        rest = [b for b in buttons() if tuple(b) not in tabs]
+        groups = rows(rest)
+        if groups:
+            return sorted(groups[0], key=lambda b: b[0])
         time.sleep(1)
     raise RuntimeError('calendar header buttons not found')
 
 
 def open_calendar_previous_month():
-    hb = header_buttons()
-    tap_button(hb[-2])  # calendar is the middle header button, settings the last
+    tap_button(tab_buttons()[1])  # calendar tab
     row = calendar_row_buttons()
     tap_button(row[0])  # previous month
 
@@ -116,7 +131,9 @@ shot('picker')
 
 # 2) note editor
 launch()
-note_btn = sorted((b for b in buttons() if b[1] > 600), key=lambda b: b[1])[0]
+tabs = {tuple(b) for b in tab_buttons()}
+note_btn = sorted((b for b in buttons() if b[1] > 600 and tuple(b) not in tabs),
+                  key=lambda b: b[1])[0]
 tap_button(note_btn)
 time.sleep(1.5)
 shot('note')
@@ -129,6 +146,6 @@ shot('calendar')
 
 # 4) settings screen (reminders)
 launch()
-tap_button(header_buttons()[-1])  # settings is the rightmost header button
+tap_button(tab_buttons()[3])  # settings tab
 time.sleep(1.5)
 shot('reminders')

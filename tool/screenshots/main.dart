@@ -14,6 +14,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:mood_calendar/core/localization/app_strings.dart';
+import 'package:mood_calendar/core/logging/app_logger.dart';
 import 'package:mood_calendar/core/logging/logger_app_logger.dart';
 import 'package:mood_calendar/core/notifications/local_notification_service.dart';
 import 'package:mood_calendar/core/rating/review_requester.dart';
@@ -27,13 +28,15 @@ import 'package:mood_calendar/features/mood/data/models/mood_model.dart';
 import 'package:mood_calendar/features/mood/data/repositories/mood_repository_impl.dart';
 import 'package:mood_calendar/features/mood/data/services/rating_prompt_service.dart';
 import 'package:mood_calendar/features/mood/domain/entities/mood_definition.dart';
+import 'package:mood_calendar/features/mood/data/services/json_mood_history_exporter.dart';
+import 'package:mood_calendar/features/mood/domain/usecases/export_mood_history_usecase.dart';
 import 'package:mood_calendar/features/mood/domain/usecases/get_moods_for_month_usecase.dart';
 import 'package:mood_calendar/features/mood/domain/usecases/get_monthly_mood_summary_usecase.dart';
 import 'package:mood_calendar/features/mood/domain/usecases/get_moods_usecase.dart';
 import 'package:mood_calendar/features/mood/domain/usecases/save_mood_usecase.dart';
 import 'package:mood_calendar/features/mood/presentation/bloc/calendar_cubit.dart';
 import 'package:mood_calendar/features/mood/presentation/bloc/mood_cubit.dart';
-import 'package:mood_calendar/features/mood/presentation/screens/mood_screen.dart';
+import 'package:mood_calendar/core/navigation/main_shell.dart';
 import 'package:mood_calendar/features/purchases/data/datasources/revenue_cat_datasource.dart';
 import 'package:mood_calendar/features/purchases/data/repositories/mood_entitlements_repository_impl.dart';
 import 'package:mood_calendar/features/purchases/domain/entities/mood_offer.dart';
@@ -174,6 +177,14 @@ Future<void> main() async {
     telemetry: telemetry,
   );
 
+  final exportMoodHistory = ExportMoodHistoryUseCase(
+    JsonMoodHistoryExporter(
+      repository: repository,
+      logger: appLogger,
+      telemetry: telemetry,
+    ),
+  );
+
   const revenueCatApiKey = String.fromEnvironment('REVENUECAT_IOS_API_KEY');
   final MoodEntitlementsRepository entitlements;
   if (revenueCatApiKey.isNotEmpty) {
@@ -186,6 +197,10 @@ Future<void> main() async {
   runApp(
     MultiRepositoryProvider(
       providers: [
+        RepositoryProvider<AppLogger>.value(value: appLogger),
+        RepositoryProvider<ExportMoodHistoryUseCase>.value(
+          value: exportMoodHistory,
+        ),
         RepositoryProvider<AppSettingsRepository>.value(
           value: appSettingsRepository,
         ),
@@ -244,7 +259,7 @@ class _ScreenshotApp extends StatelessWidget {
         textTheme: poppinsTextTheme,
         primaryTextTheme: poppinsTextTheme,
       ),
-      home: const MoodScreen(),
+      home: const MainShell(),
       debugShowCheckedModeBanner: false,
     );
   }
