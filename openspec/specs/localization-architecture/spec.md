@@ -27,19 +27,19 @@ La app SHALL usar el locale del dispositivo para determinar el idioma de la UI. 
 - **THEN** la app muestra los textos en inglés (primer locale en supportedLocales)
 
 ### Requirement: Placeholder del campo de nota localizado
-El preview inline de solo lectura y el campo de edición dentro del bottom sheet SHALL mostrar cada uno su propio placeholder localizado cuando la nota está vacía. Ambos placeholders SHALL mostrarse en el idioma activo del dispositivo. Ninguno SHALL estar hardcodeado en un solo idioma.
+La etiqueta del botón de nota del encabezado y el placeholder del campo de edición dentro del bottom sheet SHALL mostrarse cada uno en el idioma activo del dispositivo. Ninguno SHALL estar hardcodeado en un solo idioma.
 
-#### Scenario: Preview inline vacío en español
-- **WHEN** el dispositivo está en español y la nota está vacía
-- **THEN** el preview inline muestra el placeholder que invita a tocar para agregar una nota, en español
+#### Scenario: Botón de nota en español
+- **WHEN** el dispositivo está en español
+- **THEN** el botón de nota muestra su etiqueta en español
 
 #### Scenario: Campo del sheet vacío en español
 - **WHEN** el dispositivo está en español, el usuario abre el bottom sheet y la nota está vacía
 - **THEN** el campo de texto del sheet muestra el placeholder que invita a escribir sobre el día, en español
 
-#### Scenario: Placeholders en idioma no soportado
+#### Scenario: Textos de la nota en idioma no soportado
 - **WHEN** el dispositivo está en un idioma no soportado
-- **THEN** tanto el placeholder del preview inline como el del campo del sheet se muestran en inglés
+- **THEN** tanto la etiqueta del botón de nota como el placeholder del campo del sheet se muestran en inglés
 
 ### Requirement: Notificaciones y título de la app localizados
 Las notificaciones locales (título y cuerpo del recordatorio diario, nombre y descripción del canal de notificaciones) y el título de la app que expone el sistema operativo SHALL mostrarse en el idioma del dispositivo. Ninguno SHALL estar fijo en un solo idioma. Para idiomas no soportados SHALL usarse inglés. Un recordatorio ya programado SHALL actualizar su idioma la próxima vez que la app se abra y reprograme el recordatorio.
