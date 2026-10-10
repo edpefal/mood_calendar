@@ -5,7 +5,6 @@
 Define cuándo y cómo la app le pide al usuario que califique Mood Calendar en el App Store: un pedido automático en momentos de éxito, con límites estrictos para no molestar, y una entrada manual siempre disponible.
 
 ## Requirements
-
 ### Requirement: Pedido automático de calificación por hitos de entradas
 La app SHALL solicitar el diálogo nativo de calificación del sistema tras un guardado exitoso de una Mood Entry, en función de la cantidad total de días con una Mood Entry guardada:
 - Primer intento: cuando el total sea 3 o más y no exista ningún intento previo.
@@ -38,7 +37,7 @@ La app NO SHALL hacer más de 2 intentos automáticos en toda la vida de la inst
 - **THEN** la app no solicita el diálogo de calificación
 
 ### Requirement: El pedido nunca interrumpe ni sigue a una falla
-La app NO SHALL solicitar el diálogo de calificación si el guardado de la Mood Entry falló, ni mientras el editor de nota esté abierto. Cuando corresponda solicitarlo, la app SHALL hacerlo una vez que el usuario haya vuelto a la vista del calendario tras guardar.
+La app NO SHALL solicitar el diálogo de calificación si el guardado de la Mood Entry falló, ni mientras el editor de nota esté abierto. Cuando corresponda solicitarlo, la app SHALL hacerlo una vez que el usuario haya llegado a la pestaña del calendario tras guardar.
 
 #### Scenario: Falla el guardado
 - **WHEN** el guardado de la Mood Entry falla aunque el total de entradas alcance un hito
@@ -49,7 +48,7 @@ La app NO SHALL solicitar el diálogo de calificación si el guardado de la Mood
 - **THEN** la app no solicita el diálogo de calificación
 
 #### Scenario: Guardado exitoso que cumple el hito
-- **WHEN** el usuario guarda con éxito una Mood Entry que cumple las condiciones de un intento y la app vuelve a mostrar el calendario
+- **WHEN** el usuario guarda con éxito una Mood Entry que cumple las condiciones de un intento y la app cambia a la pestaña del calendario
 - **THEN** el diálogo de calificación se solicita en el calendario, no sobre otra pantalla ni sobre el editor de nota
 
 ### Requirement: El estado de los intentos persiste entre sesiones

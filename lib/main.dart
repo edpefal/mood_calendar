@@ -10,7 +10,7 @@ import 'package:path_provider/path_provider.dart';
 import 'core/localization/app_strings.dart';
 import 'core/logging/app_logger.dart';
 import 'core/logging/logger_app_logger.dart';
-import 'core/navigation/app_navigator.dart';
+import 'core/navigation/main_shell.dart';
 import 'core/notifications/local_notification_service.dart';
 import 'core/rating/review_requester.dart';
 import 'core/settings/data/datasources/app_settings_local_datasource.dart';
@@ -30,7 +30,6 @@ import 'features/mood/domain/usecases/get_moods_usecase.dart';
 import 'features/mood/domain/usecases/save_mood_usecase.dart';
 import 'features/mood/presentation/bloc/calendar_cubit.dart';
 import 'features/mood/presentation/bloc/mood_cubit.dart';
-import 'features/mood/presentation/screens/mood_screen.dart';
 import 'features/purchases/data/datasources/revenue_cat_datasource.dart';
 import 'features/purchases/data/repositories/mood_entitlements_repository_impl.dart';
 import 'features/purchases/data/repositories/noop_mood_entitlements_repository.dart';
@@ -38,9 +37,12 @@ import 'features/purchases/domain/repositories/mood_entitlements_repository.dart
 import 'features/purchases/presentation/bloc/purchases_cubit.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
+final mainShellKey = GlobalKey<MainShellState>();
 bool _isHandlingReminderTap = false;
 
-Future<void> _handleReminderTap() {
+/// Abre el selector de moods de hoy cuando el usuario toca el recordatorio.
+@visibleForTesting
+Future<void> handleReminderTap() {
   if (_isHandlingReminderTap) {
     return Future.value();
   }
@@ -51,14 +53,15 @@ Future<void> _handleReminderTap() {
 
   void navigate() {
     final navigator = navigatorKey.currentState;
-    if (navigator == null) {
+    final shell = mainShellKey.currentState;
+    if (navigator == null || shell == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) => navigate());
       return;
     }
-    AppNavigator.openMoodFromReminder(
-      navigator,
-      selectedDate: targetDate,
-    );
+    // Cierra los modales abiertos (editor de nota, hojas de compra) antes de
+    // mostrar el selector de la fecha del recordatorio.
+    navigator.popUntil((route) => route.isFirst);
+    shell.showMoodPicker(targetDate);
     _isHandlingReminderTap = false;
     if (!completer.isCompleted) {
       completer.complete();
@@ -93,7 +96,7 @@ void main() async {
     AppSettingsLocalDataSource(settingsBox),
   );
   final notificationService = LocalNotificationService(
-    onReminderTap: _handleReminderTap,
+    onReminderTap: handleReminderTap,
     appSettingsRepository: appSettingsRepository,
     telemetry: telemetry,
   );
@@ -185,7 +188,7 @@ void main() async {
       await notificationService.scheduleDailyReminder();
       if (launchedFromReminder) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          unawaited(_handleReminderTap());
+          unawaited(handleReminderTap());
         });
       }
     }),
@@ -217,7 +220,7 @@ class MyApp extends StatelessWidget {
         primaryTextTheme: poppinsTextTheme,
         colorScheme: baseTheme.colorScheme,
       ),
-      home: const MoodScreen(),
+      home: MainShell(key: mainShellKey),
       debugShowCheckedModeBanner: false,
     );
   }

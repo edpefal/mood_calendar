@@ -72,8 +72,8 @@ abstract class AppStrings {
   String streakText(int days);
   String summaryTitle(String monthName);
   String get openCalendarTooltip;
-  String get backToTodayTooltip;
-  String get backToMoodPickerTooltip;
+  String get calendarTitle;
+  String get openMoodPickerTooltip;
   String get previousMonthTooltip;
   String get nextMonthTooltip;
   String get reminderSheetTitle;

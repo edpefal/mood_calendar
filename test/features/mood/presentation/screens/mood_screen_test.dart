@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:mood_calendar/core/localization/app_strings.dart';
 import 'package:mood_calendar/core/logging/app_logger.dart';
+import 'package:mood_calendar/core/navigation/main_shell.dart';
 import 'package:mood_calendar/core/notifications/local_notification_service.dart';
 import 'package:mood_calendar/core/settings/domain/entities/app_settings.dart';
 import 'package:mood_calendar/core/settings/domain/repositories/app_settings_repository.dart';
@@ -165,7 +166,7 @@ void main() {
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-          home: MoodScreen(),
+          home: MainShell(),
         ),
       ),
     );
@@ -518,8 +519,8 @@ void main() {
             ),
           ),
           BlocProvider(
-            create: (_) =>
-                PurchasesCubit(entitlements ?? FakeMoodEntitlementsRepository()),
+            create: (_) => PurchasesCubit(
+                entitlements ?? FakeMoodEntitlementsRepository()),
           ),
           RepositoryProvider<RatingPromptService>.value(
             value: ratingPromptService,
@@ -636,7 +637,7 @@ void main() {
     });
   });
 
-  group('returning from the calendar', () {
+  group('bottom navigation', () {
     final strings = AppStrings.forLocale(const Locale('es'));
     final now = DateTime.now();
     final previousMonth = DateTime(now.year, now.month - 1);
@@ -644,47 +645,67 @@ void main() {
     String headerFor(DateTime date) =>
         '${strings.monthNames[date.month - 1]} ${date.day}, ${date.year}';
 
-    Widget buildAppWithHome(Widget home) {
-      return MultiBlocProvider(
+    Widget buildApp({
+      MoodRepository? repository,
+      GlobalKey<MainShellState>? shellKey,
+    }) {
+      final moods = repository ?? moodRepository;
+      final settingsRepository = _FakeSettingsRepository();
+      return MultiRepositoryProvider(
         providers: [
-          BlocProvider(
-            create: (_) => MoodCubit(
-              saveMood: SaveMoodUseCase(moodRepository),
-              getMoods: GetMoodsUseCase(moodRepository),
-              logger: const _TestAppLogger(),
+          RepositoryProvider<AppLogger>.value(value: const _TestAppLogger()),
+          RepositoryProvider<AppSettingsRepository>.value(
+            value: settingsRepository,
+          ),
+          RepositoryProvider<LocalNotificationService>.value(
+            value: LocalNotificationService(
+              onReminderTap: () async {},
+              appSettingsRepository: settingsRepository,
               telemetry: const _TestAppTelemetry(),
             ),
-          ),
-          BlocProvider(
-            create: (_) => CalendarCubit(
-              initialMonth: DateTime(now.year, now.month),
-              getMonthlyMoodSummary: GetMonthlyMoodSummaryUseCase(
-                GetMoodsForMonthUseCase(moodRepository),
-              ),
-            ),
-          ),
-          BlocProvider(
-            create: (_) => PurchasesCubit(FakeMoodEntitlementsRepository()),
           ),
           RepositoryProvider<RatingPromptService>.value(
             value: ratingPromptService,
           ),
         ],
-        child: MaterialApp(
-          locale: const Locale('es'),
-          supportedLocales: AppStrings.supportedLocales,
-          localizationsDelegates: const [
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
+        child: MultiBlocProvider(
+          providers: [
+            BlocProvider(
+              create: (_) => MoodCubit(
+                saveMood: SaveMoodUseCase(moods),
+                getMoods: GetMoodsUseCase(moods),
+                logger: const _TestAppLogger(),
+                telemetry: const _TestAppTelemetry(),
+              ),
+            ),
+            BlocProvider(
+              create: (_) => CalendarCubit(
+                initialMonth: DateTime(now.year, now.month),
+                getMonthlyMoodSummary: GetMonthlyMoodSummaryUseCase(
+                  GetMoodsForMonthUseCase(moods),
+                ),
+              ),
+            ),
+            BlocProvider(
+              create: (_) => PurchasesCubit(FakeMoodEntitlementsRepository()),
+            ),
           ],
-          home: home,
+          child: MaterialApp(
+            locale: const Locale('es'),
+            supportedLocales: AppStrings.supportedLocales,
+            localizationsDelegates: const [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            home: MainShell(key: shellKey),
+          ),
         ),
       );
     }
 
-    Future<void> openCalendar(WidgetTester tester) async {
-      await tester.tap(find.byTooltip(strings.openCalendarTooltip));
+    Future<void> openTab(WidgetTester tester, String tooltip) async {
+      await tester.tap(find.byTooltip(tooltip));
       await tester.pumpAndSettle();
     }
 
@@ -693,102 +714,201 @@ void main() {
       await tester.pumpAndSettle();
     }
 
-    Future<void> saveDay(WidgetTester tester, int day, {int swipes = 0}) async {
-      await tester.tap(find.text('$day'));
-      await tester.pumpAndSettle();
-      for (var i = 0; i < swipes; i++) {
-        await tester.drag(find.byType(PageView), const Offset(-400, 0));
-        await tester.pumpAndSettle();
-      }
-      await tester.tap(find.text(strings.save));
-      await tester.pumpAndSettle();
-    }
-
-    testWidgets('after editing another date, back opens that date',
+    testWidgets('shows the four tabs in order and starts on today',
         (tester) async {
-      await tester.pumpWidget(buildAppWithHome(const MoodScreen()));
-      await tester.pumpAndSettle();
-      await openCalendar(tester);
-      await goToPreviousMonth(tester);
-
-      // 4 swipes -> angry, so the entry is distinguishable from the default.
-      await saveDay(tester, 15, swipes: 4);
-
-      await tester.tap(find.byTooltip(strings.backToMoodPickerTooltip));
+      await tester.pumpWidget(buildApp());
       await tester.pumpAndSettle();
 
-      expect(find.text(headerFor(DateTime(previousMonth.year, previousMonth.month, 15))),
-          findsOneWidget);
-      expect(find.text('Enojado'), findsOneWidget);
-    });
+      final picker =
+          tester.getCenter(find.byTooltip(strings.openMoodPickerTooltip));
+      final calendar =
+          tester.getCenter(find.byTooltip(strings.openCalendarTooltip));
+      final store = tester.getCenter(find.byTooltip(strings.openStoreTooltip));
+      final settings =
+          tester.getCenter(find.byTooltip(strings.openSettingsTooltip));
 
-    testWidgets('without opening any day, back opens today', (tester) async {
-      await tester.pumpWidget(buildAppWithHome(const MoodScreen()));
-      await tester.pumpAndSettle();
-      await openCalendar(tester);
-
-      expect(find.byTooltip(strings.backToTodayTooltip), findsOneWidget);
-      expect(find.byTooltip(strings.backToMoodPickerTooltip), findsNothing);
-
-      await tester.tap(find.byTooltip(strings.backToTodayTooltip));
-      await tester.pumpAndSettle();
-
+      expect(picker.dx, lessThan(calendar.dx));
+      expect(calendar.dx, lessThan(store.dx));
+      expect(store.dx, lessThan(settings.dx));
       expect(find.text(headerFor(now)), findsOneWidget);
     });
 
-    testWidgets('after editing several dates, back opens the last one',
+    testWidgets('the picker header no longer has navigation buttons',
         (tester) async {
-      await tester.pumpWidget(buildAppWithHome(const MoodScreen()));
-      await tester.pumpAndSettle();
-      await openCalendar(tester);
-      await goToPreviousMonth(tester);
-
-      await saveDay(tester, 15);
-      await saveDay(tester, 16);
-
-      await tester.tap(find.byTooltip(strings.backToMoodPickerTooltip));
+      await tester.pumpWidget(buildApp());
       await tester.pumpAndSettle();
 
-      expect(find.text(headerFor(DateTime(previousMonth.year, previousMonth.month, 16))),
-          findsOneWidget);
+      // Each destination is reachable only through the bar.
+      expect(find.byTooltip(strings.openCalendarTooltip), findsOneWidget);
+      expect(find.byTooltip(strings.openStoreTooltip), findsOneWidget);
+      expect(find.byTooltip(strings.openSettingsTooltip), findsOneWidget);
     });
 
-    testWidgets('calendar opened from another date returns to that date',
+    testWidgets('the settings tab has no back button', (tester) async {
+      await tester.pumpWidget(buildApp());
+      await tester.pumpAndSettle();
+
+      await openTab(tester, strings.openSettingsTooltip);
+
+      expect(find.byType(SettingsScreen), findsOneWidget);
+      expect(find.text(strings.settingsTitle), findsOneWidget);
+      expect(find.byType(BackButton), findsNothing);
+      expect(find.byIcon(Icons.arrow_back), findsNothing);
+    });
+
+    testWidgets(
+        'the calendar tab has a title, no back button or reminders bell',
         (tester) async {
-      final reminderDate = DateTime(previousMonth.year, previousMonth.month, 10);
-      await tester.pumpWidget(
-        buildAppWithHome(MoodScreen(selectedDate: reminderDate)),
+      await tester.pumpWidget(buildApp());
+      await tester.pumpAndSettle();
+
+      await openTab(tester, strings.openCalendarTooltip);
+
+      expect(find.text(strings.calendarTitle), findsOneWidget);
+      expect(find.byTooltip(strings.previousMonthTooltip), findsOneWidget);
+      expect(find.byIcon(Icons.arrow_back), findsNothing);
+      expect(find.byIcon(Icons.notifications_active_outlined), findsNothing);
+    });
+
+    testWidgets('tapping a calendar day opens the picker on that date',
+        (tester) async {
+      await tester.pumpWidget(buildApp());
+      await tester.pumpAndSettle();
+      await openTab(tester, strings.openCalendarTooltip);
+      await goToPreviousMonth(tester);
+
+      await tester.tap(find.text('15'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text(
+          headerFor(DateTime(previousMonth.year, previousMonth.month, 15)),
+        ),
+        findsOneWidget,
       );
-      await tester.pumpAndSettle();
-      await openCalendar(tester);
-
-      expect(find.byTooltip(strings.backToMoodPickerTooltip), findsOneWidget);
-
-      await tester.tap(find.byTooltip(strings.backToMoodPickerTooltip));
-      await tester.pumpAndSettle();
-
-      expect(find.text(headerFor(reminderDate)), findsOneWidget);
     });
 
-    testWidgets('saving today and going back keeps opening today',
+    testWidgets('the picker keeps its date when switching tabs',
         (tester) async {
-      await tester.pumpWidget(buildAppWithHome(const MoodScreen()));
+      await tester.pumpWidget(buildApp());
       await tester.pumpAndSettle();
+      await openTab(tester, strings.openCalendarTooltip);
+      await goToPreviousMonth(tester);
+      await tester.tap(find.text('15'));
+      await tester.pumpAndSettle();
+
+      await openTab(tester, strings.openSettingsTooltip);
+      await openTab(tester, strings.openMoodPickerTooltip);
+
+      expect(
+        find.text(
+          headerFor(DateTime(previousMonth.year, previousMonth.month, 15)),
+        ),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('the picker keeps an unsaved mood when switching tabs',
+        (tester) async {
+      await tester.pumpWidget(buildApp());
+      await tester.pumpAndSettle();
+      await tester.drag(find.byType(PageView), const Offset(-400, 0));
+      await tester.pumpAndSettle();
+      expect(find.text('Tranquilo'), findsOneWidget);
+
+      await openTab(tester, strings.openStoreTooltip);
+      await openTab(tester, strings.openMoodPickerTooltip);
+
+      expect(find.text('Tranquilo'), findsOneWidget);
+    });
+
+    testWidgets('saving switches to the calendar tab', (tester) async {
+      await tester.pumpWidget(buildApp());
+      await tester.pumpAndSettle();
+
       await tester.tap(find.text(strings.save));
       await tester.pumpAndSettle();
 
-      expect(find.byTooltip(strings.backToTodayTooltip), findsOneWidget);
-      await tester.tap(find.byTooltip(strings.backToTodayTooltip));
+      expect(moodRepository.savedEntries, hasLength(1));
+      expect(find.byTooltip(strings.previousMonthTooltip), findsOneWidget);
+      expect(find.text(strings.save), findsNothing);
+      expect(ratingPromptService.maybeRequestCalls, 1);
+    });
+
+    testWidgets('a failed save stays on the picker', (tester) async {
+      await tester.pumpWidget(buildApp(repository: _FailingSaveRepository()));
       await tester.pumpAndSettle();
 
-      expect(find.text(headerFor(now)), findsOneWidget);
+      await tester.tap(find.text(strings.save));
+      await tester.pumpAndSettle();
+
+      expect(find.text(strings.save), findsOneWidget);
+      expect(find.byTooltip(strings.previousMonthTooltip), findsNothing);
+      expect(ratingPromptService.maybeRequestCalls, 0);
+    });
+
+    testWidgets('showMoodPicker from another tab shows the given date',
+        (tester) async {
+      final shellKey = GlobalKey<MainShellState>();
+      await tester.pumpWidget(buildApp(shellKey: shellKey));
+      await tester.pumpAndSettle();
+      await openTab(tester, strings.openSettingsTooltip);
+
+      final date = DateTime(previousMonth.year, previousMonth.month, 10);
+      shellKey.currentState!.showMoodPicker(date);
+      await tester.pumpAndSettle();
+
+      expect(shellKey.currentState!.currentTab, MainTab.moodPicker);
+      expect(find.text(headerFor(date)), findsOneWidget);
+    });
+
+    testWidgets('the picker does not overflow when the keyboard is open',
+        (tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.view.resetViewInsets);
+
+      await tester.pumpWidget(buildApp());
+      await tester.pumpAndSettle();
+
+      // The note editor opens a sheet over the picker with the keyboard up.
+      tester.view.viewInsets = const FakeViewPadding(bottom: 350);
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('a modal sheet covers the bar', (tester) async {
+      await tester.pumpWidget(buildApp());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text(strings.noteInlineHint));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byTooltip(strings.openCalendarTooltip).hitTestable(),
+        findsNothing,
+      );
+
+      // Tapping the barrier closes the sheet and the bar is reachable again.
+      await tester.tapAt(const Offset(10, 10));
+      await tester.pumpAndSettle();
+      expect(
+        find.byTooltip(strings.openCalendarTooltip).hitTestable(),
+        findsOneWidget,
+      );
     });
   });
 
-  group('settings entry point', () {
-    final strings = AppStrings.forLocale(const Locale('es'));
+  group('reminder tap', () {
+    final strings = AppStrings.forLocale(const Locale('en'));
+    final now = DateTime.now();
+    String headerFor(DateTime date) =>
+        '${strings.monthNames[date.month - 1]} ${date.day}, ${date.year}';
 
-    Widget buildApp() {
+    Widget buildMyApp() {
       final settingsRepository = _FakeSettingsRepository();
       return MultiRepositoryProvider(
         providers: [
@@ -819,7 +939,7 @@ void main() {
             ),
             BlocProvider(
               create: (_) => CalendarCubit(
-                initialMonth: DateTime.now(),
+                initialMonth: DateTime(now.year, now.month),
                 getMonthlyMoodSummary: GetMonthlyMoodSummaryUseCase(
                   GetMoodsForMonthUseCase(moodRepository),
                 ),
@@ -829,63 +949,65 @@ void main() {
               create: (_) => PurchasesCubit(FakeMoodEntitlementsRepository()),
             ),
           ],
-          child: const MaterialApp(
-            locale: Locale('es'),
-            supportedLocales: AppStrings.supportedLocales,
-            localizationsDelegates: [
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
-            home: MoodScreen(),
-          ),
+          child: const MyApp(),
         ),
       );
     }
 
-    testWidgets('header shows store, calendar and settings in that order',
+    testWidgets('from another tab it opens the picker on today',
         (tester) async {
-      await tester.pumpWidget(buildApp());
+      tester.platformDispatcher.localesTestValue = const [Locale('en')];
+      addTearDown(tester.platformDispatcher.clearLocalesTestValue);
+      await tester.pumpWidget(buildMyApp());
       await tester.pumpAndSettle();
-
-      final store = tester.getCenter(find.byTooltip(strings.openStoreTooltip));
-      final calendar =
-          tester.getCenter(find.byTooltip(strings.openCalendarTooltip));
-      final settings =
-          tester.getCenter(find.byTooltip(strings.openSettingsTooltip));
-
-      expect(store.dx, lessThan(calendar.dx));
-      expect(calendar.dx, lessThan(settings.dx));
-    });
-
-    testWidgets('the gear opens the settings screen and back returns',
-        (tester) async {
-      await tester.pumpWidget(buildApp());
-      await tester.pumpAndSettle();
-
       await tester.tap(find.byTooltip(strings.openSettingsTooltip));
       await tester.pumpAndSettle();
-
       expect(find.byType(SettingsScreen), findsOneWidget);
-      expect(find.text(strings.settingsTitle), findsOneWidget);
 
-      Navigator.of(tester.element(find.byType(SettingsScreen))).pop();
+      await handleReminderTap();
       await tester.pumpAndSettle();
 
-      expect(find.byType(SettingsScreen), findsNothing);
-      expect(find.byType(MoodScreen), findsOneWidget);
+      expect(mainShellKey.currentState!.currentTab, MainTab.moodPicker);
+      expect(find.text(headerFor(now)), findsOneWidget);
     });
 
-    testWidgets('the calendar header no longer has the reminders bell',
+    testWidgets('it closes an open modal and shows today, not the viewed date',
         (tester) async {
-      await tester.pumpWidget(buildApp());
+      tester.platformDispatcher.localesTestValue = const [Locale('en')];
+      addTearDown(tester.platformDispatcher.clearLocalesTestValue);
+      await tester.pumpWidget(buildMyApp());
+      await tester.pumpAndSettle();
+      final past = DateTime(now.year, now.month - 1, 10);
+      mainShellKey.currentState!.showMoodPicker(past);
+      await tester.pumpAndSettle();
+      expect(find.text(headerFor(past)), findsOneWidget);
+      await tester.tap(find.text(strings.noteInlineHint));
+      await tester.pumpAndSettle();
+      expect(find.text(strings.noteSheetTitle), findsOneWidget);
+
+      await handleReminderTap();
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byTooltip(strings.openCalendarTooltip));
-      await tester.pumpAndSettle();
+      expect(find.text(strings.noteSheetTitle), findsNothing);
+      expect(find.text(headerFor(now)), findsOneWidget);
+      expect(
+        find.byTooltip(strings.openCalendarTooltip).hitTestable(),
+        findsOneWidget,
+      );
+    });
 
-      expect(find.byTooltip(strings.previousMonthTooltip), findsOneWidget);
-      expect(find.byIcon(Icons.notifications_active_outlined), findsNothing);
+    testWidgets('a tap that arrives before the shell exists is not lost',
+        (tester) async {
+      tester.platformDispatcher.localesTestValue = const [Locale('en')];
+      addTearDown(tester.platformDispatcher.clearLocalesTestValue);
+
+      final pending = handleReminderTap();
+      await tester.pumpWidget(buildMyApp());
+      await tester.pumpAndSettle();
+      await pending;
+
+      expect(mainShellKey.currentState!.currentTab, MainTab.moodPicker);
+      expect(find.text(headerFor(now)), findsOneWidget);
     });
   });
 }
@@ -896,4 +1018,11 @@ class _FakeSettingsRepository implements AppSettingsRepository {
 
   @override
   Future<void> saveSettings(AppSettings settings) async {}
+}
+
+class _FailingSaveRepository extends _FakeMoodRepository {
+  @override
+  Future<void> saveMood(MoodEntry entry) async {
+    throw Exception('save failed');
+  }
 }

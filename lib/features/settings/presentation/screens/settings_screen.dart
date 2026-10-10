@@ -52,9 +52,9 @@ class SettingsScreen extends StatelessWidget {
   final UrlOpener _openUrl;
   final FileSharer _shareFile;
 
-  /// Route that builds the [SettingsCubit] from the app-wide services.
-  static Route<void> route() {
-    return MaterialPageRoute<void>(
+  /// Builds the screen with a [SettingsCubit] wired to the app-wide services.
+  static Widget forApp() {
+    return Builder(
       builder: (context) {
         final notificationService = context.read<LocalNotificationService>();
         return BlocProvider(
@@ -101,6 +101,7 @@ class SettingsScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         iconTheme: const IconThemeData(color: _brandColor),
         title: Text(
           strings.settingsTitle,

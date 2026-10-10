@@ -3,12 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../core/localization/app_strings.dart';
-import '../../../../core/navigation/app_navigator.dart';
 import '../../../../core/widgets/gradient_pill_button.dart';
 import '../../../purchases/presentation/bloc/purchases_cubit.dart';
-import '../../../purchases/presentation/screens/mood_store_screen.dart';
 import '../../../purchases/presentation/widgets/mood_purchase_sheet.dart';
-import '../../../settings/presentation/screens/settings_screen.dart';
 import '../../domain/entities/mood_definition.dart';
 import '../../domain/entities/mood_entry.dart';
 import '../../domain/services/mood_definition_resolver.dart';
@@ -20,7 +17,10 @@ import '../widgets/note_editor_sheet.dart';
 class MoodScreen extends StatefulWidget {
   final DateTime? selectedDate;
 
-  const MoodScreen({super.key, this.selectedDate});
+  /// Se llama con la fecha guardada cuando el guardado termina con éxito.
+  final ValueChanged<DateTime>? onSaved;
+
+  const MoodScreen({super.key, this.selectedDate, this.onSaved});
 
   @override
   State<MoodScreen> createState() => _MoodScreenState();
@@ -205,11 +205,7 @@ class _MoodScreenState extends State<MoodScreen>
             if (context.mounted) {
               context.read<CalendarCubit>().refreshForDate(normalizedDate);
             }
-            AppNavigator.popOrShowCalendar(
-              context,
-              recentlySavedDate: normalizedDate,
-              viewedDate: normalizedDate,
-            );
+            widget.onSaved?.call(normalizedDate);
           },
           error: (_) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -250,6 +246,9 @@ class _MoodScreenState extends State<MoodScreen>
 
           return Scaffold(
             backgroundColor: Colors.transparent,
+            // El teclado de la nota se abre en un sheet; el selector no debe
+            // encogerse (y desbordarse) por debajo.
+            resizeToAvoidBottomInset: false,
             body: AnimatedContainer(
               duration: const Duration(milliseconds: 300),
               decoration: BoxDecoration(
@@ -267,82 +266,33 @@ class _MoodScreenState extends State<MoodScreen>
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    _formatDate(context, _selectedDate),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleLarge
-                                        ?.copyWith(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                  ),
-                                ),
-                                IconButton(
-                                  tooltip: strings.openStoreTooltip,
-                                  icon: const Icon(
-                                    Icons.storefront_outlined,
-                                    color: Color(0xFF5F3DC4),
-                                  ),
-                                  onPressed: () {
-                                    final purchasesCubit =
-                                        context.read<PurchasesCubit>();
-                                    Navigator.of(context).push(
-                                      MaterialPageRoute<void>(
-                                        builder: (_) => BlocProvider.value(
-                                          value: purchasesCubit,
-                                          child: const MoodStoreScreen(),
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                                IconButton(
-                                  tooltip: strings.openCalendarTooltip,
-                                  icon: const Icon(
-                                    Icons.calendar_today,
-                                    color: Color(0xFF5F3DC4),
-                                  ),
-                                  onPressed: () {
-                                    AppNavigator.popOrShowCalendar(
-                                      context,
-                                      viewedDate: _selectedDate,
-                                    );
-                                  },
-                                ),
-                                IconButton(
-                                  tooltip: strings.openSettingsTooltip,
-                                  icon: const Icon(
-                                    Icons.settings_outlined,
-                                    color: Color(0xFF5F3DC4),
-                                  ),
-                                  onPressed: () {
-                                    Navigator.of(context)
-                                        .push(SettingsScreen.route());
-                                  },
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              strings.moodQuestion,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleLarge
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: const Color(0xFF5F3DC4),
-                                  ),
-                            ),
-                          ],
+                        SizedBox(
+                          width: double.infinity,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                _formatDate(context, _selectedDate),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge
+                                    ?.copyWith(fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                strings.moodQuestion,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: const Color(0xFF5F3DC4),
+                                    ),
+                              ),
+                            ],
+                          ),
                         ),
                         Column(
                           children: [
@@ -395,8 +345,8 @@ class _MoodScreenState extends State<MoodScreen>
                                                         height: 150,
                                                         width: 150,
                                                         fit: BoxFit.contain,
-                                                        semanticsLabel:
-                                                            strings.moodName(mood.id),
+                                                        semanticsLabel: strings
+                                                            .moodName(mood.id),
                                                         placeholderBuilder:
                                                             (context) =>
                                                                 const CircularProgressIndicator(),
