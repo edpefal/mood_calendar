@@ -106,6 +106,10 @@ abstract class AppStrings {
   String monthlyAverageSemantics(String moodLabel);
   String bestStreakSemantics(int days);
   List<String> get monthNames;
+
+  /// Fecha completa (día, mes y año) con el orden y la capitalización del
+  /// idioma, p. ej. "October 10, 2026" o "10 de octubre de 2026".
+  String formatFullDate(DateTime date);
   List<String> get weekdayInitials;
   String get noteButtonLabel;
   String get noteSheetTitle;

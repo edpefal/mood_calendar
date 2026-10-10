@@ -57,6 +57,8 @@ Clase abstracta `AppStrings` con subclases concretas por idioma. Para añadir un
 
 Idiomas soportados: inglés (en, **fallback**), español (es), alemán (de), francés (fr), italiano (it). La UI usa el locale del dispositivo (no hay locale hardcodeado).
 
+Las fechas completas (día, mes y año) se formatean con `AppStrings.formatFullDate(date)` (orden y capitalización por idioma: "October 10, 2026", "10 de octubre de 2026", "10. Oktober 2026"…); no armarlas a mano con `monthNames`, que va capitalizado para títulos.
+
 Las notificaciones (`LocalNotificationService`) resuelven el idioma con `PlatformDispatcher.instance.locale` (inyectable vía `localeResolver`) cada vez que programan el recordatorio, y el `title` de `MaterialApp` usa `onGenerateTitle`. Un recordatorio ya programado cambia de idioma en el siguiente arranque. `AppStrings.forLocale` cae a inglés para locales no soportados.
 
 ## Estados de ánimo
