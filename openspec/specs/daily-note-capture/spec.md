@@ -2,29 +2,61 @@
 
 ## Purpose
 
-Define cómo el usuario captura la nota diaria asociada a su mood a través de un preview inline de solo lectura que abre un bottom sheet de edición expandida, con un límite de caracteres explícito.
+Define cómo el usuario captura la nota diaria asociada a su mood a través de un botón de nota en el encabezado de la pantalla principal que abre un bottom sheet de edición expandida, con un límite de caracteres explícito.
 
 ## Requirements
-### Requirement: Preview inline de solo lectura
-El campo de nota mostrado en la pantalla principal de registro de mood SHALL ser de solo lectura. El usuario NO SHALL poder escribir directamente sobre ese campo; tocarlo SHALL abrir la superficie de edición expandida (bottom sheet).
 
-#### Scenario: Tocar el preview con nota vacía
-- **WHEN** el usuario toca el preview de nota y no hay texto guardado
+### Requirement: Botón de nota en el encabezado
+La pantalla principal de registro de mood SHALL ofrecer un botón de nota en la esquina superior derecha, alineado con el encabezado de fecha y pregunta, compuesto por un icono y una etiqueta de texto corta. Tocarlo SHALL abrir la superficie de edición expandida (bottom sheet). La pantalla NO SHALL mostrar un campo de nota inline ni el texto de la nota fuera del sheet.
+
+#### Scenario: Tocar el botón con nota vacía
+- **WHEN** el usuario toca el botón de nota y no hay texto guardado
 - **THEN** se abre el bottom sheet de edición con el campo de texto vacío
 
-#### Scenario: Tocar el preview con nota existente
-- **WHEN** el usuario toca el preview de nota y ya existe texto
+#### Scenario: Tocar el botón con nota existente
+- **WHEN** el usuario toca el botón de nota y ya existe texto
 - **THEN** se abre el bottom sheet de edición mostrando el texto existente, con el cursor listo para continuar editando
 
-#### Scenario: Preview trunca texto largo
-- **WHEN** el texto de la nota excede las 3 líneas visibles en el preview
-- **THEN** el preview muestra como máximo 3 líneas y recorta el resto con elipsis, sin desbordar el layout de la pantalla
+#### Scenario: Sin campo inline
+- **WHEN** el usuario ve la pantalla principal de registro de mood
+- **THEN** no hay un campo de nota sobre el botón Guardar y el texto de la nota no se muestra fuera del sheet
+
+#### Scenario: Encabezado angosto
+- **WHEN** la fecha y la pregunta no caben junto al botón en un ancho reducido o con texto grande
+- **THEN** la fecha y la pregunta se recortan con elipsis antes de ocultar o desbordar el botón
+
+### Requirement: Indicador de nota existente
+El botón de nota SHALL indicar si hay una nota escrita para la fecha seleccionada. Sin nota, SHALL mostrar el icono en su variante de contorno. Con nota, SHALL mostrar el icono en su variante rellena y un indicador de punto de color fijo, independiente del mood seleccionado, de modo que no cambie al deslizar el carrusel. La etiqueta de texto SHALL ser la misma en ambos estados.
+
+#### Scenario: Sin nota
+- **WHEN** la nota de la fecha seleccionada está vacía
+- **THEN** el botón muestra el icono de contorno y ningún punto indicador
+
+#### Scenario: Con nota
+- **WHEN** la fecha seleccionada tiene una nota con texto
+- **THEN** el botón muestra el icono relleno y un punto indicador, del mismo color con cualquier mood seleccionado
+
+#### Scenario: Escribir y cerrar el sheet
+- **WHEN** el usuario escribe texto en el sheet y lo cierra
+- **THEN** el botón pasa al estado con nota sin necesidad de guardar el mood
+
+#### Scenario: Borrar toda la nota
+- **WHEN** el usuario borra todo el texto de la nota y cierra el sheet
+- **THEN** el botón vuelve al estado sin nota
+
+#### Scenario: Cambio de fecha con entrada existente
+- **WHEN** el usuario selecciona una fecha cuya entrada ya tiene nota
+- **THEN** el botón muestra el estado con nota desde que carga la pantalla
+
+#### Scenario: Etiqueta accesible
+- **WHEN** un lector de pantalla enfoca el botón de nota
+- **THEN** lo anuncia como botón con la etiqueta de texto localizada, tanto con nota como sin ella
 
 ### Requirement: Edición expandida en bottom sheet
-El sistema SHALL ofrecer una superficie de edición expandida (bottom sheet) para la nota diaria, distinta del preview inline. El campo de texto dentro del sheet SHALL recibir el foco automáticamente al abrirse.
+El sistema SHALL ofrecer una superficie de edición expandida (bottom sheet) para la nota diaria, abierta desde el botón de nota del encabezado. El campo de texto dentro del sheet SHALL recibir el foco automáticamente al abrirse.
 
 #### Scenario: Apertura del sheet
-- **WHEN** el usuario toca el preview de nota
+- **WHEN** el usuario toca el botón de nota
 - **THEN** se presenta un bottom sheet que ocupa la mayor parte de la pantalla, con el teclado visible de inmediato y el cursor en el campo de texto
 
 #### Scenario: Edición en vivo
@@ -36,7 +68,7 @@ El bottom sheet SHALL poder cerrarse mediante un control explícito de cierre, o
 
 #### Scenario: Cierre con control explícito
 - **WHEN** el usuario activa el control de cierre del sheet
-- **THEN** el sheet se cierra y el texto escrito permanece asociado a la nota, visible en el preview inline
+- **THEN** el sheet se cierra y el texto escrito permanece asociado a la nota, reflejado en el indicador del botón de nota
 
 #### Scenario: Cierre por gesto
 - **WHEN** el usuario desliza el sheet hacia abajo o toca fuera de él
@@ -64,7 +96,7 @@ El bottom sheet de edición de nota SHALL usar el color del mood actualmente sel
 Mientras el bottom sheet de edición de la nota esté abierto, el bottom bar SHALL quedar cubierto por el sheet y no recibir toques, y SHALL volver a estar disponible al cerrarse el sheet.
 
 #### Scenario: Abrir el editor
-- **WHEN** el usuario toca el preview de nota
+- **WHEN** el usuario toca el botón de nota
 - **THEN** el bottom sheet se abre y el bottom bar queda cubierto por el sheet
 
 #### Scenario: Cerrar el editor
