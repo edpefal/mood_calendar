@@ -7,6 +7,7 @@ and have an idb companion connected to that simulator (see CLAUDE.md).
 usage: python3 tool/screenshots/capture.py <udid> <device: iphone|ipad> <locale: en|es|de|fr|it>
 Writes build/screenshots/shots/<device>/<locale>/<picker|note|calendar|reminders>.png
 Buttons are found by position (not label) so it works in every language.
+The note editor is opened with the pill in the picker header (top-right).
 The four tabs of the bottom bar are the bottom-most row of buttons:
 [mood picker, calendar, store, settings].
 """
@@ -92,6 +93,23 @@ def tab_buttons():
     return sorted(groups[-1], key=lambda b: b[0]) if groups else []
 
 
+def note_button():
+    """Note pill in the picker header (top-right corner).
+
+    It is the topmost button of the picker once the bottom bar tabs are
+    excluded (the header sits above the carousel); on that row it is the
+    rightmost one.
+    """
+    for _ in range(6):
+        tabs = {tuple(b) for b in tab_buttons()}
+        rest = [b for b in buttons() if tuple(b) not in tabs]
+        groups = rows(rest)
+        if groups:
+            return max(groups[0], key=lambda b: b[0])
+        time.sleep(1)
+    raise RuntimeError('note button not found')
+
+
 def calendar_row_buttons():
     """Calendar card header, left to right: [previous, next].
 
@@ -131,10 +149,7 @@ shot('picker')
 
 # 2) note editor
 launch()
-tabs = {tuple(b) for b in tab_buttons()}
-note_btn = sorted((b for b in buttons() if b[1] > 600 and tuple(b) not in tabs),
-                  key=lambda b: b[1])[0]
-tap_button(note_btn)
+tap_button(note_button())
 time.sleep(1.5)
 shot('note')
 

@@ -311,7 +311,11 @@ void main() {
     expect(find.text('Cancelar'), findsOneWidget);
   });
 
-  Widget buildApp() {
+  Widget buildApp({
+    DateTime? selectedDate,
+    Locale locale = const Locale('es'),
+    double textScale = 1,
+  }) {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
@@ -334,29 +338,35 @@ void main() {
           create: (_) => PurchasesCubit(FakeMoodEntitlementsRepository()),
         ),
       ],
-      child: const MaterialApp(
-        locale: Locale('es'),
+      child: MaterialApp(
+        locale: locale,
         supportedLocales: AppStrings.supportedLocales,
-        localizationsDelegates: [
+        localizationsDelegates: const [
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
         ],
-        home: MoodScreen(),
+        builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            textScaler: TextScaler.linear(textScale),
+          ),
+          child: child!,
+        ),
+        home: MoodScreen(selectedDate: selectedDate),
       ),
     );
   }
 
   testWidgets(
-      'tapping the inline note preview opens the note editor bottom sheet',
+      'tapping the note button opens the note editor bottom sheet',
       (tester) async {
     await tester.pumpWidget(buildApp());
     await tester.pumpAndSettle();
 
-    expect(find.text('Toca para agregar una nota'), findsOneWidget);
+    expect(find.text('Nota'), findsOneWidget);
     expect(find.text('Nota del día'), findsNothing);
 
-    await tester.tap(find.text('Toca para agregar una nota'));
+    await tester.tap(find.text('Nota'));
     await tester.pumpAndSettle();
 
     expect(find.text('Nota del día'), findsOneWidget);
@@ -369,7 +379,7 @@ void main() {
     await tester.pumpWidget(buildApp());
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Toca para agregar una nota'));
+    await tester.tap(find.text('Nota'));
     await tester.pumpAndSettle();
 
     final longText = 'a' * 600;
@@ -387,7 +397,7 @@ void main() {
     await tester.pumpWidget(buildApp());
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Toca para agregar una nota'));
+    await tester.tap(find.text('Nota'));
     await tester.pumpAndSettle();
 
     await tester.enterText(find.byType(TextField), 'Hoy fue un buen día');
@@ -397,7 +407,119 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Nota del día'), findsNothing);
+    expect(find.byIcon(Icons.sticky_note_2_rounded), findsOneWidget);
+
+    // The text is not previewed outside the sheet; it is back when reopened.
+    expect(find.text('Hoy fue un buen día'), findsNothing);
+    await tester.tap(find.text('Nota'));
+    await tester.pumpAndSettle();
     expect(find.text('Hoy fue un buen día'), findsOneWidget);
+  });
+
+  group('note button', () {
+    testWidgets('has no inline note field above the save button',
+        (tester) async {
+      await tester.pumpWidget(buildApp());
+      await tester.pumpAndSettle();
+
+      expect(find.text('Toca para agregar una nota'), findsNothing);
+      expect(find.byType(TextField), findsNothing);
+    });
+
+    testWidgets('shows the outlined icon and no dot when there is no note',
+        (tester) async {
+      await tester.pumpWidget(buildApp());
+      await tester.pumpAndSettle();
+
+      expect(find.byIcon(Icons.sticky_note_2_outlined), findsOneWidget);
+      expect(find.byIcon(Icons.sticky_note_2_rounded), findsNothing);
+    });
+
+    testWidgets('shows the filled icon when the entry already has a note',
+        (tester) async {
+      moodRepository.savedEntries.add(
+        MoodEntry(
+          date: DateTime(2026, 3, 10),
+          mood: 'assets/icon/angry.svg',
+          note: 'Día largo',
+          intensity: 5,
+        ),
+      );
+      await tester.pumpWidget(buildApp(selectedDate: DateTime(2026, 3, 10)));
+      await tester.pumpAndSettle();
+
+      expect(find.byIcon(Icons.sticky_note_2_rounded), findsOneWidget);
+      expect(find.byIcon(Icons.sticky_note_2_outlined), findsNothing);
+      expect(find.text('Día largo'), findsNothing);
+    });
+
+    testWidgets('clearing the note in the sheet returns to the empty state',
+        (tester) async {
+      await tester.pumpWidget(buildApp());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Nota'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField), 'algo');
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Listo'));
+      await tester.pumpAndSettle();
+      expect(find.byIcon(Icons.sticky_note_2_rounded), findsOneWidget);
+
+      await tester.tap(find.text('Nota'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField), '');
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Listo'));
+      await tester.pumpAndSettle();
+
+      expect(find.byIcon(Icons.sticky_note_2_outlined), findsOneWidget);
+      expect(find.byIcon(Icons.sticky_note_2_rounded), findsNothing);
+    });
+
+    testWidgets('is announced as a button with the localized label',
+        (tester) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpWidget(buildApp());
+      await tester.pumpAndSettle();
+
+      expect(
+        tester.getSemantics(find.text('Nota')),
+        matchesSemantics(label: 'Nota', isButton: true, hasTapAction: true),
+      );
+      handle.dispose();
+    });
+
+    testWidgets('label follows the device language, English as fallback',
+        (tester) async {
+      await tester.pumpWidget(buildApp(locale: const Locale('de')));
+      await tester.pumpAndSettle();
+      expect(find.text('Notiz'), findsOneWidget);
+
+      await tester.pumpWidget(buildApp(locale: const Locale('en')));
+      await tester.pumpAndSettle();
+      expect(find.text('Note'), findsOneWidget);
+    });
+
+    testWidgets('stays visible with a long date and large text',
+        (tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(
+        buildApp(
+          selectedDate: DateTime(2026, 9, 28),
+          locale: const Locale('de'),
+          textScale: 1.5,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      expect(find.text('Notiz').hitTestable(), findsOneWidget);
+    });
   });
 
   testWidgets('opening a date with an entry positions the carousel on its mood',
@@ -884,7 +1006,7 @@ void main() {
       await tester.pumpWidget(buildApp());
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text(strings.noteInlineHint));
+      await tester.tap(find.text(strings.noteButtonLabel));
       await tester.pumpAndSettle();
 
       expect(
@@ -981,7 +1103,7 @@ void main() {
       mainShellKey.currentState!.showMoodPicker(past);
       await tester.pumpAndSettle();
       expect(find.text(headerFor(past)), findsOneWidget);
-      await tester.tap(find.text(strings.noteInlineHint));
+      await tester.tap(find.text(strings.noteButtonLabel));
       await tester.pumpAndSettle();
       expect(find.text(strings.noteSheetTitle), findsOneWidget);
 

@@ -157,7 +157,7 @@ class AppStringsFr extends AppStrings {
       const ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
 
   @override
-  String get noteInlineHint => 'Appuyez pour ajouter une note';
+  String get noteButtonLabel => 'Note';
 
   @override
   String get noteSheetTitle => 'Note du jour';

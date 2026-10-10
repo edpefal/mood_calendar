@@ -107,7 +107,7 @@ abstract class AppStrings {
   String bestStreakSemantics(int days);
   List<String> get monthNames;
   List<String> get weekdayInitials;
-  String get noteInlineHint;
+  String get noteButtonLabel;
   String get noteSheetTitle;
   String get noteSheetDoneButton;
   String get noteSheetPlaceholder;
