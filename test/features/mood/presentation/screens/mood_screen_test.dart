@@ -357,8 +357,7 @@ void main() {
     );
   }
 
-  testWidgets(
-      'tapping the note button opens the note editor bottom sheet',
+  testWidgets('tapping the note button opens the note editor bottom sheet',
       (tester) async {
     await tester.pumpWidget(buildApp());
     await tester.pumpAndSettle();
@@ -414,6 +413,80 @@ void main() {
     await tester.tap(find.text('Nota'));
     await tester.pumpAndSettle();
     expect(find.text('Hoy fue un buen día'), findsOneWidget);
+  });
+
+  group('header date', () {
+    testWidgets('follows the order of each language', (tester) async {
+      final date = DateTime(2026, 10, 10);
+      for (final entry in {
+        const Locale('en'): 'October 10, 2026',
+        const Locale('es'): '10 de octubre de 2026',
+        const Locale('de'): '10. Oktober 2026',
+        const Locale('fr'): '10 octobre 2026',
+        const Locale('it'): '10 ottobre 2026',
+      }.entries) {
+        await tester.pumpWidget(
+          buildApp(selectedDate: date, locale: entry.key),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text(entry.value), findsOneWidget, reason: '${entry.key}');
+      }
+    });
+  });
+
+  group('text scale', () {
+    void useNarrowPhone(WidgetTester tester) {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+    }
+
+    ScrollableState verticalScrollable(WidgetTester tester) =>
+        tester.state<ScrollableState>(find.byType(Scrollable).first);
+
+    testWidgets('at 100% the picker does not scroll', (tester) async {
+      useNarrowPhone(tester);
+      await tester.pumpWidget(buildApp());
+      await tester.pumpAndSettle();
+
+      expect(verticalScrollable(tester).position.maxScrollExtent, 0);
+    });
+
+    // German with a long date is the case that overflowed by 119 px before.
+    Widget buildOverflowingApp() => buildApp(
+          selectedDate: DateTime(2026, 9, 28),
+          locale: const Locale('de'),
+          textScale: 2,
+        );
+
+    testWidgets('at 200% the picker overflows nothing and scrolls',
+        (tester) async {
+      useNarrowPhone(tester);
+      await tester.pumpWidget(buildOverflowingApp());
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      expect(
+          verticalScrollable(tester).position.maxScrollExtent, greaterThan(0));
+    });
+
+    testWidgets(
+        'at 200% the carousel still changes mood with a horizontal swipe',
+        (tester) async {
+      final de = AppStrings.forLocale(const Locale('de'));
+      useNarrowPhone(tester);
+      await tester.pumpWidget(buildOverflowingApp());
+      await tester.pumpAndSettle();
+      expect(find.text(de.moodName('happy')), findsOneWidget);
+
+      await tester.drag(find.byType(PageView), const Offset(-300, 0));
+      await tester.pumpAndSettle();
+
+      expect(find.text(de.moodName('happy')), findsNothing);
+      expect(find.text(de.moodName('calm')), findsOneWidget);
+    });
   });
 
   group('note button', () {
@@ -512,13 +585,19 @@ void main() {
         buildApp(
           selectedDate: DateTime(2026, 9, 28),
           locale: const Locale('de'),
-          textScale: 1.5,
+          textScale: 2,
         ),
       );
       await tester.pumpAndSettle();
 
       expect(tester.takeException(), isNull);
       expect(find.text('Notiz').hitTestable(), findsOneWidget);
+
+      // The save button is reachable by scrolling.
+      expect(find.text('Speichern').hitTestable(), findsNothing);
+      await tester.drag(find.byType(Scrollable).first, const Offset(0, -300));
+      await tester.pumpAndSettle();
+      expect(find.text('Speichern').hitTestable(), findsOneWidget);
     });
   });
 
@@ -764,8 +843,7 @@ void main() {
     final now = DateTime.now();
     final previousMonth = DateTime(now.year, now.month - 1);
 
-    String headerFor(DateTime date) =>
-        '${strings.monthNames[date.month - 1]} ${date.day}, ${date.year}';
+    String headerFor(DateTime date) => strings.formatFullDate(date);
 
     Widget buildApp({
       MoodRepository? repository,
@@ -910,6 +988,24 @@ void main() {
       );
     });
 
+    testWidgets('calendar days announce the same date format as the picker',
+        (tester) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpWidget(buildApp());
+      await tester.pumpAndSettle();
+      await openTab(tester, strings.openCalendarTooltip);
+      await goToPreviousMonth(tester);
+
+      final label = strings.formatFullDate(
+        DateTime(previousMonth.year, previousMonth.month, 15),
+      );
+      expect(
+        find.bySemanticsLabel(RegExp('^${RegExp.escape(label)}')),
+        findsOneWidget,
+      );
+      handle.dispose();
+    });
+
     testWidgets('the picker keeps its date when switching tabs',
         (tester) async {
       await tester.pumpWidget(buildApp());
@@ -1027,8 +1123,7 @@ void main() {
   group('reminder tap', () {
     final strings = AppStrings.forLocale(const Locale('en'));
     final now = DateTime.now();
-    String headerFor(DateTime date) =>
-        '${strings.monthNames[date.month - 1]} ${date.day}, ${date.year}';
+    String headerFor(DateTime date) => strings.formatFullDate(date);
 
     Widget buildMyApp() {
       final settingsRepository = _FakeSettingsRepository();

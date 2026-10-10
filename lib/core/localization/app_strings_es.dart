@@ -151,6 +151,10 @@ class AppStringsEs extends AppStrings {
       ];
 
   @override
+  String formatFullDate(DateTime date) =>
+      '${date.day} de ${monthNames[date.month - 1].toLowerCase()} de ${date.year}';
+
+  @override
   List<String> get weekdayInitials =>
       const ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
 

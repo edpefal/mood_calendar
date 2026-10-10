@@ -9,6 +9,37 @@ import 'package:mood_calendar/core/localization/app_strings_it.dart';
 import 'package:mood_calendar/features/mood/domain/entities/mood_definition.dart';
 
 void main() {
+  group('AppStrings.formatFullDate', () {
+    final date = DateTime(2026, 10, 10);
+
+    test('follows the order and capitalization of each language', () {
+      expect(const AppStringsEn().formatFullDate(date), 'October 10, 2026');
+      expect(
+          const AppStringsEs().formatFullDate(date), '10 de octubre de 2026');
+      expect(const AppStringsDe().formatFullDate(date), '10. Oktober 2026');
+      expect(const AppStringsFr().formatFullDate(date), '10 octobre 2026');
+      expect(const AppStringsIt().formatFullDate(date), '10 ottobre 2026');
+    });
+
+    test('does not pad the day with a leading zero', () {
+      final firstOfMarch = DateTime(2026, 3, 1);
+      expect(
+          const AppStringsEn().formatFullDate(firstOfMarch), 'March 1, 2026');
+      expect(const AppStringsEs().formatFullDate(firstOfMarch),
+          '1 de marzo de 2026');
+      expect(const AppStringsDe().formatFullDate(firstOfMarch), '1. März 2026');
+      expect(const AppStringsFr().formatFullDate(firstOfMarch), '1 mars 2026');
+      expect(const AppStringsIt().formatFullDate(firstOfMarch), '1 marzo 2026');
+    });
+
+    test('falls back to the English format for unsupported locales', () {
+      expect(
+        AppStrings.forLocale(const Locale('pt')).formatFullDate(date),
+        'October 10, 2026',
+      );
+    });
+  });
+
   group('AppStrings.forLocale', () {
     test('returns the matching language for each supported locale', () {
       expect(AppStrings.forLocale(const Locale('en')), isA<AppStringsEn>());

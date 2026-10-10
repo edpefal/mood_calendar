@@ -257,192 +257,214 @@ class _MoodScreenState extends State<MoodScreen>
                 ),
               ),
               child: SafeArea(
-                child: SizedBox.expand(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 24,
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    _formatDate(context, _selectedDate),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleLarge
-                                        ?.copyWith(fontWeight: FontWeight.bold),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    strings.moodQuestion,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleLarge
-                                        ?.copyWith(
-                                          fontWeight: FontWeight.bold,
-                                          color: const Color(0xFF5F3DC4),
-                                        ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            AnimatedBuilder(
-                              animation: _noteController,
-                              builder: (context, _) => _NoteButton(
-                                label: strings.noteButtonLabel,
-                                hasNote: _noteController.text.isNotEmpty,
-                                onTap: _openNoteEditor,
-                              ),
-                            ),
-                          ],
+                // Con texto grande el contenido no cabe: la pantalla se
+                // desplaza. Con tamaños normales el sliver llena el alto y la
+                // columna se reparte igual que antes.
+                child: CustomScrollView(
+                  // primary: false evita AlwaysScrollableScrollPhysics: a tamaños
+                  // normales no hay scroll ni rebote.
+                  primary: false,
+                  slivers: [
+                    SliverFillRemaining(
+                      hasScrollBody: false,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 24,
                         ),
-                        Column(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            SizedBox(
-                              height: 260,
-                              child: Semantics(
-                                label: strings.selectedMood(
-                                  strings.moodName(selectedMood.id),
-                                  _currentPage,
-                                  _orderedMoods.length,
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        strings.formatFullDate(_selectedDate),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleLarge
+                                            ?.copyWith(
+                                                fontWeight: FontWeight.bold),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        strings.moodQuestion,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleLarge
+                                            ?.copyWith(
+                                              fontWeight: FontWeight.bold,
+                                              color: const Color(0xFF5F3DC4),
+                                            ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                                child: PageView.builder(
-                                  controller: _pageController,
-                                  itemCount: _orderedMoods.length,
-                                  onPageChanged: _onPageChanged,
-                                  itemBuilder: (context, index) {
-                                    final mood = _orderedMoods[index];
+                                const SizedBox(width: 12),
+                                AnimatedBuilder(
+                                  animation: _noteController,
+                                  builder: (context, _) => _NoteButton(
+                                    label: strings.noteButtonLabel,
+                                    hasNote: _noteController.text.isNotEmpty,
+                                    onTap: _openNoteEditor,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                SizedBox(
+                                  height: 260,
+                                  child: Semantics(
+                                    label: strings.selectedMood(
+                                      strings.moodName(selectedMood.id),
+                                      _currentPage,
+                                      _orderedMoods.length,
+                                    ),
+                                    child: PageView.builder(
+                                      controller: _pageController,
+                                      itemCount: _orderedMoods.length,
+                                      onPageChanged: _onPageChanged,
+                                      itemBuilder: (context, index) {
+                                        final mood = _orderedMoods[index];
 
-                                    return BlocBuilder<PurchasesCubit,
-                                        PurchasesState>(
-                                      buildWhen: (previous, current) =>
-                                          previous.isMoodUnlocked(mood.id) !=
-                                          current.isMoodUnlocked(mood.id),
-                                      builder: (context, purchasesState) {
-                                        final isLocked = !purchasesState
-                                            .isMoodUnlocked(mood.id);
+                                        return BlocBuilder<PurchasesCubit,
+                                            PurchasesState>(
+                                          buildWhen: (previous, current) =>
+                                              previous
+                                                  .isMoodUnlocked(mood.id) !=
+                                              current.isMoodUnlocked(mood.id),
+                                          builder: (context, purchasesState) {
+                                            final isLocked = !purchasesState
+                                                .isMoodUnlocked(mood.id);
 
-                                        return Semantics(
-                                          label: strings.selectedMood(
-                                            strings.moodName(mood.id),
-                                            index,
-                                            _orderedMoods.length,
-                                          ),
-                                          child: GestureDetector(
-                                            onTap: isLocked
-                                                ? () => _openPurchaseFlow(mood)
-                                                : null,
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Stack(
-                                                  alignment: Alignment.center,
+                                            return Semantics(
+                                              label: strings.selectedMood(
+                                                strings.moodName(mood.id),
+                                                index,
+                                                _orderedMoods.length,
+                                              ),
+                                              child: GestureDetector(
+                                                onTap: isLocked
+                                                    ? () =>
+                                                        _openPurchaseFlow(mood)
+                                                    : null,
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
                                                   children: [
-                                                    Opacity(
-                                                      opacity:
-                                                          isLocked ? 0.4 : 1,
-                                                      child: SvgPicture.asset(
-                                                        mood.assetPath,
-                                                        height: 150,
-                                                        width: 150,
-                                                        fit: BoxFit.contain,
-                                                        semanticsLabel: strings
-                                                            .moodName(mood.id),
-                                                        placeholderBuilder:
-                                                            (context) =>
-                                                                const CircularProgressIndicator(),
-                                                        errorBuilder: (
-                                                          context,
-                                                          error,
-                                                          stackTrace,
-                                                        ) {
-                                                          return const Icon(
-                                                            Icons.error_outline,
-                                                            size: 150,
-                                                            color: Colors.red,
-                                                          );
-                                                        },
-                                                      ),
+                                                    Stack(
+                                                      alignment:
+                                                          Alignment.center,
+                                                      children: [
+                                                        Opacity(
+                                                          opacity: isLocked
+                                                              ? 0.4
+                                                              : 1,
+                                                          child:
+                                                              SvgPicture.asset(
+                                                            mood.assetPath,
+                                                            height: 150,
+                                                            width: 150,
+                                                            fit: BoxFit.contain,
+                                                            semanticsLabel:
+                                                                strings.moodName(
+                                                                    mood.id),
+                                                            placeholderBuilder:
+                                                                (context) =>
+                                                                    const CircularProgressIndicator(),
+                                                            errorBuilder: (
+                                                              context,
+                                                              error,
+                                                              stackTrace,
+                                                            ) {
+                                                              return const Icon(
+                                                                Icons
+                                                                    .error_outline,
+                                                                size: 150,
+                                                                color:
+                                                                    Colors.red,
+                                                              );
+                                                            },
+                                                          ),
+                                                        ),
+                                                        if (isLocked)
+                                                          const Icon(
+                                                            Icons.lock_rounded,
+                                                            size: 40,
+                                                            color: Color(
+                                                                0xFF5F3DC4),
+                                                          ),
+                                                      ],
                                                     ),
-                                                    if (isLocked)
-                                                      const Icon(
-                                                        Icons.lock_rounded,
-                                                        size: 40,
-                                                        color:
-                                                            Color(0xFF5F3DC4),
-                                                      ),
+                                                    const SizedBox(height: 8),
+                                                    Text(
+                                                      strings.moodName(mood.id),
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .titleMedium,
+                                                    ),
                                                   ],
                                                 ),
-                                                const SizedBox(height: 8),
-                                                Text(
-                                                  strings.moodName(mood.id),
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .titleMedium,
-                                                ),
-                                              ],
-                                            ),
-                                          ),
+                                              ),
+                                            );
+                                          },
                                         );
                                       },
-                                    );
-                                  },
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: List.generate(
-                                _orderedMoods.length,
-                                (index) => Container(
-                                  width: 8,
-                                  height: 8,
-                                  margin:
-                                      const EdgeInsets.symmetric(horizontal: 4),
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: _currentPage == index
-                                        ? const Color(0xFF5F3DC4)
-                                        : Colors.grey[300],
+                                    ),
                                   ),
                                 ),
-                              ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: List.generate(
+                                    _orderedMoods.length,
+                                    (index) => Container(
+                                      width: 8,
+                                      height: 8,
+                                      margin: const EdgeInsets.symmetric(
+                                          horizontal: 4),
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: _currentPage == index
+                                            ? const Color(0xFF5F3DC4)
+                                            : Colors.grey[300],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                GradientPillButton(
+                                  label: strings.save,
+                                  semanticsLabel: strings.saveMoodButtonLabel,
+                                  loading: isBusy,
+                                  onPressed: _saveMood,
+                                ),
+                                if (isBusy) ...[
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    strings.savingMood,
+                                    style:
+                                        Theme.of(context).textTheme.bodyMedium,
+                                  ),
+                                ],
+                              ],
                             ),
                           ],
                         ),
-                        Column(
-                          children: [
-                            GradientPillButton(
-                              label: strings.save,
-                              semanticsLabel: strings.saveMoodButtonLabel,
-                              loading: isBusy,
-                              onPressed: _saveMood,
-                            ),
-                            if (isBusy) ...[
-                              const SizedBox(height: 12),
-                              Text(
-                                strings.savingMood,
-                                style: Theme.of(context).textTheme.bodyMedium,
-                              ),
-                            ],
-                          ],
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ),
             ),
@@ -450,11 +472,6 @@ class _MoodScreenState extends State<MoodScreen>
         },
       ),
     );
-  }
-
-  String _formatDate(BuildContext context, DateTime date) {
-    final months = AppStrings.of(context).monthNames;
-    return '${months[date.month - 1]} ${date.day}, ${date.year}';
   }
 }
 

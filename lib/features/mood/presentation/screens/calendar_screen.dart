@@ -225,10 +225,7 @@ class _CalendarScreenState extends State<CalendarScreen>
                                   button: !isFutureDate,
                                   enabled: !isFutureDate,
                                   label: strings.calendarDayLabel(
-                                    formattedDate: _formatCalendarDate(
-                                      context,
-                                      date,
-                                    ),
+                                    formattedDate: strings.formatFullDate(date),
                                     moodLabel: moodLabel,
                                     isFutureDate: isFutureDate,
                                   ),
@@ -332,11 +329,6 @@ class _CalendarScreenState extends State<CalendarScreen>
 
   static String _dateKey(DateTime date) =>
       '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
-
-  String _formatCalendarDate(BuildContext context, DateTime date) {
-    final strings = AppStrings.of(context);
-    return '${date.day} ${strings.monthNames[date.month - 1]} ${date.year}';
-  }
 
   String _moodLabelForPath(BuildContext context, String path) {
     return AppStrings.of(context)
