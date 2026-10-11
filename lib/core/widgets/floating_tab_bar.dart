@@ -4,6 +4,12 @@ import 'package:flutter/material.dart';
 
 const Color _brandColor = Color(0xFF5F3DC4);
 
+// Relleno y desenfoque bajos a propósito: el contenido que pasa por debajo del
+// bar debe seguir siendo reconocible (spec `bottom-navigation`).
+const double _blurSigma = 10;
+const double _fillAlpha = 0.40;
+const double _borderAlpha = 0.75;
+
 class FloatingTabItem {
   const FloatingTabItem({required this.icon, required this.label});
 
@@ -63,15 +69,15 @@ class FloatingTabBar extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(height / 2),
               child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                filter: ImageFilter.blur(sigmaX: _blurSigma, sigmaY: _blurSigma),
                 child: Container(
                   height: height,
                   padding: const EdgeInsets.symmetric(horizontal: 8),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.72),
+                    color: Colors.white.withValues(alpha: _fillAlpha),
                     borderRadius: BorderRadius.circular(height / 2),
                     border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.6),
+                      color: Colors.white.withValues(alpha: _borderAlpha),
                     ),
                   ),
                   child: Row(
