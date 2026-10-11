@@ -233,6 +233,19 @@ Esas resoluciones corresponden a los tamaños de 6.9" y 13" que Apple lista para
   `compose.py` arma cada slide en HTML (fondo pastel, titular traducido, marco de dispositivo sobre la captura) y lo exporta a PNG con Chrome headless en el tamaño exacto (iPhone 1320×2868, iPad 2064×2752). Los titulares están en el diccionario `TEXT` del script y la fuente Poppins va incluida en `tool/screenshots/fonts/` (licencia OFL). Los slides 1, 3 y 6 reutilizan la captura del calendario con distinto encuadre.
 - El set publicado no incluye la pantalla de la tienda a propósito: mostraba precios en dólares en todos los idiomas y los nombres de los moods premium, que cambiarán al añadir más. `build/` está en `.gitignore`, así que las capturas y los slides generados no entran al repo.
 
+### Header y Search Results de App Store
+
+App Store Connect > Product Page Information > "Header and Search Results" acepta un arte opcional por idioma (distinto de las capturas). `tool/screenshots/header.py` lo genera con Chrome headless y Pillow (sin simulador):
+
+```bash
+python3 tool/screenshots/header.py [en es de fr it]   # -> aso/header/<locale>/header_search_5244x2950.png
+```
+
+- Una sola imagen **16:9 de 5244×2950, PNG sin alfa** sirve para los dos slots. Specs de Apple: Header 21:9 (3840×1646), Search Results 3:2 (1920×1280 a 3840×2560); videos opcionales de 5–30 s.
+- Apple recorta la imagen según el slot, así que el contenido debe quedar dentro de los 4425×2247 px centrales (cubre ambos recortes). Si se cambia el layout, mantenerlo ahí.
+- Muestra ícono (`AppIcon 1024`), nombre, lema y una fila de caritas de `assets/icon/` (sin `brave.svg`, que es muy pesado). Los lemas por idioma están en el diccionario `TAGLINE` del script.
+- Se sube a mano, un archivo por idioma, con el selector de idioma de la esquina: la misma imagen en **Header** y en **Search Results**, y revisar con **Preview**.
+
 ## Notas
 
 - No hay backend ni autenticación; todos los datos son locales (Hive). Los unlocks de compras se cachean localmente; no hay validación de recibos en servidor (ver `docs/risks.md`).
