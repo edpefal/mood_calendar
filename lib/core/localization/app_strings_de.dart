@@ -242,5 +242,14 @@ class AppStringsDe extends AppStrings {
         'confident': 'Selbstbewusst',
         'romantic': 'Romantisch',
         'shy': 'Schüchtern',
+        'affectionate': 'Zärtlich',
+        'hugging': 'Umarmend',
+        'laughing': 'Lachend',
+        'sleepy': 'Schläfrig',
+        'sick': 'Krank',
+        'hurt': 'Verletzt',
+        'crying': 'Weinend',
+        'scared': 'Verängstigt',
+        'stressed': 'Gestresst',
       };
 }

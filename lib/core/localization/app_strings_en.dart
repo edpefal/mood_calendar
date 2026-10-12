@@ -237,5 +237,14 @@ class AppStringsEn extends AppStrings {
         'confident': 'Confident',
         'romantic': 'Romantic',
         'shy': 'Shy',
+        'affectionate': 'Affectionate',
+        'hugging': 'Hugging',
+        'laughing': 'Laughing',
+        'sleepy': 'Sleepy',
+        'sick': 'Sick',
+        'hurt': 'Hurt',
+        'crying': 'Crying',
+        'scared': 'Scared',
+        'stressed': 'Stressed',
       };
 }
