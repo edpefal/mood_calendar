@@ -242,5 +242,14 @@ class AppStringsIt extends AppStrings {
         'confident': 'Sicuro',
         'romantic': 'Romantico',
         'shy': 'Timido',
+        'affectionate': 'Affettuoso',
+        'hugging': 'Abbracciando',
+        'laughing': 'Ridendo',
+        'sleepy': 'Assonnato',
+        'sick': 'Malato',
+        'hurt': 'Ferito',
+        'crying': 'Piangendo',
+        'scared': 'Spaventato',
+        'stressed': 'Stressato',
       };
 }

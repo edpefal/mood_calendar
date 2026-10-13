@@ -116,6 +116,16 @@ void main() {
     expect((await readPayload(result))['entries'][0]['mood'], 'anxious');
   });
 
+  test('exports first-wave moods by their stable id', () async {
+    final result = await buildExporter([
+      entry(DateTime(2026, 4, 1), 'assets/icon/sleepy.svg'),
+      entry(DateTime(2026, 4, 2), 'assets/icon/affectionate.svg'),
+    ]).exportHistory();
+    final entries = (await readPayload(result))['entries'] as List;
+
+    expect(entries.map((e) => (e as Map)['mood']), ['sleepy', 'affectionate']);
+  });
+
   test('exports an unrecognized mood as stored, not as another mood', () async {
     final result = await buildExporter([
       entry(DateTime(2026, 4, 1), 'assets/icon/retired.svg'),
