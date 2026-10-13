@@ -37,7 +37,7 @@
 ## 6. Privacidad y documentación
 
 - [ ] 6.1 Declarar *Crash Data* (no vinculado a la identidad, sin tracking) en App Privacy de App Store Connect
-- [ ] 6.2 Actualizar la política de privacidad en `edpefal.github.io` con una línea sobre reportes de fallos anónimos
+- [ ] 6.2 Actualizar la política de privacidad (TermsFeed, la que enlaza `privacyPolicyUrl` en Settings; no vive en el repo `support`) con un párrafo sobre reportes de fallos anónimos de Crashlytics
 - [x] 6.3 Anotar en `backlog.md` el toggle de opt-out en Settings 
 - [ ] 6.4 Completar la sección "Data safety" de Google Play declarando datos de diagnóstico (crash logs)
 - [x] 6.5 Actualizar `CLAUDE.md` (stack, arranque y comandos de release) con Crashlytics

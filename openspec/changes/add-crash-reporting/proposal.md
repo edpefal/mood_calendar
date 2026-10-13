@@ -25,5 +25,5 @@ Hoy no hay visibilidad de los crashes en producción: `AppTelemetry.recordError`
 - **Dependencias**: `firebase_core`, `firebase_crashlytics` en `pubspec.yaml`; pods de Firebase en iOS (deployment target iOS 15.0 es compatible).
 - **Código**: `lib/main.dart` (init y hooks), `lib/core/telemetry/` (nueva implementación y config), archivos de plataforma (`ios/Runner/GoogleService-Info.plist`, build phase de Crashlytics, `android/app/google-services.json`, plugins de Gradle de Google Services y Crashlytics).
 - **Release**: `scripts/build_ios_release.sh` / verificación de archive deben cubrir la subida de dSYMs; `tool/screenshots/main.dart` no debe reportar.
-- **Privacidad / tienda**: política de privacidad (`edpefal.github.io`) y App Privacy en App Store Connect; el mensaje "datos solo locales" cambia a "datos locales, salvo reportes de fallos anónimos".
+- **Privacidad / tienda**: política de privacidad (página de TermsFeed enlazada desde Settings) y App Privacy en App Store Connect; el mensaje "datos solo locales" cambia a "datos locales, salvo reportes de fallos anónimos".
 - **CI**: `flutter analyze` y `flutter test` no deben requerir Firebase (la implementación se inyecta y se prueba con fakes).
