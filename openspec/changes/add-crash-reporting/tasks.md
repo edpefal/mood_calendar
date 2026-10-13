@@ -4,7 +4,7 @@
 - [ ] 1.2 Colocar `GoogleService-Info.plist` en `ios/Runner/`, versionarlo en el repo (añadirlo al target Runner) y `android/app/google-services.json` (descargados con `firebase apps:sdkconfig`); restringir las API keys al bundle ID iOS y al package + SHA-1 de Android en Google Cloud Console
 - [x] 1.3 Añadir `firebase_core` y `firebase_crashlytics` a `pubspec.yaml`, correr `flutter pub get` y `pod install`; confirmar que compila con iOS 15.0
 - [x] 1.4 Añadir la build phase de subida de símbolos de Crashlytics al target Runner
-- [ ] 1.5 Android: añadir los plugins de Gradle `com.google.gms.google-services` y `com.google.firebase.crashlytics` y confirmar que `flutter build appbundle` compila
+- [x] 1.5 Android: añadir los plugins de Gradle `com.google.gms.google-services` y `com.google.firebase.crashlytics` y confirmar que `flutter build appbundle` compila
 
 ## 2. Capa de telemetría
 
