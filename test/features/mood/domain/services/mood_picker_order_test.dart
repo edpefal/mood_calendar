@@ -53,7 +53,15 @@ void main() {
     );
     expect(
       _ids(result),
-      ['brave', 'happy', 'calm', 'neutral', 'sad', 'angry', 'anxious', 'confident', 'romantic', 'shy'],
+      [
+        'brave',
+        'happy',
+        'calm',
+        'neutral',
+        'sad',
+        'angry',
+        ...catalogIds.skip(5).where((id) => id != 'brave')
+      ],
     );
   });
 
@@ -67,6 +75,20 @@ void main() {
       _ids(result).take(7),
       ['angry', 'happy', 'calm', 'neutral', 'sad', 'anxious', 'brave'],
     );
+  });
+
+  test('un mood nuevo comprado con historial se ordena entre los desbloqueados',
+      () {
+    final entries = [_entry('sleepy', day: 1), _entry('sleepy', day: 2)];
+    final result = MoodPickerOrder.sort(
+      entries,
+      isUnlocked: (id) => _onlyBase(id) || id == 'sleepy',
+    );
+    final ids = _ids(result);
+
+    expect(ids.take(6), ['sleepy', 'happy', 'calm', 'neutral', 'sad', 'angry']);
+    expect(ids.where((id) => id == 'sleepy'), hasLength(1));
+    expect(ids, hasLength(catalogIds.length));
   });
 
   test('los bloqueados van al final aunque tengan historial', () {

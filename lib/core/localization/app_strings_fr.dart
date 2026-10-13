@@ -242,5 +242,14 @@ class AppStringsFr extends AppStrings {
         'confident': 'Confiant',
         'romantic': 'Romantique',
         'shy': 'Timide',
+        'affectionate': 'Affectueux',
+        'hugging': 'Câlin',
+        'laughing': 'Hilare',
+        'sleepy': 'Somnolent',
+        'sick': 'Malade',
+        'hurt': 'Blessé',
+        'crying': 'En pleurs',
+        'scared': 'Effrayé',
+        'stressed': 'Stressé',
       };
 }
