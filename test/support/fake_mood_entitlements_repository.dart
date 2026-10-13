@@ -6,10 +6,16 @@ import 'package:mood_calendar/features/purchases/domain/entities/mood_pack.dart'
 import 'package:mood_calendar/features/purchases/domain/repositories/mood_entitlements_repository.dart';
 
 class FakeMoodEntitlementsRepository implements MoodEntitlementsRepository {
-  FakeMoodEntitlementsRepository({Set<String> unlockedMoodIds = const {}})
-      : _unlockedMoodIds = Set<String>.from(unlockedMoodIds);
+  FakeMoodEntitlementsRepository({
+    Set<String> unlockedMoodIds = const {},
+    Set<String> restorableMoodIds = const {},
+  })  : _unlockedMoodIds = Set<String>.from(unlockedMoodIds),
+        _restorableMoodIds = Set<String>.from(restorableMoodIds);
 
   final Set<String> _unlockedMoodIds;
+
+  /// Moods que `restorePurchases` desbloquea, como una restauración real.
+  final Set<String> _restorableMoodIds;
   final _controller = StreamController<Set<String>>.broadcast();
 
   @override
@@ -45,5 +51,8 @@ class FakeMoodEntitlementsRepository implements MoodEntitlementsRepository {
   Future<void> purchasePack(String packId) async {}
 
   @override
-  Future<void> restorePurchases() async {}
+  Future<void> restorePurchases() async {
+    _unlockedMoodIds.addAll(_restorableMoodIds);
+    _controller.add(_unlockedMoodIds);
+  }
 }

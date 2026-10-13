@@ -72,6 +72,7 @@ class MainShellState extends State<MainShell> {
         return MoodScreen(
           key: _pickerKey,
           selectedDate: _pickerDate,
+          isActive: _tab == MainTab.moodPicker,
           onSaved: _onMoodSaved,
         );
       case MainTab.calendar:
