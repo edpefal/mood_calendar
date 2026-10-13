@@ -20,7 +20,16 @@ class MoodScreen extends StatefulWidget {
   /// Se llama con la fecha guardada cuando el guardado termina con éxito.
   final ValueChanged<DateTime>? onSaved;
 
-  const MoodScreen({super.key, this.selectedDate, this.onSaved});
+  /// Si la pestaña del selector está visible. Al volver a activarse se
+  /// recalcula el orden del carrusel (compras, restauraciones, historial).
+  final bool isActive;
+
+  const MoodScreen({
+    super.key,
+    this.selectedDate,
+    this.onSaved,
+    this.isActive = true,
+  });
 
   @override
   State<MoodScreen> createState() => _MoodScreenState();
@@ -28,13 +37,15 @@ class MoodScreen extends StatefulWidget {
 
 class _MoodScreenState extends State<MoodScreen>
     with SingleTickerProviderStateMixin {
-  // Se fija una sola vez, con la primera carga del historial, para que el
-  // carrusel no se reacomode mientras la pantalla está abierta.
+  // Se fija con la primera carga del historial y solo se recalcula cuando el
+  // usuario vuelve a la pestaña (`_refreshOrderOnActivation`), para que el
+  // carrusel no se reacomode mientras la pantalla está visible.
   List<MoodDefinition>? _fixedOrderedMoods;
   List<MoodDefinition> get _orderedMoods =>
       _fixedOrderedMoods ?? allMoodDefinitions;
   MoodDefinition selectedMood = allMoodDefinitions.first;
   int _currentPage = 0;
+  int _carouselGeneration = 0;
   final TextEditingController _noteController = TextEditingController();
   bool isLoading = true;
   bool _isSaving = false;
@@ -55,6 +66,53 @@ class _MoodScreenState extends State<MoodScreen>
     }
     _didHydrateInitialState = true;
     _hydrateFromState(context.read<MoodCubit>().state);
+  }
+
+  @override
+  void didUpdateWidget(covariant MoodScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!oldWidget.isActive && widget.isActive) {
+      _refreshOrderOnActivation();
+    }
+  }
+
+  /// Recalcula el orden al volver a la pestaña, conservando el mood
+  /// seleccionado (por id), la fecha y la nota sin guardar.
+  void _refreshOrderOnActivation() {
+    final current = _fixedOrderedMoods;
+    if (current == null) {
+      return;
+    }
+    context.read<MoodCubit>().state.maybeWhen(
+          loaded: (entries) {
+            final next = MoodPickerOrder.sort(
+              entries,
+              isUnlocked: context.read<PurchasesCubit>().isMoodUnlockedNow,
+            );
+            final sameOrder = next.length == current.length &&
+                List.generate(next.length, (i) => next[i].id == current[i].id)
+                    .every((same) => same);
+            if (sameOrder) {
+              return;
+            }
+            final selectedIndex =
+                next.indexWhere((mood) => mood.id == selectedMood.id);
+            final target = selectedIndex >= 0 ? selectedIndex : 0;
+            final previousController = _pageController;
+            _fixedOrderedMoods = next;
+            _currentPage = target;
+            selectedMood = next[target];
+            // El Scrollable del PageView reutiliza su posición al cambiar de
+            // controlador, así que el PageView se recrea (nueva `Key`) para que
+            // respete `initialPage`.
+            _pageController =
+                PageController(initialPage: target, keepPage: false);
+            _carouselGeneration++;
+            WidgetsBinding.instance
+                .addPostFrameCallback((_) => previousController.dispose());
+          },
+          orElse: () {},
+        );
   }
 
   @override
@@ -329,6 +387,7 @@ class _MoodScreenState extends State<MoodScreen>
                                       _orderedMoods.length,
                                     ),
                                     child: PageView.builder(
+                                      key: ValueKey(_carouselGeneration),
                                       controller: _pageController,
                                       itemCount: _orderedMoods.length,
                                       onPageChanged: _onPageChanged,

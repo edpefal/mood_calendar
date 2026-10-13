@@ -700,6 +700,7 @@ void main() {
     Widget buildOrderedApp({
       FakeMoodEntitlementsRepository? entitlements,
       DateTime? selectedDate,
+      ValueNotifier<bool>? active,
     }) {
       return MultiBlocProvider(
         providers: [
@@ -735,7 +736,15 @@ void main() {
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-          home: MoodScreen(selectedDate: selectedDate),
+          home: active == null
+              ? MoodScreen(selectedDate: selectedDate)
+              : ValueListenableBuilder<bool>(
+                  valueListenable: active,
+                  builder: (_, isActive, __) => MoodScreen(
+                    selectedDate: selectedDate,
+                    isActive: isActive,
+                  ),
+                ),
         ),
       );
     }
@@ -818,6 +827,141 @@ void main() {
       expect(find.text('Ansioso'), findsNothing);
     });
 
+    Future<void> swipePrevious(WidgetTester tester) async {
+      await tester.drag(find.byType(PageView), const Offset(400, 0));
+      await tester.pumpAndSettle();
+    }
+
+    Future<void> leaveAndReturn(
+      WidgetTester tester,
+      ValueNotifier<bool> active, {
+      Future<void> Function()? whileAway,
+    }) async {
+      active.value = false;
+      await tester.pumpAndSettle();
+      await whileAway?.call();
+      await tester.pumpAndSettle();
+      active.value = true;
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('returning to the tab after a purchase moves the mood forward',
+        (tester) async {
+      final entitlements = FakeMoodEntitlementsRepository();
+      final active = ValueNotifier<bool>(true);
+      addTearDown(active.dispose);
+      moodRepository.savedEntries.addAll([
+        entry('anxious', DateTime(2026, 3, 1)),
+        entry('anxious', DateTime(2026, 3, 2)),
+      ]);
+
+      await tester.pumpWidget(
+        buildOrderedApp(
+          entitlements: entitlements,
+          selectedDate: DateTime(2026, 3, 10),
+          active: active,
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Feliz'), findsOneWidget);
+
+      await leaveAndReturn(
+        tester,
+        active,
+        whileAway: () => entitlements.purchaseMood('anxious'),
+      );
+
+      // The selected mood stays, but anxious is now the first of the carousel.
+      expect(find.text('Feliz'), findsOneWidget);
+      await swipePrevious(tester);
+      expect(find.text('Ansioso'), findsOneWidget);
+    });
+
+    testWidgets('returning to the tab after restoring purchases reorders',
+        (tester) async {
+      final entitlements = FakeMoodEntitlementsRepository(
+        restorableMoodIds: {'anxious'},
+      );
+      final active = ValueNotifier<bool>(true);
+      addTearDown(active.dispose);
+      moodRepository.savedEntries.addAll([
+        entry('anxious', DateTime(2026, 3, 1)),
+        entry('anxious', DateTime(2026, 3, 2)),
+      ]);
+
+      await tester.pumpWidget(
+        buildOrderedApp(
+          entitlements: entitlements,
+          selectedDate: DateTime(2026, 3, 10),
+          active: active,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await leaveAndReturn(
+        tester,
+        active,
+        whileAway: entitlements.restorePurchases,
+      );
+
+      expect(find.text('Feliz'), findsOneWidget);
+      await swipePrevious(tester);
+      expect(find.text('Ansioso'), findsOneWidget);
+    });
+
+    testWidgets('reordering keeps the mood the user had selected',
+        (tester) async {
+      final entitlements = FakeMoodEntitlementsRepository();
+      final active = ValueNotifier<bool>(true);
+      addTearDown(active.dispose);
+      moodRepository.savedEntries.addAll([
+        entry('anxious', DateTime(2026, 3, 1)),
+        entry('anxious', DateTime(2026, 3, 2)),
+      ]);
+
+      await tester.pumpWidget(
+        buildOrderedApp(
+          entitlements: entitlements,
+          selectedDate: DateTime(2026, 3, 10),
+          active: active,
+        ),
+      );
+      await tester.pumpAndSettle();
+      await swipeNext(tester);
+      expect(find.text('Tranquilo'), findsOneWidget);
+
+      await leaveAndReturn(
+        tester,
+        active,
+        whileAway: () => entitlements.purchaseMood('anxious'),
+      );
+
+      expect(find.text('Tranquilo'), findsOneWidget);
+      await tester.tap(find.text('Guardar'));
+      await tester.pumpAndSettle();
+      expect(moodRepository.savedEntries.last.mood, 'assets/icon/calm.svg');
+    });
+
+    testWidgets('returning to the tab with nothing new keeps the carousel',
+        (tester) async {
+      final active = ValueNotifier<bool>(true);
+      addTearDown(active.dispose);
+
+      await tester.pumpWidget(
+        buildOrderedApp(
+          selectedDate: DateTime(2026, 3, 10),
+          active: active,
+        ),
+      );
+      await tester.pumpAndSettle();
+      await swipeNext(tester);
+      expect(find.text('Tranquilo'), findsOneWidget);
+
+      await leaveAndReturn(tester, active);
+
+      expect(find.text('Tranquilo'), findsOneWidget);
+    });
+
     testWidgets('a purchased mood with history is ordered with unlocked moods',
         (tester) async {
       moodRepository.savedEntries.addAll([
@@ -848,6 +992,7 @@ void main() {
     Widget buildApp({
       MoodRepository? repository,
       GlobalKey<MainShellState>? shellKey,
+      FakeMoodEntitlementsRepository? entitlements,
     }) {
       final moods = repository ?? moodRepository;
       final settingsRepository = _FakeSettingsRepository();
@@ -887,7 +1032,9 @@ void main() {
               ),
             ),
             BlocProvider(
-              create: (_) => PurchasesCubit(FakeMoodEntitlementsRepository()),
+              create: (_) => PurchasesCubit(
+                entitlements ?? FakeMoodEntitlementsRepository(),
+              ),
             ),
           ],
           child: MaterialApp(
@@ -912,6 +1059,49 @@ void main() {
     Future<void> goToPreviousMonth(WidgetTester tester) async {
       await tester.tap(find.byTooltip(strings.previousMonthTooltip));
       await tester.pumpAndSettle();
+    }
+
+    for (final otherTab in ['calendar', 'store', 'settings']) {
+      testWidgets(
+          'a purchase made from the $otherTab tab reorders the picker on return',
+          (tester) async {
+        final entitlements = FakeMoodEntitlementsRepository();
+        moodRepository.savedEntries.addAll([
+          MoodEntry(
+            date: DateTime(now.year, now.month - 1, 1),
+            mood: 'assets/icon/anxious.svg',
+            intensity: 1,
+          ),
+          MoodEntry(
+            date: DateTime(now.year, now.month - 1, 2),
+            mood: 'assets/icon/anxious.svg',
+            intensity: 1,
+          ),
+        ]);
+
+        await tester.pumpWidget(buildApp(entitlements: entitlements));
+        await tester.pumpAndSettle();
+        expect(find.text('Feliz'), findsOneWidget);
+
+        await openTab(
+          tester,
+          switch (otherTab) {
+            'calendar' => strings.openCalendarTooltip,
+            'store' => strings.openStoreTooltip,
+            _ => strings.openSettingsTooltip,
+          },
+        );
+        await entitlements.purchaseMood('anxious');
+        await tester.pumpAndSettle();
+        await openTab(tester, strings.openMoodPickerTooltip);
+
+        expect(tester.takeException(), isNull);
+        expect(find.text('Feliz'), findsOneWidget);
+        await tester.drag(find.byType(PageView), const Offset(400, 0));
+        await tester.pumpAndSettle();
+        expect(find.text('Ansioso'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      });
     }
 
     testWidgets('shows the four tabs in order and starts on today',
