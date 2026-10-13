@@ -2,6 +2,8 @@
 # Builds the iOS release IPA for the App Store. This is the only supported way to
 # produce an upload build: it refuses to run without the RevenueCat key, always
 # passes it via --dart-define, and checks it ended up inside the compiled app.
+# It also checks the archive can report symbolicated crashes (Crashlytics config
+# and dSYMs).
 #
 # Usage:
 #   REVENUECAT_IOS_API_KEY=appl_xxx STORE_VERIFIED=1 scripts/build_ios_release.sh [flutter build ipa flags]
@@ -58,6 +60,7 @@ flutter build ipa \
   "$@"
 
 scripts/verify_ios_archive_key.sh
+scripts/verify_ios_archive_crash_reporting.sh
 
 echo
 grep '^version:' pubspec.yaml
