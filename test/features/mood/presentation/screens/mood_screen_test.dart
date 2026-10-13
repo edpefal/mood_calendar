@@ -992,6 +992,7 @@ void main() {
     Widget buildApp({
       MoodRepository? repository,
       GlobalKey<MainShellState>? shellKey,
+      FakeMoodEntitlementsRepository? entitlements,
     }) {
       final moods = repository ?? moodRepository;
       final settingsRepository = _FakeSettingsRepository();
@@ -1031,7 +1032,9 @@ void main() {
               ),
             ),
             BlocProvider(
-              create: (_) => PurchasesCubit(FakeMoodEntitlementsRepository()),
+              create: (_) => PurchasesCubit(
+                entitlements ?? FakeMoodEntitlementsRepository(),
+              ),
             ),
           ],
           child: MaterialApp(
@@ -1056,6 +1059,49 @@ void main() {
     Future<void> goToPreviousMonth(WidgetTester tester) async {
       await tester.tap(find.byTooltip(strings.previousMonthTooltip));
       await tester.pumpAndSettle();
+    }
+
+    for (final otherTab in ['calendar', 'store', 'settings']) {
+      testWidgets(
+          'a purchase made from the $otherTab tab reorders the picker on return',
+          (tester) async {
+        final entitlements = FakeMoodEntitlementsRepository();
+        moodRepository.savedEntries.addAll([
+          MoodEntry(
+            date: DateTime(now.year, now.month - 1, 1),
+            mood: 'assets/icon/anxious.svg',
+            intensity: 1,
+          ),
+          MoodEntry(
+            date: DateTime(now.year, now.month - 1, 2),
+            mood: 'assets/icon/anxious.svg',
+            intensity: 1,
+          ),
+        ]);
+
+        await tester.pumpWidget(buildApp(entitlements: entitlements));
+        await tester.pumpAndSettle();
+        expect(find.text('Feliz'), findsOneWidget);
+
+        await openTab(
+          tester,
+          switch (otherTab) {
+            'calendar' => strings.openCalendarTooltip,
+            'store' => strings.openStoreTooltip,
+            _ => strings.openSettingsTooltip,
+          },
+        );
+        await entitlements.purchaseMood('anxious');
+        await tester.pumpAndSettle();
+        await openTab(tester, strings.openMoodPickerTooltip);
+
+        expect(tester.takeException(), isNull);
+        expect(find.text('Feliz'), findsOneWidget);
+        await tester.drag(find.byType(PageView), const Offset(400, 0));
+        await tester.pumpAndSettle();
+        expect(find.text('Ansioso'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      });
     }
 
     testWidgets('shows the four tabs in order and starts on today',
