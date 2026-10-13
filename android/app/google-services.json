@@ -1,0 +1,90 @@
+{
+  "project_info": {
+    "project_number": "1027445865703",
+    "project_id": "mood-calendar-fee5c",
+    "storage_bucket": "mood-calendar-fee5c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1027445865703:android:aecf736adeabf7051ef642",
+        "android_client_info": {
+          "package_name": "com.artlab.mood_calendar"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1027445865703-fn4mf68sdb0i95sc7rv3ojrous24kvcp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBLBTa1_wOUyrqTjjqoyzVnWhlEUrzr3y0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1027445865703-fn4mf68sdb0i95sc7rv3ojrous24kvcp.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1027445865703-ipcj0gi62eq1il1rojaa4gl64pk5a6g0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.wezen.moodCalendar"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1027445865703:android:3bfa8d7dbd429e711ef642",
+        "android_client_info": {
+          "package_name": "com.wezen.mood_calendar"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1027445865703-9caekvjdb7ocglc7qrflasj41cn21lo8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.wezen.mood_calendar",
+            "certificate_hash": "979cfdbe045fae601cfa7bbb66fbd4de3eb03f5f"
+          }
+        },
+        {
+          "client_id": "1027445865703-fn4mf68sdb0i95sc7rv3ojrous24kvcp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBLBTa1_wOUyrqTjjqoyzVnWhlEUrzr3y0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1027445865703-fn4mf68sdb0i95sc7rv3ojrous24kvcp.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1027445865703-ipcj0gi62eq1il1rojaa4gl64pk5a6g0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.wezen.moodCalendar"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

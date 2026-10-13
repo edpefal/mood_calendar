@@ -4,9 +4,10 @@ Flutter app para registrar y revisar estados de ánimo diarios, con un catálogo
 
 ## Stack
 
-- **Flutter** 3.x (CI usa 3.32.1), Dart SDK `>=3.4.4 <4.0.0`
+- **Flutter** 3.x (CI usa 3.32.1), Dart SDK `>=3.6.0 <4.0.0`
 - **Estado**: flutter_bloc + Cubit
 - **Persistencia**: Hive (local, sin backend)
+- **Crashes**: Firebase Crashlytics (`firebase_core` + `firebase_crashlytics`, proyecto Firebase `mood-calendar-fee5c`), solo en release en iOS/Android
 - **Compras in-app**: purchases_flutter (RevenueCat), solo iOS por ahora
 - **Generación de código**: freezed, json_serializable, hive_generator → correr con `flutter pub run build_runner build`
 - **Notificaciones**: flutter_local_notifications + timezone
@@ -26,7 +27,7 @@ lib/
 │   ├── notifications/    # LocalNotificationService
 │   ├── rating/           # ReviewRequester (in_app_review)
 │   ├── settings/         # AppSettings y estado del pedido de calificación (Hive)
-│   ├── telemetry/        # AppTelemetry
+│   ├── telemetry/        # AppTelemetry, CrashReporter y Crashlytics (crash reporting)
 │   ├── widgets/          # widgets compartidos (GradientPillButton, FloatingTabBar)
 │   └── navigation/       # MainShell: raíz de la app con las 4 pestañas y el bottom bar
 └── features/
@@ -99,6 +100,8 @@ Cada uno tiene su spec en `openspec/specs/`; leerla antes de cambiarlo.
 
 `runApp()` se llama **antes** de inicializar notificaciones (que espera el diálogo nativo de permisos) y de tareas lentas. Nunca volver a hacer `await` de nada que dependa de interacción del usuario (diálogos del sistema, p. ej. el permiso de notificaciones) antes de `runApp()`: dejó la app congelada en el launch screen y causó un rechazo de Apple (Guideline 2.1(a)). Hive y `Purchases.configure()` sí se esperan antes de `runApp()` a propósito: no esperan al usuario y `configure()` debe terminar antes de construir `MoodEntitlementsRepositoryImpl` (ver `openspec/changes/archive/2026-09-29-fix-launch-blocked-on-notification-permission/`).
 
+`initializeCrashReporting()` (`lib/core/telemetry/crash_reporting_bootstrap.dart`) es lo primero que corre en `main()` tras `ensureInitialized()`, para capturar también crashes de arranque; tampoco espera al usuario. Solo se activa con `kReleaseMode`, en iOS/Android y con `errorsEnabled` (`ENABLE_ERROR_TELEMETRY`); en debug, tests y `tool/screenshots/main.dart` queda `LoggerAppTelemetry` y nada sale del dispositivo. Si falla, la app arranca igual sin reporte. `CrashlyticsAppTelemetry` envuelve al logger y reenvía `recordError` como no fatal, **sin** las claves de contexto `date`, `mood`, `intensity` y `note` (`blockedContextKeys`): al añadir contexto a un `recordError`, no meter datos de entradas del usuario. El reporte es opt-out y no hay toggle en Settings (pendiente en `backlog.md`).
+
 ## Sistema de diseño
 
 - Color de marca: púrpura `#5F3DC4` → `#6C63FF` (gradiente); launch screen con fondo `#8C52FF` coincidiendo con el ícono.
@@ -124,7 +127,7 @@ flutter run --dart-define=REVENUECAT_IOS_API_KEY=<key>   # correr en simulador c
 REVENUECAT_IOS_API_KEY=<key> STORE_VERIFIED=1 scripts/build_ios_release.sh
 ```
 
-El script se niega a correr sin la key, siempre pasa `--dart-define=REVENUECAT_IOS_API_KEY=<key>` y, al terminar (`scripts/verify_ios_archive_key.sh`), comprueba que la key quedó embebida en el binario compilado: falla si no está. Acepta flags extra de `flutter build ipa`.
+El script se niega a correr sin la key, siempre pasa `--dart-define=REVENUECAT_IOS_API_KEY=<key>` y, al terminar (`scripts/verify_ios_archive_key.sh`), comprueba que la key quedó embebida en el binario compilado: falla si no está. Acepta flags extra de `flutter build ipa`. Después corre `scripts/verify_ios_archive_crash_reporting.sh`, que falla si el archive no trae `GoogleService-Info.plist` o los dSYMs de `Runner.app` y `App.framework` (sin ellos Crashlytics no inicializa o los traces no se simbolican). La build phase "FlutterFire: upload-crashlytics-symbols" del target Runner sube los símbolos al archivar y necesita `flutterfire` instalado (`dart pub global activate flutterfire_cli`, en `~/.pub-cache/bin`).
 
 Un hook de Claude Code (`.claude/settings.json` → `.claude/hooks/require-release-script.sh`) bloquea `flutter build ipa` y `flutter build ios` de release ejecutados directo en una sesión. Los builds de simulador, debug y profile no se bloquean. Si se archiva desde Xcode (no recomendado) hay que poner el mismo `--dart-define` en los Build Settings del scheme de Release y correr después `REVENUECAT_IOS_API_KEY=<key> scripts/verify_ios_archive_key.sh`.
 
