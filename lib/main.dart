@@ -17,7 +17,10 @@ import 'core/settings/data/datasources/app_settings_local_datasource.dart';
 import 'core/settings/data/datasources/rating_prompt_local_datasource.dart';
 import 'core/settings/data/repositories/app_settings_repository_impl.dart';
 import 'core/settings/domain/repositories/app_settings_repository.dart';
+import 'core/telemetry/app_telemetry.dart';
 import 'core/telemetry/app_telemetry_config.dart';
+import 'core/telemetry/crash_reporting_bootstrap.dart';
+import 'core/telemetry/crashlytics_app_telemetry.dart';
 import 'core/telemetry/logger_app_telemetry.dart';
 import 'features/mood/data/models/mood_model.dart';
 import 'features/mood/data/repositories/mood_repository_impl.dart';
@@ -75,6 +78,15 @@ Future<void> handleReminderTap() {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  final appLogger = LoggerAppLogger();
+  final telemetryConfig = AppTelemetryConfig.fromEnvironment();
+  // Before anything else so startup crashes are captured too. It never waits
+  // on the user (no system dialogs), so it is safe ahead of runApp().
+  final crashReporter = await initializeCrashReporting(
+    logger: appLogger,
+    config: telemetryConfig,
+  );
+
   final appDocumentDir = await getApplicationDocumentsDirectory();
   await Hive.initFlutter(appDocumentDir.path);
 
@@ -86,11 +98,18 @@ void main() async {
   final moodBox = Hive.box<MoodModel>('moods');
   final settingsBox = Hive.box<dynamic>(AppSettingsLocalDataSource.boxName);
 
-  final appLogger = LoggerAppLogger();
-  final telemetry = LoggerAppTelemetry(
+  final loggerTelemetry = LoggerAppTelemetry(
     logger: appLogger,
-    config: AppTelemetryConfig.fromEnvironment(),
+    config: telemetryConfig,
   );
+  final AppTelemetry telemetry = crashReporter == null
+      ? loggerTelemetry
+      : CrashlyticsAppTelemetry(
+          delegate: loggerTelemetry,
+          reporter: crashReporter,
+          logger: appLogger,
+          config: telemetryConfig,
+        );
   final repository = MoodRepositoryImpl(moodBox, logger: appLogger);
   final appSettingsRepository = AppSettingsRepositoryImpl(
     AppSettingsLocalDataSource(settingsBox),

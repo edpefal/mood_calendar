@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>1027445865703-tqvkdj9imigldvpiiem0cnei19tlc29e.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.1027445865703-tqvkdj9imigldvpiiem0cnei19tlc29e</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>1027445865703-9caekvjdb7ocglc7qrflasj41cn21lo8.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyBIEBJ-sK6PEEdy2HR1_6hsnQ1EUY-nuGE</string>
+	<key>GCM_SENDER_ID</key>
+	<string>1027445865703</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.artlab.moodcalendar</string>
+	<key>PROJECT_ID</key>
+	<string>mood-calendar-fee5c</string>
+	<key>STORAGE_BUCKET</key>
+	<string>mood-calendar-fee5c.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:1027445865703:ios:8ba25f27493625c91ef642</string>
+</dict>
+</plist>
