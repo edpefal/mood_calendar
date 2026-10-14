@@ -40,6 +40,16 @@ void main() {
     });
   });
 
+  group('AppStrings.storeRetry', () {
+    test('has a translation for every supported language', () {
+      expect(const AppStringsEn().storeRetry, 'Try again');
+      expect(const AppStringsEs().storeRetry, 'Reintentar');
+      expect(const AppStringsDe().storeRetry, 'Erneut versuchen');
+      expect(const AppStringsFr().storeRetry, 'Réessayer');
+      expect(const AppStringsIt().storeRetry, 'Riprova');
+    });
+  });
+
   group('AppStrings.forLocale', () {
     test('returns the matching language for each supported locale', () {
       expect(AppStrings.forLocale(const Locale('en')), isA<AppStringsEn>());

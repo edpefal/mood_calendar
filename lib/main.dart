@@ -190,7 +190,10 @@ void main() async {
             ),
           ),
           BlocProvider(
-            create: (context) => PurchasesCubit(moodEntitlementsRepository),
+            create: (context) => PurchasesCubit(
+              moodEntitlementsRepository,
+              telemetry: telemetry,
+            ),
           ),
         ],
         child: const MyApp(),

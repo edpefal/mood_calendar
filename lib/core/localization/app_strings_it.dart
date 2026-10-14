@@ -187,6 +187,8 @@ class AppStringsIt extends AppStrings {
   String get storeLoadError =>
       'Non siamo riusciti a caricare il negozio in questo momento. Riprova.';
   @override
+  String get storeRetry => 'Riprova';
+  @override
   String get storeEmptyMoods =>
       'Nessun umore premium disponibile al momento.';
   @override

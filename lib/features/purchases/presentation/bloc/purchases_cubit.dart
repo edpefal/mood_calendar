@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/telemetry/app_telemetry.dart';
 import '../../../mood/domain/entities/mood_definition.dart';
 import '../../domain/entities/mood_offer.dart';
 import '../../domain/entities/mood_pack.dart';
@@ -13,9 +14,11 @@ part 'purchases_state.dart';
 
 class PurchasesCubit extends Cubit<PurchasesState> {
   final MoodEntitlementsRepository repository;
+  final AppTelemetry? telemetry;
   StreamSubscription<Set<String>>? _unlockedSubscription;
 
-  PurchasesCubit(this.repository) : super(const PurchasesState()) {
+  PurchasesCubit(this.repository, {this.telemetry})
+      : super(const PurchasesState()) {
     _unlockedSubscription = repository.unlockedPremiumMoodIds().listen((ids) {
       emit(state.copyWith(unlockedMoodIds: ids));
     });
@@ -47,7 +50,13 @@ class PurchasesCubit extends Cubit<PurchasesState> {
           isLoadingCatalog: false,
         ),
       );
-    } catch (e) {
+    } catch (e, stackTrace) {
+      telemetry?.recordError(
+        'load_store_catalog_failed',
+        reason: 'get_offerings',
+        error: e,
+        stackTrace: stackTrace,
+      );
       emit(state.copyWith(isLoadingCatalog: false, catalogError: e));
     }
   }
