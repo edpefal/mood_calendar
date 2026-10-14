@@ -11,8 +11,43 @@ import '../bloc/purchases_cubit.dart';
 import '../widgets/mood_purchase_sheet.dart';
 import '../widgets/pack_purchase_sheet.dart';
 
-class MoodStoreScreen extends StatelessWidget {
-  const MoodStoreScreen({super.key});
+class MoodStoreScreen extends StatefulWidget {
+  const MoodStoreScreen({super.key, this.isActive = true});
+
+  /// Si la pestaña de la Tienda es la visible. Al activarse con el catálogo
+  /// en error se reintenta la carga una vez.
+  final bool isActive;
+
+  @override
+  State<MoodStoreScreen> createState() => _MoodStoreScreenState();
+}
+
+class _MoodStoreScreenState extends State<MoodStoreScreen> {
+  @override
+  void initState() {
+    super.initState();
+    if (widget.isActive) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _retryIfFailed());
+    }
+  }
+
+  @override
+  void didUpdateWidget(MoodStoreScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isActive && !oldWidget.isActive) {
+      _retryIfFailed();
+    }
+  }
+
+  void _retryIfFailed() {
+    if (!mounted) {
+      return;
+    }
+    final cubit = context.read<PurchasesCubit>();
+    if (cubit.state.catalogError != null && !cubit.state.isLoadingCatalog) {
+      cubit.loadCatalog();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +81,32 @@ class MoodStoreScreen extends StatelessWidget {
             return Center(child: Text(strings.storeLoading));
           }
           if (state.catalogError != null && state.offers.isEmpty && state.packs.isEmpty) {
-            return Center(child: Text(strings.storeLoadError));
+            return Center(
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(
+                  24,
+                  24,
+                  24,
+                  24 + MediaQuery.paddingOf(context).bottom,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      strings.storeLoadError,
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    GradientPillButton(
+                      label: strings.storeRetry,
+                      semanticsLabel: strings.storeRetry,
+                      onPressed: () =>
+                          context.read<PurchasesCubit>().loadCatalog(),
+                    ),
+                  ],
+                ),
+              ),
+            );
           }
 
           return RefreshIndicator(

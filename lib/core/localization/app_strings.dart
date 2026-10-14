@@ -123,6 +123,7 @@ abstract class AppStrings {
   String get storePacksSectionTitle;
   String get storeLoading;
   String get storeLoadError;
+  String get storeRetry;
   String get storeEmptyMoods;
   String get storeEmptyPacks;
   String get moodUnlockedLabel;

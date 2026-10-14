@@ -183,6 +183,8 @@ class AppStringsEn extends AppStrings {
   String get storeLoadError =>
       'We could not load the store right now. Please try again.';
   @override
+  String get storeRetry => 'Try again';
+  @override
   String get storeEmptyMoods => 'No premium moods available right now.';
   @override
   String get storeEmptyPacks => 'No packs available right now.';

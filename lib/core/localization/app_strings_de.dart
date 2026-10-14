@@ -187,6 +187,8 @@ class AppStringsDe extends AppStrings {
   String get storeLoadError =>
       'Wir konnten den Shop gerade nicht laden. Bitte versuche es erneut.';
   @override
+  String get storeRetry => 'Erneut versuchen';
+  @override
   String get storeEmptyMoods =>
       'Derzeit sind keine Premium-Stimmungen verfügbar.';
   @override

@@ -83,7 +83,7 @@ class MainShellState extends State<MainShell> {
           onDaySelected: showMoodPicker,
         );
       case MainTab.store:
-        return const MoodStoreScreen();
+        return MoodStoreScreen(isActive: _tab == MainTab.store);
       case MainTab.settings:
         return SettingsScreen.forApp();
     }

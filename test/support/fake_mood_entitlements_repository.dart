@@ -9,8 +9,22 @@ class FakeMoodEntitlementsRepository implements MoodEntitlementsRepository {
   FakeMoodEntitlementsRepository({
     Set<String> unlockedMoodIds = const {},
     Set<String> restorableMoodIds = const {},
+    this.offers = const [],
+    int failCatalogLoads = 0,
+    this.holdCatalogLoads,
   })  : _unlockedMoodIds = Set<String>.from(unlockedMoodIds),
-        _restorableMoodIds = Set<String>.from(restorableMoodIds);
+        _restorableMoodIds = Set<String>.from(restorableMoodIds),
+        _failCatalogLoads = failCatalogLoads;
+
+  /// Ofertas que devuelve `availableMoodOffers` cuando la carga no falla.
+  final List<MoodOffer> offers;
+
+  /// Si no es nulo, las cargas del catálogo esperan a este future.
+  Future<void>? holdCatalogLoads;
+
+  /// Cuántas veces se pidió el catálogo (aciertos y fallos).
+  int catalogLoadCount = 0;
+  int _failCatalogLoads;
 
   final Set<String> _unlockedMoodIds;
 
@@ -36,7 +50,15 @@ class FakeMoodEntitlementsRepository implements MoodEntitlementsRepository {
   }
 
   @override
-  Future<List<MoodOffer>> availableMoodOffers() async => const [];
+  Future<List<MoodOffer>> availableMoodOffers() async {
+    catalogLoadCount++;
+    await holdCatalogLoads;
+    if (_failCatalogLoads > 0) {
+      _failCatalogLoads--;
+      throw StateError('catalog unavailable');
+    }
+    return offers;
+  }
 
   @override
   Future<List<MoodPack>> availablePacks() async => const [];

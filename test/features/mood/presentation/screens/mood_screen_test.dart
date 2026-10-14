@@ -27,6 +27,7 @@ import 'package:mood_calendar/features/mood/presentation/screens/mood_screen.dar
 import 'package:mood_calendar/features/purchases/presentation/bloc/purchases_cubit.dart';
 import 'package:mood_calendar/features/settings/presentation/screens/settings_screen.dart';
 
+import 'package:mood_calendar/features/purchases/domain/entities/mood_offer.dart';
 import '../../../../support/fake_mood_entitlements_repository.dart';
 
 class _FakeMoodRepository implements MoodRepository {
@@ -1060,6 +1061,79 @@ void main() {
       await tester.tap(find.byTooltip(strings.previousMonthTooltip));
       await tester.pumpAndSettle();
     }
+
+    testWidgets('the store tab retries a catalog that failed at startup',
+        (tester) async {
+      final entitlements = FakeMoodEntitlementsRepository(
+        offers: const [
+          MoodOffer(
+            moodId: 'anxious',
+            displayPrice: r'$0.99',
+            productId: 'mood_anxious_unlock',
+          ),
+        ],
+        failCatalogLoads: 1,
+      );
+      await tester.pumpWidget(buildApp(entitlements: entitlements));
+      await tester.pumpAndSettle();
+      expect(entitlements.catalogLoadCount, 1);
+
+      await openTab(tester, strings.openStoreTooltip);
+
+      expect(find.text(strings.storeLoadError), findsNothing);
+      expect(find.text(strings.moodName('anxious')), findsOneWidget);
+      expect(entitlements.catalogLoadCount, 2);
+    });
+
+    testWidgets('returning to the store tab retries after a failed retry',
+        (tester) async {
+      final entitlements = FakeMoodEntitlementsRepository(
+        offers: const [
+          MoodOffer(
+            moodId: 'anxious',
+            displayPrice: r'$0.99',
+            productId: 'mood_anxious_unlock',
+          ),
+        ],
+        // Falla al arrancar y también en el reintento de la primera visita.
+        failCatalogLoads: 2,
+      );
+      await tester.pumpWidget(buildApp(entitlements: entitlements));
+      await tester.pumpAndSettle();
+
+      await openTab(tester, strings.openStoreTooltip);
+      expect(find.text(strings.storeLoadError), findsOneWidget);
+      expect(entitlements.catalogLoadCount, 2);
+
+      await openTab(tester, strings.openCalendarTooltip);
+      await openTab(tester, strings.openStoreTooltip);
+
+      expect(find.text(strings.storeLoadError), findsNothing);
+      expect(find.text(strings.moodName('anxious')), findsOneWidget);
+      expect(entitlements.catalogLoadCount, 3);
+    });
+
+    testWidgets('returning to the store tab does not reload a loaded catalog',
+        (tester) async {
+      final entitlements = FakeMoodEntitlementsRepository(
+        offers: const [
+          MoodOffer(
+            moodId: 'anxious',
+            displayPrice: r'$0.99',
+            productId: 'mood_anxious_unlock',
+          ),
+        ],
+      );
+      await tester.pumpWidget(buildApp(entitlements: entitlements));
+      await tester.pumpAndSettle();
+
+      await openTab(tester, strings.openStoreTooltip);
+      await openTab(tester, strings.openCalendarTooltip);
+      await openTab(tester, strings.openStoreTooltip);
+
+      expect(entitlements.catalogLoadCount, 1);
+      expect(find.text(strings.moodName('anxious')), findsOneWidget);
+    });
 
     for (final otherTab in ['calendar', 'store', 'settings']) {
       testWidgets(
