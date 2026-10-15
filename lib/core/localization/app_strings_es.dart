@@ -28,6 +28,14 @@ class AppStringsEs extends AppStrings {
   @override
   String get saveMoodButtonLabel => 'Guardar registro de ánimo';
   @override
+  String get moodGridButtonLabel => 'Ver todos los moods';
+  @override
+  String get moodGridTitle => 'Todos los moods';
+  @override
+  String get previousMoodLabel => 'Mood anterior';
+  @override
+  String get nextMoodLabel => 'Mood siguiente';
+  @override
   String get savingMood => 'Guardando tu ánimo...';
   @override
   String get saveMoodError =>
@@ -91,19 +99,23 @@ class AppStringsEs extends AppStrings {
   @override
   String get privacyPolicyTitle => 'Política de privacidad';
   @override
-  String get privacyPolicySemanticLabel => 'Abrir la política de privacidad en el navegador';
+  String get privacyPolicySemanticLabel =>
+      'Abrir la política de privacidad en el navegador';
   @override
   String get appVersionTitle => 'Versión';
   @override
-  String get privacyLinkFailed => 'No se pudo abrir el enlace. Inténtalo de nuevo más tarde.';
+  String get privacyLinkFailed =>
+      'No se pudo abrir el enlace. Inténtalo de nuevo más tarde.';
   @override
-  String get settingsSaveFailed => 'No se pudieron guardar los ajustes. Inténtalo de nuevo.';
+  String get settingsSaveFailed =>
+      'No se pudieron guardar los ajustes. Inténtalo de nuevo.';
   @override
   String get settingsDataSection => 'Tus datos';
   @override
   String get exportHistoryTitle => 'Exportar historial';
   @override
-  String get exportHistorySemanticLabel => 'Exportar tu historial de ánimo como archivo';
+  String get exportHistorySemanticLabel =>
+      'Exportar tu historial de ánimo como archivo';
   @override
   String get exportHistoryEmpty => 'Aún no hay historial para exportar.';
   @override
@@ -155,8 +167,7 @@ class AppStringsEs extends AppStrings {
       '${date.day} de ${monthNames[date.month - 1].toLowerCase()} de ${date.year}';
 
   @override
-  List<String> get weekdayInitials =>
-      const ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
+  List<String> get weekdayInitials => const ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
 
   @override
   String get noteButtonLabel => 'Nota';

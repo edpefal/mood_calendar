@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../core/localization/app_strings.dart';
+import '../../../../core/widgets/floating_tab_bar.dart';
 import '../../../../core/widgets/gradient_pill_button.dart';
 import '../../../purchases/presentation/bloc/purchases_cubit.dart';
 import '../../../purchases/presentation/widgets/mood_purchase_sheet.dart';
@@ -12,6 +13,7 @@ import '../../domain/services/mood_definition_resolver.dart';
 import '../../domain/services/mood_picker_order.dart';
 import '../bloc/calendar_cubit.dart';
 import '../bloc/mood_cubit.dart';
+import '../widgets/mood_grid_sheet.dart';
 import '../widgets/note_editor_sheet.dart';
 
 class MoodScreen extends StatefulWidget {
@@ -35,6 +37,24 @@ class MoodScreen extends StatefulWidget {
   State<MoodScreen> createState() => _MoodScreenState();
 }
 
+/// Fracción del ancho que ocupa cada página: con 0.5 se asoma la mitad de
+/// cada vecino y es evidente que el carrusel se desliza. En pantallas anchas
+/// (iPad) la página se limita a [_maxPageWidth] para que los vecinos sigan
+/// cerca del seleccionado en vez de quedar pegados a los bordes.
+const double _maxViewportFraction = 0.5;
+const double _maxPageWidth = 240;
+
+double _viewportFractionFor(double screenWidth) {
+  if (screenWidth <= 0) {
+    return _maxViewportFraction;
+  }
+  final fraction = _maxPageWidth / screenWidth;
+  return fraction < _maxViewportFraction ? fraction : _maxViewportFraction;
+}
+
+/// Margen horizontal de la pantalla (todo menos el carrusel).
+const double _screenGutterWidth = 16;
+
 class _MoodScreenState extends State<MoodScreen>
     with SingleTickerProviderStateMixin {
   // Se fija con la primera carga del historial y solo se recalcula cuando el
@@ -51,11 +71,12 @@ class _MoodScreenState extends State<MoodScreen>
   bool _isSaving = false;
   bool _didHydrateInitialState = false;
   late PageController _pageController;
+  double _viewportFraction = _maxViewportFraction;
 
   @override
   void initState() {
     super.initState();
-    _pageController = PageController(initialPage: 0);
+    _pageController = _newPageController(0);
   }
 
   @override
@@ -105,8 +126,7 @@ class _MoodScreenState extends State<MoodScreen>
             // El Scrollable del PageView reutiliza su posición al cambiar de
             // controlador, así que el PageView se recrea (nueva `Key`) para que
             // respete `initialPage`.
-            _pageController =
-                PageController(initialPage: target, keepPage: false);
+            _pageController = _newPageController(target, keepPage: false);
             _carouselGeneration++;
             WidgetsBinding.instance
                 .addPostFrameCallback((_) => previousController.dispose());
@@ -187,7 +207,7 @@ class _MoodScreenState extends State<MoodScreen>
         // El PageView aún no existe (se muestra el loader), así que no hay a
         // dónde saltar: se recrea el controlador con la página correcta.
         _pageController.dispose();
-        _pageController = PageController(initialPage: targetPage);
+        _pageController = _newPageController(targetPage);
       }
     });
 
@@ -208,6 +228,68 @@ class _MoodScreenState extends State<MoodScreen>
       return false;
     }
     return !context.read<PurchasesCubit>().isMoodUnlocked(mood.id);
+  }
+
+  static Widget _screenGutter(Widget child) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: _screenGutterWidth),
+        child: child,
+      );
+
+  Future<void> _openMoodGrid() async {
+    final chosen = await showMoodGridSheet(
+      context,
+      moods: _orderedMoods,
+      selectedId: selectedMood.id,
+      isLocked: _isMoodLocked,
+    );
+    if (chosen == null || !mounted) {
+      return;
+    }
+    if (_isMoodLocked(chosen)) {
+      _openPurchaseFlow(chosen);
+      return;
+    }
+    final index = _orderedMoods.indexWhere((mood) => mood.id == chosen.id);
+    if (index >= 0) {
+      await _goToPage(index);
+    }
+  }
+
+  PageController _newPageController(int initialPage, {bool keepPage = true}) =>
+      PageController(
+        initialPage: initialPage,
+        keepPage: keepPage,
+        viewportFraction: _viewportFraction,
+      );
+
+  /// Ajusta el ancho de página al ancho de la pantalla (rotación, iPad). El
+  /// PageView reutiliza su posición al cambiar de controlador, así que se
+  /// recrea con una nueva `Key`, igual que al reordenar.
+  void _syncViewportFraction(double screenWidth) {
+    final fraction = _viewportFractionFor(screenWidth);
+    if ((fraction - _viewportFraction).abs() < 0.001) {
+      return;
+    }
+    _viewportFraction = fraction;
+    final previous = _pageController;
+    _pageController = _newPageController(_currentPage, keepPage: false);
+    _carouselGeneration++;
+    WidgetsBinding.instance.addPostFrameCallback((_) => previous.dispose());
+  }
+
+  Future<void> _goToPage(int index) async {
+    if (!_pageController.hasClients) {
+      return;
+    }
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _pageController.jumpToPage(index);
+    } else {
+      await _pageController.animateToPage(
+        index,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
   }
 
   void _openPurchaseFlow(MoodDefinition mood) {
@@ -278,6 +360,7 @@ class _MoodScreenState extends State<MoodScreen>
       },
       child: Builder(
         builder: (context) {
+          _syncViewportFraction(MediaQuery.sizeOf(context).width);
           if (isLoading) {
             return Scaffold(
               body: Center(
@@ -326,55 +409,57 @@ class _MoodScreenState extends State<MoodScreen>
                     SliverFillRemaining(
                       hasScrollBody: false,
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 24,
-                        ),
+                        // Sin padding horizontal: el carrusel ocupa todo el ancho
+                        // para que los vecinos se asomen desde el borde de la
+                        // pantalla; el resto de hijos pone su propio margen.
+                        padding: const EdgeInsets.symmetric(vertical: 24),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        strings.formatFullDate(_selectedDate),
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleLarge
-                                            ?.copyWith(
-                                                fontWeight: FontWeight.bold),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        strings.moodQuestion,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleLarge
-                                            ?.copyWith(
-                                              fontWeight: FontWeight.bold,
-                                              color: const Color(0xFF5F3DC4),
-                                            ),
-                                      ),
-                                    ],
+                            _screenGutter(
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          strings.formatFullDate(_selectedDate),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleLarge
+                                              ?.copyWith(
+                                                  fontWeight: FontWeight.bold),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          strings.moodQuestion,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleLarge
+                                              ?.copyWith(
+                                                fontWeight: FontWeight.bold,
+                                                color: const Color(0xFF5F3DC4),
+                                              ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(width: 12),
-                                AnimatedBuilder(
-                                  animation: _noteController,
-                                  builder: (context, _) => _NoteButton(
-                                    label: strings.noteButtonLabel,
-                                    hasNote: _noteController.text.isNotEmpty,
-                                    onTap: _openNoteEditor,
+                                  const SizedBox(width: 12),
+                                  AnimatedBuilder(
+                                    animation: _noteController,
+                                    builder: (context, _) => _NoteButton(
+                                      label: strings.noteButtonLabel,
+                                      hasNote: _noteController.text.isNotEmpty,
+                                      onTap: _openNoteEditor,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                             Column(
                               children: [
@@ -411,66 +496,28 @@ class _MoodScreenState extends State<MoodScreen>
                                                 _orderedMoods.length,
                                               ),
                                               child: GestureDetector(
-                                                onTap: isLocked
-                                                    ? () =>
-                                                        _openPurchaseFlow(mood)
-                                                    : null,
-                                                child: Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    Stack(
-                                                      alignment:
-                                                          Alignment.center,
-                                                      children: [
-                                                        Opacity(
-                                                          opacity: isLocked
-                                                              ? 0.4
-                                                              : 1,
-                                                          child:
-                                                              SvgPicture.asset(
-                                                            mood.assetPath,
-                                                            height: 150,
-                                                            width: 150,
-                                                            fit: BoxFit.contain,
-                                                            semanticsLabel:
-                                                                strings.moodName(
-                                                                    mood.id),
-                                                            placeholderBuilder:
-                                                                (context) =>
-                                                                    const CircularProgressIndicator(),
-                                                            errorBuilder: (
-                                                              context,
-                                                              error,
-                                                              stackTrace,
-                                                            ) {
-                                                              return const Icon(
-                                                                Icons
-                                                                    .error_outline,
-                                                                size: 150,
-                                                                color:
-                                                                    Colors.red,
-                                                              );
-                                                            },
-                                                          ),
-                                                        ),
-                                                        if (isLocked)
-                                                          const Icon(
-                                                            Icons.lock_rounded,
-                                                            size: 40,
-                                                            color: Color(
-                                                                0xFF5F3DC4),
-                                                          ),
-                                                      ],
-                                                    ),
-                                                    const SizedBox(height: 8),
-                                                    Text(
-                                                      strings.moodName(mood.id),
-                                                      style: Theme.of(context)
-                                                          .textTheme
-                                                          .titleMedium,
-                                                    ),
-                                                  ],
+                                                // Un vecino solo se centra; la
+                                                // compra se abre desde el
+                                                // seleccionado, para no comprar
+                                                // por accidente al querer avanzar.
+                                                onTap: index != _currentPage
+                                                    ? () => _goToPage(index)
+                                                    : isLocked
+                                                        ? () =>
+                                                            _openPurchaseFlow(
+                                                                mood)
+                                                        : null,
+                                                child: _CarouselMood(
+                                                  mood: mood,
+                                                  index: index,
+                                                  isLocked: isLocked,
+                                                  isSelected:
+                                                      index == _currentPage,
+                                                  controller: _pageController,
+                                                  initialPage: _currentPage,
+                                                  label: strings.moodName(
+                                                    mood.id,
+                                                  ),
                                                 ),
                                               ),
                                             );
@@ -481,43 +528,89 @@ class _MoodScreenState extends State<MoodScreen>
                                   ),
                                 ),
                                 const SizedBox(height: 8),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: List.generate(
-                                    _orderedMoods.length,
-                                    (index) => Container(
-                                      width: 8,
-                                      height: 8,
-                                      margin: const EdgeInsets.symmetric(
-                                          horizontal: 4),
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: _currentPage == index
-                                            ? const Color(0xFF5F3DC4)
-                                            : Colors.grey[300],
+                                _screenGutter(
+                                  Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          _CarouselArrow(
+                                            icon: Icons.chevron_left_rounded,
+                                            tooltip: strings.previousMoodLabel,
+                                            onPressed: _currentPage > 0
+                                                ? () =>
+                                                    _goToPage(_currentPage - 1)
+                                                : null,
+                                          ),
+                                          ExcludeSemantics(
+                                            child: Text(
+                                              '${_currentPage + 1} / ${_orderedMoods.length}',
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyMedium
+                                                  ?.copyWith(
+                                                    fontWeight: FontWeight.w600,
+                                                    color: Colors.grey[600],
+                                                  ),
+                                            ),
+                                          ),
+                                          _CarouselArrow(
+                                            icon: Icons.chevron_right_rounded,
+                                            tooltip: strings.nextMoodLabel,
+                                            onPressed: _currentPage <
+                                                    _orderedMoods.length - 1
+                                                ? () =>
+                                                    _goToPage(_currentPage + 1)
+                                                : null,
+                                          ),
+                                        ],
                                       ),
-                                    ),
+                                      SizedBox(
+                                        width: 48,
+                                        height: 48,
+                                        child: IconButton(
+                                          tooltip: strings.moodGridButtonLabel,
+                                          icon: const Icon(
+                                            Icons.grid_view_rounded,
+                                            color: Color(0xFF5F3DC4),
+                                          ),
+                                          onPressed: _openMoodGrid,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
                             ),
-                            Column(
-                              children: [
-                                GradientPillButton(
-                                  label: strings.save,
-                                  semanticsLabel: strings.saveMoodButtonLabel,
-                                  loading: isBusy,
-                                  onPressed: _saveMood,
-                                ),
-                                if (isBusy) ...[
-                                  const SizedBox(height: 12),
-                                  Text(
-                                    strings.savingMood,
-                                    style:
-                                        Theme.of(context).textTheme.bodyMedium,
+                            _screenGutter(
+                              Column(
+                                children: [
+                                  // Mismo tope que la barra inferior: en iPad un
+                                  // botón de todo el ancho se ve desproporcionado.
+                                  ConstrainedBox(
+                                    constraints: const BoxConstraints(
+                                      maxWidth: FloatingTabBar.maxWidth,
+                                    ),
+                                    child: GradientPillButton(
+                                      label: strings.save,
+                                      semanticsLabel:
+                                          strings.saveMoodButtonLabel,
+                                      loading: isBusy,
+                                      onPressed: _saveMood,
+                                    ),
                                   ),
+                                  if (isBusy) ...[
+                                    const SizedBox(height: 12),
+                                    Text(
+                                      strings.savingMood,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium,
+                                    ),
+                                  ],
                                 ],
-                              ],
+                              ),
                             ),
                           ],
                         ),
@@ -529,6 +622,121 @@ class _MoodScreenState extends State<MoodScreen>
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+/// Un mood del carrusel: el seleccionado a tamaño completo y los vecinos más
+/// chicos y atenuados según su distancia a la página actual.
+class _CarouselMood extends StatelessWidget {
+  const _CarouselMood({
+    required this.mood,
+    required this.index,
+    required this.isLocked,
+    required this.isSelected,
+    required this.controller,
+    required this.initialPage,
+    required this.label,
+  });
+
+  final MoodDefinition mood;
+  final int index;
+  final bool isLocked;
+  final bool isSelected;
+  final PageController controller;
+  final int initialPage;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: controller,
+      builder: (context, _) {
+        final page = controller.hasClients && controller.position.haveDimensions
+            ? controller.page ?? initialPage.toDouble()
+            : initialPage.toDouble();
+        final distance = (page - index).abs().clamp(0.0, 1.0);
+
+        return Opacity(
+          opacity: 1 - 0.5 * distance,
+          child: Transform.scale(
+            scale: 1 - 0.4 * distance,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Opacity(
+                      opacity: isLocked ? 0.4 : 1,
+                      child: SvgPicture.asset(
+                        mood.assetPath,
+                        height: 150,
+                        width: 150,
+                        fit: BoxFit.contain,
+                        semanticsLabel: label,
+                        placeholderBuilder: (context) =>
+                            const CircularProgressIndicator(),
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Icon(
+                            Icons.error_outline,
+                            size: 150,
+                            color: Colors.red,
+                          );
+                        },
+                      ),
+                    ),
+                    if (isLocked)
+                      const Icon(
+                        Icons.lock_rounded,
+                        size: 40,
+                        color: Color(0xFF5F3DC4),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                // Solo el seleccionado muestra su nombre; el hueco se
+                // conserva para que el emoji no salte de lugar.
+                if (isSelected)
+                  Text(
+                    label,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  )
+                else
+                  SizedBox(
+                    height: Theme.of(context).textTheme.titleMedium?.height,
+                  ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _CarouselArrow extends StatelessWidget {
+  const _CarouselArrow({
+    required this.icon,
+    required this.tooltip,
+    required this.onPressed,
+  });
+
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 48,
+      height: 48,
+      child: IconButton(
+        tooltip: tooltip,
+        icon: Icon(icon, size: 28),
+        color: const Color(0xFF5F3DC4),
+        onPressed: onPressed,
       ),
     );
   }

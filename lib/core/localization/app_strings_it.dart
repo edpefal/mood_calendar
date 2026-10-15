@@ -29,6 +29,14 @@ class AppStringsIt extends AppStrings {
   @override
   String get saveMoodButtonLabel => 'Salva registrazione umore';
   @override
+  String get moodGridButtonLabel => 'Mostra tutti gli umori';
+  @override
+  String get moodGridTitle => 'Tutti gli umori';
+  @override
+  String get previousMoodLabel => 'Umore precedente';
+  @override
+  String get nextMoodLabel => 'Umore successivo';
+  @override
   String get savingMood => 'Salvataggio del tuo umore...';
   @override
   String get saveMoodError =>
@@ -93,21 +101,26 @@ class AppStringsIt extends AppStrings {
   @override
   String get privacyPolicyTitle => 'Informativa sulla privacy';
   @override
-  String get privacyPolicySemanticLabel => 'Apri l\'informativa sulla privacy nel browser';
+  String get privacyPolicySemanticLabel =>
+      'Apri l\'informativa sulla privacy nel browser';
   @override
   String get appVersionTitle => 'Versione';
   @override
-  String get privacyLinkFailed => 'Impossibile aprire il link. Riprova più tardi.';
+  String get privacyLinkFailed =>
+      'Impossibile aprire il link. Riprova più tardi.';
   @override
-  String get settingsSaveFailed => 'Impossibile salvare le impostazioni. Riprova.';
+  String get settingsSaveFailed =>
+      'Impossibile salvare le impostazioni. Riprova.';
   @override
   String get settingsDataSection => 'I tuoi dati';
   @override
   String get exportHistoryTitle => 'Esporta cronologia';
   @override
-  String get exportHistorySemanticLabel => 'Esporta la cronologia dell\'umore come file';
+  String get exportHistorySemanticLabel =>
+      'Esporta la cronologia dell\'umore come file';
   @override
-  String get exportHistoryEmpty => 'Non c\'è ancora nessuna cronologia da esportare.';
+  String get exportHistoryEmpty =>
+      'Non c\'è ancora nessuna cronologia da esportare.';
   @override
   String get exportingHistory => 'Esportazione della tua cronologia...';
   @override
@@ -157,8 +170,7 @@ class AppStringsIt extends AppStrings {
       '${date.day} ${monthNames[date.month - 1].toLowerCase()} ${date.year}';
 
   @override
-  List<String> get weekdayInitials =>
-      const ['L', 'M', 'M', 'G', 'V', 'S', 'D'];
+  List<String> get weekdayInitials => const ['L', 'M', 'M', 'G', 'V', 'S', 'D'];
 
   @override
   String get noteButtonLabel => 'Nota';
@@ -189,8 +201,7 @@ class AppStringsIt extends AppStrings {
   @override
   String get storeRetry => 'Riprova';
   @override
-  String get storeEmptyMoods =>
-      'Nessun umore premium disponibile al momento.';
+  String get storeEmptyMoods => 'Nessun umore premium disponibile al momento.';
   @override
   String get storeEmptyPacks => 'Nessun pacchetto disponibile al momento.';
   @override
@@ -208,9 +219,11 @@ class AppStringsIt extends AppStrings {
   @override
   String get restoringPurchases => 'Ripristino dei tuoi acquisti...';
   @override
-  String get restoreSuccessMessage => 'I tuoi acquisti sono stati ripristinati.';
+  String get restoreSuccessMessage =>
+      'I tuoi acquisti sono stati ripristinati.';
   @override
-  String get purchaseSuccessMessage => 'Acquisto completato. Buon divertimento!';
+  String get purchaseSuccessMessage =>
+      'Acquisto completato. Buon divertimento!';
   @override
   String get purchaseCancelledMessage => 'Acquisto annullato.';
   @override

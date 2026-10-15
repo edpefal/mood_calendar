@@ -17,6 +17,7 @@ import 'package:mood_calendar/features/mood/presentation/screens/mood_screen.dar
 import 'package:mood_calendar/features/purchases/presentation/bloc/purchases_cubit.dart';
 
 import 'support/fake_mood_entitlements_repository.dart';
+import 'support/drag_page.dart';
 
 void main() {
   testWidgets('Mood screen loads without reading Hive from the UI',
@@ -94,7 +95,7 @@ void main() {
       [Colors.green.shade50, Colors.green.shade200],
     );
 
-    await tester.drag(find.byType(PageView), const Offset(-400, 0));
+    await dragPage(tester);
     await tester.pumpAndSettle();
 
     final nextGradient = _currentBackgroundGradient(tester);

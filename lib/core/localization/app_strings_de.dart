@@ -29,6 +29,14 @@ class AppStringsDe extends AppStrings {
   @override
   String get saveMoodButtonLabel => 'Stimmungseintrag speichern';
   @override
+  String get moodGridButtonLabel => 'Alle Stimmungen anzeigen';
+  @override
+  String get moodGridTitle => 'Alle Stimmungen';
+  @override
+  String get previousMoodLabel => 'Vorherige Stimmung';
+  @override
+  String get nextMoodLabel => 'Nächste Stimmung';
+  @override
   String get savingMood => 'Deine Stimmung wird gespeichert...';
   @override
   String get saveMoodError =>
@@ -39,8 +47,7 @@ class AppStringsDe extends AppStrings {
   @override
   String get retry => 'Erneut versuchen';
   @override
-  String get summaryLoadError =>
-      'Wir konnten die Monatsübersicht nicht laden.';
+  String get summaryLoadError => 'Wir konnten die Monatsübersicht nicht laden.';
   @override
   String get loadingSummary => 'Monatsübersicht wird geladen...';
   @override
@@ -93,21 +100,26 @@ class AppStringsDe extends AppStrings {
   @override
   String get privacyPolicyTitle => 'Datenschutzerklärung';
   @override
-  String get privacyPolicySemanticLabel => 'Datenschutzerklärung im Browser öffnen';
+  String get privacyPolicySemanticLabel =>
+      'Datenschutzerklärung im Browser öffnen';
   @override
   String get appVersionTitle => 'Version';
   @override
-  String get privacyLinkFailed => 'Der Link konnte nicht geöffnet werden. Bitte versuche es später erneut.';
+  String get privacyLinkFailed =>
+      'Der Link konnte nicht geöffnet werden. Bitte versuche es später erneut.';
   @override
-  String get settingsSaveFailed => 'Die Einstellungen konnten nicht gespeichert werden. Bitte versuche es erneut.';
+  String get settingsSaveFailed =>
+      'Die Einstellungen konnten nicht gespeichert werden. Bitte versuche es erneut.';
   @override
   String get settingsDataSection => 'Deine Daten';
   @override
   String get exportHistoryTitle => 'Verlauf exportieren';
   @override
-  String get exportHistorySemanticLabel => 'Exportiere deinen Stimmungsverlauf als Datei';
+  String get exportHistorySemanticLabel =>
+      'Exportiere deinen Stimmungsverlauf als Datei';
   @override
-  String get exportHistoryEmpty => 'Es gibt noch keinen Verlauf zum Exportieren.';
+  String get exportHistoryEmpty =>
+      'Es gibt noch keinen Verlauf zum Exportieren.';
   @override
   String get exportingHistory => 'Dein Verlauf wird exportiert...';
   @override
@@ -157,8 +169,7 @@ class AppStringsDe extends AppStrings {
       '${date.day}. ${monthNames[date.month - 1]} ${date.year}';
 
   @override
-  List<String> get weekdayInitials =>
-      const ['M', 'D', 'M', 'D', 'F', 'S', 'S'];
+  List<String> get weekdayInitials => const ['M', 'D', 'M', 'D', 'F', 'S', 'S'];
 
   @override
   String get noteButtonLabel => 'Notiz';

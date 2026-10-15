@@ -29,6 +29,14 @@ class AppStringsFr extends AppStrings {
   @override
   String get saveMoodButtonLabel => 'Enregistrer l\'humeur';
   @override
+  String get moodGridButtonLabel => 'Voir toutes les humeurs';
+  @override
+  String get moodGridTitle => 'Toutes les humeurs';
+  @override
+  String get previousMoodLabel => 'Humeur précédente';
+  @override
+  String get nextMoodLabel => 'Humeur suivante';
+  @override
   String get savingMood => 'Enregistrement de ton humeur...';
   @override
   String get saveMoodError =>
@@ -93,21 +101,26 @@ class AppStringsFr extends AppStrings {
   @override
   String get privacyPolicyTitle => 'Politique de confidentialité';
   @override
-  String get privacyPolicySemanticLabel => 'Ouvrir la politique de confidentialité dans le navigateur';
+  String get privacyPolicySemanticLabel =>
+      'Ouvrir la politique de confidentialité dans le navigateur';
   @override
   String get appVersionTitle => 'Version';
   @override
-  String get privacyLinkFailed => 'Impossible d\'ouvrir le lien. Réessaie plus tard.';
+  String get privacyLinkFailed =>
+      'Impossible d\'ouvrir le lien. Réessaie plus tard.';
   @override
-  String get settingsSaveFailed => 'Impossible d\'enregistrer les réglages. Réessaie.';
+  String get settingsSaveFailed =>
+      'Impossible d\'enregistrer les réglages. Réessaie.';
   @override
   String get settingsDataSection => 'Tes données';
   @override
   String get exportHistoryTitle => 'Exporter l\'historique';
   @override
-  String get exportHistorySemanticLabel => 'Exporter ton historique d\'humeur dans un fichier';
+  String get exportHistorySemanticLabel =>
+      'Exporter ton historique d\'humeur dans un fichier';
   @override
-  String get exportHistoryEmpty => 'Il n\'y a pas encore d\'historique à exporter.';
+  String get exportHistoryEmpty =>
+      'Il n\'y a pas encore d\'historique à exporter.';
   @override
   String get exportingHistory => 'Exportation de ton historique...';
   @override
@@ -157,8 +170,7 @@ class AppStringsFr extends AppStrings {
       '${date.day} ${monthNames[date.month - 1].toLowerCase()} ${date.year}';
 
   @override
-  List<String> get weekdayInitials =>
-      const ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
+  List<String> get weekdayInitials => const ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
 
   @override
   String get noteButtonLabel => 'Note';
