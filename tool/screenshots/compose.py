@@ -35,7 +35,7 @@ SLIDES = [
 TEXT = {
     'en': {
         '01_calendar': 'Your mood, in full color',
-        '02_moods': '10 moods for every feeling',
+        '02_moods': 'A mood for every feeling',
         '03_summary': 'See your month and best streak',
         '04_notes': 'Add a note to any day',
         '05_reminders': 'A gentle daily reminder',
@@ -43,7 +43,7 @@ TEXT = {
     },
     'es': {
         '01_calendar': 'Tu ánimo, a todo color',
-        '02_moods': '10 moods para cada emoción',
+        '02_moods': 'Un mood para cada emoción',
         '03_summary': 'Tu mes y tu mejor racha',
         '04_notes': 'Añade una nota a cada día',
         '05_reminders': 'Un recordatorio diario y amable',
@@ -51,7 +51,7 @@ TEXT = {
     },
     'de': {
         '01_calendar': 'Deine Stimmung in allen Farben',
-        '02_moods': '10 Stimmungen für jedes Gefühl',
+        '02_moods': 'Eine Stimmung für jedes Gefühl',
         '03_summary': 'Dein Monat und deine beste Serie',
         '04_notes': 'Eine Notiz zu jedem Tag',
         '05_reminders': 'Eine sanfte tägliche Erinnerung',
@@ -59,7 +59,7 @@ TEXT = {
     },
     'fr': {
         '01_calendar': 'Votre humeur en couleurs',
-        '02_moods': '10 humeurs pour chaque émotion',
+        '02_moods': 'Une humeur pour chaque émotion',
         '03_summary': 'Votre mois et votre meilleure série',
         '04_notes': 'Une note pour chaque jour',
         '05_reminders': 'Un rappel quotidien en douceur',
@@ -67,7 +67,7 @@ TEXT = {
     },
     'it': {
         '01_calendar': 'Il tuo umore a colori',
-        '02_moods': '10 stati d’animo per ogni emozione',
+        '02_moods': 'Uno stato d’animo per ogni emozione',
         '03_summary': 'Il tuo mese e la tua serie migliore',
         '04_notes': 'Una nota per ogni giorno',
         '05_reminders': 'Un promemoria quotidiano gentile',
