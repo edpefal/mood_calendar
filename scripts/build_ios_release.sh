@@ -55,6 +55,9 @@ MSG
   fi
 fi
 
+# A stale IPA from a previous build must not hide a failed export below.
+rm -rf build/ios/ipa
+
 flutter build ipa \
   --dart-define=REVENUECAT_IOS_API_KEY="$REVENUECAT_IOS_API_KEY" \
   "$@"
@@ -64,5 +67,24 @@ scripts/verify_ios_archive_crash_reporting.sh
 
 echo
 grep '^version:' pubspec.yaml
-echo "IPA: $(ls build/ios/ipa/*.ipa)"
+
+# `flutter build ipa` exits 0 even when the archive is built but the export
+# fails (for example "No Accounts" / missing distribution certificate), so the
+# IPA has to be checked explicitly.
+shopt -s nullglob
+ipas=(build/ios/ipa/*.ipa)
+if [[ ${#ipas[@]} -eq 0 ]]; then
+  cat >&2 <<'MSG'
+
+ERROR: the archive was built and verified, but no .ipa was exported.
+
+The archive is at build/ios/archive/Runner.xcarchive. Export it yourself (Xcode
+Organizer > Distribute App, or xcodebuild -exportArchive ... -allowProvisioningUpdates
+from a terminal that can reach your Xcode account), then upload the IPA with
+xcrun altool --upload-app ...
+MSG
+  exit 1
+fi
+
+echo "IPA: ${ipas[0]}"
 echo "Next: upload it to App Store Connect (xcrun altool --upload-app ...)."
