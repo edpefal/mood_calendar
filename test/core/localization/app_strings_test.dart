@@ -40,6 +40,23 @@ void main() {
     });
   });
 
+  group('AppStrings mood grid', () {
+    test('every language defines the button label and sheet title', () {
+      for (final strings in const <AppStrings>[
+        AppStringsEn(),
+        AppStringsEs(),
+        AppStringsDe(),
+        AppStringsFr(),
+        AppStringsIt(),
+      ]) {
+        expect(strings.moodGridButtonLabel, isNotEmpty);
+        expect(strings.moodGridTitle, isNotEmpty);
+        expect(strings.previousMoodLabel, isNotEmpty);
+        expect(strings.nextMoodLabel, isNotEmpty);
+      }
+    });
+  });
+
   group('AppStrings.storeRetry', () {
     test('has a translation for every supported language', () {
       expect(const AppStringsEn().storeRetry, 'Try again');

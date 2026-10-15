@@ -64,10 +64,10 @@ Las notificaciones (`LocalNotificationService`) resuelven el idioma con `Platfor
 
 ## Estados de ánimo
 
-10 moods en `mood_definition.dart`, cada uno con `tier` (`MoodTier.base` | `MoodTier.premium`):
+19 moods en `mood_definition.dart`, cada uno con `tier` (`MoodTier.base` | `MoodTier.premium`):
 
 - **Base** (gratis): `happy(1)`, `calm(2)`, `neutral(3)`, `sad(4)`, `angry(5)`
-- **Premium** (compra individual o vía Pack): `anxious(6)`, `brave(7)`, `confident(8)`, `romantic(9)`, `shy(10)`
+- **Premium** (compra individual o vía Pack): `anxious(6)`, `brave(7)`, `confident(8)`, `romantic(9)`, `shy(10)`, `affectionate(11)`, `hugging(12)`, `laughing(13)`, `sleepy(14)`, `sick(15)`, `hurt(16)`, `crying(17)`, `scared(18)`, `stressed(19)`
 
 Reglas importantes:
 - **`intensity` es solo un identificador interno, NO una escala de valencia** (ADR 0001). No ordenar, comparar ni promediar moods por intensity.

@@ -28,12 +28,21 @@ class AppStringsEn extends AppStrings {
   @override
   String get saveMoodButtonLabel => 'Save mood entry';
   @override
+  String get moodGridButtonLabel => 'View all moods';
+  @override
+  String get moodGridTitle => 'All moods';
+  @override
+  String get previousMoodLabel => 'Previous mood';
+  @override
+  String get nextMoodLabel => 'Next mood';
+  @override
   String get savingMood => 'Saving your mood...';
   @override
   String get saveMoodError =>
       'We could not save your mood right now. Please try again.';
   @override
-  String get loadingMonthError => 'We could not load this month. Please try again.';
+  String get loadingMonthError =>
+      'We could not load this month. Please try again.';
   @override
   String get retry => 'Retry';
   @override
@@ -89,13 +98,16 @@ class AppStringsEn extends AppStrings {
   @override
   String get privacyPolicyTitle => 'Privacy policy';
   @override
-  String get privacyPolicySemanticLabel => 'Open the privacy policy in your browser';
+  String get privacyPolicySemanticLabel =>
+      'Open the privacy policy in your browser';
   @override
   String get appVersionTitle => 'Version';
   @override
-  String get privacyLinkFailed => 'Couldn\'t open the link. Please try again later.';
+  String get privacyLinkFailed =>
+      'Couldn\'t open the link. Please try again later.';
   @override
-  String get settingsSaveFailed => 'Couldn\'t save your settings. Please try again.';
+  String get settingsSaveFailed =>
+      'Couldn\'t save your settings. Please try again.';
   @override
   String get settingsDataSection => 'Your data';
   @override
@@ -153,8 +165,7 @@ class AppStringsEn extends AppStrings {
       '${monthNames[date.month - 1]} ${date.day}, ${date.year}';
 
   @override
-  List<String> get weekdayInitials =>
-      const ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+  List<String> get weekdayInitials => const ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
   @override
   String get noteButtonLabel => 'Note';

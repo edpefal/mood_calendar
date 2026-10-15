@@ -59,6 +59,10 @@ abstract class AppStrings {
   String selectedMood(String moodLabel, int index, int total);
   String get save;
   String get saveMoodButtonLabel;
+  String get moodGridButtonLabel;
+  String get moodGridTitle;
+  String get previousMoodLabel;
+  String get nextMoodLabel;
   String get savingMood;
   String get saveMoodError;
   String get loadingMonthError;
