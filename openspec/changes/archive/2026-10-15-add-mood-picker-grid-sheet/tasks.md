@@ -36,4 +36,4 @@
 
 - [x] 5.1 Probar en el simulador (iPhone 17: contador, hoja, salto a un mood; falta iPad y texto grande a mano)
 - [x] 5.2 `flutter analyze` y `flutter test` limpios
-- [ ] 5.3 Actualizar `CLAUDE.md` (Selector de moods) y archivar con `/opsx:archive`
+- [x] 5.3 Actualizar `CLAUDE.md` (Selector de moods) y archivar con `/opsx:archive`
