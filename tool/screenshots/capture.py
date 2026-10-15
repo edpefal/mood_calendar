@@ -133,17 +133,29 @@ def open_calendar_previous_month():
     tap_button(row[0])  # previous month
 
 
-# 1) mood picker: swipe to a colorful premium mood
+# 1) mood picker: advance with the "next" arrow to a colorful premium mood.
+# Buttons of the picker, top to bottom, once the bottom bar row is excluded:
+# [Note], [previous, next], [grid], [Save]. At the first mood "previous" is
+# disabled and absent from the accessibility tree, so the arrows row can have
+# a single button; "next" is always its rightmost one.
+NEXT_TAPS = 6
+
+
+def next_arrow():
+    for _ in range(6):
+        tabs = {tuple(b) for b in tab_buttons()}
+        rest = [b for b in buttons() if tuple(b) not in tabs]
+        groups = rows(rest)
+        if len(groups) >= 4:
+            return max(groups[1], key=lambda b: b[0])
+        time.sleep(1)
+    raise RuntimeError('next arrow not found')
+
+
 launch()
-els = elements()
-page = max((e for e in els if e.get('type') == 'GenericElement'),
-           key=lambda e: e['frame']['width'] * e['frame']['height'])
-fx, fy, fw, fh = (page['frame'][k] for k in ('x', 'y', 'width', 'height'))
-cy = fy + fh / 2
-for _ in range(8):
-    sh('idb', 'ui', 'swipe', '--udid', UDID, str(int(fx + fw * 0.85)), str(int(cy)),
-       str(int(fx + fw * 0.15)), str(int(cy)), '--duration', '0.25')
-    time.sleep(0.7)
+arrow = next_arrow()
+for _ in range(NEXT_TAPS):
+    tap_button(arrow)
 time.sleep(1)
 shot('picker')
 
