@@ -50,6 +50,14 @@ abstract class AppStrings {
   String moodName(String moodId) =>
       moodNames[moodId] ?? const AppStringsEn().moodNames[moodId] ?? moodId;
 
+  /// Títulos de los Packs por id (`afecto`, `confianza`, `cuerpo`, `intenso`).
+  Map<String, String> get packNames;
+
+  /// Título del Pack en el idioma activo, con fallback a inglés y, si el Pack
+  /// no tiene cadena propia, al título del producto de la tienda ([fallback]).
+  String packName(String packId, {required String fallback}) =>
+      packNames[packId] ?? const AppStringsEn().packNames[packId] ?? fallback;
+
   String get notificationChannelName;
   String get notificationChannelDescription;
   String get reminderNotificationTitle;

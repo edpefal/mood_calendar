@@ -41,6 +41,7 @@ class _PackPurchaseSheetContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
+    final packTitle = strings.packName(pack.id, fallback: pack.label);
 
     return BlocConsumer<PurchasesCubit, PurchasesState>(
       listenWhen: (previous, current) =>
@@ -50,14 +51,16 @@ class _PackPurchaseSheetContent extends StatelessWidget {
         if (message == null) {
           return;
         }
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(message)));
         if (state.actionStatus == PurchaseActionStatus.success) {
           Navigator.of(context).pop();
         }
         context.read<PurchasesCubit>().acknowledgeActionStatus();
       },
       builder: (context, state) {
-        final isPurchasing = state.actionStatus == PurchaseActionStatus.inProgress;
+        final isPurchasing =
+            state.actionStatus == PurchaseActionStatus.inProgress;
 
         return SafeArea(
           child: Padding(
@@ -66,9 +69,10 @@ class _PackPurchaseSheetContent extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(pack.label, style: Theme.of(context).textTheme.titleLarge),
+                Text(packTitle, style: Theme.of(context).textTheme.titleLarge),
                 const SizedBox(height: 8),
-                Text(strings.packIncludesMoods(_moodLabels(strings, pack.moodIds))),
+                Text(strings
+                    .packIncludesMoods(_moodLabels(strings, pack.moodIds))),
                 if (overlappingMoodIds.isNotEmpty) ...[
                   const SizedBox(height: 16),
                   Container(
@@ -99,11 +103,13 @@ class _PackPurchaseSheetContent extends StatelessWidget {
                 ],
                 const SizedBox(height: 24),
                 GradientPillButton(
-                  label: strings.buyPackButtonLabel(pack.label, pack.displayPrice),
+                  label:
+                      strings.buyPackButtonLabel(packTitle, pack.displayPrice),
                   loading: isPurchasing,
                   onPressed: isPurchasing
                       ? null
-                      : () => context.read<PurchasesCubit>().purchasePack(pack.id),
+                      : () =>
+                          context.read<PurchasesCubit>().purchasePack(pack.id),
                 ),
                 const SizedBox(height: 8),
                 TextButton(
@@ -118,9 +124,8 @@ class _PackPurchaseSheetContent extends StatelessWidget {
     );
   }
 
-  String _moodLabels(AppStrings strings, List<String> moodIds) => moodIds
-      .map(strings.moodName)
-      .join(', ');
+  String _moodLabels(AppStrings strings, List<String> moodIds) =>
+      moodIds.map(strings.moodName).join(', ');
 
   String? _messageFor(AppStrings strings, PurchaseActionStatus status) {
     switch (status) {
