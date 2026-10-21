@@ -15,7 +15,7 @@
 - **Productos de RevenueCat para Android**: tipo `non_consumable`, un producto por cada uno de iOS, adjuntos a los mismos entitlements (el Pack a los 3 de su composición) y a los mismos paquetes con `eligibility_criteria: all`. Se crean vía MCP; nada de esto crea el producto en Play.
 - **Script de build de Android espejo del de iOS** (`scripts/build_android_release.sh`): exige `REVENUECAT_ANDROID_API_KEY` con prefijo `goog_`, ejecuta `flutter build appbundle --release --dart-define=...` y llama a `scripts/verify_android_bundle_key.sh`, que busca la llave dentro de `libapp.so` del bundle (como hace el de iOS con `App.framework/App`). Lleva el mismo `STORE_VERIFIED=1` para afirmar la comprobación manual. Falla si no se generó el `.aab`.
 - **Hook**: se amplía `require-release-script.sh` para bloquear `flutter build appbundle` y `flutter build apk` de release directos (no debug ni profile), con el mensaje apuntando al script.
-- **CI**: un paso previo comprueba que el secreto exista y pasa `--dart-define=REVENUECAT_ANDROID_API_KEY=...` al build; el despliegue sigue yendo a la pista `internal`.
+- **CI**: se añadió la comprobación del secreto al workflow de despliegue, que luego se eliminó por completo (nunca llegó a funcionar de punta a punta; los builds de Android se hacen con `scripts/build_android_release.sh` y se suben a mano).
 - **Fallback**: se mantiene `NoopMoodEntitlementsRepository` cuando falta la llave, con el mensaje de error indicando qué variable falta para la plataforma actual.
 
 ## Risks / Trade-offs

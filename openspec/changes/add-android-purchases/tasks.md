@@ -17,7 +17,7 @@
 - [x] 3.1 `scripts/build_android_release.sh`: exige la llave `goog_...`, la pasa por `--dart-define`, verifica el bundle y falla si no hay `.aab`
 - [x] 3.2 `scripts/verify_android_bundle_key.sh`: busca la llave dentro de `libapp.so` del `.aab`; probarlo con un build real y comprobar que falla sin llave
 - [x] 3.3 Ampliar `.claude/hooks/require-release-script.sh` para bloquear `flutter build appbundle`/`apk` de release directos
-- [x] 3.4 `deploy_android.yml`: comprobar el secreto `REVENUECAT_ANDROID_API_KEY` y pasarlo por `--dart-define`
+- [x] 3.4 ~~`deploy_android.yml`: comprobar el secreto `REVENUECAT_ANDROID_API_KEY` y pasarlo por `--dart-define`~~ (descartado el 2026-10-21: el workflow de despliegue por tag se eliminó por completo)
 
 ## 4. Documentación y verificación
 
@@ -29,6 +29,6 @@
 
 - [x] 5.1 Crear los 18 productos en Google Play Console con los mismos identificadores y precios (hecho el 2026-10-19 por la API de Android Publisher: 14 moods a $0.99 y 4 packs a $1.99, todos ACTIVE)
 - [x] 5.2 Subir las credenciales de servicio de Play a RevenueCat (hecho el 2026-10-19; las 3 comprobaciones pasan)
-- [ ] 5.3 Crear el secreto `REVENUECAT_ANDROID_API_KEY` en GitHub
+- [x] 5.3 ~~Crear el secreto `REVENUECAT_ANDROID_API_KEY` en GitHub~~ (ya no hace falta: no hay workflow de despliegue)
 - [x] 5.4 Subir el primer build a la pista interna, añadir testers de licencia y probar una compra (compra de prueba exitosa el 2026-10-20; falta probar Restaurar compras)
 - [ ] 5.5 Archivar con `/opsx:archive`
