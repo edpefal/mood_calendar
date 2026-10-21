@@ -10,6 +10,7 @@ class FakeMoodEntitlementsRepository implements MoodEntitlementsRepository {
     Set<String> unlockedMoodIds = const {},
     Set<String> restorableMoodIds = const {},
     this.offers = const [],
+    this.packs = const [],
     int failCatalogLoads = 0,
     this.holdCatalogLoads,
   })  : _unlockedMoodIds = Set<String>.from(unlockedMoodIds),
@@ -18,6 +19,9 @@ class FakeMoodEntitlementsRepository implements MoodEntitlementsRepository {
 
   /// Ofertas que devuelve `availableMoodOffers` cuando la carga no falla.
   final List<MoodOffer> offers;
+
+  /// Packs que devuelve `availablePacks`.
+  final List<MoodPack> packs;
 
   /// Si no es nulo, las cargas del catálogo esperan a este future.
   Future<void>? holdCatalogLoads;
@@ -61,7 +65,7 @@ class FakeMoodEntitlementsRepository implements MoodEntitlementsRepository {
   }
 
   @override
-  Future<List<MoodPack>> availablePacks() async => const [];
+  Future<List<MoodPack>> availablePacks() async => packs;
 
   @override
   Future<void> purchaseMood(String moodId) async {

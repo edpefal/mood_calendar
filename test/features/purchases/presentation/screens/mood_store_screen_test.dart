@@ -6,10 +6,20 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mood_calendar/core/localization/app_strings.dart';
 import 'package:mood_calendar/features/purchases/domain/entities/mood_offer.dart';
+import 'package:mood_calendar/features/purchases/domain/entities/mood_pack.dart';
 import 'package:mood_calendar/features/purchases/presentation/bloc/purchases_cubit.dart';
 import 'package:mood_calendar/features/purchases/presentation/screens/mood_store_screen.dart';
 
 import '../../../../support/fake_mood_entitlements_repository.dart';
+
+// Título tal como lo devuelve Google Play mientras la app no está revisada.
+const _confianza = MoodPack(
+  id: 'confianza',
+  label: 'Confidence Pack (com.artlab.moodcalendar (unreviewed))',
+  moodIds: ['brave', 'confident', 'romantic'],
+  displayPrice: r'$1.99',
+  productId: 'pack_confianza_unlock',
+);
 
 const _anxious = MoodOffer(
   moodId: 'anxious',
@@ -24,11 +34,12 @@ void main() {
     FakeMoodEntitlementsRepository repository, {
     ValueNotifier<bool>? isActive,
     Key? screenKey,
+    Locale locale = const Locale('en'),
   }) {
     return BlocProvider(
       create: (_) => PurchasesCubit(repository),
       child: MaterialApp(
-        locale: const Locale('en'),
+        locale: locale,
         supportedLocales: AppStrings.supportedLocales,
         localizationsDelegates: const [
           GlobalMaterialLocalizations.delegate,
@@ -180,5 +191,72 @@ void main() {
 
     expect(repository.catalogLoadCount, 1);
     expect(find.text(strings.moodName('anxious')), findsOneWidget);
+  });
+  group('pack titles', () {
+    testWidgets('come from the app strings, not from the store product',
+        (tester) async {
+      await tester.pumpWidget(buildApp(
+        FakeMoodEntitlementsRepository(
+          offers: const [_anxious],
+          packs: const [_confianza],
+        ),
+      ));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Confidence Pack'), findsOneWidget);
+      expect(find.textContaining('unreviewed'), findsNothing);
+    });
+
+    testWidgets('follow the device language', (tester) async {
+      await tester.pumpWidget(buildApp(
+        FakeMoodEntitlementsRepository(
+          offers: const [_anxious],
+          packs: const [_confianza],
+        ),
+        locale: const Locale('es'),
+      ));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Pack de Confianza'), findsOneWidget);
+      expect(find.text('Confidence Pack'), findsNothing);
+    });
+
+    testWidgets('a pack without its own string keeps the store title',
+        (tester) async {
+      await tester.pumpWidget(buildApp(
+        FakeMoodEntitlementsRepository(
+          offers: const [_anxious],
+          packs: const [
+            MoodPack(
+              id: 'nuevo',
+              label: 'Pack Nuevo',
+              moodIds: ['shy'],
+              displayPrice: r'$1.99',
+              productId: 'pack_nuevo_unlock',
+            ),
+          ],
+        ),
+      ));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Pack Nuevo'), findsOneWidget);
+    });
+
+    testWidgets('the purchase sheet shows the app title too', (tester) async {
+      await tester.pumpWidget(buildApp(
+        FakeMoodEntitlementsRepository(
+          offers: const [_anxious],
+          packs: const [_confianza],
+        ),
+      ));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text(r'$1.99'));
+      await tester.pumpAndSettle();
+
+      // Tile + sheet title.
+      expect(find.text('Confidence Pack'), findsNWidgets(2));
+      expect(find.textContaining('unreviewed'), findsNothing);
+    });
   });
 }

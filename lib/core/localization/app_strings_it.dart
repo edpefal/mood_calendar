@@ -267,4 +267,12 @@ class AppStringsIt extends AppStrings {
         'scared': 'Spaventato',
         'stressed': 'Stressato',
       };
+
+  @override
+  Map<String, String> get packNames => const {
+        'afecto': 'Pacchetto Affetto',
+        'confianza': 'Pacchetto Fiducia',
+        'cuerpo': 'Pacchetto Corpo',
+        'intenso': 'Pacchetto Intenso',
+      };
 }

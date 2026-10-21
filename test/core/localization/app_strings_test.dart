@@ -100,6 +100,37 @@ void main() {
     });
   });
 
+  group('AppStrings.packName', () {
+    const packIds = ['afecto', 'confianza', 'cuerpo', 'intenso'];
+
+    test('every pack has a non-empty title in every supported language', () {
+      for (final locale in AppStrings.supportedLocales) {
+        final strings = AppStrings.forLocale(locale);
+        for (final id in packIds) {
+          expect(
+            strings.packNames[id],
+            isNotNull,
+            reason: '$id missing in ${locale.languageCode}',
+          );
+          expect(strings.packName(id, fallback: 'store'), isNotEmpty);
+        }
+      }
+    });
+
+    test('returns the localized title and ignores the store title', () {
+      final es = AppStrings.forLocale(const Locale('es'));
+      expect(es.packName('confianza', fallback: 'Store title (unreviewed)'),
+          'Pack de Confianza');
+      final de = AppStrings.forLocale(const Locale('de'));
+      expect(de.packName('cuerpo', fallback: 'x'), 'Körper-Paket');
+    });
+
+    test('uses the store title only for a pack without its own string', () {
+      final strings = AppStrings.forLocale(const Locale('fr'));
+      expect(strings.packName('nuevo', fallback: 'Nuevo Pack'), 'Nuevo Pack');
+    });
+  });
+
   group('AppStrings.moodName', () {
     test('every mood has a non-empty name in every supported language', () {
       for (final locale in AppStrings.supportedLocales) {

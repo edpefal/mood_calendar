@@ -77,10 +77,14 @@ class _MoodStoreScreenState extends State<MoodStoreScreen> {
           }
         },
         builder: (context, state) {
-          if (state.isLoadingCatalog && state.offers.isEmpty && state.packs.isEmpty) {
+          if (state.isLoadingCatalog &&
+              state.offers.isEmpty &&
+              state.packs.isEmpty) {
             return Center(child: Text(strings.storeLoading));
           }
-          if (state.catalogError != null && state.offers.isEmpty && state.packs.isEmpty) {
+          if (state.catalogError != null &&
+              state.offers.isEmpty &&
+              state.packs.isEmpty) {
             return Center(
               child: Padding(
                 padding: EdgeInsets.fromLTRB(
@@ -163,7 +167,8 @@ class _MoodStoreScreenState extends State<MoodStoreScreen> {
                     ),
                     padding: const EdgeInsets.symmetric(vertical: 18),
                   ),
-                  onPressed: state.actionStatus == PurchaseActionStatus.inProgress
+                  onPressed: state.actionStatus ==
+                          PurchaseActionStatus.inProgress
                       ? null
                       : () => context.read<PurchasesCubit>().restorePurchases(),
                   child: Text(
@@ -194,7 +199,8 @@ class _MoodOfferTile extends StatelessWidget {
 
     return Card(
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         leading: SvgPicture.asset(mood.assetPath, height: 40, width: 40),
         title: Text(strings.moodName(mood.id)),
         trailing: isUnlocked
@@ -229,8 +235,9 @@ class _MoodPackTile extends StatelessWidget {
 
     return Card(
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        title: Text(pack.label),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        title: Text(strings.packName(pack.id, fallback: pack.label)),
         subtitle: Padding(
           padding: const EdgeInsets.only(top: 4),
           child: Wrap(
