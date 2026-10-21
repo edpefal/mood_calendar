@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyBLBTa1_wOUyrqTjjqoyzVnWhlEUrzr3y0',
-    appId: '1:1027445865703:android:aecf736adeabf7051ef642',
+    appId: '1:1027445865703:android:2681877cad0198851ef642',
     messagingSenderId: '1027445865703',
     projectId: 'mood-calendar-fee5c',
     storageBucket: 'mood-calendar-fee5c.firebasestorage.app',

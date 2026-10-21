@@ -56,10 +56,27 @@ jobs:
       - name: Get Flutter dependencies
         run: flutter pub get # Instala las dependencias de tu proyecto Flutter
 
+      - name: Check RevenueCat key
+        # Sin la llave la app cae a NoopMoodEntitlementsRepository y toda compra falla.
+        env:
+          REVENUECAT_ANDROID_API_KEY: ${{ secrets.REVENUECAT_ANDROID_API_KEY }}
+        run: |
+          if [[ ! "$REVENUECAT_ANDROID_API_KEY" =~ ^goog_[A-Za-z0-9]+$ ]]; then
+            echo "::error::Secret REVENUECAT_ANDROID_API_KEY is missing or is not an Android public key (goog_...)."
+            exit 1
+          fi
+
       - name: Build Android App Bundle (AAB)
         # El App Bundle es el formato recomendado por Google Play para todas las aplicaciones nuevas
         # y proporciona optimizaciones para el tamaño de la aplicación.
-        run: flutter build appbundle --release # Compila tu aplicación en formato AAB en modo release
+        env:
+          REVENUECAT_ANDROID_API_KEY: ${{ secrets.REVENUECAT_ANDROID_API_KEY }}
+        run: flutter build appbundle --release --dart-define=REVENUECAT_ANDROID_API_KEY="$REVENUECAT_ANDROID_API_KEY"
+
+      - name: Verify the RevenueCat key is inside the bundle
+        env:
+          REVENUECAT_ANDROID_API_KEY: ${{ secrets.REVENUECAT_ANDROID_API_KEY }}
+        run: scripts/verify_android_bundle_key.sh
 
       - name: Upload to Google Play Store
         # Usa la acción de la comunidad 'r0adkll/upload-google-play@v1', que es muy robusta
@@ -68,7 +85,7 @@ jobs:
           # ¡IMPORTANTE! Reemplaza con el **nombre de paquete (package_name)** de tu aplicación Android.
           # Lo encuentras en el archivo `android/app/build.gradle` (como `namespace` o `applicationId`).
           # Ejemplo: `com.tuempresa.tuapp`
-          packageName: "com.artlab.mood_calendar"
+          packageName: "com.artlab.moodcalendar"
           # Ruta al archivo AAB generado por el paso anterior
           aabFile: build/app/outputs/bundle/release/app-release.aab
           # El secreto de GitHub que creaste en el Paso 1, que contiene tus credenciales JSON
