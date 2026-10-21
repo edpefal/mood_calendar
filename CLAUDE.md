@@ -7,7 +7,7 @@ Flutter app para registrar y revisar estados de ánimo diarios, con un catálogo
 - **Flutter** 3.x (CI usa 3.32.1), Dart SDK `>=3.6.0 <4.0.0`
 - **Estado**: flutter_bloc + Cubit
 - **Persistencia**: Hive (local, sin backend)
-- **Crashes**: Firebase Crashlytics (`firebase_core` + `firebase_crashlytics`, proyecto Firebase `mood-calendar-fee5c`), solo en release en iOS/Android
+- **Crashes**: Firebase Crashlytics (`firebase_core` + `firebase_crashlytics`, proyecto Firebase `mood-calendar-fee5c`, apps iOS y Android con el mismo identificador `com.artlab.moodcalendar`; Android aún no está publicado en Google Play), solo en release en iOS/Android
 - **Compras in-app**: purchases_flutter (RevenueCat), solo iOS por ahora
 - **Generación de código**: freezed, json_serializable, hive_generator → correr con `flutter pub run build_runner build`
 - **Notificaciones**: flutter_local_notifications + timezone

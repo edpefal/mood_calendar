@@ -68,7 +68,7 @@ jobs:
           # ¡IMPORTANTE! Reemplaza con el **nombre de paquete (package_name)** de tu aplicación Android.
           # Lo encuentras en el archivo `android/app/build.gradle` (como `namespace` o `applicationId`).
           # Ejemplo: `com.tuempresa.tuapp`
-          packageName: "com.artlab.mood_calendar"
+          packageName: "com.artlab.moodcalendar"
           # Ruta al archivo AAB generado por el paso anterior
           aabFile: build/app/outputs/bundle/release/app-release.aab
           # El secreto de GitHub que creaste en el Paso 1, que contiene tus credenciales JSON

@@ -1,4 +1,4 @@
-package com.artlab.mood_calendar
+package com.artlab.moodcalendar
 
 import io.flutter.embedding.android.FlutterActivity
 
