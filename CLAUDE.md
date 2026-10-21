@@ -8,7 +8,7 @@ Flutter app para registrar y revisar estados de ánimo diarios, con un catálogo
 - **Estado**: flutter_bloc + Cubit
 - **Persistencia**: Hive (local, sin backend)
 - **Crashes**: Firebase Crashlytics (`firebase_core` + `firebase_crashlytics`, proyecto Firebase `mood-calendar-fee5c`, apps iOS y Android con el mismo identificador `com.artlab.moodcalendar`; Android aún no está publicado en Google Play), solo en release en iOS/Android
-- **Compras in-app**: purchases_flutter (RevenueCat), solo iOS por ahora
+- **Compras in-app**: purchases_flutter (RevenueCat) en iOS y Android (Android aún sin publicar en Google Play)
 - **Generación de código**: freezed, json_serializable, hive_generator → correr con `flutter pub run build_runner build`
 - **Notificaciones**: flutter_local_notifications + timezone
 - **UI**: flutter_svg (emojis SVG), google_fonts (Poppins), lottie
@@ -92,9 +92,9 @@ Cada uno tiene su spec en `openspec/specs/`; leerla antes de cambiarlo.
 
 ## Compras in-app (RevenueCat)
 
-- 6 productos no consumibles en App Store Connect: `mood_anxious_unlock`, `mood_brave_unlock`, `mood_confident_unlock`, `mood_romantic_unlock`, `mood_shy_unlock`, `pack_confianza_unlock`.
+- 18 productos no consumibles: 14 moods (`mood_<id>_unlock`, p. ej. `mood_anxious_unlock`) y 4 Packs (`pack_afecto_unlock`, `pack_confianza_unlock`, `pack_cuerpo_unlock`, `pack_intenso_unlock`). Existen en App Store Connect y en RevenueCat para iOS; para Android hay otros 18 en RevenueCat (app "Mood Calendar Android") con **los mismos identificadores**, adjuntos a los mismos entitlements y paquetes de la oferta `default`; en Google Play Console deben crearse con esos identificadores.
 - Un entitlement por mood premium; un Pack otorga varios entitlements. Composición y precio de packs se configuran en RevenueCat, no en código, y un Pack publicado nunca cambia de composición (ADR 0002).
-- `lib/main.dart` configura RevenueCat solo si recibe `REVENUECAT_IOS_API_KEY` vía `--dart-define`; si no, usa `NoopMoodEntitlementsRepository` (todas las compras fallan con "producto no disponible"). No tocar `purchases_flutter` antes de `Purchases.configure()`.
+- `lib/main.dart` configura RevenueCat solo si recibe la llave de la plataforma vía `--dart-define` (`REVENUECAT_IOS_API_KEY` en iOS, `REVENUECAT_ANDROID_API_KEY` en Android; `revenueCatApiKeyFor` en `lib/features/purchases/data/revenue_cat_config.dart` elige la que toca); si no, usa `NoopMoodEntitlementsRepository` (todas las compras fallan con "producto no disponible"). No tocar `purchases_flutter` antes de `Purchases.configure()`.
 - El MCP de RevenueCat (`mcp__revenuecat__*`) está disponible para consultar estado real de productos/entitlements — preferirlo a notas viejas en specs.
 
 ## Arranque de la app
@@ -132,7 +132,7 @@ El script se niega a correr sin la key, siempre pasa `--dart-define=REVENUECAT_I
 
 `ios/Runner/Info.plist` declara `ITSAppUsesNonExemptEncryption=false` (la app solo usa HTTPS y el cifrado del sistema, exentos), así que App Store Connect ya no pide el cuestionario de cumplimiento de exportación en cada build; si algún día se añade cifrado propio, hay que revisarlo.
 
-Un hook de Claude Code (`.claude/settings.json` → `.claude/hooks/require-release-script.sh`) bloquea `flutter build ipa` y `flutter build ios` de release ejecutados directo en una sesión. Los builds de simulador, debug y profile no se bloquean. Si se archiva desde Xcode (no recomendado) hay que poner el mismo `--dart-define` en los Build Settings del scheme de Release y correr después `REVENUECAT_IOS_API_KEY=<key> scripts/verify_ios_archive_key.sh`.
+Un hook de Claude Code (`.claude/settings.json` → `.claude/hooks/require-release-script.sh`) bloquea `flutter build ipa`, `flutter build ios`, `flutter build appbundle` y `flutter build apk` de release ejecutados directo en una sesión. Los builds de simulador, debug y profile no se bloquean. Si se archiva desde Xcode (no recomendado) hay que poner el mismo `--dart-define` en los Build Settings del scheme de Release y correr después `REVENUECAT_IOS_API_KEY=<key> scripts/verify_ios_archive_key.sh`.
 
 **Pasos manuales previos — el script no puede hacerlos por vos:**
 
@@ -143,6 +143,20 @@ Un hook de Claude Code (`.claude/settings.json` → `.claude/hooks/require-relea
 **Simuladores compartidos**: las apps `com.artlab.*` (Mood Calendar, Photo Wardrobe, Reevo) comparten vendor. En un simulador que tenga otras de esas apps instaladas, el SDK de RevenueCat puede reutilizar el ID anónimo de otra app y mostrar productos ajenos o "no packages found". Si la tienda sale vacía o con productos que no son de Mood Calendar, repetir la prueba en un simulador limpio (`xcrun simctl create ...`) antes de sospechar de la configuración; la del dashboard se puede confirmar con el MCP de RevenueCat.
 
 **Por qué es obligatorio**: si falta el `--dart-define`, la app cae a `NoopMoodEntitlementsRepository` (todas las compras fallan con "producto no disponible" de inmediato). Eso ya causó un rechazo real de Apple (Guideline 2.1(b)) por un error visible en la pantalla de tienda durante la revisión; ver `openspec/changes/archive/2026-10-01-fix-app-review-iap-rejection/`. Olvidar el flag justo al archivar es fácil, y por eso el script y el hook existen.
+
+## Build de release de Android (App Bundle)
+
+**La única forma soportada de generar un `.aab` para Google Play es `scripts/build_android_release.sh`. No correr `flutter build appbundle` a mano** (sin la llave, las compras de Android fallan; el hook lo bloquea).
+
+```bash
+REVENUECAT_ANDROID_API_KEY=<key goog_...> STORE_VERIFIED=1 scripts/build_android_release.sh
+```
+
+Igual que el de iOS: se niega a correr sin la llave (debe empezar con `goog_`), la pasa por `--dart-define=REVENUECAT_ANDROID_API_KEY=<key>`, comprueba con `scripts/verify_android_bundle_key.sh` que está dentro del `libapp.so` de cada ABI del bundle y falla si no se generó el `.aab` (`build/app/outputs/bundle/release/app-release.aab`). La llave pública sale del MCP de RevenueCat: `list-projects` → `list-apps` (app "Mood Calendar Android", tipo `play_store`) → `list-app-public-api-keys`. Es pública, pero no se hardcodea: siempre por variable de entorno.
+
+- `STORE_VERIFIED=1` afirma que `MoodStoreScreen` se probó en un dispositivo Android con esa llave. Para el build que se sube a la pista interna justamente para hacer esa prueba, usar `INTERNAL_TEST_BUILD=1` en su lugar (la llave se exige y se verifica igual); ese bundle no debe promoverse a producción sin reconstruirlo con `STORE_VERIFIED=1`. Play exige que `targetSdk` sea el nivel actual (hoy 36) y que el código de versión no se repita entre subidas. Para que el catálogo cargue, los 18 productos deben existir en Google Play Console, RevenueCat necesita las credenciales de servicio de Play y el build tiene que estar subido a una pista de pruebas.
+- El paquete de Android es `com.artlab.moodcalendar` (igual que el bundle ID de iOS). Se firma con el keystore de `android/key.properties`; en CI (`deploy_android.yml`, que se dispara con cualquier tag `v*.*.*` y sube a la pista `internal`) hace falta además el secreto de GitHub `REVENUECAT_ANDROID_API_KEY`, y el workflow falla si falta o no es una llave `goog_`.
+- Si se publica con Play App Signing, añadir el SHA-1 de la clave de firma de Play a la API key de Firebase de Android (restringida por paquete y SHA-1).
 
 ## Conventional Commits
 
