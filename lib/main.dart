@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -34,6 +35,7 @@ import 'features/mood/domain/usecases/save_mood_usecase.dart';
 import 'features/mood/presentation/bloc/calendar_cubit.dart';
 import 'features/mood/presentation/bloc/mood_cubit.dart';
 import 'features/purchases/data/datasources/revenue_cat_datasource.dart';
+import 'features/purchases/data/revenue_cat_config.dart';
 import 'features/purchases/data/repositories/mood_entitlements_repository_impl.dart';
 import 'features/purchases/data/repositories/noop_mood_entitlements_repository.dart';
 import 'features/purchases/domain/repositories/mood_entitlements_repository.dart';
@@ -133,7 +135,11 @@ void main() async {
     telemetry: telemetry,
   );
 
-  const revenueCatApiKey = String.fromEnvironment('REVENUECAT_IOS_API_KEY');
+  final revenueCatApiKey = revenueCatApiKeyFor(
+    defaultTargetPlatform,
+    iosKey: const String.fromEnvironment('REVENUECAT_IOS_API_KEY'),
+    androidKey: const String.fromEnvironment('REVENUECAT_ANDROID_API_KEY'),
+  );
   final MoodEntitlementsRepository moodEntitlementsRepository;
   if (revenueCatApiKey.isNotEmpty) {
     await RevenueCatDatasource.configure(revenueCatApiKey);
@@ -147,8 +153,8 @@ void main() async {
     // the whole app when the key is missing, e.g. launching from VS Code's
     // "Run" button without a launch.json that sets --dart-define.
     appLogger.error(
-      'REVENUECAT_IOS_API_KEY was not provided via --dart-define; '
-      'purchases will not work.',
+      '${revenueCatKeyVariableFor(defaultTargetPlatform)} was not provided '
+      'via --dart-define; purchases will not work.',
       tag: 'main',
     );
     moodEntitlementsRepository = const NoopMoodEntitlementsRepository();
