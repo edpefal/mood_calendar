@@ -47,7 +47,7 @@ La Tienda SHALL ofrecer una acción de restaurar compras que recupere el estado 
 - **THEN** todos los Moods y Packs comprados previamente vuelven a estar `unlocked`
 
 ### Requirement: Nombres de Mood localizados en la tienda
-La tienda y las hojas de compra SHALL mostrar los nombres de los Moods premium (incluidos los de la lista de Moods de un Pack) en el idioma activo del dispositivo, con fallback a inglés. El título de un Pack, que proviene del producto de la tienda, no está cubierto por este requisito.
+La tienda y las hojas de compra SHALL mostrar los nombres de los Moods premium (incluidos los de la lista de Moods de un Pack) y los títulos de los Packs en el idioma activo del dispositivo, con fallback a inglés. Los títulos de los Packs SHALL salir de las cadenas de la app, no del título del producto de la tienda. Solo para un Pack cuyo identificador no tenga cadena propia, el sistema SHALL mostrar el título del producto de la tienda.
 
 #### Scenario: Tienda en alemán
 - **WHEN** el dispositivo está en alemán y se abre la tienda
@@ -56,6 +56,18 @@ La tienda y las hojas de compra SHALL mostrar los nombres de los Moods premium (
 #### Scenario: Hoja de compra de Pack
 - **WHEN** se abre la hoja de un Pack en francés
 - **THEN** la lista de Moods incluidos muestra los nombres en francés
+
+#### Scenario: Título de un Pack en el idioma del dispositivo
+- **WHEN** el dispositivo está en español y se abre la tienda
+- **THEN** el Pack `confianza` se muestra como "Pack de Confianza" aunque el producto de la tienda devuelva otro texto
+
+#### Scenario: Título del Pack sin sufijos de la tienda
+- **WHEN** la tienda devuelve un título con texto añadido, por ejemplo "(unreviewed)"
+- **THEN** la Tienda y la hoja de compra muestran el nombre de la app, sin ese texto
+
+#### Scenario: Pack sin cadena propia
+- **WHEN** aparece un Pack cuyo identificador no tiene cadena en la app
+- **THEN** se muestra el título del producto de la tienda
 
 ### Requirement: La Tienda es una pestaña del bottom bar
 La Tienda SHALL abrirse desde la tercera pestaña del bottom bar, con un icono de tienda. La pantalla principal NO SHALL mostrar un icono de tienda en su header, y la Tienda NO SHALL mostrar un botón de regresar. Las hojas de compra de Moods y de Packs SHALL cubrir el bottom bar mientras estén abiertas.

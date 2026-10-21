@@ -12,4 +12,4 @@
 ## 3. Cierre
 
 - [x] 3.1 `flutter analyze` y `flutter test` limpios
-- [ ] 3.2 Sincronizar el spec `mood-store` y archivar con `/opsx:archive`
+- [x] 3.2 Sincronizar el spec `mood-store` y archivar con `/opsx:archive`
