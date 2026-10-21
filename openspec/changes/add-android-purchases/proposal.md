@@ -7,7 +7,7 @@ La app compila para Android, pero las compras no funcionan allí: `main.dart` so
 - RevenueCat: crear la app Android (`play_store`, paquete `com.artlab.moodcalendar`), registrar sus 18 productos (14 moods y 4 packs, con los mismos identificadores de tienda que en iOS), adjuntarlos a los mismos entitlements y a los mismos paquetes de la oferta `default`.
 - App: elegir la llave de RevenueCat según la plataforma (`REVENUECAT_IOS_API_KEY` en iOS, `REVENUECAT_ANDROID_API_KEY` en Android) con una función pequeña y probada, y ajustar el mensaje de error del arranque.
 - Build: nuevo `scripts/build_android_release.sh`, equivalente al de iOS (se niega a correr sin la llave, la pasa por `--dart-define` y comprueba que quedó dentro del bundle). El hook de Claude Code también bloquea `flutter build appbundle`/`apk` de release directos.
-- CI: `deploy_android.yml` falla si falta el secreto `REVENUECAT_ANDROID_API_KEY` y lo pasa por `--dart-define`.
+- ~~CI: `deploy_android.yml` falla si falta el secreto `REVENUECAT_ANDROID_API_KEY`~~ (se hizo, pero el workflow de despliegue por tag se eliminó después por completo).
 - Documentación: `CLAUDE.md` (compras ya no son "solo iOS", build de Android, cómo obtener la llave).
 - Sin cambios en iOS ni en el comportamiento de la tienda: es el mismo catálogo, los mismos entitlements y los mismos Packs.
 

@@ -13,7 +13,7 @@ Flutter app para registrar y revisar estados de ánimo diarios, con un catálogo
 - **Notificaciones**: flutter_local_notifications + timezone
 - **UI**: flutter_svg (emojis SVG), google_fonts (Poppins), lottie
 - **Utilidades de plataforma**: in_app_review (pedir/abrir calificación), url_launcher (política de privacidad), package_info_plus (versión en Settings), share_plus (hoja de compartir al exportar el historial)
-- **CI/CD**: `.github/workflows/ci.yml` corre `flutter analyze` + `flutter test` en cada push a `main` y en cada PR; `deploy_android.yml` publica a Google Play al empujar un tag `vX.Y.Z`
+- **CI/CD**: `.github/workflows/ci.yml` corre `flutter analyze` + `flutter test` en cada push a `main` y en cada PR. No hay despliegue automático: los builds de iOS y Android se generan con los scripts de `scripts/` y se suben a mano (el workflow de despliegue de Android por tag se eliminó: nunca llegó a funcionar de punta a punta y los tags ya no publican nada)
 
 ## Arquitectura
 
@@ -156,7 +156,7 @@ REVENUECAT_ANDROID_API_KEY=<key goog_...> STORE_VERIFIED=1 scripts/build_android
 Igual que el de iOS: se niega a correr sin la llave (debe empezar con `goog_`), la pasa por `--dart-define=REVENUECAT_ANDROID_API_KEY=<key>`, comprueba con `scripts/verify_android_bundle_key.sh` que está dentro del `libapp.so` de cada ABI del bundle y falla si no se generó el `.aab` (`build/app/outputs/bundle/release/app-release.aab`). La llave pública sale del MCP de RevenueCat: `list-projects` → `list-apps` (app "Mood Calendar Android", tipo `play_store`) → `list-app-public-api-keys`. Es pública, pero no se hardcodea: siempre por variable de entorno.
 
 - `STORE_VERIFIED=1` afirma que `MoodStoreScreen` se probó en un dispositivo Android con esa llave. Para el build que se sube a la pista interna justamente para hacer esa prueba, usar `INTERNAL_TEST_BUILD=1` en su lugar (la llave se exige y se verifica igual); ese bundle no debe promoverse a producción sin reconstruirlo con `STORE_VERIFIED=1`. Play exige que `targetSdk` sea el nivel actual (hoy 36) y que el código de versión no se repita entre subidas. Para que el catálogo cargue, los 18 productos deben existir en Google Play Console, RevenueCat necesita las credenciales de servicio de Play y el build tiene que estar subido a una pista de pruebas.
-- El paquete de Android es `com.artlab.moodcalendar` (igual que el bundle ID de iOS). Se firma con el keystore de `android/key.properties`; en CI (`deploy_android.yml`, que se dispara con cualquier tag `v*.*.*` y sube a la pista `internal`) hace falta además el secreto de GitHub `REVENUECAT_ANDROID_API_KEY`, y el workflow falla si falta o no es una llave `goog_`.
+- El paquete de Android es `com.artlab.moodcalendar` (igual que el bundle ID de iOS). Se firma con el keystore de `android/key.properties`; el `.aab` resultante se sube a mano a Google Play Console (primero a la pista interna). Poner un tag `v*.*.*` ya no dispara ningún despliegue.
 - Si se publica con Play App Signing, añadir el SHA-1 de la clave de firma de Play a la API key de Firebase de Android (restringida por paquete y SHA-1).
 
 ## Conventional Commits
