@@ -31,4 +31,4 @@
 - [x] 5.2 Subir las credenciales de servicio de Play a RevenueCat (hecho el 2026-10-19; las 3 comprobaciones pasan)
 - [x] 5.3 ~~Crear el secreto `REVENUECAT_ANDROID_API_KEY` en GitHub~~ (ya no hace falta: no hay workflow de despliegue)
 - [x] 5.4 Subir el primer build a la pista interna, añadir testers de licencia y probar una compra (compra de prueba exitosa el 2026-10-20; falta probar Restaurar compras)
-- [ ] 5.5 Archivar con `/opsx:archive`
+- [x] 5.5 Archivar con `/opsx:archive`
