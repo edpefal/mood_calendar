@@ -3,9 +3,12 @@
 
 Needs Pillow (`pip install pillow`) and Google Chrome (headless) on macOS.
 
-usage: python3 tool/screenshots/compose.py <device: iphone|ipad> [locale ...]
+usage: python3 tool/screenshots/compose.py <device: iphone|ipad|android> [locale ...]
 Reads  build/screenshots/shots/<device>/<locale>/<screen>.png   (from capture.py)
 Writes build/screenshots/slides/<device>/<locale>/<NN>_<name>.png at the exact App Store size.
+
+`android` composes Google Play phone slides (1080x1920, 9:16) from the emulator captures
+made with `capture_android.py` (shots/android/<locale>/).
 """
 import html
 import os
@@ -20,7 +23,7 @@ CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 DEVICE = sys.argv[1]
 LOCALES = sys.argv[2:] or ['en', 'es', 'de', 'fr', 'it']
 
-CANVAS = {'iphone': (1320, 2868), 'ipad': (2064, 2752)}[DEVICE]
+CANVAS = {'iphone': (1320, 2868), 'ipad': (2064, 2752), 'android': (1080, 1920)}[DEVICE]
 
 # (screen file, background gradient, dark text?)
 SLIDES = [
@@ -80,6 +83,10 @@ if DEVICE == 'iphone':
     L = dict(frame_w=1140, bezel=26, frame_radius=150, top=640, head_top=170,
              head_sizes=((22, 124), (32, 108), (99, 92)), side=100,
              panel_w=1100)
+elif DEVICE == 'android':
+    L = dict(frame_w=900, bezel=20, frame_radius=84, top=450, head_top=110,
+             head_sizes=((22, 96), (32, 84), (99, 72)), side=80,
+             panel_w=900)
 else:
     L = dict(frame_w=1560, bezel=30, frame_radius=96, top=560, head_top=150,
              head_sizes=((22, 150), (32, 132), (99, 112)), side=120,
@@ -170,11 +177,11 @@ def page(slide_id, screen, bg, dark, locale):
         im_w = Image.open(shot).width
         cy0 = find_calendar_top(shot)
         cw, ch = im_w, y1 - cy0
-        pw = 1180 if DEVICE == 'iphone' else 1640
+        pw = {'iphone': 1180, 'android': 940}.get(DEVICE, 1640)
         scale = pw / cw
         panel_h = round(ch * scale)
         rgb = '#%02x%02x%02x' % bg_px
-        panel_top = top + (60 if DEVICE == 'iphone' else 30)
+        panel_top = top + {'iphone': 60, 'android': 40}.get(DEVICE, 30)
         body = f'''
         <div style="position:absolute;left:{(W - pw) // 2}px;top:{panel_top}px;width:{pw}px;height:{panel_h}px;
              border-radius:72px;overflow:hidden;background:{rgb};
@@ -183,10 +190,10 @@ def page(slide_id, screen, bg, dark, locale):
                background-size:{pw}px auto;background-position:0 -{round(cy0 * scale)}px;"></div>
         </div>'''
     elif slide_id == '06_privacy':
-        head_top = 380
-        top = 1180 if DEVICE == 'iphone' else 1000
+        head_top = {'android': 330}.get(DEVICE, 380)
+        top = {'iphone': 1180, 'android': 1000}.get(DEVICE, 1000)
         lock = f'''
-        <svg style="position:absolute;left:{W // 2 - 90}px;top:{150 if DEVICE == 'iphone' else 110}px"
+        <svg style="position:absolute;left:{W // 2 - 90}px;top:{ {'iphone': 150, 'android': 120}.get(DEVICE, 110) }px"
              width="180" height="180" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7"
              stroke-linecap="round" stroke-linejoin="round">
           <rect x="4.5" y="10.5" width="15" height="10" rx="2.5" fill="rgba(255,255,255,.18)"/>
