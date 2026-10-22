@@ -25,6 +25,6 @@
 
 - [x] 5.1 Borrar la app Android vieja (`com.artlab.mood_calendar`) en la consola de Firebase
 - [x] 5.2a API key de Android (`Android key`, uid `2babf85d-…`) restringida el 2026-10-19 al paquete `com.artlab.moodcalendar` con los SHA-1 de debug (`979CFDBE…`) y del keystore de release/subida (`2263073F…`)
-- [ ] 5.2b Al crear la ficha en Google Play: añadir a esa llave el SHA-1 de la **clave de firma de la app de Play** (Play Console > Integridad de la app); sin él, Firebase/Crashlytics fallará en las instalaciones de Play
-- [ ] 5.2c Completar Data safety en Play Console (respuestas en las notas de la release 1.8.4 / memoria)
-- [ ] 5.3 Archivar con `/opsx:archive`
+- [x] 5.2b Al crear la ficha en Google Play: añadir a esa llave el SHA-1 de la **clave de firma de la app de Play** (Play Console > Integridad de la app); sin él, Firebase/Crashlytics fallará en las instalaciones de Play
+- [x] 5.2c Completar Data safety en Play Console (respuestas en las notas de la release 1.8.4 / memoria)
+- [x] 5.3 Archivar con `/opsx:archive`
