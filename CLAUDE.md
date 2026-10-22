@@ -267,6 +267,23 @@ python3 tool/screenshots/header.py [en es de fr it]   # -> aso/header/<locale>/h
 - Muestra ícono (`AppIcon 1024`), nombre, lema y una fila de caritas de `assets/icon/` (sin `brave.svg`, que es muy pesado). Los lemas por idioma están en el diccionario `TAGLINE` del script.
 - Se sube a mano, un archivo por idioma, con el selector de idioma de la esquina: la misma imagen en **Header** y en **Search Results**, y revisar con **Preview**.
 
+### Capturas y gráfico de funciones de Google Play
+
+Play pide capturas de teléfono con proporción de hasta 2:1 (las de App Store, 1320×2868, no sirven) y un **gráfico de funciones de 1024×500**. Se generan igual que las de iOS, pero desde un emulador de Android:
+
+```bash
+# emulador sin datos que importen (el entrypoint BORRA los datos locales) y barra de estado en modo demo (9:41)
+flutter run -t tool/screenshots/main.dart -d <serial>
+python3 tool/screenshots/capture_android.py <serial> <en|es|de|fr|it>   # picker, note, calendar, reminders -> build/screenshots/shots/android/
+python3 tool/screenshots/compose.py android [idiomas]                    # 6 slides de 1080×1920 -> build/screenshots/slides/android/
+python3 tool/screenshots/header.py --play [idiomas]                      # -> aso/play/<locale>/feature_1024x500.png
+```
+
+- `capture_android.py` usa `adb` y `uiautomator dump` (botones por posición, igual que `capture.py`), cambia el idioma con `cmd locale set-app-locales` y lanza la app con `am start` (`monkey` no la abre). Pinta de blanco el gotero del cursor que Android deja en la nota.
+- Imagen de emulador: Pixel 8, Android 15 `google_apis` arm64 con el disco de datos limitado a 3 GB; son varios GB, así que borrar el AVD y la imagen al terminar (`avdmanager delete avd`, `sdkmanager --uninstall`).
+- Si Chrome ya está abierto, `header.py` usa un perfil temporal propio; sin él, el modo headless puede colgarse.
+- El ícono de 512×512 sale de `AppIcon 1024` (opaco). Las imágenes se subieron a Play con la API (`edits.listings/<idioma>/<phoneScreenshots|featureGraphic|icon>`); la cuenta de servicio no puede validar ni confirmar una versión de producción, así que las versiones se crean a mano en Play Console.
+
 ## Notas
 
 - No hay backend ni autenticación; todos los datos son locales (Hive). Los unlocks de compras se cachean localmente; no hay validación de recibos en servidor (ver `docs/risks.md`).
