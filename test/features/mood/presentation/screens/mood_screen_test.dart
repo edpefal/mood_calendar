@@ -11,6 +11,7 @@ import 'package:mood_calendar/core/navigation/main_shell.dart';
 import 'package:mood_calendar/core/notifications/local_notification_service.dart';
 import 'package:mood_calendar/core/settings/domain/entities/app_settings.dart';
 import 'package:mood_calendar/core/settings/domain/repositories/app_settings_repository.dart';
+import 'package:mood_calendar/core/telemetry/analytics_reporter.dart';
 import 'package:mood_calendar/core/telemetry/app_telemetry.dart';
 import 'package:mood_calendar/core/widgets/floating_tab_bar.dart';
 import 'package:mood_calendar/core/widgets/gradient_pill_button.dart';
@@ -1326,6 +1327,9 @@ void main() {
       return MultiRepositoryProvider(
         providers: [
           RepositoryProvider<AppLogger>.value(value: const _TestAppLogger()),
+          RepositoryProvider<AnalyticsReporter>.value(
+            value: const NoopAnalyticsReporter(),
+          ),
           RepositoryProvider<AppSettingsRepository>.value(
             value: settingsRepository,
           ),
@@ -1720,6 +1724,9 @@ void main() {
       return MultiRepositoryProvider(
         providers: [
           RepositoryProvider<AppLogger>.value(value: const _TestAppLogger()),
+          RepositoryProvider<AnalyticsReporter>.value(
+            value: const NoopAnalyticsReporter(),
+          ),
           RepositoryProvider<AppSettingsRepository>.value(
             value: settingsRepository,
           ),

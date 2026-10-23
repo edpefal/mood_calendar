@@ -64,6 +64,7 @@ flutter build ipa \
 
 scripts/verify_ios_archive_key.sh
 scripts/verify_ios_archive_crash_reporting.sh
+scripts/verify_ios_archive_no_ad_id.sh
 
 echo
 grep '^version:' pubspec.yaml

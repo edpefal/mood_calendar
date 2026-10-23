@@ -7,6 +7,7 @@ Flutter app para registrar y revisar estados de ánimo diarios, con un catálogo
 - **Flutter** 3.x (CI usa 3.32.1), Dart SDK `>=3.6.0 <4.0.0`
 - **Estado**: flutter_bloc + Cubit
 - **Persistencia**: Hive (local, sin backend)
+- **Analíticas de uso**: Firebase Analytics (`firebase_analytics`), anónimas, solo en release en iOS/Android y con interruptor en Settings; sin ID de publicidad (ver "Arranque de la app")
 - **Crashes**: Firebase Crashlytics (`firebase_core` + `firebase_crashlytics`, proyecto Firebase `mood-calendar-fee5c`, apps iOS y Android con el mismo identificador `com.artlab.moodcalendar`; Android aún no está publicado en Google Play), solo en release en iOS/Android
 - **Compras in-app**: purchases_flutter (RevenueCat) en iOS y Android (Android aún sin publicar en Google Play)
 - **Generación de código**: freezed, json_serializable, hive_generator → correr con `flutter pub run build_runner build`
@@ -27,7 +28,7 @@ lib/
 │   ├── notifications/    # LocalNotificationService
 │   ├── rating/           # ReviewRequester (in_app_review)
 │   ├── settings/         # AppSettings y estado del pedido de calificación (Hive)
-│   ├── telemetry/        # AppTelemetry, CrashReporter y Crashlytics (crash reporting)
+│   ├── telemetry/        # AppTelemetry, CrashReporter/Crashlytics (crash reporting) y AnalyticsReporter/Analytics (uso anónimo)
 │   ├── widgets/          # widgets compartidos (GradientPillButton, FloatingTabBar)
 │   └── navigation/       # MainShell: raíz de la app con las 4 pestañas y el bottom bar
 └── features/
@@ -103,6 +104,8 @@ Cada uno tiene su spec en `openspec/specs/`; leerla antes de cambiarlo.
 `runApp()` se llama **antes** de inicializar notificaciones (que espera el diálogo nativo de permisos) y de tareas lentas. Nunca volver a hacer `await` de nada que dependa de interacción del usuario (diálogos del sistema, p. ej. el permiso de notificaciones) antes de `runApp()`: dejó la app congelada en el launch screen y causó un rechazo de Apple (Guideline 2.1(a)). Hive y `Purchases.configure()` sí se esperan antes de `runApp()` a propósito: no esperan al usuario y `configure()` debe terminar antes de construir `MoodEntitlementsRepositoryImpl` (ver `openspec/changes/archive/2026-09-29-fix-launch-blocked-on-notification-permission/`).
 
 `initializeCrashReporting()` (`lib/core/telemetry/crash_reporting_bootstrap.dart`) es lo primero que corre en `main()` tras `ensureInitialized()`, para capturar también crashes de arranque; tampoco espera al usuario. Solo se activa con `kReleaseMode`, en iOS/Android y con `errorsEnabled` (`ENABLE_ERROR_TELEMETRY`); en debug, tests y `tool/screenshots/main.dart` queda `LoggerAppTelemetry` y nada sale del dispositivo. Si falla, la app arranca igual sin reporte. `CrashlyticsAppTelemetry` envuelve al logger y reenvía `recordError` como no fatal, **sin** las claves de contexto `date`, `mood`, `intensity` y `note` (`blockedContextKeys`): al añadir contexto a un `recordError`, no meter datos de entradas del usuario. El reporte es opt-out y no hay toggle en Settings (pendiente en `backlog.md`).
+
+**Analytics** (`openspec/specs/usage-analytics/` al archivar `add-firebase-analytics`): `initializeAnalytics()` (`analytics_bootstrap.dart`) corre tras abrir Hive y solo se activa con `kReleaseMode`, iOS/Android, Firebase ya inicializado y la preferencia `usageAnalyticsEnabled` (Hive, `true` por defecto, interruptor "Compartir datos de uso anónimos" en Settings); aplica `setCollectionEnabled(preferencia)` antes de componer la telemetría. La recolección nace apagada en `Info.plist` y el manifiesto y se enciende en código. La cadena es `Logger → Crashlytics → Analytics`: `AnalyticsAppTelemetry` solo reenvía los eventos de `AppTelemetryEvents.analyticsAllowlist` y los parámetros de `analyticsParameterAllowlist` (`has_note`, `source`); `blockedContextKeys` (`telemetry_privacy.dart`) se comparte con Crashlytics. **Al añadir un evento, ponerlo en la allowlist solo si no lleva datos de entradas ni ids de moods/Packs.** Sin ID de publicidad: el `Podfile` fija `$FirebaseAnalyticsWithoutAdIdSupport = true` (no enlaza IdentitySupport/AdSupport), no hay ATT, y el manifiesto quita `AD_ID` y `ACCESS_ADSERVICES_*`; los scripts `verify_android_bundle_no_ad_id.sh` y `verify_ios_archive_no_ad_id.sh` lo comprueban en cada release. `tool/screenshots/main.dart` provee `NoopAnalyticsReporter`.
 
 ## Sistema de diseño
 

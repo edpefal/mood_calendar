@@ -5,6 +5,7 @@ class SettingsState extends Equatable {
   const SettingsState({
     this.isLoading = true,
     this.remindersEnabled = false,
+    this.usageAnalyticsEnabled = true,
     this.reminderTime = const TimeOfDay(hour: 18, minute: 0),
     this.appVersion = '',
     this.saveFailureCount = 0,
@@ -12,6 +13,7 @@ class SettingsState extends Equatable {
 
   final bool isLoading;
   final bool remindersEnabled;
+  final bool usageAnalyticsEnabled;
   final TimeOfDay reminderTime;
   final String appVersion;
 
@@ -22,6 +24,7 @@ class SettingsState extends Equatable {
   SettingsState copyWith({
     bool? isLoading,
     bool? remindersEnabled,
+    bool? usageAnalyticsEnabled,
     TimeOfDay? reminderTime,
     String? appVersion,
     int? saveFailureCount,
@@ -29,6 +32,8 @@ class SettingsState extends Equatable {
     return SettingsState(
       isLoading: isLoading ?? this.isLoading,
       remindersEnabled: remindersEnabled ?? this.remindersEnabled,
+      usageAnalyticsEnabled:
+          usageAnalyticsEnabled ?? this.usageAnalyticsEnabled,
       reminderTime: reminderTime ?? this.reminderTime,
       appVersion: appVersion ?? this.appVersion,
       saveFailureCount: saveFailureCount ?? this.saveFailureCount,
@@ -39,6 +44,7 @@ class SettingsState extends Equatable {
   List<Object?> get props => [
         isLoading,
         remindersEnabled,
+        usageAnalyticsEnabled,
         reminderTime,
         appVersion,
         saveFailureCount,

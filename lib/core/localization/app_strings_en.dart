@@ -111,6 +111,11 @@ class AppStringsEn extends AppStrings {
   @override
   String get settingsDataSection => 'Your data';
   @override
+  String get usageAnalyticsTitle => 'Share anonymous usage data';
+  @override
+  String get usageAnalyticsSubtitle =>
+      'Helps us understand how many people use the app. Your moods and notes are never included.';
+  @override
   String get exportHistoryTitle => 'Export history';
   @override
   String get exportHistorySemanticLabel => 'Export your mood history as a file';

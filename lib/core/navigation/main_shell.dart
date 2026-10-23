@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../features/mood/presentation/screens/calendar_screen.dart';
 import '../../features/mood/presentation/screens/mood_screen.dart';
+import '../../features/purchases/presentation/bloc/purchases_cubit.dart';
 import '../../features/purchases/presentation/screens/mood_store_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
 import '../localization/app_strings.dart';
@@ -59,6 +61,9 @@ class MainShellState extends State<MainShell> {
   }
 
   void _selectTab(MainTab tab) {
+    if (tab == MainTab.store && _tab != MainTab.store) {
+      context.read<PurchasesCubit>().trackStoreOpened();
+    }
     _tab = tab;
     _visited.add(tab);
   }
@@ -105,7 +110,8 @@ class MainShellState extends State<MainShell> {
           MediaQuery(
             data: mediaQuery.copyWith(
               padding: mediaQuery.padding.copyWith(
-                bottom: mediaQuery.padding.bottom + FloatingTabBar.reservedHeight,
+                bottom:
+                    mediaQuery.padding.bottom + FloatingTabBar.reservedHeight,
               ),
             ),
             child: IndexedStack(

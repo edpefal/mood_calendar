@@ -13,6 +13,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:mood_calendar/core/telemetry/analytics_reporter.dart';
 import 'package:mood_calendar/core/localization/app_strings.dart';
 import 'package:mood_calendar/core/logging/app_logger.dart';
 import 'package:mood_calendar/core/logging/logger_app_logger.dart';
@@ -198,6 +199,10 @@ Future<void> main() async {
     MultiRepositoryProvider(
       providers: [
         RepositoryProvider<AppLogger>.value(value: appLogger),
+        // Analytics is never initialized here: nothing leaves the device.
+        RepositoryProvider<AnalyticsReporter>.value(
+          value: const NoopAnalyticsReporter(),
+        ),
         RepositoryProvider<ExportMoodHistoryUseCase>.value(
           value: exportMoodHistory,
         ),

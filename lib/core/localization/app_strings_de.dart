@@ -113,6 +113,11 @@ class AppStringsDe extends AppStrings {
   @override
   String get settingsDataSection => 'Deine Daten';
   @override
+  String get usageAnalyticsTitle => 'Anonyme Nutzungsdaten teilen';
+  @override
+  String get usageAnalyticsSubtitle =>
+      'Hilft uns zu verstehen, wie viele Menschen die App nutzen. Deine Stimmungen und Notizen sind nie enthalten.';
+  @override
   String get exportHistoryTitle => 'Verlauf exportieren';
   @override
   String get exportHistorySemanticLabel =>
