@@ -287,6 +287,10 @@ python3 tool/screenshots/header.py --play [idiomas]                      # -> as
 - Si Chrome ya está abierto, `header.py` usa un perfil temporal propio; sin él, el modo headless puede colgarse.
 - El ícono de 512×512 sale de `AppIcon 1024` (opaco). Las imágenes se subieron a Play con la API (`edits.listings/<idioma>/<phoneScreenshots|featureGraphic|icon>`); la cuenta de servicio no puede validar ni confirmar una versión de producción, así que las versiones se crean a mano en Play Console.
 
+## Sitio web (`site/`)
+
+Sitio estático bilingüe para `moodcalendar.app` (dominio comprado en Cloudflare; el desplegado va en Vercel): inglés en `/` y español en `/es/`, con `/privacy/` y `/terms/` en cada idioma. Contacto: `support@moodcalendar.app` (reenvío de correo en Cloudflare). **Reevo no tiene nada que ver con Mood Calendar**: no usarlo como editor, titular ni copyright en el sitio, la política ni los términos (el sitio usa "Mood Calendar"; el copyright de App Store Connect también es "Mood Calendar"). Si cambia lo que la app recoge, actualizar `privacy` en los dos idiomas y la fecha.
+
 ## Notas
 
 - No hay backend ni autenticación; todos los datos son locales (Hive). Los unlocks de compras se cachean localmente; no hay validación de recibos en servidor (ver `docs/risks.md`).
