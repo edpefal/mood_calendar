@@ -104,6 +104,8 @@ abstract class AppStrings {
   String get privacyLinkFailed;
   String get settingsSaveFailed;
   String get settingsDataSection;
+  String get usageAnalyticsTitle;
+  String get usageAnalyticsSubtitle;
   String get exportHistoryTitle;
   String get exportHistorySemanticLabel;
   String get exportHistoryEmpty;

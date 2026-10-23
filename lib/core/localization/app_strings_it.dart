@@ -114,6 +114,11 @@ class AppStringsIt extends AppStrings {
   @override
   String get settingsDataSection => 'I tuoi dati';
   @override
+  String get usageAnalyticsTitle => 'Condividi dati di utilizzo anonimi';
+  @override
+  String get usageAnalyticsSubtitle =>
+      'Ci aiuta a capire quante persone usano l\'app. I tuoi stati d\'animo e le tue note non sono mai inclusi.';
+  @override
   String get exportHistoryTitle => 'Esporta cronologia';
   @override
   String get exportHistorySemanticLabel =>

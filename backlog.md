@@ -80,7 +80,7 @@ Backlog activo del proyecto, actualizado contra el estado actual del repo.
   Ya hay telemetría básica, pero conviene decidir qué eventos de exportación, recordatorios y errores de plataforma son realmente útiles para producto.
 
 - Añadir un toggle en Settings para desactivar el reporte de crashes.
-  Hoy el reporte a Crashlytics (change `add-crash-reporting`) es opt-out sin control en la app; los datos son anónimos y se declaran en App Privacy. Agregar el toggle refuerza la postura de privacidad si llega un reclamo (requiere persistir el valor en Hive y leerlo antes de inicializar Firebase).
+  Hoy el reporte a Crashlytics (change `add-crash-reporting`) es opt-out sin control en la app (el interruptor "Compartir datos de uso anónimos" de `add-firebase-analytics` solo gobierna Analytics, no Crashlytics); los datos son anónimos y se declaran en App Privacy. Agregar el toggle refuerza la postura de privacidad si llega un reclamo (requiere persistir el valor en Hive y leerlo antes de inicializar Firebase).
 
 ## Prioridad baja
 

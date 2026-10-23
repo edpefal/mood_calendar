@@ -9,6 +9,7 @@ class AppSettingsLocalDataSource {
   static const String _dailyReminderEnabledKey = 'daily_reminder_enabled';
   static const String _dailyReminderHourKey = 'daily_reminder_hour';
   static const String _dailyReminderMinuteKey = 'daily_reminder_minute';
+  static const String _usageAnalyticsEnabledKey = 'usage_analytics_enabled';
 
   final Box<dynamic> _settingsBox;
 
@@ -26,10 +27,16 @@ class AppSettingsLocalDataSource {
       defaultValue: AppSettings.defaults.dailyReminderMinute,
     ) as int;
 
+    final usageAnalyticsEnabled = _settingsBox.get(
+      _usageAnalyticsEnabledKey,
+      defaultValue: AppSettings.defaults.usageAnalyticsEnabled,
+    ) as bool;
+
     return AppSettings(
       dailyReminderEnabled: dailyReminderEnabled,
       dailyReminderHour: dailyReminderHour,
       dailyReminderMinute: dailyReminderMinute,
+      usageAnalyticsEnabled: usageAnalyticsEnabled,
     );
   }
 
@@ -45,6 +52,10 @@ class AppSettingsLocalDataSource {
     await _settingsBox.put(
       _dailyReminderMinuteKey,
       settings.dailyReminderMinute,
+    );
+    await _settingsBox.put(
+      _usageAnalyticsEnabledKey,
+      settings.usageAnalyticsEnabled,
     );
   }
 }

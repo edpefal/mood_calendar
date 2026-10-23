@@ -16,11 +16,14 @@ class SettingsCubit extends Cubit<SettingsState> {
     required Future<void> Function() cancelReminder,
     required AppVersionLoader loadAppVersion,
     required AppLogger logger,
+    Future<void> Function(bool enabled)? setUsageAnalyticsCollection,
   })  : _settingsRepository = settingsRepository,
         _scheduleReminder = scheduleReminder,
         _cancelReminder = cancelReminder,
         _loadAppVersion = loadAppVersion,
         _logger = logger,
+        _setUsageAnalyticsCollection =
+            setUsageAnalyticsCollection ?? ((_) async {}),
         super(const SettingsState());
 
   final AppSettingsRepository _settingsRepository;
@@ -28,6 +31,7 @@ class SettingsCubit extends Cubit<SettingsState> {
   final Future<void> Function() _cancelReminder;
   final AppVersionLoader _loadAppVersion;
   final AppLogger _logger;
+  final Future<void> Function(bool enabled) _setUsageAnalyticsCollection;
 
   /// Last settings known to be saved; changes that fail revert to this.
   AppSettings _persisted = AppSettings.defaults;
@@ -62,6 +66,14 @@ class SettingsCubit extends Cubit<SettingsState> {
         (current) => current.copyWith(dailyReminderEnabled: enabled));
   }
 
+  Future<void> setUsageAnalyticsEnabled(bool enabled) {
+    emit(state.copyWith(usageAnalyticsEnabled: enabled));
+    return _enqueue(
+      (current) => current.copyWith(usageAnalyticsEnabled: enabled),
+      touchesReminder: false,
+    );
+  }
+
   Future<void> setReminderTime(TimeOfDay time) {
     emit(state.copyWith(reminderTime: time));
     return _enqueue(
@@ -72,13 +84,19 @@ class SettingsCubit extends Cubit<SettingsState> {
     );
   }
 
-  Future<void> _enqueue(AppSettings Function(AppSettings) change) {
-    final run = _queue.then((_) => _apply(change));
+  Future<void> _enqueue(
+    AppSettings Function(AppSettings) change, {
+    bool touchesReminder = true,
+  }) {
+    final run = _queue.then((_) => _apply(change, touchesReminder));
     _queue = run;
     return run;
   }
 
-  Future<void> _apply(AppSettings Function(AppSettings) change) async {
+  Future<void> _apply(
+    AppSettings Function(AppSettings) change,
+    bool touchesReminder,
+  ) async {
     // Applied to the latest saved values, not to those at the time of the
     // tap, so a queued change never undoes an earlier one.
     final previous = _persisted;
@@ -86,10 +104,15 @@ class SettingsCubit extends Cubit<SettingsState> {
     try {
       await _settingsRepository.saveSettings(next);
       _persisted = next;
-      if (next.dailyReminderEnabled) {
-        await _scheduleReminder();
-      } else {
-        await _cancelReminder();
+      if (touchesReminder) {
+        if (next.dailyReminderEnabled) {
+          await _scheduleReminder();
+        } else {
+          await _cancelReminder();
+        }
+      }
+      if (previous.usageAnalyticsEnabled != next.usageAnalyticsEnabled) {
+        await _setUsageAnalyticsCollection(next.usageAnalyticsEnabled);
       }
       if (isClosed) return;
       emit(_stateFrom(next).copyWith(
@@ -99,18 +122,28 @@ class SettingsCubit extends Cubit<SettingsState> {
       ));
     } catch (error, stackTrace) {
       _logger.error(
-        'Failed to save reminder settings',
+        'Failed to save settings',
         tag: 'Settings',
         error: error,
         stackTrace: stackTrace,
       );
       await _restore(previous);
+      await _reapplyUsageAnalytics(previous);
       if (isClosed) return;
       emit(_stateFrom(previous).copyWith(
         isLoading: false,
         appVersion: state.appVersion,
         saveFailureCount: state.saveFailureCount + 1,
       ));
+    }
+  }
+
+  /// Si el cambio falló a medias, deja el SDK como el valor guardado.
+  Future<void> _reapplyUsageAnalytics(AppSettings previous) async {
+    try {
+      await _setUsageAnalyticsCollection(previous.usageAnalyticsEnabled);
+    } catch (_) {
+      // Best effort: the original failure is already reported.
     }
   }
 
@@ -126,6 +159,7 @@ class SettingsCubit extends Cubit<SettingsState> {
   SettingsState _stateFrom(AppSettings settings) {
     return state.copyWith(
       remindersEnabled: settings.dailyReminderEnabled,
+      usageAnalyticsEnabled: settings.usageAnalyticsEnabled,
       reminderTime: TimeOfDay(
         hour: settings.dailyReminderHour,
         minute: settings.dailyReminderMinute,

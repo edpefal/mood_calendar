@@ -30,6 +30,7 @@ void main() {
     expect(settings.dailyReminderEnabled, isTrue);
     expect(settings.dailyReminderHour, 18);
     expect(settings.dailyReminderMinute, 0);
+    expect(settings.usageAnalyticsEnabled, isTrue);
   });
 
   test('persists and reloads typed settings values', () async {
@@ -45,5 +46,20 @@ void main() {
     expect(reloadedSettings.dailyReminderEnabled, isFalse);
     expect(reloadedSettings.dailyReminderHour, 9);
     expect(reloadedSettings.dailyReminderMinute, 30);
+  });
+
+  test('persists the usage analytics preference across reopens', () async {
+    await dataSource.saveSettings(
+      AppSettings.defaults.copyWith(usageAnalyticsEnabled: false),
+    );
+    await settingsBox.close();
+    settingsBox = await Hive.openBox<dynamic>(
+      AppSettingsLocalDataSource.boxName,
+    );
+
+    final reloaded =
+        await AppSettingsLocalDataSource(settingsBox).getSettings();
+
+    expect(reloaded.usageAnalyticsEnabled, isFalse);
   });
 }

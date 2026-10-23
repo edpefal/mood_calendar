@@ -10,6 +10,7 @@ import '../../../../core/localization/app_strings.dart';
 import '../../../../core/logging/app_logger.dart';
 import '../../../../core/notifications/local_notification_service.dart';
 import '../../../../core/settings/domain/repositories/app_settings_repository.dart';
+import '../../../../core/telemetry/analytics_reporter.dart';
 import '../../../mood/data/services/rating_prompt_service.dart';
 import '../../../mood/domain/usecases/export_mood_history_usecase.dart';
 import '../bloc/settings_cubit.dart';
@@ -64,6 +65,8 @@ class SettingsScreen extends StatelessWidget {
             cancelReminder: notificationService.cancelDailyReminder,
             loadAppVersion: _loadPackageVersion,
             logger: context.read<AppLogger>(),
+            setUsageAnalyticsCollection:
+                context.read<AnalyticsReporter>().setCollectionEnabled,
           )..load(),
           child: const SettingsScreen(),
         );
@@ -158,6 +161,17 @@ class SettingsScreen extends StatelessWidget {
                 const SizedBox(height: 8),
                 _SectionHeader(strings.settingsDataSection),
                 _ExportHistoryRow(shareFile: _shareFile),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  value: state.usageAnalyticsEnabled,
+                  title: Text(strings.usageAnalyticsTitle),
+                  subtitle: Text(strings.usageAnalyticsSubtitle),
+                  onChanged: (value) => unawaited(
+                    context
+                        .read<SettingsCubit>()
+                        .setUsageAnalyticsEnabled(value),
+                  ),
+                ),
                 const SizedBox(height: 8),
                 const Divider(),
                 const SizedBox(height: 8),

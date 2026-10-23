@@ -18,6 +18,9 @@ import 'core/settings/data/datasources/app_settings_local_datasource.dart';
 import 'core/settings/data/datasources/rating_prompt_local_datasource.dart';
 import 'core/settings/data/repositories/app_settings_repository_impl.dart';
 import 'core/settings/domain/repositories/app_settings_repository.dart';
+import 'core/telemetry/analytics_app_telemetry.dart';
+import 'core/telemetry/analytics_bootstrap.dart';
+import 'core/telemetry/analytics_reporter.dart';
 import 'core/telemetry/app_telemetry.dart';
 import 'core/telemetry/app_telemetry_config.dart';
 import 'core/telemetry/crash_reporting_bootstrap.dart';
@@ -100,22 +103,40 @@ void main() async {
   final moodBox = Hive.box<MoodModel>('moods');
   final settingsBox = Hive.box<dynamic>(AppSettingsLocalDataSource.boxName);
 
+  final appSettingsRepository = AppSettingsRepositoryImpl(
+    AppSettingsLocalDataSource(settingsBox),
+  );
+  // The preference is read and applied to the SDK before any telemetry is
+  // composed, so nothing is sent while the user has opted out.
+  final usageAnalyticsEnabled =
+      (await appSettingsRepository.getSettings()).usageAnalyticsEnabled;
+  final analyticsReporter = await initializeAnalytics(
+    logger: appLogger,
+    usageAnalyticsEnabled: usageAnalyticsEnabled,
+    firebaseReady: isFirebaseInitialized(),
+  );
+
   final loggerTelemetry = LoggerAppTelemetry(
     logger: appLogger,
     config: telemetryConfig,
   );
-  final AppTelemetry telemetry = crashReporter == null
-      ? loggerTelemetry
-      : CrashlyticsAppTelemetry(
-          delegate: loggerTelemetry,
-          reporter: crashReporter,
-          logger: appLogger,
-          config: telemetryConfig,
-        );
+  AppTelemetry telemetry = loggerTelemetry;
+  if (crashReporter != null) {
+    telemetry = CrashlyticsAppTelemetry(
+      delegate: telemetry,
+      reporter: crashReporter,
+      logger: appLogger,
+      config: telemetryConfig,
+    );
+  }
+  if (analyticsReporter != null) {
+    telemetry = AnalyticsAppTelemetry(
+      delegate: telemetry,
+      reporter: analyticsReporter,
+      logger: appLogger,
+    );
+  }
   final repository = MoodRepositoryImpl(moodBox, logger: appLogger);
-  final appSettingsRepository = AppSettingsRepositoryImpl(
-    AppSettingsLocalDataSource(settingsBox),
-  );
   final notificationService = LocalNotificationService(
     onReminderTap: handleReminderTap,
     appSettingsRepository: appSettingsRepository,
@@ -164,6 +185,9 @@ void main() async {
     MultiRepositoryProvider(
       providers: [
         RepositoryProvider<AppLogger>.value(value: appLogger),
+        RepositoryProvider<AnalyticsReporter>.value(
+          value: analyticsReporter ?? const NoopAnalyticsReporter(),
+        ),
         RepositoryProvider<AppSettingsRepository>.value(
           value: appSettingsRepository,
         ),

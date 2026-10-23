@@ -72,6 +72,7 @@ flutter build appbundle --release \
   "$@"
 
 scripts/verify_android_bundle_key.sh
+scripts/verify_android_bundle_no_ad_id.sh
 
 echo
 grep '^version:' pubspec.yaml

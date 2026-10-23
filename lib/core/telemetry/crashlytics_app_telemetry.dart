@@ -4,6 +4,7 @@ import '../logging/app_logger.dart';
 import 'app_telemetry.dart';
 import 'app_telemetry_config.dart';
 import 'crash_reporter.dart';
+import 'telemetry_privacy.dart' as privacy;
 
 /// Envuelve otra [AppTelemetry]: todo sigue yendo al destino original (el log
 /// local) y además `recordError` se reenvía a [CrashReporter] como no fatal.
@@ -20,9 +21,8 @@ class CrashlyticsAppTelemetry implements AppTelemetry {
 
   static const _tag = 'CrashlyticsAppTelemetry';
 
-  /// Claves de contexto que nunca salen del dispositivo: describen una entrada
-  /// del usuario (fecha, mood, nota). Siguen escribiéndose en el log local.
-  static const blockedContextKeys = {'date', 'mood', 'intensity', 'note'};
+  /// Ver [privacy.blockedContextKeys]: la misma lista que usa Analytics.
+  static const blockedContextKeys = privacy.blockedContextKeys;
 
   final AppTelemetry _delegate;
   final CrashReporter _reporter;

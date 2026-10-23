@@ -15,6 +15,8 @@ import 'package:mood_calendar/features/mood/domain/usecases/export_mood_history_
 import 'package:mood_calendar/features/settings/presentation/bloc/settings_cubit.dart';
 import 'package:mood_calendar/features/settings/presentation/screens/settings_screen.dart';
 
+import '../../../../support/fake_analytics_reporter.dart';
+
 void main() {
   late _FakeSettingsRepository repository;
   late _FakeRatingPromptService ratingPromptService;
@@ -23,12 +25,17 @@ void main() {
   late Future<bool> Function(Uri) openUrl;
   late _FakeHistoryExporter exporter;
   late List<String> sharedFiles;
+  late FakeAnalyticsReporter analytics;
 
   Future<void> pumpScreen(
     WidgetTester tester, {
     Locale locale = const Locale('en'),
     String version = '1.8.3 (28)',
   }) async {
+    // Tall enough for every row, including the version at the bottom.
+    tester.view.physicalSize = const Size(800, 1400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
     await tester.pumpWidget(
       MultiRepositoryProvider(
         providers: [
@@ -46,6 +53,7 @@ void main() {
             cancelReminder: () async => notificationCalls.add('cancel'),
             loadAppVersion: () async => version,
             logger: const _SilentLogger(),
+            setUsageAnalyticsCollection: analytics.setCollectionEnabled,
           )..load(),
           child: MaterialApp(
             locale: locale,
@@ -77,6 +85,7 @@ void main() {
     ratingPromptService = _FakeRatingPromptService();
     exporter = _FakeHistoryExporter();
     sharedFiles = [];
+    analytics = FakeAnalyticsReporter();
     notificationCalls = [];
     openedUrls = [];
     openUrl = (url) async {
@@ -90,7 +99,8 @@ void main() {
     await pumpScreen(tester);
 
     expect(find.text('Settings'), findsOneWidget);
-    expect(tester.widget<SwitchListTile>(find.byType(SwitchListTile)).value,
+    expect(
+        tester.widget<SwitchListTile>(find.byType(SwitchListTile).first).value,
         isTrue);
     expect(find.text('6:00 PM'), findsOneWidget);
     expect(find.text('1.8.3 (28)'), findsOneWidget);
@@ -100,7 +110,7 @@ void main() {
       (tester) async {
     await pumpScreen(tester);
 
-    await tester.tap(find.byType(SwitchListTile));
+    await tester.tap(find.byType(SwitchListTile).first);
     await tester.pumpAndSettle();
 
     expect(repository.saved.dailyReminderEnabled, isFalse);
@@ -188,10 +198,11 @@ void main() {
     await pumpScreen(tester);
     repository.failSaves = true;
 
-    await tester.tap(find.byType(SwitchListTile));
+    await tester.tap(find.byType(SwitchListTile).first);
     await tester.pumpAndSettle();
 
-    expect(tester.widget<SwitchListTile>(find.byType(SwitchListTile)).value,
+    expect(
+        tester.widget<SwitchListTile>(find.byType(SwitchListTile).first).value,
         isTrue);
     expect(find.byType(SnackBar), findsOneWidget);
   });
@@ -221,6 +232,79 @@ void main() {
         findsOneWidget);
     handle.dispose();
   });
+  group('usage analytics switch', () {
+    Finder analyticsSwitch() => find.widgetWithText(
+          SwitchListTile,
+          'Share anonymous usage data',
+        );
+
+    testWidgets('starts on and does not touch the reminder', (tester) async {
+      await pumpScreen(tester);
+
+      expect(tester.widget<SwitchListTile>(analyticsSwitch()).value, isTrue);
+      expect(find.textContaining('never included'), findsOneWidget);
+    });
+
+    testWidgets('turning it off saves it and stops collection', (tester) async {
+      await pumpScreen(tester);
+
+      await tester.tap(analyticsSwitch());
+      await tester.pumpAndSettle();
+
+      expect(repository.saved.usageAnalyticsEnabled, isFalse);
+      expect(analytics.collectionChanges, [false]);
+      expect(notificationCalls, isEmpty);
+      expect(tester.widget<SwitchListTile>(analyticsSwitch()).value, isFalse);
+    });
+
+    testWidgets('turning it back on enables collection again', (tester) async {
+      await pumpScreen(tester);
+
+      await tester.tap(analyticsSwitch());
+      await tester.pumpAndSettle();
+      await tester.tap(analyticsSwitch());
+      await tester.pumpAndSettle();
+
+      expect(repository.saved.usageAnalyticsEnabled, isTrue);
+      expect(analytics.collectionChanges, [false, true]);
+    });
+
+    testWidgets('a failed save reverts the switch and shows a message',
+        (tester) async {
+      await pumpScreen(tester);
+      repository.failSaves = true;
+
+      await tester.tap(analyticsSwitch());
+      await tester.pumpAndSettle();
+
+      expect(tester.widget<SwitchListTile>(analyticsSwitch()).value, isTrue);
+      // The SDK is left at the saved value, never at the failed one.
+      expect(analytics.collectionChanges, [true]);
+      expect(find.byType(SnackBar), findsOneWidget);
+    });
+
+    testWidgets('shows the saved preference', (tester) async {
+      repository.saved =
+          repository.saved.copyWith(usageAnalyticsEnabled: false);
+      await pumpScreen(tester);
+
+      expect(tester.widget<SwitchListTile>(analyticsSwitch()).value, isFalse);
+    });
+
+    for (final entry in {
+      'es': 'Compartir datos de uso anónimos',
+      'de': 'Anonyme Nutzungsdaten teilen',
+      'fr': 'Partager des données d\'utilisation anonymes',
+      'it': 'Condividi dati di utilizzo anonimi',
+    }.entries) {
+      testWidgets('is localized (${entry.key})', (tester) async {
+        await pumpScreen(tester, locale: Locale(entry.key));
+
+        expect(find.text(entry.value), findsOneWidget);
+      });
+    }
+  });
+
   group('export history', () {
     testWidgets('has its own section with the export row', (tester) async {
       await pumpScreen(tester);

@@ -4,6 +4,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/telemetry/app_telemetry.dart';
+import '../../../../core/telemetry/app_telemetry_events.dart';
 import '../../../mood/domain/entities/mood_definition.dart';
 import '../../domain/entities/mood_offer.dart';
 import '../../domain/entities/mood_pack.dart';
@@ -71,23 +72,53 @@ class PurchasesCubit extends Cubit<PurchasesState> {
     return pack.moodIds.where(isMoodUnlocked).toList();
   }
 
+  /// La pestaña de la tienda se abrió. Sin ids de moods ni de Packs.
+  void trackStoreOpened() {
+    telemetry?.trackEvent(AppTelemetryEvents.storeOpened);
+  }
+
   Future<void> purchaseMood(String moodId) =>
       _runPurchaseAction(() => repository.purchaseMood(moodId));
 
   Future<void> purchasePack(String packId) =>
       _runPurchaseAction(() => repository.purchasePack(packId));
 
-  Future<void> restorePurchases() =>
-      _runPurchaseAction(() => repository.restorePurchases());
+  Future<void> restorePurchases() => _runPurchaseAction(
+        () => repository.restorePurchases(),
+        isRestore: true,
+      );
 
-  Future<void> _runPurchaseAction(Future<void> Function() action) async {
+  // Los eventos de compras nunca llevan el id del mood ni del Pack.
+  Future<void> _runPurchaseAction(
+    Future<void> Function() action, {
+    bool isRestore = false,
+  }) async {
     emit(state.copyWith(actionStatus: PurchaseActionStatus.inProgress));
+    if (!isRestore) {
+      telemetry?.trackEvent(AppTelemetryEvents.purchaseStarted);
+    }
     try {
       await action();
+      telemetry?.trackEvent(
+        isRestore
+            ? AppTelemetryEvents.purchasesRestored
+            : AppTelemetryEvents.purchaseCompleted,
+      );
       emit(state.copyWith(actionStatus: PurchaseActionStatus.success));
     } on PurchaseException catch (e) {
-      emit(state.copyWith(actionStatus: _statusForReason(e.reason)));
+      final status = _statusForReason(e.reason);
+      if (!isRestore) {
+        telemetry?.trackEvent(
+          status == PurchaseActionStatus.cancelled
+              ? AppTelemetryEvents.purchaseCancelled
+              : AppTelemetryEvents.purchaseFailed,
+        );
+      }
+      emit(state.copyWith(actionStatus: status));
     } catch (_) {
+      if (!isRestore) {
+        telemetry?.trackEvent(AppTelemetryEvents.purchaseFailed);
+      }
       emit(state.copyWith(actionStatus: PurchaseActionStatus.unknownError));
     }
   }

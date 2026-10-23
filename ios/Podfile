@@ -4,6 +4,10 @@
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
 
+# Analytics sin ID de publicidad: no enlazar GoogleAppMeasurement/IdentitySupport
+# (acceso al IDFA). Ver openspec/changes/add-firebase-analytics.
+$FirebaseAnalyticsWithoutAdIdSupport = true
+
 project 'Runner', {
   'Debug' => :debug,
   'Profile' => :release,
