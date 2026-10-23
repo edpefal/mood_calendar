@@ -19,6 +19,7 @@ main{max-width:960px;margin:0 auto;padding:32px 16px}
 article{max-width:720px;margin:0 auto}
 article h1{font-size:1.9rem}
 article h2{margin-top:2rem}
+article h3{margin-top:1.4rem}
 footer{max-width:960px;margin:0 auto;padding:24px 16px 48px;color:var(--muted);font-size:.9rem;border-top:1px solid var(--line)}
 footer a{color:var(--muted);margin-right:16px}
 .stores{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:28px}
