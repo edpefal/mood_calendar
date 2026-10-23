@@ -16,8 +16,7 @@ import '../../../mood/domain/usecases/export_mood_history_usecase.dart';
 import '../bloc/settings_cubit.dart';
 import '../bloc/settings_state.dart';
 
-const privacyPolicyUrl =
-    'https://www.termsfeed.com/live/c7cd2907-6d6c-46d2-9e1a-a715b74979c8';
+const privacyPolicyUrl = 'https://moodcalendar.app/privacy/';
 
 const _brandColor = Color(0xFF5F3DC4);
 
