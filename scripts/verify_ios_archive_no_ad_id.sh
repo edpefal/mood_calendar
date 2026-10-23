@@ -31,7 +31,10 @@ for fw in "$APP"/Frameworks/*.framework; do
 done
 
 for binary in "${binaries[@]}"; do
-  if otool -L "$binary" 2>/dev/null | grep -q 'AdSupport.framework'; then
+  # grep -c reads all input, so pipefail never trips on a SIGPIPE (grep -q would
+  # hide a real AdSupport link behind a false "not found").
+  links=$(otool -L "$binary" 2>/dev/null | grep -c 'AdSupport.framework' || true)
+  if [[ "$links" -ge 1 ]]; then
     echo "ERROR: $binary links AdSupport (advertising identifier access)." >&2
     bad=1
   fi
