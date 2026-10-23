@@ -20,7 +20,9 @@ if [[ ! -f "$BUNDLE" ]]; then
   exit 2
 fi
 
-if ! unzip -Z1 "$BUNDLE" | grep -qx 'base/manifest/AndroidManifest.xml'; then
+# grep -c reads all input, so pipefail never trips on a SIGPIPE (grep -q would).
+has_manifest=$(unzip -Z1 "$BUNDLE" | grep -cx 'base/manifest/AndroidManifest.xml' || true)
+if [[ "$has_manifest" -lt 1 ]]; then
   echo "ERROR: no base manifest found in $BUNDLE (is it an app bundle?)." >&2
   exit 2
 fi
