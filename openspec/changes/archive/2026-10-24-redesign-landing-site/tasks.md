@@ -2,7 +2,7 @@
 
 - [x] 1.1 Ejecutar `/impeccable init` y guardar `PRODUCT.md` (público: tráfico de redes y tiendas; promesa: gratis para descargar y privada). Hecho: plataforma `web`, usuario "registro diario simple y privado", sin pruebas citables.
 - [x] 1.2 Ejecutar `/impeccable shape` para la landing (modo Persuade) y fijar tono, composición del héroe y si habrá animación; las legales se tratan como modo Read. Hecho: estructura "La página es el selector", ver decisión 10 de `design.md`.
-- [ ] 1.3 Opcional: `/impeccable document` para dejar `DESIGN.md` con los tokens del sistema de marca (púrpura `#5F3DC4`→`#6C63FF`, Poppins, pasteles por mood).
+- [x] 1.3 Opcional: `/impeccable document` para dejar `DESIGN.md` con los tokens del sistema de marca (púrpura `#5F3DC4`→`#6C63FF`, Poppins, pasteles por mood). Hecho en el PR #110 (`DESIGN.md` y `.impeccable/design.json`).
 
 ## 2. Activos
 
