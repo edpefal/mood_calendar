@@ -30,7 +30,7 @@ El carrusel de selección diaria SHALL mostrar todos los Moods del catálogo (ba
 
 El carrusel SHALL ordenar sus Moods en dos grupos consecutivos: primero los Moods `unlocked`, ordenados por cantidad de Mood Entry guardadas con ese Mood (todo el historial) de mayor a menor; después los Moods no `unlocked`, en el orden del catálogo. Entre Moods `unlocked` con la misma cantidad de Mood Entry, el sistema SHALL conservar el orden del catálogo. El orden SHALL NOT depender de `intensity`.
 
-El sistema SHALL calcular este orden al abrir la pantalla y SHALL NOT modificarlo mientras la pantalla permanece abierta.
+El sistema SHALL calcular este orden al abrir el selector y cada vez que el usuario regresa a la pestaña del selector desde otra pestaña, de modo que refleje las compras, las restauraciones y las entradas guardadas desde la última vez. Al recalcularlo, el sistema SHALL conservar la fecha del selector, el Mood seleccionado (aunque cambie de posición) y la nota sin guardar. El sistema SHALL NOT modificar el orden mientras el selector permanece visible.
 
 #### Scenario: Usuario toca un Mood bloqueado
 - **WHEN** el usuario toca el Mood premium no `unlocked` que está seleccionado en el carrusel
@@ -68,9 +68,21 @@ El sistema SHALL calcular este orden al abrir la pantalla y SHALL NOT modificarl
 - **WHEN** el usuario abre una fecha que ya tiene una Mood Entry
 - **THEN** el carrusel se posiciona en el Mood de esa entrada, esté en la posición que esté
 
-#### Scenario: El orden no cambia con la pantalla abierta
-- **WHEN** la pantalla de selección está abierta y cambia el historial o el estado `unlocked` de un Mood
-- **THEN** el orden del carrusel no cambia hasta que la pantalla se vuelve a abrir
+#### Scenario: El orden no cambia con el selector visible
+- **WHEN** el selector está visible y cambia el historial o el estado `unlocked` de un Mood, por ejemplo al completar una compra iniciada desde un Mood bloqueado
+- **THEN** el orden del carrusel no cambia hasta que el usuario sale de la pestaña del selector y regresa
+
+#### Scenario: Compra en la Tienda reordena al volver
+- **WHEN** el usuario compra un Mood o un Pack en la Tienda y regresa a la pestaña del selector
+- **THEN** los Moods recién desbloqueados aparecen entre los Moods `unlocked`, antes de los bloqueados
+
+#### Scenario: Restaurar compras reordena al volver
+- **WHEN** el usuario restaura sus compras en la Tienda y regresa a la pestaña del selector
+- **THEN** los Moods restaurados aparecen entre los Moods `unlocked`, antes de los bloqueados
+
+#### Scenario: Reordenar conserva la selección sin guardar
+- **WHEN** el usuario tiene un Mood seleccionado y una nota sin guardar, cambia de pestaña, compra un Mood y regresa al selector
+- **THEN** el Mood seleccionado, la fecha y la nota siguen iguales, y el carrusel está posicionado en ese Mood en su nueva posición
 
 ### Requirement: El desbloqueo no reescribe el historial
 Un cambio en el estado `unlocked` de un Mood (incluida su pérdida, por ejemplo tras un reembolso) SHALL afectar únicamente la capacidad de crear o editar entradas nuevas con ese Mood. El sistema SHALL NOT ocultar, modificar ni invalidar entradas (Mood Entry) ya guardadas con ese Mood.
