@@ -20,4 +20,4 @@
 ## 4. Verificación y release
 
 - [x] 4.1 En el simulador de iPhone, forzar fallos de catálogo con un parche temporal (no commiteado) y confirmar que el botón recupera la Tienda; el reintento fallido vuelve a mostrar el botón. No se probó en iPad
-- [ ] 4.2 Decidir con el release si este cambio entra en la 1.8.4 y, de ser así, subir el build a +30 y repetir `scripts/build_ios_release.sh`
+- [x] 4.2 Decidir con el release si este cambio entra en la 1.8.4 y, de ser así, subir el build a +30 y repetir `scripts/build_ios_release.sh` — Entró en la 1.8.4 (builds +30 y +31).
