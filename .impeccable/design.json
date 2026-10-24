@@ -1,0 +1,347 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-24T21:28:08+00:00",
+  "title": "Design System: Mood Calendar (sitio web)",
+  "extensions": {
+    "colorMeta": {
+      "brand": {
+        "role": "primary",
+        "displayName": "Violeta de Marca",
+        "canonical": "oklch(48% 0.198 288)",
+        "tonalRamp": [
+          "#130042",
+          "#2A0070",
+          "#4616A1",
+          "#6241C8",
+          "#8166EF",
+          "#A28BFF",
+          "#C5B5FF",
+          "#EADFFF"
+        ]
+      },
+      "brand-signal": {
+        "role": "primary",
+        "displayName": "Violeta Señal",
+        "canonical": "oklch(60% 0.224 280)",
+        "tonalRamp": [
+          "#11004C",
+          "#23007D",
+          "#390AB2",
+          "#523FDA",
+          "#6F66FF",
+          "#8E8CFF",
+          "#B2B7FF",
+          "#D9E2FF"
+        ]
+      },
+      "brand-deep": {
+        "role": "primary",
+        "displayName": "Violeta Profundo",
+        "canonical": "oklch(37% 0.171 284)",
+        "tonalRamp": [
+          "#0E003B",
+          "#230667",
+          "#3D2896",
+          "#594CBD",
+          "#786FE3",
+          "#9993FF",
+          "#BDBBFF",
+          "#E3E4FF"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Tinta de Noche Suave",
+        "canonical": "oklch(23% 0.062 294)",
+        "tonalRamp": [
+          "#0C071C",
+          "#261F3C",
+          "#443B60",
+          "#635B81",
+          "#847CA4",
+          "#A69EC9",
+          "#CAC3E9",
+          "#EFE9FF"
+        ]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Papel Lavanda",
+        "canonical": "oklch(98% 0.009 299)",
+        "tonalRamp": [
+          "#0B0B0E",
+          "#252429",
+          "#434146",
+          "#626066",
+          "#838187",
+          "#A6A4AA",
+          "#CAC8CE",
+          "#EFEDF2"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Gris Violeta",
+        "canonical": "oklch(44% 0.056 293)",
+        "tonalRamp": [
+          "#0C071A",
+          "#26203A",
+          "#433C5D",
+          "#625B7E",
+          "#837CA1",
+          "#A69FC5",
+          "#CAC4E6",
+          "#EFEAFF"
+        ]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Línea Lila",
+        "canonical": "oklch(92% 0.027 297)",
+        "tonalRamp": [
+          "#0C0912",
+          "#26232F",
+          "#433F4F",
+          "#635E6F",
+          "#847F91",
+          "#A7A2B4",
+          "#CAC6D7",
+          "#F0ECFB"
+        ]
+      },
+      "night": {
+        "role": "neutral",
+        "displayName": "Noche Violeta",
+        "canonical": "oklch(19% 0.028 293)",
+        "tonalRamp": [
+          "#0B0913",
+          "#252330",
+          "#423F50",
+          "#625E70",
+          "#837F92",
+          "#A5A2B6",
+          "#C9C7D8",
+          "#EFECFB"
+        ]
+      },
+      "bezel": {
+        "role": "neutral",
+        "displayName": "Bisel del Teléfono",
+        "canonical": "oklch(20% 0.058 291)",
+        "tonalRamp": [
+          "#0C071B",
+          "#25203B",
+          "#423C5E",
+          "#615C80",
+          "#827DA3",
+          "#A59FC7",
+          "#C9C4E8",
+          "#EEEAFF"
+        ]
+      },
+      "happy-to": {
+        "role": "secondary",
+        "displayName": "Pastel Feliz",
+        "canonical": "oklch(83% 0.083 146)",
+        "tonalRamp": [
+          "#001100",
+          "#072E0D",
+          "#214D26",
+          "#416E44",
+          "#619064",
+          "#84B386",
+          "#ACD6AE",
+          "#D6FAD7"
+        ]
+      },
+      "calm-to": {
+        "role": "secondary",
+        "displayName": "Pastel Tranquilo",
+        "canonical": "oklch(82% 0.090 244)",
+        "tonalRamp": [
+          "#000B24",
+          "#002747",
+          "#06466D",
+          "#2E6690",
+          "#5088B4",
+          "#73ACD9",
+          "#9ED0F8",
+          "#CAF4FF"
+        ]
+      },
+      "sad-to": {
+        "role": "secondary",
+        "displayName": "Pastel Triste",
+        "canonical": "oklch(87% 0.110 76)",
+        "tonalRamp": [
+          "#1C0300",
+          "#3E1B00",
+          "#623700",
+          "#845700",
+          "#A77829",
+          "#CC9B50",
+          "#ECC182",
+          "#FFE8B3"
+        ]
+      },
+      "angry-to": {
+        "role": "secondary",
+        "displayName": "Pastel Enojado",
+        "canonical": "oklch(77% 0.102 20)",
+        "tonalRamp": [
+          "#220001",
+          "#470C12",
+          "#6E262B",
+          "#924749",
+          "#B86869",
+          "#DE8B8B",
+          "#FDB3B2",
+          "#FFDCDA"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Titular del héroe, en dos líneas."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Títulos de sección."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Encabezados de los puntos de privacidad."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Párrafos, hasta 52ch."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Nombre del mood y contador."
+      }
+    },
+    "shadows": [
+      {
+        "name": "phone-lift",
+        "value": "0 36px 60px -28px rgba(0,0,0,.5), 0 12px 24px -12px rgba(0,0,0,.3)",
+        "purpose": "Única sombra del sistema, solo para el teléfono."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out-expo",
+        "value": "cubic-bezier(.16, 1, .3, 1)",
+        "purpose": "Cambio de carita y de pastel; 0.6 s en la carita, 0.7 s en el fondo. Se anula con prefers-reduced-motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "wide",
+        "value": "900px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Picker Nav",
+      "kind": "nav",
+      "refersTo": "picker-nav-button",
+      "description": "Botones ‹ › y contador del selector de caritas.",
+      "html": "<div class=\"ds-nav\"><button class=\"ds-nav-btn\" aria-label=\"Previous\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M15 5l-7 7 7 7\"/></svg></button><span class=\"ds-nav-count\">2 / 5</span><button class=\"ds-nav-btn\" aria-label=\"Next\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M9 5l7 7-7 7\"/></svg></button></div>",
+      "css": ".ds-nav{display:flex;align-items:center;justify-content:center;gap:6px;padding:16px;background:linear-gradient(135deg,#E3F2FD,#90CAF9);color:#3B2494;font:600 1.0625rem Poppins,system-ui,sans-serif;font-variant-numeric:tabular-nums}.ds-nav-btn{width:48px;height:48px;border:0;border-radius:50%;background:transparent;color:inherit;display:grid;place-items:center;cursor:pointer}.ds-nav-btn:hover{background:rgba(255,255,255,.55)}.ds-nav-btn:focus-visible{outline:3px solid #6C63FF;outline-offset:3px}.ds-nav-btn svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}.ds-nav-count{min-width:3.6em;text-align:center}"
+    },
+    {
+      "name": "Mood Face (current)",
+      "kind": "custom",
+      "description": "Carita seleccionada: escala completa y opacidad 1, sobre el pastel de su mood.",
+      "html": "<div class=\"ds-face-stage\"><svg class=\"ds-face\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" viewBox=\"0 0 512 512\" ><circle style=\"fill:#FFE17D;\" cx=\"256\" cy=\"256\" r=\"256\"/><path style=\"fill:#FFD164;\" d=\"M293.161,474.839c-141.385,0-256-114.615-256-256c0-61.227,21.521-117.411,57.376-161.463 C36.863,104.316,0,175.842,0,256c0,141.385,114.615,256,256,256c80.159,0,151.685-36.864,198.626-94.538 C410.573,453.317,354.389,474.839,293.161,474.839z\"/><path style=\"fill:#9C6846;\" d=\"M256,305.305c-49.323,0-96.405-5.727-139.598-16.079c-5.595-1.341-10.417,4.504-8.691,10.596 c19.92,70.324,78.718,121.34,148.29,121.34s128.369-51.016,148.29-121.34c1.726-6.092-3.096-11.937-8.691-10.596 C352.405,299.578,305.323,305.305,256,305.305z\"/><g><path style=\"fill:#7D5046;\" d=\"M395.599,289.226c-43.194,10.352-90.275,16.079-139.599,16.079s-96.405-5.726-139.598-16.079 c-5.595-1.341-10.417,4.504-8.691,10.596c5.214,18.408,13.148,35.443,23.186,50.637c41.04,7.796,82.792,12.085,125.121,12.085 c42.315,0,84.051-4.286,125.079-12.076c10.041-15.196,17.978-32.233,23.193-50.645 C406.015,293.729,401.194,287.885,395.599,289.226z\"/><path style=\"fill:#7D5046;\" d=\"M169.29,231.642L169.29,231.642c-11.402,0-20.645-9.243-20.645-20.645v-33.449 c0-11.402,9.243-20.645,20.645-20.645l0,0c11.402,0,20.645,9.243,20.645,20.645v33.449 C189.935,222.399,180.692,231.642,169.29,231.642z\"/></g><path style=\"fill:#9C6846;\" d=\"M169.29,156.903c-1.414,0-2.794,0.145-4.129,0.416v45.419c0,6.841,5.546,12.387,12.387,12.387 s12.387-5.546,12.387-12.387v-25.191C189.935,166.146,180.693,156.903,169.29,156.903z\"/><path style=\"fill:#7D5046;\" d=\"M342.71,231.642L342.71,231.642c-11.402,0-20.645-9.243-20.645-20.645v-33.449 c0-11.402,9.243-20.645,20.645-20.645l0,0c11.402,0,20.645,9.243,20.645,20.645v33.449 C363.355,222.399,354.112,231.642,342.71,231.642z\"/><path style=\"fill:#9C6846;\" d=\"M342.71,156.903c-1.414,0-2.794,0.145-4.129,0.416v45.419c0,6.841,5.546,12.387,12.387,12.387 s12.387-5.546,12.387-12.387v-25.191C363.355,166.146,354.112,156.903,342.71,156.903z\"/><path style=\"fill:#FFFFFF;\" d=\"M367.048,317.428c4.464-7.649,8.199-15.845,11.331-24.377 c-38.384,7.921-79.532,12.253-122.379,12.253c-42.873,0-84.044-4.336-122.448-12.267c3.148,8.573,6.944,16.784,11.438,24.465 c5.195,8.88,13.99,14.56,23.558,15.724c28.649,3.485,57.847,5.354,87.452,5.354c29.599,0,58.79-1.868,87.433-5.352 C353.033,332.061,361.845,326.344,367.048,317.428z\"/><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g></svg></div>",
+      "css": ".ds-face-stage{display:grid;place-items:center;padding:24px;background:linear-gradient(135deg,#E8F5E9,#A5D6A7)}.ds-face{width:160px;height:160px}"
+    },
+    {
+      "name": "Mood Face (neighbor)",
+      "kind": "custom",
+      "description": "Carita vecina: 40% de escala y 50% de opacidad.",
+      "html": "<div class=\"ds-face-stage\"><svg class=\"ds-face\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" viewBox=\"0 0 512 512\" ><circle style=\"fill:#FFE17D;\" cx=\"256\" cy=\"256\" r=\"256\"/><path style=\"fill:#FFD164;\" d=\"M293.161,474.839c-141.385,0-256-114.615-256-256c0-61.227,21.521-117.411,57.376-161.463 C36.863,104.316,0,175.842,0,256c0,141.385,114.615,256,256,256c80.159,0,151.685-36.864,198.626-94.538 C410.573,453.317,354.389,474.839,293.161,474.839z\"/><path style=\"fill:#9C6846;\" d=\"M256,305.305c-49.323,0-96.405-5.727-139.598-16.079c-5.595-1.341-10.417,4.504-8.691,10.596 c19.92,70.324,78.718,121.34,148.29,121.34s128.369-51.016,148.29-121.34c1.726-6.092-3.096-11.937-8.691-10.596 C352.405,299.578,305.323,305.305,256,305.305z\"/><g><path style=\"fill:#7D5046;\" d=\"M395.599,289.226c-43.194,10.352-90.275,16.079-139.599,16.079s-96.405-5.726-139.598-16.079 c-5.595-1.341-10.417,4.504-8.691,10.596c5.214,18.408,13.148,35.443,23.186,50.637c41.04,7.796,82.792,12.085,125.121,12.085 c42.315,0,84.051-4.286,125.079-12.076c10.041-15.196,17.978-32.233,23.193-50.645 C406.015,293.729,401.194,287.885,395.599,289.226z\"/><path style=\"fill:#7D5046;\" d=\"M169.29,231.642L169.29,231.642c-11.402,0-20.645-9.243-20.645-20.645v-33.449 c0-11.402,9.243-20.645,20.645-20.645l0,0c11.402,0,20.645,9.243,20.645,20.645v33.449 C189.935,222.399,180.692,231.642,169.29,231.642z\"/></g><path style=\"fill:#9C6846;\" d=\"M169.29,156.903c-1.414,0-2.794,0.145-4.129,0.416v45.419c0,6.841,5.546,12.387,12.387,12.387 s12.387-5.546,12.387-12.387v-25.191C189.935,166.146,180.693,156.903,169.29,156.903z\"/><path style=\"fill:#7D5046;\" d=\"M342.71,231.642L342.71,231.642c-11.402,0-20.645-9.243-20.645-20.645v-33.449 c0-11.402,9.243-20.645,20.645-20.645l0,0c11.402,0,20.645,9.243,20.645,20.645v33.449 C363.355,222.399,354.112,231.642,342.71,231.642z\"/><path style=\"fill:#9C6846;\" d=\"M342.71,156.903c-1.414,0-2.794,0.145-4.129,0.416v45.419c0,6.841,5.546,12.387,12.387,12.387 s12.387-5.546,12.387-12.387v-25.191C363.355,166.146,354.112,156.903,342.71,156.903z\"/><path style=\"fill:#FFFFFF;\" d=\"M367.048,317.428c4.464-7.649,8.199-15.845,11.331-24.377 c-38.384,7.921-79.532,12.253-122.379,12.253c-42.873,0-84.044-4.336-122.448-12.267c3.148,8.573,6.944,16.784,11.438,24.465 c5.195,8.88,13.99,14.56,23.558,15.724c28.649,3.485,57.847,5.354,87.452,5.354c29.599,0,58.79-1.868,87.433-5.352 C353.033,332.061,361.845,326.344,367.048,317.428z\"/><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g></svg></div>",
+      "css": ".ds-face-stage{display:grid;place-items:center;padding:24px;background:linear-gradient(135deg,#E8F5E9,#A5D6A7)}.ds-face{width:160px;height:160px;transform:scale(.4);opacity:.5}"
+    },
+    {
+      "name": "Phone Frame",
+      "kind": "card",
+      "refersTo": "phone-frame",
+      "description": "Marco del teléfono, cortado por abajo, con la única sombra del sistema.",
+      "html": "<div class=\"ds-phone\"><div class=\"ds-screen\"></div></div>",
+      "css": ".ds-phone{width:200px;height:240px;overflow:hidden;border:10px solid #17102E;border-bottom:0;border-radius:46px 46px 0 0;background:#17102E;box-shadow:0 36px 60px -28px rgba(0,0,0,.5),0 12px 24px -12px rgba(0,0,0,.3);margin:0 auto}.ds-screen{height:100%;border-radius:36px 36px 0 0;background:#FAF8FF}"
+    },
+    {
+      "name": "Privacy Block",
+      "kind": "custom",
+      "refersTo": "privacy-block",
+      "description": "Cierre de marca: titular blanco y tres puntos separados por una línea.",
+      "html": "<section class=\"ds-priv\"><h2>Your entries never leave your phone.</h2><ul><li><strong>No account</strong><span>No sign-up and no password.</span></li><li><strong>Everything on your device</strong><span>Export them any time.</span></li></ul></section>",
+      "css": ".ds-priv{padding:32px 20px;background:linear-gradient(135deg,#3B2494,#5F3DC4);color:#fff;font:500 1rem/1.55 Poppins,system-ui,sans-serif}.ds-priv h2{margin:0 0 20px;max-width:16ch;font:700 1.9rem/1.15 Poppins,system-ui,sans-serif;letter-spacing:-.02em}.ds-priv ul{list-style:none;margin:0;padding:0}.ds-priv li{padding:14px 0;border-top:1px solid rgba(255,255,255,.28)}.ds-priv strong{display:block;font-weight:600;font-size:1.1875rem}.ds-priv span{color:#EDE9FF}"
+    },
+    {
+      "name": "Section Heading",
+      "kind": "custom",
+      "refersTo": "headline",
+      "description": "Titular de sección en Violeta Profundo sobre papel.",
+      "html": "<div class=\"ds-sec\"><h2>Your month, in full color.</h2><p>See every day at a glance.</p></div>",
+      "css": ".ds-sec{padding:24px 20px;background:#FAF8FF;text-align:center;font:500 1.0625rem/1.65 Poppins,system-ui,sans-serif}.ds-sec h2{margin:0 0 12px;font:700 1.9rem/1.15 Poppins,system-ui,sans-serif;letter-spacing:-.02em;color:#3B2494}.ds-sec p{margin:0;color:#554E70}"
+    }
+  ],
+  "narrative": {
+    "northStar": "El selector de bolsillo",
+    "overview": "La web se comporta como la app: una carita grande al centro, un pastel que cambia con ella y todo lo demás en calma. Tono tranquilo y confiable; las caritas llevan toda la expresividad y el resto es tipografía, espacio y planos de color.",
+    "keyCharacteristics": [
+      "Móvil primero: titular, carita, selector y badges en 390 pt.",
+      "Dos voces de color: pasteles de mood y púrpura de marca, nunca en la misma superficie.",
+      "Planos y suaves: solo el teléfono lleva sombra.",
+      "Funciona sin JavaScript y sin movimiento.",
+      "Sin recursos de terceros."
+    ],
+    "rules": [
+      {
+        "name": "The Two Voices Rule",
+        "body": "Un pastel de mood y el púrpura de marca nunca comparten superficie.",
+        "section": "colors"
+      },
+      {
+        "name": "The Mood Owns The Hero Rule",
+        "body": "El fondo del héroe es siempre el degradado del mood seleccionado.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two Weights Rule",
+        "body": "Los titulares son 700 y todo lo demás 500 o 600.",
+        "section": "typography"
+      },
+      {
+        "name": "The Balanced Headline Rule",
+        "body": "Todo titular usa text-wrap: balance e interletrado de -0.02em.",
+        "section": "typography"
+      },
+      {
+        "name": "The One Shadow Rule",
+        "body": "Solo el teléfono proyecta sombra, siempre negra translúcida.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do dejar que el mood seleccionado tiña todo el héroe con su degradado de la app.",
+      "Do mantener la primera pantalla de 390 pt con titular, carita, selector y los dos badges.",
+      "Do usar Poppins autoalojada y nada que cargue desde otro dominio.",
+      "Do mantener un contraste mínimo de 4.5:1 en texto de cuerpo y 3:1 en grande.",
+      "Do mantener la edición en inglés y en español a la vez."
+    ],
+    "donts": [
+      "Don't mezclar un pastel de mood con el púrpura de marca en la misma superficie.",
+      "Don't poner sombra a nada que no sea el teléfono, ni sombras de color.",
+      "Don't usar texto con degradado ni tarjetas idénticas de ícono más título.",
+      "Don't afirmar que todos los moods son gratis ni mostrar precios.",
+      "Don't modificar, recolorear ni recortar los badges oficiales.",
+      "Don't tocar el texto de las páginas legales por motivos de diseño."
+    ]
+  }
+}
