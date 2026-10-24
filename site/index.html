@@ -3,24 +3,74 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Mood Calendar – Track your daily mood</title>
-<meta name="description" content="Mood Calendar is a simple, private mood tracker: pick how you feel, add a note and see your month at a glance.">
+<title>Mood Calendar – A free, private mood diary</title>
+<meta name="description" content="Mood Calendar is a free, private mood diary: pick how you feel, add a note and see your month in color. Your entries stay on your phone.">
+<meta name="theme-color" content="#5F3DC4">
+<meta name="apple-itunes-app" content="app-id=6752843360">
 <link rel="canonical" href="https://moodcalendar.app/">
 <link rel="alternate" hreflang="en" href="https://moodcalendar.app/">
 <link rel="alternate" hreflang="es" href="https://moodcalendar.app/es/">
 <link rel="alternate" hreflang="x-default" href="https://moodcalendar.app/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Mood Calendar">
+<meta property="og:title" content="Mood Calendar – Your mood, in full color">
+<meta property="og:description" content="Mood Calendar is a free, private mood diary: pick how you feel, add a note and see your month in color. Your entries stay on your phone.">
+<meta property="og:url" content="https://moodcalendar.app/">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="es_ES">
+<meta property="og:image" content="https://moodcalendar.app/img/og-en.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Mood Calendar app icon with a row of mood faces on a purple background">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/icon.png">
+<link rel="preload" href="/fonts/poppins-700.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/style.css">
 </head>
-<body>
-<header class="top"><a href="/">Mood Calendar</a><nav><a href="/es/">Español</a></nav></header>
-<section class="hero"><img class="icon" src="/icon.png" alt="Mood Calendar icon" width="112" height="112"><h1>Mood Calendar</h1><p>Record how you feel each day, add a note, and see your month in color. Private by design: your entries stay on your device.</p><div class="stores"><a href="https://apps.apple.com/app/id6752843360" rel="noopener">Download on the App Store</a><a href="https://play.google.com/store/apps/details?id=com.artlab.moodcalendar" rel="noopener">Get it on Google Play</a></div></section>
+<body class="home">
+<header class="top"><a class="brand" href="/"><img src="/icon.png" alt="" width="32" height="32"><span>Mood Calendar</span></a><nav><a href="/es/" hreflang="es" lang="es">Español</a></nav></header>
 <main>
-<div class="features"><div class="card"><h3>Pick your mood</h3><p>Choose from expressive moods in seconds, with an optional note.</p></div><div class="card"><h3>See your month</h3><p>A colorful calendar, your most common mood and your best streak.</p></div><div class="card"><h3>Gentle reminder</h3><p>A daily reminder at the time you choose, never pushy.</p></div><div class="card"><h3>Yours alone</h3><p>No account. Your moods and notes are stored on your device, and you can export them any time.</p></div></div><h2>Screenshots</h2><div class="shots"><img src="/img/en-01_calendar.jpg" alt="Mood Calendar" loading="lazy" width="194" height="420"><img src="/img/en-02_moods.jpg" alt="Mood Calendar" loading="lazy" width="194" height="420"><img src="/img/en-04_notes.jpg" alt="Mood Calendar" loading="lazy" width="194" height="420"></div>
+<section class="picker">
+<h1><span>Pick one.</span> <span>Free to download.</span></h1>
+<p class="lede">A private mood diary. Your entries stay on your phone, with no account.</p>
+<ul class="faces" aria-label="Moods" tabindex="0"><li data-c1="#E8F5E9" data-c2="#A5D6A7" data-name="Happy"><img src="/img/moods/happy.svg" alt="Happy face" width="232" height="232"></li><li data-c1="#E3F2FD" data-c2="#90CAF9" data-name="Calm"><img src="/img/moods/calm.svg" alt="Calm face" width="232" height="232" fetchpriority=high></li><li data-c1="#FAFAFA" data-c2="#EEEEEE" data-name="Neutral"><img src="/img/moods/neutral.svg" alt="Neutral face" width="232" height="232"></li><li data-c1="#FFF3E0" data-c2="#FFCC80" data-name="Sad"><img src="/img/moods/sad.svg" alt="Sad face" width="232" height="232"></li><li data-c1="#FFEBEE" data-c2="#EF9A9A" data-name="Angry"><img src="/img/moods/angry.svg" alt="Angry face" width="232" height="232"></li></ul>
+<p class="name" aria-live="polite"></p>
+<div class="nav"><button type="button" data-dir="-1" aria-label="Previous mood"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button><span class="count"></span><button type="button" data-dir="1" aria-label="Next mood"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button></div>
+<div class="stores"><a href="https://apps.apple.com/app/id6752843360" rel="noopener"><img src="/img/badges/appstore-en.svg" alt="Download on the App Store" width="144" height="48"></a><a class="gp" href="https://play.google.com/store/apps/details?id=com.artlab.moodcalendar" rel="noopener"><img src="/img/badges/googleplay-en.png" alt="Get it on Google Play" width="165" height="64"></a></div>
+</section>
+<section class="block month">
+<div class="copy"><h2>Your month, in full color.</h2><p>See every day at a glance, your most common mood and your best streak. And if you want one, a gentle daily reminder at the time you choose.</p></div>
+<figure class="phone" style="margin-bottom:0"><img src="/img/calendar-en-780.webp" srcset="/img/calendar-en-390.webp 390w, /img/calendar-en-780.webp 780w" sizes="(min-width:900px) 300px, 78vw" alt="The Mood Calendar calendar: a month of colored mood faces, the most frequent mood and a 14-day streak" width="780" height="1695" loading="lazy"></figure>
+</section>
+<section class="private"><div class="inner"><h2>Your entries never leave your phone.</h2><ul><li><strong>No account</strong><span>No sign-up and no password: open the app and pick how you feel.</span></li><li><strong>Everything on your device</strong><span>Your mood, note and date are stored only on your phone. Export them any time.</span></li><li><strong>No ads, no tracking</strong><span>No advertising ID and no tracking across apps. Anonymous usage data can be turned off in Settings.</span></li></ul><p><a href="/privacy/">Read the privacy policy</a></p></div></section>
+<section class="get"><h2>Free to download on iPhone and Android.</h2>
+<div class="stores"><a href="https://apps.apple.com/app/id6752843360" rel="noopener"><img src="/img/badges/appstore-en.svg" alt="Download on the App Store" width="144" height="48"></a><a class="gp" href="https://play.google.com/store/apps/details?id=com.artlab.moodcalendar" rel="noopener"><img src="/img/badges/googleplay-en.png" alt="Get it on Google Play" width="165" height="64"></a></div>
+</section>
 </main>
 <footer>
 <a href="/support/">Support</a><a href="/privacy/">Privacy Policy</a><a href="/terms/">Terms of Use</a><a href="mailto:support@moodcalendar.app">Contact</a>
 <p>© 2026 Mood Calendar. All rights reserved.</p>
 </footer>
+<script>
+(function(){
+var picker=document.querySelector('.picker'),list=picker.querySelector('.faces'),items=[].slice.call(list.children),
+name=picker.querySelector('.name'),count=picker.querySelector('.count'),nav=picker.querySelector('.nav'),
+reduce=matchMedia('(prefers-reduced-motion: reduce)').matches,cur=-1,raf;
+function center(i){var li=items[i];return li.offsetLeft+li.offsetWidth/2-list.clientWidth/2}
+function go(i,instant){i=Math.max(0,Math.min(items.length-1,i));list.scrollTo({left:center(i),behavior:instant||reduce?'auto':'smooth'})}
+function set(i){if(i===cur)return;cur=i;
+items.forEach(function(li,n){n===i?li.setAttribute('aria-current','true'):li.removeAttribute('aria-current')});
+var li=items[i];picker.style.setProperty('--c1',li.dataset.c1);picker.style.setProperty('--c2',li.dataset.c2);
+name.textContent=li.dataset.name;count.textContent=(i+1)+' / '+items.length}
+function read(){var mid=list.scrollLeft+list.clientWidth/2,best=0,d=1e9;
+items.forEach(function(li,i){var x=Math.abs(li.offsetLeft+li.offsetWidth/2-mid);if(x<d){d=x;best=i}});set(best)}
+list.classList.add('live');nav.classList.add('live');
+list.addEventListener('scroll',function(){cancelAnimationFrame(raf);raf=requestAnimationFrame(read)},{passive:true});
+items.forEach(function(li,i){li.addEventListener('click',function(){go(i)})});
+[].forEach.call(nav.querySelectorAll('button'),function(b){b.addEventListener('click',function(){go(cur+Number(b.dataset.dir))})});
+list.addEventListener('keydown',function(e){if(e.key==='ArrowRight'){e.preventDefault();go(cur+1)}else if(e.key==='ArrowLeft'){e.preventDefault();go(cur-1)}});
+go(1,true);read();
+})();
+</script>
 </body>
 </html>
