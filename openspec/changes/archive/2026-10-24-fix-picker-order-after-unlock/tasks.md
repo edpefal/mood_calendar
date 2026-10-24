@@ -16,6 +16,6 @@
 
 ## 3. Verificación y documentación
 
-- [ ] 3.1 Probar en simulador: comprar un mood en la Tienda, volver al selector y ver el mood entre los desbloqueados
-- [ ] 3.2 Probar restaurar compras y volver al selector
+- [ ] 3.1 Probar en simulador: comprar un mood en la Tienda, volver al selector y ver el mood entre los desbloqueados — No se probó a mano; cubierto por el test automático "una compra hecha desde Ajustes reordena el selector al volver". — No probado a mano al archivar.
+- [ ] 3.2 Probar restaurar compras y volver al selector — No se probó a mano al archivar.
 - [x] 3.3 Actualizar la sección "Selector de moods" de `CLAUDE.md` con la regla nueva
