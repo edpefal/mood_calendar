@@ -1,234 +1,137 @@
 # Mood Calendar
 
-Mood Calendar es una app Flutter para registrar el estado de animo diario, revisar el calendario mensual y consultar un resumen del mes. El proyecto usa una arquitectura por capas, persistencia local con Hive y estado con Cubit.
+Mood Calendar es una app Flutter para registrar el estado de ánimo de cada día, añadir una nota y revisar el mes en un calendario de colores. Los datos viven solo en el dispositivo. Está disponible en iOS y Android (mismo identificador, `com.artlab.moodcalendar`) y en cinco idiomas: inglés, español, alemán, francés e italiano.
 
-## Estado actual
+- Sitio: <https://moodcalendar.app> (política de privacidad, términos y soporte)
+- Versión actual: `1.8.5+36` (ver `pubspec.yaml`)
 
-- Registro diario de mood por fecha.
-- Calendario mensual con navegacion entre meses.
-- Resumen mensual con grafica, promedio y mejor racha.
-- Recordatorios diarios configurables.
-- Exportacion local del historial en JSON.
-- Localizacion base para `es` y `en`.
-- Logging y telemetria desacoplados del proveedor.
-- CI con `flutter analyze` y `flutter test`.
+## Qué hace
+
+- **Registro diario**: carrusel de moods con flechas y una cuadrícula para saltar a uno concreto, y una nota opcional por día.
+- **Catálogo de 19 moods**: 5 gratuitos y 14 premium de compra única, sueltos o en Packs (Confianza, Afecto, Cuerpo e Intenso). Las compras pasan por RevenueCat (App Store y Google Play).
+- **Calendario mensual** con navegación entre meses y un resumen con el mood más frecuente y la mejor racha.
+- **Recordatorio diario** local, con hora configurable y autoguardado.
+- **Exportar el historial** en JSON y compartirlo con la hoja del sistema.
+- **Calificar la app** de forma automática (en hitos de uso) y manual desde Ajustes.
+- Cuatro pestañas en un bottom bar flotante: selector, calendario, tienda y ajustes.
+
+El idioma sigue al del dispositivo (el inglés es el fallback).
+
+## Privacidad
+
+- No hay cuentas ni backend: las entradas (mood, nota, fecha) no salen del dispositivo.
+- **Firebase Analytics** mide el uso de forma anónima (instalaciones activas, sesiones, versión y una lista cerrada de eventos), solo en builds de release. Se puede apagar en Ajustes → "Compartir datos de uso anónimos". No usa el ID de publicidad ni pide permiso de rastreo.
+- **Firebase Crashlytics** reporta fallos de forma anónima, solo en release.
+- **RevenueCat** gestiona las compras.
+
+Los detalles están en la [política de privacidad](https://moodcalendar.app/privacy/) y, para quien mantiene el proyecto, en las secciones de privacidad de `CLAUDE.md`.
+
+## Stack
+
+- Flutter 3.x (el CI usa 3.32.1), Dart `>=3.6.0 <4.0.0`. iOS 15.0 como mínimo.
+- Estado con `flutter_bloc` (Cubit); persistencia local con `hive`.
+- Compras con `purchases_flutter` (RevenueCat).
+- Firebase: `firebase_core`, `firebase_crashlytics` y `firebase_analytics`.
+- Notificaciones locales con `flutter_local_notifications` y `timezone`.
+- UI con `flutter_svg`, `google_fonts` (Poppins) y `lottie`.
+- Plataforma: `in_app_review`, `url_launcher`, `package_info_plus`, `share_plus`, `path_provider`.
+- Código generado con `freezed`, `json_serializable` y `hive_generator`.
 
 ## Arquitectura
 
-La app esta organizada en `core/` y `features/`.
+Clean Architecture con tres features (`mood`, `purchases`, `settings`) y un `core/` compartido:
 
 ```text
 lib/
   core/
-    localization/   # Textos y estructura base de localizacion
-    logging/        # Abstraccion de logger + implementacion con package:logger
-    navigation/     # Navegacion principal entre pantallas
-    notifications/  # Notificaciones locales y manejo de payloads
-    settings/       # Preferencias tipadas de la aplicacion
-    telemetry/      # Eventos y errores relevantes desacoplados del proveedor
+    localization/   # AppStrings (abstracta) + una subclase por idioma
+    logging/        # AppLogger (package:logger)
+    navigation/     # MainShell: pestañas y bottom bar
+    notifications/  # LocalNotificationService
+    rating/         # Pedido de calificación (in_app_review)
+    settings/       # Preferencias en Hive (recordatorio, datos de uso, calificación)
+    telemetry/      # AppTelemetry; reporte de fallos (Crashlytics) y analíticas (Firebase)
+    widgets/        # Widgets compartidos
   features/
-    mood/
-      data/         # Datasources, modelos Hive, repositorios y servicios
-      domain/       # Entidades, contratos, servicios y casos de uso
-      presentation/ # Pantallas, widgets y cubits
+    mood/           # data / domain / presentation: registro, calendario, resumen, exportación
+    purchases/      # RevenueCat, entitlements, Tienda y hojas de compra
+    settings/       # Pantalla de Ajustes y su cubit
   main.dart
 ```
 
-### Flujo de datos
+Reglas:
 
-1. La UI interactua con `MoodCubit` y `CalendarCubit`.
-2. Los casos de uso y cubits delegan en repositorios y servicios de `mood/` y `core/`.
-3. `MoodRepositoryImpl` persiste registros diarios normalizados en Hive.
-4. `AppSettingsRepository` persiste preferencias de recordatorios.
-5. `LocalNotificationService` usa settings + telemetria para programar y atender recordatorios.
+- La capa `presentation` no accede a Hive: pasa por cubits, casos de uso y repositorios.
+- La persistencia de ajustes pasa por `AppSettingsRepository` (`core/settings/`).
+- Logging y telemetría van por abstracciones (`AppLogger`, `AppTelemetry`), nunca por los paquetes directos.
+- La telemetría se compone en `main.dart` como Logger → Crashlytics → Analytics. `AnalyticsAppTelemetry` solo reenvía una lista cerrada de eventos y parámetros, sin datos de las entradas.
+- Todo control interactivo lleva `Semantics`.
 
-Reglas del proyecto:
+El resto de carpetas del repo:
 
-- La capa `presentation` no accede directo a `Hive`.
-- La persistencia de settings pasa por `AppSettingsRepository`.
-- Logging y telemetria van por abstracciones, no por paquetes usados directo en la UI.
+| Carpeta | Contenido |
+|---|---|
+| `scripts/` | Builds de release de iOS y Android y sus verificaciones |
+| `site/` | Sitio web estático de `moodcalendar.app` (Vercel) |
+| `aso/` | Material de las fichas de las tiendas |
+| `tool/screenshots/` | Generadores de capturas y arte de App Store y Google Play |
+| `openspec/` | Specs vigentes (`specs/`) e historial de cambios (`changes/archive/`) |
+| `docs/` | ADRs, riesgos aceptados y notas históricas |
 
-## Componentes principales
-
-### Moods
-
-- `MoodRepositoryImpl` guarda los registros diarios normalizados por clave `YYYY-MM-DD`.
-- Los datos legacy se migran automaticamente al leer o guardar.
-- `MoodCubit` maneja carga, guardado, errores y telemetria de eventos clave.
-
-### Calendario y resumen
-
-- `CalendarCubit` calcula el resumen mensual con `GetMonthlyMoodSummaryUseCase`.
-- `MonthlyMoodSummaryCard` muestra:
-  - grafica del mes
-  - animo promedio del mes
-  - mejor racha
-
-### Settings y recordatorios
-
-- `AppSettingsLocalDataSource` centraliza las claves de configuracion.
-- `LocalNotificationService` inicializa permisos, zona horaria y programacion diaria.
-- La hora del recordatorio puede activarse, desactivarse o ajustarse desde la UI.
-
-### Exportacion
-
-- `JsonMoodHistoryExporter` genera un archivo JSON con:
-  - `date`
-  - `mood`
-  - `note`
-  - `intensity`
-- Los archivos se guardan en una carpeta `exports` dentro del directorio de la app.
-
-### Localizacion
-
-- `AppStrings` expone la estructura base de textos.
-- La app arranca actualmente en espanol.
-- La base de `supportedLocales` ya soporta `es` y `en`.
-
-## Dependencias principales
-
-- `flutter_bloc`
-- `freezed` y `freezed_annotation`
-- `json_serializable`
-- `hive` y `hive_flutter`
-- `logger`
-- `flutter_local_notifications`
-- `timezone`
-- `flutter_native_timezone`
-- `flutter_svg`
-- `fl_chart`
-- `path_provider`
-- `google_fonts`
-- `lottie`
-
-## Requisitos
-
-- Flutter compatible con el SDK declarado en `pubspec.yaml`
-- Dart incluido con tu instalacion de Flutter
-- Xcode o Android Studio segun la plataforma objetivo
-
-## Como correr el proyecto
-
-1. Instala dependencias:
+## Puesta en marcha
 
 ```sh
 flutter pub get
-```
-
-2. Genera codigo si cambias modelos `freezed`, `json_serializable` o adapters:
-
-```sh
-flutter pub run build_runner build --delete-conflicting-outputs
-```
-
-3. Corre la app:
-
-```sh
+flutter pub run build_runner build --delete-conflicting-outputs   # solo si cambias modelos freezed/json/hive
 flutter run
 ```
 
+Los archivos generados (`*.g.dart`, `*.freezed.dart`) se versionan.
+
+Sin la llave de RevenueCat la app arranca igual, pero todas las compras fallan con "producto no disponible". Para probar la tienda con el catálogo real:
+
+```sh
+flutter run --dart-define=REVENUECAT_IOS_API_KEY=<key appl_...>        # iOS
+flutter run --dart-define=REVENUECAT_ANDROID_API_KEY=<key goog_...>    # Android
+```
+
+Firebase (Crashlytics y Analytics) solo se activa en builds de release; en debug, en los tests y en el entrypoint de capturas no sale nada del dispositivo.
+
 ## Comandos de desarrollo
 
-Analisis estatico:
-
 ```sh
-flutter analyze
+flutter analyze        # lint; debe estar limpio para hacer merge
+flutter test           # suite completa
+dart format lib test   # formato
 ```
 
-Pruebas:
+## Builds de release
+
+Los builds de las tiendas **solo** se generan con los scripts de `scripts/`; no se corre `flutter build ipa` ni `flutter build appbundle` a mano (un hook de Claude Code lo bloquea en sesiones del agente):
 
 ```sh
-flutter test
+REVENUECAT_IOS_API_KEY=<key> STORE_VERIFIED=1 scripts/build_ios_release.sh
+REVENUECAT_ANDROID_API_KEY=<key> STORE_VERIFIED=1 scripts/build_android_release.sh
 ```
 
-Formato:
+Los scripts exigen la llave de RevenueCat, la pasan con `--dart-define` y comprueban que quedó dentro del binario, que Crashlytics tiene su configuración y que el build no enlaza el ID de publicidad. El detalle (qué significan `STORE_VERIFIED` e `INTERNAL_TEST_BUILD`, cómo se sube cada build y qué se hace en App Store Connect y Play Console) está en `CLAUDE.md`, secciones "Build de release" y "Flujo de release".
 
-```sh
-dart format lib test
-```
+## Pruebas y CI
 
-Modo watch para generacion:
+Hay 262 pruebas unitarias y de widget en `test/`: repositorios, resolver y orden del selector, resumen y rachas, calificación, exportación, cubits de moods, compras y ajustes, pantallas principales y la telemetría (analíticas y reporte de fallos). Los fakes viven en `test/support/`.
 
-```sh
-flutter pub run build_runner watch --delete-conflicting-outputs
-```
+`.github/workflows/ci.yml` corre `flutter pub get`, `flutter analyze` y `flutter test` en cada push a `main`, en cada pull request y a mano. El repo protege `main`: los PR necesitan que pase el check "Analyze and Test".
 
-## Convenciones del proyecto
+## Flujo de trabajo
 
-- Los archivos generados `*.g.dart` y `*.freezed.dart` se versionan.
-- Si agregas una nueva configuracion persistente, pasa por `core/settings/`.
-- Si agregas eventos o errores trazables, usa `core/telemetry/`.
-- Si agregas logs, usa la abstraccion de `core/logging/`.
-- Si una pantalla necesita datos, consume cubits o casos de uso, no almacenamiento directo.
-- Mantener `flutter analyze` limpio es parte del criterio de merge.
+- Siempre en ramas y con PR; nada de push directo a `main`. Se borra la rama una vez mergeada.
+- Commits con [Conventional Commits](https://www.conventionalcommits.org/) (`feat(settings): ...`, `fix(mood): ...`, `docs(openspec): ...`).
+- Los cambios no triviales siguen el flujo de OpenSpec (proponer, implementar, archivar); los specs vigentes están en `openspec/specs/`.
 
-## Notificaciones
+## Documentación
 
-`LocalNotificationService`:
-
-- pide permisos segun plataforma
-- resuelve la zona horaria local
-- programa un recordatorio diario
-- detecta si la app fue abierta desde la notificacion
-- navega a `MoodScreen` con la fecha actual cuando aplica
-
-La configuracion actual se guarda en settings y no en constantes sueltas.
-
-## Telemetria
-
-La telemetria actual usa una implementacion basada en logger, pero quedo abstraida para cambiar de proveedor despues.
-
-Eventos ya registrados:
-
-- guardado de mood
-- apertura desde recordatorio
-- programacion y cancelacion de recordatorios
-- exportacion del historial
-
-Errores relevantes:
-
-- fallos de guardado
-- fallos de carga
-- problemas de notificaciones o zona horaria
-- fallos de exportacion
-
-Configuracion por entorno:
-
-- `ENABLE_APP_TELEMETRY`
-- `ENABLE_ERROR_TELEMETRY`
-
-## CI
-
-El workflow de `.github/workflows/ci.yml` corre en `push`, `pull_request` y `workflow_dispatch`.
-
-Pasos:
-
-- `flutter pub get`
-- `flutter analyze`
-- `flutter test`
-
-## Pruebas existentes
-
-Hay pruebas para:
-
-- repositorio de moods
-- datasource de settings
-- resumen mensual
-- telemetria del `MoodCubit`
-- exportacion JSON del historial
-- widget principal de `MoodScreen`
-
-## Archivos clave
-
-- `lib/main.dart`
-- `lib/features/mood/data/repositories/mood_repository_impl.dart`
-- `lib/features/mood/presentation/bloc/mood_cubit.dart`
-- `lib/features/mood/presentation/bloc/calendar_cubit.dart`
-- `lib/core/notifications/local_notification_service.dart`
-- `lib/core/settings/data/datasources/app_settings_local_datasource.dart`
-- `lib/core/localization/app_strings.dart`
-
-## Notas pendientes
-
-- El Project de GitHub puede quedar temporalmente desalineado del estado de los issues cuando `gh project` falla contra la API.
-- La localizacion ya tiene base para ingles, pero la app arranca en espanol.
+- `CLAUDE.md` — guía de trabajo del proyecto: estado actual, reglas de arquitectura, compras, releases, privacidad y sitio web.
+- `CONTEXT.md` — glosario del dominio (Mood vs Mood Entry, Tier, Unlocked, Pack, Intensity...).
+- `openspec/specs/` — comportamiento vigente de cada área; `openspec/changes/archive/` — el historial.
+- `docs/adr/` — decisiones de arquitectura; `docs/risks.md` — riesgos aceptados de las compras.
+- `backlog.md` — trabajo pendiente.

@@ -1,6 +1,15 @@
 # Mood Calendar
 
-Flutter app para registrar y revisar estados de ánimo diarios, con un catálogo de moods gratuitos + moods premium de pago (RevenueCat). iOS como plataforma principal (deployment target **iOS 15.0**).
+Flutter app para registrar y revisar estados de ánimo diarios, con un catálogo de moods gratuitos + moods premium de pago (RevenueCat). Se publica en iOS (plataforma principal, deployment target **iOS 15.0**) y en Android, con el mismo identificador `com.artlab.moodcalendar`.
+
+## Estado actual (2026-10-24)
+
+- **Versión**: `pubspec.yaml` está en `1.8.5+36`. iOS: la 1.8.4 (build 31) está publicada y la **1.8.5 (build 36) está en revisión de Apple** (lanzamiento automático al aprobarse). Android: la **1.8.5 (versionCode 36)** se envió a revisión en Google Play (primera publicación de Android en producción; reemplazó a la 34). Al publicarse, actualizar esta sección.
+- **Analíticas medidas**: Firebase Analytics funciona (eventos vistos en Analytics → Realtime desde builds de TestFlight y de la pista interna). Los `GoogleService-Info.plist` y `google-services.json` siguen trayendo Analytics como deshabilitado aunque la propiedad de GA (`mood-calendar-fee5c`) está vinculada, y aun así funciona: no hace falta regenerarlos.
+- **Declaraciones de privacidad al día**: App Privacy de Apple (Device ID, Purchase History, Product Interaction y Crash Data; no vinculados, sin rastreo) y Data safety de Play (interacciones en la app, ID de dispositivo, historial de compras y registros de fallos). Ver "Privacidad y declaraciones de las tiendas".
+- **Sitio** `https://moodcalendar.app` activo (política de privacidad, términos y soporte en inglés y español). Ver "Sitio web".
+- **OpenSpec**: 14 specs vigentes y **ningún change activo**.
+- **Pendiente**: notificaciones RTDN de Google Play hacia RevenueCat, respaldo de `~/my-release-key.jks` fuera del equipo y el toggle de Crashlytics (ver `backlog.md`).
 
 ## Stack
 
@@ -8,8 +17,8 @@ Flutter app para registrar y revisar estados de ánimo diarios, con un catálogo
 - **Estado**: flutter_bloc + Cubit
 - **Persistencia**: Hive (local, sin backend)
 - **Analíticas de uso**: Firebase Analytics (`firebase_analytics`), anónimas, solo en release en iOS/Android y con interruptor en Settings; sin ID de publicidad (ver "Arranque de la app")
-- **Crashes**: Firebase Crashlytics (`firebase_core` + `firebase_crashlytics`, proyecto Firebase `mood-calendar-fee5c`, apps iOS y Android con el mismo identificador `com.artlab.moodcalendar`; Android aún no está publicado en Google Play), solo en release en iOS/Android
-- **Compras in-app**: purchases_flutter (RevenueCat) en iOS y Android (Android aún sin publicar en Google Play)
+- **Crashes**: Firebase Crashlytics (`firebase_core` + `firebase_crashlytics`, proyecto Firebase `mood-calendar-fee5c`, apps iOS y Android con el mismo identificador `com.artlab.moodcalendar`; Android se publica por primera vez con la 1.8.5), solo en release en iOS/Android
+- **Compras in-app**: purchases_flutter (RevenueCat) en iOS y Android (Android en revisión de Google Play con la 1.8.5)
 - **Generación de código**: freezed, json_serializable, hive_generator → correr con `flutter pub run build_runner build`
 - **Notificaciones**: flutter_local_notifications + timezone
 - **UI**: flutter_svg (emojis SVG), google_fonts (Poppins), lottie
@@ -40,7 +49,16 @@ lib/
     └── settings/         # solo presentation: SettingsScreen + SettingsCubit (recordatorio diario con autoguardado, exportar historial, calificar, privacidad, versión); la persistencia vive en core/settings/
 ```
 
-`lib/features/ads/` y `lib/features/premium/` son carpetas vacías residuales (sin archivos `.dart`); la monetización vive en `purchases/`.
+`lib/firebase_options.dart` lo genera FlutterFire. `lib/features/ads/` y `lib/features/premium/` son carpetas vacías residuales (sin archivos `.dart`); la monetización vive en `purchases/`.
+
+Fuera de `lib/`:
+
+- `scripts/` — builds de release y verificaciones de los artefactos (llave de RevenueCat, Crashlytics, sin ID de publicidad).
+- `site/` — sitio web estático de `moodcalendar.app` (ver "Sitio web").
+- `aso/` — material de la ficha de las tiendas (reporte ASO, headers de App Store, gráficos de funciones de Play).
+- `tool/screenshots/` — generadores de capturas y arte de las tiendas (ver las secciones de screenshots).
+- `openspec/`, `docs/` — specs, historial de cambios, ADRs y riesgos.
+- `.github/workflows/ci.yml` — CI.
 
 ## Documentación de dominio y decisiones
 
@@ -93,7 +111,7 @@ Cada uno tiene su spec en `openspec/specs/`; leerla antes de cambiarlo.
 
 ## Compras in-app (RevenueCat)
 
-- 18 productos no consumibles: 14 moods (`mood_<id>_unlock`, p. ej. `mood_anxious_unlock`) y 4 Packs (`pack_afecto_unlock`, `pack_confianza_unlock`, `pack_cuerpo_unlock`, `pack_intenso_unlock`). Existen en App Store Connect y en RevenueCat para iOS; para Android hay otros 18 en RevenueCat (app "Mood Calendar Android") con **los mismos identificadores**, adjuntos a los mismos entitlements y paquetes de la oferta `default`; en Google Play Console deben crearse con esos identificadores.
+- 18 productos no consumibles: 14 moods (`mood_<id>_unlock`, p. ej. `mood_anxious_unlock`) y 4 Packs (`pack_afecto_unlock`, `pack_confianza_unlock`, `pack_cuerpo_unlock`, `pack_intenso_unlock`). Existen en App Store Connect y en RevenueCat para iOS; para Android hay otros 18 en RevenueCat (app "Mood Calendar Android") con **los mismos identificadores**, adjuntos a los mismos entitlements y paquetes de la oferta `default`, y creados en Google Play Console con esos identificadores.
 - Un entitlement por mood premium; un Pack otorga varios entitlements. Composición y precio de packs se configuran en RevenueCat, no en código, y un Pack publicado nunca cambia de composición (ADR 0002).
 - `lib/main.dart` configura RevenueCat solo si recibe la llave de la plataforma vía `--dart-define` (`REVENUECAT_IOS_API_KEY` en iOS, `REVENUECAT_ANDROID_API_KEY` en Android; `revenueCatApiKeyFor` en `lib/features/purchases/data/revenue_cat_config.dart` elige la que toca); si no, usa `NoopMoodEntitlementsRepository` (todas las compras fallan con "producto no disponible"). No tocar `purchases_flutter` antes de `Purchases.configure()`.
 - Los títulos de los Packs salen de `AppStrings` (`packNames` / `packName(id, fallback:)`, con fallback a inglés y, para un Pack sin cadena propia, al título del producto de la tienda), no de `storeProduct.title`: Google Play añade "(… (unreviewed))" a los títulos mientras la app no está revisada. Al crear un Pack nuevo hay que añadir su nombre en los 5 idiomas.
@@ -132,7 +150,7 @@ flutter run --dart-define=REVENUECAT_IOS_API_KEY=<key>   # correr en simulador c
 REVENUECAT_IOS_API_KEY=<key> STORE_VERIFIED=1 scripts/build_ios_release.sh
 ```
 
-El script se niega a correr sin la key, siempre pasa `--dart-define=REVENUECAT_IOS_API_KEY=<key>` y, al terminar (`scripts/verify_ios_archive_key.sh`), comprueba que la key quedó embebida en el binario compilado: falla si no está. Acepta flags extra de `flutter build ipa`. Después corre `scripts/verify_ios_archive_crash_reporting.sh`, que falla si el archive no trae `GoogleService-Info.plist` o los dSYMs de `Runner.app` y `App.framework` (sin ellos Crashlytics no inicializa o los traces no se simbolican). Si el archive se compila pero la exportación falla (p. ej. `No Accounts` o falta el certificado de distribución, porque `xcodebuild` no alcanza la sesión de Xcode del usuario), el script termina con error y sin `.ipa`: el archive queda en `build/ios/archive/Runner.xcarchive` y hay que exportarlo desde Xcode Organizer o con `xcodebuild -exportArchive ... -allowProvisioningUpdates` en la terminal del usuario. La build phase "FlutterFire: upload-crashlytics-symbols" del target Runner sube los símbolos al archivar y necesita `flutterfire` instalado (`dart pub global activate flutterfire_cli`, en `~/.pub-cache/bin`).
+El script se niega a correr sin la key, siempre pasa `--dart-define=REVENUECAT_IOS_API_KEY=<key>` y, al terminar (`scripts/verify_ios_archive_key.sh`), comprueba que la key quedó embebida en el binario compilado: falla si no está. Acepta flags extra de `flutter build ipa`. Después corre `scripts/verify_ios_archive_crash_reporting.sh`, que falla si el archive no trae `GoogleService-Info.plist` o los dSYMs de `Runner.app` y `App.framework` (sin ellos Crashlytics no inicializa o los traces no se simbolican). Por último corre `scripts/verify_ios_archive_no_ad_id.sh`, que falla si algún binario enlaza `AdSupport`, si el `Info.plist` declara `NSUserTrackingUsageDescription` o si las claves de Analytics (`FIREBASE_ANALYTICS_COLLECTION_ENABLED`, personalización y almacenamiento de anuncios) no están en `false`. El IPA se sube con `xcrun altool --upload-app --type ios -f build/ios/ipa/*.ipa --apiKey <key id> --apiIssuer <issuer id>` (la `.p8` va en `~/.appstoreconnect/private_keys/`). A diferencia de Android, el script de iOS no tiene `INTERNAL_TEST_BUILD`: para un build de TestFlight hay que usar `STORE_VERIFIED=1`. Si el archive se compila pero la exportación falla (p. ej. `No Accounts` o falta el certificado de distribución, porque `xcodebuild` no alcanza la sesión de Xcode del usuario), el script termina con error y sin `.ipa`: el archive queda en `build/ios/archive/Runner.xcarchive` y hay que exportarlo desde Xcode Organizer o con `xcodebuild -exportArchive ... -allowProvisioningUpdates` en la terminal del usuario. La build phase "FlutterFire: upload-crashlytics-symbols" del target Runner sube los símbolos al archivar y necesita `flutterfire` instalado (`dart pub global activate flutterfire_cli`, en `~/.pub-cache/bin`).
 
 `ios/Runner/Info.plist` declara `ITSAppUsesNonExemptEncryption=false` (la app solo usa HTTPS y el cifrado del sistema, exentos), así que App Store Connect ya no pide el cuestionario de cumplimiento de exportación en cada build; si algún día se añade cifrado propio, hay que revisarlo.
 
@@ -160,7 +178,28 @@ Igual que el de iOS: se niega a correr sin la llave (debe empezar con `goog_`), 
 
 - `STORE_VERIFIED=1` afirma que `MoodStoreScreen` se probó en un dispositivo Android con esa llave. Para el build que se sube a la pista interna justamente para hacer esa prueba, usar `INTERNAL_TEST_BUILD=1` en su lugar (la llave se exige y se verifica igual); ese bundle no debe promoverse a producción sin reconstruirlo con `STORE_VERIFIED=1`. Play exige que `targetSdk` sea el nivel actual (hoy 36) y que el código de versión no se repita entre subidas. Para que el catálogo cargue, los 18 productos deben existir en Google Play Console, RevenueCat necesita las credenciales de servicio de Play y el build tiene que estar subido a una pista de pruebas.
 - El paquete de Android es `com.artlab.moodcalendar` (igual que el bundle ID de iOS). Se firma con el keystore de `android/key.properties`; el `.aab` resultante se sube a mano a Google Play Console (primero a la pista interna). Poner un tag `v*.*.*` ya no dispara ningún despliegue.
+- Tras construir, `scripts/verify_android_bundle_no_ad_id.sh` falla si el manifiesto del `.aab` declara `com.google.android.gms.permission.AD_ID` o `ACCESS_ADSERVICES_*` (el manifiesto fuente los quita con `tools:node="remove"` porque el SDK de Analytics los añade). Estos dos scripts usan `grep -c` y no `grep -q`: con `pipefail`, `grep -q` cierra la tubería antes y da resultados falsos.
+- Play no acepta repetir un `versionCode`: si un bundle `INTERNAL_TEST_BUILD` ya ocupó el número, el bundle de producción (con `STORE_VERIFIED=1`) necesita subir el build en `pubspec.yaml` (+1) en un PR aparte.
 - Si se publica con Play App Signing, añadir el SHA-1 de la clave de firma de Play a la API key de Firebase de Android (restringida por paquete y SHA-1).
+
+## Flujo de release
+
+1. **Bump**: rama `chore/bump-...` y PR con la versión en `pubspec.yaml` (`<nombre>+<build>`); tras el merge, trabajar desde `main` limpio.
+2. **Builds**: `scripts/build_ios_release.sh` y `scripts/build_android_release.sh` (secciones anteriores). Las llaves públicas de RevenueCat salen del MCP (`list-projects` → `list-apps` → `list-app-public-api-keys`).
+3. **iOS**: subir el IPA con `altool` y esperar a que el build quede `VALID`. La versión de App Store Connect se crea por la API (`appStoreVersions`, `releaseType: AFTER_APPROVAL`, copyright `Mood Calendar`): hay que fijar `whatsNew`, el texto promocional (no se hereda), `supportUrl` y, en el `appInfo` nuevo, `privacyPolicyUrl` (solo editable con una versión en preparación; en la publicada da 409). Las capturas, descripción y palabras clave sí se heredan. Adjuntar el build y enviar a revisión.
+4. **Android**: subir el `.aab` a la pista interna con la API de Play (edit → `bundles` → `tracks/internal` → `validate` → `commit`). La cuenta de servicio **no puede** confirmar una versión de producción (403 en `validate`): la versión de producción, con las notas por idioma, se crea a mano en Play Console con el bundle ya subido.
+5. **Declaraciones**: si cambia qué datos recoge la app, actualizar antes App Privacy, Data safety y la política (ver la sección siguiente).
+
+## Privacidad y declaraciones de las tiendas
+
+La app solo envía datos anónimos de analíticas (Firebase Analytics, con interruptor en Settings) y de fallos (Crashlytics, sin interruptor), más las compras vía RevenueCat. Nada de las entradas (mood, nota, fecha, intensidad) sale del dispositivo. Esto está declarado en cuatro sitios que deben decir lo mismo:
+
+- **App Privacy** (App Store Connect → App Privacy; solo web, la API no lo expone): Device ID (analíticas y funciones de la app), Purchase History (funciones de la app), Product Interaction (analíticas) y Crash Data (funciones de la app); todos no vinculados y sin rastreo.
+- **Data safety** (Play Console → Contenido de la app): interacciones en la app (recopiladas, opcionales, estadísticas), ID de dispositivo (necesario, funciones de la app y estadísticas), historial de compras y registros de fallos/diagnóstico; sin datos compartidos con terceros.
+- **Política de privacidad**: `site/privacy/` y `site/es/privacy/`; la URL se configura en la app (`privacyPolicyUrl` en `settings_screen.dart`), en Play Console y en cada versión de App Store Connect.
+- **Specs**: `usage-analytics` y `crash-reporting`.
+
+Cualquier SDK o evento nuevo que recoja datos obliga a actualizar los cuatro antes de publicar. Mantener la verificación de "sin ID de publicidad" (sin AdSupport, sin ATT, sin `AD_ID`).
 
 ## Conventional Commits
 
@@ -213,7 +252,7 @@ Cambios no triviales siguen el flujo OpenSpec: proponer (`/opsx:propose`) → im
 
 ## Testing
 
-- Tests unitarios y de widget en `test/` (repositorio, resolver, streak calculator, orden del selector, summary usecase, política y servicio de calificación, exportador JSON, `MoodCubit`, `MoodScreen`, `SettingsCubit` y `SettingsScreen`). `test/support/fake_mood_entitlements_repository.dart` es el fake de compras para tests.
+- Tests unitarios y de widget en `test/` (hoy 262 en 27 archivos): repositorio, resolver, streak calculator, orden del selector, summary usecase, política y servicio de calificación, exportador JSON, `MoodCubit`, `MoodScreen`, `PurchasesCubit` (incluye los eventos de compras), `SettingsCubit` y `SettingsScreen` (incluye el interruptor de datos de uso), y la telemetría (`AnalyticsAppTelemetry`, `initializeAnalytics`, `initializeCrashReporting`). Los fakes están en `test/support/`: `fake_mood_entitlements_repository.dart` (compras), `fake_crash_reporter.dart` (fallos y `RecordingLogger`) y `fake_analytics_reporter.dart` (analíticas). Las pantallas que usan `SettingsScreen.forApp()` necesitan un `RepositoryProvider<AnalyticsReporter>` (en tests, `NoopAnalyticsReporter`).
 - Las pantallas con efectos de plataforma reciben esos efectos inyectados para poder probarlos sin plugins: `SettingsScreen` toma `openUrl` y `shareFile`, `SettingsCubit` toma `scheduleReminder`/`cancelReminder`/`loadAppVersion`, el exportador toma `directoryProvider`.
 - Siguen sin cubrirse la programación real de notificaciones (`LocalNotificationService` solo prueba el idioma) ni la navegación por notificación (pendiente en `backlog.md`).
 
@@ -289,7 +328,13 @@ python3 tool/screenshots/header.py --play [idiomas]                      # -> as
 
 ## Sitio web (`site/`)
 
-Sitio estático bilingüe para `moodcalendar.app` (dominio comprado en Cloudflare; el desplegado va en Vercel): inglés en `/` y español en `/es/`, con `/privacy/` y `/terms/` en cada idioma. Contacto: `support@moodcalendar.app` (reenvío de correo en Cloudflare). **Reevo no tiene nada que ver con Mood Calendar**: no usarlo como editor, titular ni copyright en el sitio, la política ni los términos (el sitio usa "Mood Calendar"; el copyright de App Store Connect también es "Mood Calendar"). Si cambia lo que la app recoge, actualizar `privacy` en los dos idiomas y la fecha.
+Sitio estático bilingüe para `https://moodcalendar.app`: inglés en `/` y español en `/es/`, cada uno con inicio (capturas y botones de las tiendas), `/privacy/`, `/terms/` y `/support/`. Son archivos HTML escritos a mano más `style.css`, `icon.png` y `img/`; **hay que editar siempre las dos versiones** y la fecha de "última actualización" de la política cuando cambie. No hay paso de build.
+
+- **Hosting**: proyecto Vercel `mood-calendar-web` (equipo `artlabstudio`), con `site/` como directorio raíz y conectado al repo: despliega en cada push a `main` que cambie `site/` (un paso de "build ignorado" cancela los demás). Los comentarios de Vercel en los PR están desactivados en el panel.
+- **Dominio y DNS**: comprado en Cloudflare; registro `A` `@` → `76.76.21.21` y `CNAME` `www` → `cname.vercel-dns.com`, ambos en "solo DNS" (con el proxy de Cloudflare, Vercel no puede emitir el certificado).
+- **Correo**: `support@moodcalendar.app` es un reenvío de Cloudflare Email Routing hacia un Gmail; es el contacto de la política, los términos y el soporte.
+- **URLs en las tiendas**: privacidad `https://moodcalendar.app/privacy/` (`/es/privacy/` para español) y soporte `https://moodcalendar.app/support/` (`/es/support/`).
+- **Editor y copyright**: el sitio, la política y el copyright de App Store Connect usan "Mood Calendar". **Reevo no tiene nada que ver con Mood Calendar**: no usarlo como editor, titular ni copyright.
 
 ## Notas
 

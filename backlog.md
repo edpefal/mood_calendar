@@ -29,19 +29,31 @@ Backlog activo del proyecto, actualizado contra el estado actual del repo.
 
 - Ficha de App Store localizada a es/de/fr/it, subtitle y keywords nuevos, categoría primaria Lifestyle, aviso para calificar la app (versión 1.8.3) y script/hook que obligan a pasar por `scripts/build_ios_release.sh` al generar builds de iOS.
 
-- Set nuevo de 6 screenshots por idioma (iPhone + iPad) generado con `tool/screenshots/` y subido a la versión 1.8.4 en App Store Connect (aún sin build ni enviar a revisión).
+- Set nuevo de 6 screenshots por idioma (iPhone + iPad) generado con `tool/screenshots/` y subido a la versión 1.8.4 en App Store Connect.
 
 - Notificaciones de recordatorio y `title` de la app ya siguen el idioma del dispositivo (fallback inglés).
 
 - Los nombres de los moods se muestran en el idioma del dispositivo (`AppStrings.moodName`).
 
+- Compras y moods: catálogo de 19 moods (14 premium) con Packs, Tienda con reintento del catálogo, y compras en iOS y Android con RevenueCat.
+
+- Android publicado en Google Play junto al mismo identificador de iOS, con capturas, gráfico de funciones y notas generados desde `tool/screenshots/`.
+
+- Firebase Analytics anónimo con interruptor en Settings, sin ID de publicidad, y declaraciones actualizadas (App Privacy, Data safety y política).
+
+- Sitio web `moodcalendar.app` con política de privacidad, términos y soporte en inglés y español.
+
+- README y `CLAUDE.md` actualizados con el estado real del proyecto (2026-10-24); todos los cambios de OpenSpec están archivados.
+
 ## Alta prioridad
 
-- Terminar y publicar la versión 1.8.4.
-  Está creada en App Store Connect con los screenshots cargados, pero falta: subir la versión en `pubspec.yaml`, generar el build con `scripts/build_ios_release.sh` (checklist de `CLAUDE.md`), escribir el promotional text y el What's New (están vacíos en los 5 idiomas; no se heredan de la versión anterior), asociar el build y enviar a revisión. Se pospone hasta meter más features. Opcional: recapturar los slides en español, que muestran los textos anteriores a la corrección de acentos. Al regenerar los slides, revisar en `compose.py` que el slide 5 (recordatorios) enmarque bien la captura de Settings a pantalla completa (antes era un bottom sheet); quedó pendiente al archivar `add-settings-screen`.
+- Cerrar el lanzamiento de la 1.8.5 (iOS y Android).
+  Está en revisión en App Store y en Google Play (build 36). Al aprobarse: comprobar en Firebase → Analytics que llegan usuarios reales, anotar el estado en `CLAUDE.md` ("Estado actual") y, para Android, crear a mano la versión de producción si Play Console no la publica sola. Opcional: recapturar los slides en español, que muestran los textos anteriores a la corrección de acentos; al regenerarlos, revisar en `compose.py` que el slide 5 (recordatorios) enmarque bien la captura de Settings a pantalla completa.
 
-- Documentar mejor la arquitectura real del proyecto.
-  El README debe describir con precisión `features/mood`, settings, notificaciones y telemetría. Hace falta una guía de onboarding que refleje el flujo real de dependencias, estado y persistencia.
+- Configurar las notificaciones en tiempo real (RTDN) de Google Play hacia RevenueCat.
+  Elegir el tema `play-notifications` en RevenueCat, pegarlo en Play Console → Monetización y enviar una notificación de prueba. No bloquea nada: hace que reembolsos y cancelaciones lleguen más rápido.
+
+- Respaldar `~/my-release-key.jks` fuera del equipo y borrar la clave local antigua de la cuenta de servicio de Play (no la que está subida a RevenueCat).
 
 - Añadir cobertura para recordatorios y navegación por notificación.
   `SettingsCubit` y `SettingsScreen` ya tienen tests, con la programación simulada.
@@ -106,7 +118,7 @@ Sale de `aso/aso_report.md` (auditoría del 2026-10-02). Lo ya hecho está en "C
 
 ## Orden sugerido de ejecución
 
-1. Alinear documentación técnica y checklist de release con el estado real del proyecto.
+1. Cerrar el lanzamiento de la 1.8.5 y mantener `CLAUDE.md` al día con cada release.
 2. Cubrir con pruebas el flujo de recordatorios y apertura desde notificaciones.
 3. Mejorar UX y manejo de errores en plataforma y estados offline.
 4. Iterar en producto: historial, edición/borrado, accesibilidad e insights.
