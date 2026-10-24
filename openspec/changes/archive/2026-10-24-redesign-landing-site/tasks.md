@@ -38,7 +38,7 @@
 - [x] 6.3 Correr Lighthouse en la home en y es (móvil): rendimiento, accesibilidad y SEO sin regresiones, peso de la carga fría por debajo de ~300 KB.
 - [x] 6.4 Verificar que no hay peticiones a dominios externos salvo los enlaces de salida (`curl`/red del navegador) y que los enlaces de tienda, contacto y las 8 páginas responden.
 - [x] 6.5 Comparar en y es: mismas secciones, mismos enlaces, `alt` traducidos y fecha de actualización de la política intacta.
-- [x] 6.6 Tras abrir el PR, revisar la vista previa de Vercel en un teléfono real (iOS y Android) y la tarjeta de compartir con un depurador de Open Graph. Hecho: probado en teléfono real; la tarjeta `og` queda por comprobar con un depurador ahora que la imagen está en producción.
+- [x] 6.6 Tras abrir el PR, revisar la vista previa de Vercel en un teléfono real (iOS y Android) y la tarjeta de compartir con un depurador de Open Graph. Hecho: probado en teléfono real y la tarjeta de compartir (`og`) comprobada en producción.
 
 ## 7. Documentación y cierre
 
