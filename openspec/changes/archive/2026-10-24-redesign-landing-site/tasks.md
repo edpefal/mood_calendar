@@ -2,7 +2,7 @@
 
 - [x] 1.1 Ejecutar `/impeccable init` y guardar `PRODUCT.md` (público: tráfico de redes y tiendas; promesa: gratis para descargar y privada). Hecho: plataforma `web`, usuario "registro diario simple y privado", sin pruebas citables.
 - [x] 1.2 Ejecutar `/impeccable shape` para la landing (modo Persuade) y fijar tono, composición del héroe y si habrá animación; las legales se tratan como modo Read. Hecho: estructura "La página es el selector", ver decisión 10 de `design.md`.
-- [ ] 1.3 Opcional: `/impeccable document` para dejar `DESIGN.md` con los tokens del sistema de marca (púrpura `#5F3DC4`→`#6C63FF`, Poppins, pasteles por mood).
+- [x] 1.3 Opcional: `/impeccable document` para dejar `DESIGN.md` con los tokens del sistema de marca (púrpura `#5F3DC4`→`#6C63FF`, Poppins, pasteles por mood). Hecho en el PR #110 (`DESIGN.md` y `.impeccable/design.json`).
 
 ## 2. Activos
 
@@ -38,10 +38,10 @@
 - [x] 6.3 Correr Lighthouse en la home en y es (móvil): rendimiento, accesibilidad y SEO sin regresiones, peso de la carga fría por debajo de ~300 KB.
 - [x] 6.4 Verificar que no hay peticiones a dominios externos salvo los enlaces de salida (`curl`/red del navegador) y que los enlaces de tienda, contacto y las 8 páginas responden.
 - [x] 6.5 Comparar en y es: mismas secciones, mismos enlaces, `alt` traducidos y fecha de actualización de la política intacta.
-- [ ] 6.6 Tras abrir el PR, revisar la vista previa de Vercel en un teléfono real (iOS y Android) y la tarjeta de compartir con un depurador de Open Graph.
+- [x] 6.6 Tras abrir el PR, revisar la vista previa de Vercel en un teléfono real (iOS y Android) y la tarjeta de compartir con un depurador de Open Graph. Hecho: probado en teléfono real y la tarjeta de compartir (`og`) comprobada en producción.
 
 ## 7. Documentación y cierre
 
 - [x] 7.1 Actualizar `CLAUDE.md`: estado actual (Android 1.8.5 ya publicado, no "en revisión") y la sección "Sitio web" (Poppins, imágenes og, badges, cómo regenerar la captura y las caritas).
-- [ ] 7.2 Abrir el PR en la rama `feat/redesign-landing-site` con commits `feat(site)`/`docs`, esperar "Analyze and Test" y mergear.
-- [ ] 7.3 Borrar la rama (remota y local) y archivar el change con `/opsx:archive`.
+- [x] 7.2 Abrir el PR en la rama `feat/redesign-landing-site` con commits `feat(site)`/`docs`, esperar "Analyze and Test" y mergear.
+- [x] 7.3 Borrar la rama (remota y local) y archivar el change con `/opsx:archive`.
