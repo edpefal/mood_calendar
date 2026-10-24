@@ -13,7 +13,7 @@
 ## 3. Localización
 
 - [x] 3.1 Añadir los 9 nombres a `moodNames` en `app_strings_en.dart`, `app_strings_es.dart`, `app_strings_de.dart`, `app_strings_fr.dart` y `app_strings_it.dart`
-- [ ] 3.2 Revisar cada traducción viendo el emoji (no el nombre de archivo) y con texto largo en alemán
+- [ ] 3.2 Revisar cada traducción viendo el emoji (no el nombre de archivo) y con texto largo en alemán — No se hizo una revisión visual dedicada al archivar.
 
 ## 4. Tests
 
@@ -36,13 +36,13 @@
 
 - [x] 6.1 Correr con `--dart-define=REVENUECAT_IOS_API_KEY=<key>` en un simulador iPhone limpio y confirmar que la Tienda lista los 4 packs y los 14 moods premium sin errores
 - [x] 6.2 Repetir en iPad y confirmar que la UI aparece antes del diálogo de permisos
-- [ ] 6.3 Probar una compra sandbox de un mood suelto y de un pack nuevo, y el aviso de solape
+- [ ] 6.3 Probar una compra sandbox de un mood suelto y de un pack nuevo, y el aviso de solape — No se probó una compra sandbox dedicada al archivar.
 - [x] 6.4 Revisar el selector y el calendario con los 19 moods en iPhone 390 pt y con texto grande (selector OK con 19 moods y a ≈190 % de texto; calendario OK con entradas de sleepy, sick, hurt, crying y hugging; la tienda desborda con texto grande, limitación previa fuera de este change)
 
 ## 7. Release 1.8.4
 
-- [ ] 7.1 Subir la versión en `pubspec.yaml`
-- [ ] 7.2 Generar el build con `REVENUECAT_IOS_API_KEY=<key> STORE_VERIFIED=1 scripts/build_ios_release.sh`
-- [ ] 7.3 Redactar promotional text y What's New en los 5 idiomas
-- [ ] 7.4 Asociar el build y los 12 productos a la versión y enviar a revisión
-- [ ] 7.5 Actualizar `CLAUDE.md` (conteo de moods y packs), `CONTEXT.md` si cambia el glosario y `backlog.md`
+- [x] 7.1 Subir la versión en `pubspec.yaml` — Hecho: el cambio ya está publicado (según el usuario), dentro de las versiones 1.8.4 y 1.8.5.
+- [x] 7.2 Generar el build con `REVENUECAT_IOS_API_KEY=<key> STORE_VERIFIED=1 scripts/build_ios_release.sh` — Hecho: el cambio ya está publicado (según el usuario), dentro de las versiones 1.8.4 y 1.8.5.
+- [x] 7.3 Redactar promotional text y What's New en los 5 idiomas — Hecho: el cambio ya está publicado (según el usuario), dentro de las versiones 1.8.4 y 1.8.5.
+- [x] 7.4 Asociar el build y los 12 productos a la versión y enviar a revisión — Hecho: el cambio ya está publicado (según el usuario), dentro de las versiones 1.8.4 y 1.8.5.
+- [x] 7.5 Actualizar `CLAUDE.md` (conteo de moods y packs), `CONTEXT.md` si cambia el glosario y `backlog.md` — `CLAUDE.md` ya describe 19 moods (14 premium) y los 4 packs.
