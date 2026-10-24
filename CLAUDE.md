@@ -4,7 +4,7 @@ Flutter app para registrar y revisar estados de ánimo diarios, con un catálogo
 
 ## Estado actual (2026-10-24)
 
-- **Versión**: `pubspec.yaml` está en `1.8.5+36`. iOS: la 1.8.4 (build 31) está publicada y la **1.8.5 (build 36) está en revisión de Apple** (lanzamiento automático al aprobarse). Android: la **1.8.5 (versionCode 36)** se envió a revisión en Google Play (primera publicación de Android en producción; reemplazó a la 34). Al publicarse, actualizar esta sección.
+- **Versión**: `pubspec.yaml` está en `1.8.5+36`. iOS: la 1.8.4 (build 31) está publicada y la **1.8.5 (build 36) está en revisión de Apple** (lanzamiento automático al aprobarse). Android: la app **ya está publicada en Google Play** (confirmado el 2026-10-24; la ficha pública responde). La 1.8.5 (versionCode 36) fue la primera publicación en producción; no se ha verificado qué versionCode sirve hoy. Al publicarse iOS 1.8.5, actualizar esta sección.
 - **Analíticas medidas**: Firebase Analytics funciona (eventos vistos en Analytics → Realtime desde builds de TestFlight y de la pista interna). Los `GoogleService-Info.plist` y `google-services.json` siguen trayendo Analytics como deshabilitado aunque la propiedad de GA (`mood-calendar-fee5c`) está vinculada, y aun así funciona: no hace falta regenerarlos.
 - **Declaraciones de privacidad al día**: App Privacy de Apple (Device ID, Purchase History, Product Interaction y Crash Data; no vinculados, sin rastreo) y Data safety de Play (interacciones en la app, ID de dispositivo, historial de compras y registros de fallos). Ver "Privacidad y declaraciones de las tiendas".
 - **Sitio** `https://moodcalendar.app` activo (política de privacidad, términos y soporte en inglés y español). Ver "Sitio web".
@@ -17,8 +17,8 @@ Flutter app para registrar y revisar estados de ánimo diarios, con un catálogo
 - **Estado**: flutter_bloc + Cubit
 - **Persistencia**: Hive (local, sin backend)
 - **Analíticas de uso**: Firebase Analytics (`firebase_analytics`), anónimas, solo en release en iOS/Android y con interruptor en Settings; sin ID de publicidad (ver "Arranque de la app")
-- **Crashes**: Firebase Crashlytics (`firebase_core` + `firebase_crashlytics`, proyecto Firebase `mood-calendar-fee5c`, apps iOS y Android con el mismo identificador `com.artlab.moodcalendar`; Android se publica por primera vez con la 1.8.5), solo en release en iOS/Android
-- **Compras in-app**: purchases_flutter (RevenueCat) en iOS y Android (Android en revisión de Google Play con la 1.8.5)
+- **Crashes**: Firebase Crashlytics (`firebase_core` + `firebase_crashlytics`, proyecto Firebase `mood-calendar-fee5c`, apps iOS y Android con el mismo identificador `com.artlab.moodcalendar`; Android ya está publicado en Google Play), solo en release en iOS/Android
+- **Compras in-app**: purchases_flutter (RevenueCat) en iOS y Android (Android ya publicado en Google Play)
 - **Generación de código**: freezed, json_serializable, hive_generator → correr con `flutter pub run build_runner build`
 - **Notificaciones**: flutter_local_notifications + timezone
 - **UI**: flutter_svg (emojis SVG), google_fonts (Poppins), lottie
@@ -328,7 +328,10 @@ python3 tool/screenshots/header.py --play [idiomas]                      # -> as
 
 ## Sitio web (`site/`)
 
-Sitio estático bilingüe para `https://moodcalendar.app`: inglés en `/` y español en `/es/`, cada uno con inicio (capturas y botones de las tiendas), `/privacy/`, `/terms/` y `/support/`. Son archivos HTML escritos a mano más `style.css`, `icon.png` y `img/`; **hay que editar siempre las dos versiones** y la fecha de "última actualización" de la política cuando cambie. No hay paso de build.
+Sitio estático bilingüe para `https://moodcalendar.app`: inglés en `/` y español en `/es/`, cada uno con inicio, `/privacy/`, `/terms/` y `/support/`. Son archivos HTML escritos a mano más `style.css`, `icon.png`, `fonts/` e `img/`; **hay que editar siempre las dos versiones** y la fecha de "última actualización" de la política cuando cambie. No hay paso de build. Contexto de producto en `PRODUCT.md`; el change `redesign-landing-site` (OpenSpec) documenta las decisiones del rediseño.
+
+- **Inicio** (`index.html`, `es/index.html`): la primera pantalla imita el selector de moods de la app (carrusel de las 5 caritas base con el degradado pastel de cada una, contador y botones de tienda), y debajo van la captura del calendario, el bloque de privacidad y una descarga final. Funciona sin JavaScript (las caritas se deslizan con scroll-snap; el script solo cambia fondo, nombre y contador) y respeta `prefers-reduced-motion`. Se publica como "gratis para descargar y usar": no afirma que todos los moods sean gratis ni menciona precios ni la tienda de moods. Lo que dice de privacidad debe coincidir con `site/privacy/` y con las declaraciones de las tiendas.
+- **Activos**: Poppins autoalojada en `fonts/` (OFL; sin fuentes ni scripts de terceros) y caritas base en `img/moods/` (copiadas de `assets/icon/`; actualizarlas si cambia el arte). La captura `img/calendar-<idioma>-{390,780}.webp` sale del calendario de `capture.py` (ver "Screenshots de App Store") y se regenera si cambia la UI; `img/og-<idioma>.jpg` (1200×630) se recorta de `aso/header/<idioma>/header_search_5244x2950.png`; los badges oficiales de App Store y Google Play están en `img/badges/` y no se modifican.
 
 - **Hosting**: proyecto Vercel `mood-calendar-web` (equipo `artlabstudio`), con `site/` como directorio raíz y conectado al repo: despliega en cada push a `main` que cambie `site/` (un paso de "build ignorado" cancela los demás). Los comentarios de Vercel en los PR están desactivados en el panel.
 - **Dominio y DNS**: comprado en Cloudflare; registro `A` `@` → `76.76.21.21` y `CNAME` `www` → `cname.vercel-dns.com`, ambos en "solo DNS" (con el proxy de Cloudflare, Vercel no puede emitir el certificado).
