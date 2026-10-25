@@ -62,6 +62,8 @@ Fuera de `lib/`:
 
 ## Documentación de dominio y decisiones
 
+- `PRODUCT.md` — contexto de producto del sitio y la marca (público, posicionamiento, restricciones y pruebas disponibles). Leerlo antes de tocar el copy o el diseño de `site/`.
+- `DESIGN.md` (+ `.impeccable/design.json`) — sistema visual del sitio web: tokens, tipografía, componentes y reglas con nombre. Lo usan los comandos de `/impeccable`; actualizarlo si cambia `site/style.css`.
 - `CONTEXT.md` — glosario del dominio (Mood vs Mood Entry, Tier, Unlocked, Purchase, Pack, Intensity, Most Common Mood). Respetar sus términos y los "_Avoid_".
 - `docs/adr/` — ADR 0001 (intensity no es valencia), ADR 0002 (composición de Pack congelada).
 - `docs/risks.md` — riesgos aceptados de IAP (sin validación de recibos en backend, etc.).

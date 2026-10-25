@@ -43,12 +43,14 @@ Backlog activo del proyecto, actualizado contra el estado actual del repo.
 
 - Sitio web `moodcalendar.app` con política de privacidad, términos y soporte en inglés y español.
 
+- Landing rediseñada (2026-10-24): la primera pantalla imita el selector de la app (caritas base sobre su pastel, "gratis para descargar" y badges oficiales), con captura del calendario, bloque de privacidad, Poppins autoalojada, tarjeta de compartir por idioma y Lighthouse 100 en las cuatro categorías. Contexto en `PRODUCT.md` y `DESIGN.md`; el change quedó archivado como `redesign-landing-site`.
+
 - README y `CLAUDE.md` actualizados con el estado real del proyecto (2026-10-24); todos los cambios de OpenSpec están archivados.
 
 ## Alta prioridad
 
 - Cerrar el lanzamiento de la 1.8.5 (iOS y Android).
-  Está en revisión en App Store y en Google Play (build 36). Al aprobarse: comprobar en Firebase → Analytics que llegan usuarios reales, anotar el estado en `CLAUDE.md` ("Estado actual") y, para Android, crear a mano la versión de producción si Play Console no la publica sola. Opcional: recapturar los slides en español, que muestran los textos anteriores a la corrección de acentos; al regenerarlos, revisar en `compose.py` que el slide 5 (recordatorios) enmarque bien la captura de Settings a pantalla completa.
+  Android ya está publicado en Google Play (confirmado el 2026-10-24); falta verificar qué `versionCode` sirve en producción. En iOS, comprobar el estado de la 1.8.5 (build 36) en App Store Connect: estaba en revisión. Al aprobarse: comprobar en Firebase → Analytics que llegan usuarios reales y anotar el estado en `CLAUDE.md` ("Estado actual"). Opcional: recapturar los slides en español, que muestran los textos anteriores a la corrección de acentos; al regenerarlos, revisar en `compose.py` que el slide 5 (recordatorios) enmarque bien la captura de Settings a pantalla completa.
 
 - Configurar las notificaciones en tiempo real (RTDN) de Google Play hacia RevenueCat.
   Elegir el tema `play-notifications` en RevenueCat, pegarlo en Play Console → Monetización y enviar una notificación de prueba. No bloquea nada: hace que reembolsos y cancelaciones lleguen más rápido.
