@@ -34,7 +34,7 @@ Cola persistente: sobrevive a que el iPhone esté lejos o la app cerrada.
 ```
 
 - `id`: UUID de la elección; el iPhone deduplica por él.
-- `date`: fecha **local** del reloj al elegir (`YYYY-MM-DD`). Solo se acepta la de hoy.
+- `date`: fecha **local** del reloj al elegir (`YYYY-MM-DD`). El reloj solo ofrece elegir hoy; el iPhone aplica la fecha tal como llega (una elección entregada tarde conserva su día) y descarta fechas mal formadas, imposibles o futuras (se tolera un día por la zona horaria).
 - `mood`: id estable del mood (`calm`). Nunca `intensity` ni rutas de assets (ADR 0001).
 - `chosenAt`: milisegundos desde epoch en el reloj; ordena elecciones del mismo día (gana la última).
 

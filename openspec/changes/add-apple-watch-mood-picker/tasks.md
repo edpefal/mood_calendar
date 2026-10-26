@@ -16,12 +16,12 @@
 
 ## 3. Caso de uso y cableado en Dart
 
-- [ ] 3.1 Crear `lib/features/watch/` (domain: `WatchMoodChoice`, interfaz de canal; data: canal de plataforma y versión sin efecto para Android y tests).
-- [ ] 3.2 Implementar `ProcessWatchInboxUseCase`: ordenar por `chosenAt`, descartar ids desconocidos o bloqueados, conservar la nota existente, resolver `intensity` con `MoodDefinitionResolver`, guardar con `SaveMoodUseCase` y confirmar al canal solo después de aplicar.
-- [ ] 3.3 Implementar `PublishWatchStateUseCase`: nombres con `AppStrings.forLocale`, orden con `MoodPickerOrder`, `today` desde el repositorio, y publicación con debounce cuando cambian desbloqueos (`unlockedPremiumMoodIds()`), la entrada de hoy o el idioma.
-- [ ] 3.4 Cablear en `main.dart` tras abrir Hive y `Purchases.configure()`, procesando al arrancar y en `AppLifecycleState.resumed`, sin `await` de nada que dependa del usuario antes de `runApp()`.
-- [ ] 3.5 Recargar `MoodCubit` y `CalendarCubit` cuando se aplica una elección con la app en primer plano, sin reordenar el selector mientras está visible.
-- [ ] 3.6 Tests de Dart con un canal falso en `test/support/`: nota conservada, fecha local, id desconocido, id bloqueado, orden por `chosenAt`, `ack` solo tras aplicar, no dispara calificación ni analíticas, publicación al cambiar desbloqueos; correr `flutter analyze` y `flutter test`.
+- [x] 3.1 Crear `lib/features/watch/` (domain: `WatchMoodChoice`, interfaz de canal; data: canal de plataforma y versión sin efecto para Android y tests).
+- [x] 3.2 Implementar `ProcessWatchInboxUseCase`: ordenar por `chosenAt`, descartar ids desconocidos o bloqueados, conservar la nota existente, resolver `intensity` con `MoodDefinitionResolver`, guardar con `SaveMoodUseCase` y confirmar al canal solo después de aplicar.
+- [x] 3.3 Implementar `PublishWatchStateUseCase`: nombres con `AppStrings.forLocale`, orden con `MoodPickerOrder`, `today` desde el repositorio, y publicación con debounce cuando cambian desbloqueos (`unlockedPremiumMoodIds()`), la entrada de hoy o el idioma.
+- [x] 3.4 Cablear en `main.dart` tras abrir Hive y `Purchases.configure()`, procesando al arrancar y en `AppLifecycleState.resumed`, sin `await` de nada que dependa del usuario antes de `runApp()`.
+- [x] 3.5 Recargar `MoodCubit` y `CalendarCubit` cuando se aplica una elección con la app en primer plano, sin reordenar el selector mientras está visible.
+- [x] 3.6 Tests de Dart con un canal falso en `test/support/`: nota conservada, fecha local, id desconocido, id bloqueado, orden por `chosenAt`, `ack` solo tras aplicar, no dispara calificación ni analíticas, publicación al cambiar desbloqueos; correr `flutter analyze` y `flutter test`.
 
 ## 4. App SwiftUI del reloj
 
