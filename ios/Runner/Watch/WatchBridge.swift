@@ -41,7 +41,10 @@ final class WatchBridge: NSObject, WCSessionDelegate {
       result(nil)
     case "publishState":
       if let state = call.arguments as? [String: Any] {
-        UserDefaults.standard.set(state, forKey: Self.stateKey)
+        // Dart sends `today: null` when there is no entry; NSNull is not a
+        // property-list value, so UserDefaults and WatchConnectivity reject it.
+        let cleaned = state.filter { !($0.value is NSNull) }
+        UserDefaults.standard.set(cleaned, forKey: Self.stateKey)
         sendLastState()
       }
       result(nil)

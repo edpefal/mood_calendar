@@ -8,9 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
+		1A6BEAB305D1DB6A14BAA876 /* WatchModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4053BC483964E374D0503C9E /* WatchModels.swift */; };
 		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
 		35AA2720F8C726BAB7F2C57B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CF95D21E723462103F9666B /* Foundation.framework */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
+		5159B436A9FB6F200BC76BE2 /* WatchModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5585AFA721ADEE8112B15BA4 /* WatchModel.swift */; };
 		53B4AB97076FD1B86E3992A9 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC07AB9E55D11A991F59C398 /* Pods_Runner.framework */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		85B39156251977A4EE704BCD /* WatchInboxStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0855EA164038A93D6816F0EF /* WatchInboxStoreTests.swift */; };
@@ -21,9 +23,15 @@
 		9CC5D8E0131D1405744A3D1C /* WatchApp.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 93849C64D5B1551382770CBD /* WatchApp.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		AA3CF9DD0BA390F6B13B43DB /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C46E2145640F1FD591D6F19A /* Pods_RunnerTests.framework */; };
 		AD0290C257BAC2C4AEA4C094 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 718D816DB8FB59E16BF8140C /* GoogleService-Info.plist */; };
+		B759AC28EE3127579BAC0A3D /* PhoneLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 680D7BBCBEDF35BC15565F95 /* PhoneLink.swift */; };
+		BC84B35D64F7E0D610842F5B /* MoodGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C2A1B1594562093B6577BE8 /* MoodGridView.swift */; };
 		DBEEF462EF652A6024CC706E /* MoodCalendarWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C64823B3E92C095F637BA58 /* MoodCalendarWatchApp.swift */; };
+		DDCC3A54502FA87EBDE6F659 /* WatchModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4053BC483964E374D0503C9E /* WatchModels.swift */; };
+		DE3CF8085323FCF1C5BD6FB6 /* WatchModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5585AFA721ADEE8112B15BA4 /* WatchModel.swift */; };
+		E4AC8759F3B191A618053EF5 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = FF69DBEADED03441A9D7C4C4 /* Localizable.strings */; };
 		E54E0708EB815CBA10A2A584 /* WatchBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDF3C8AF9DE3226DA872776A /* WatchBridge.swift */; };
 		F5A864B979F10107C41828EF /* WatchInboxStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 656F450DE0BD81E06DFAFF3B /* WatchInboxStore.swift */; };
+		F5D91CA85F58AC9EC597C589 /* WatchModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5417F318D26ED9469EFE3A2B /* WatchModelTests.swift */; };
 		F655DBDBF670BA3A57F7756A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A4D7B1072297F54A0D000495 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -77,14 +85,23 @@
 		331C807B294A618700263BE5 /* RunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunnerTests.swift; sourceTree = "<group>"; };
 		331C8081294A63A400263BE5 /* RunnerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RunnerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
+		4053BC483964E374D0503C9E /* WatchModels.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WatchModels.swift; sourceTree = "<group>"; };
 		40F79472E4E41CFBD8EB72B5 /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
 		4CF95D21E723462103F9666B /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/WatchOS.platform/Developer/SDKs/WatchOS11.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		5417F318D26ED9469EFE3A2B /* WatchModelTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WatchModelTests.swift; sourceTree = "<group>"; };
+		5585AFA721ADEE8112B15BA4 /* WatchModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WatchModel.swift; sourceTree = "<group>"; };
+		5C2A1B1594562093B6577BE8 /* MoodGridView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MoodGridView.swift; sourceTree = "<group>"; };
 		62F2594D4586613D89BC1A8A /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
 		656F450DE0BD81E06DFAFF3B /* WatchInboxStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WatchInboxStore.swift; sourceTree = "<group>"; };
+		680D7BBCBEDF35BC15565F95 /* PhoneLink.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PhoneLink.swift; sourceTree = "<group>"; };
 		718D816DB8FB59E16BF8140C /* GoogleService-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "Runner/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
 		74858FAE1ED2DC5600515810 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		7648FFA847E1D95C6AF28E11 /* Localizable.strings */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = Localizable.strings; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = Flutter/Release.xcconfig; sourceTree = "<group>"; };
+		82C05EBFC3E17ACA9D359D5F /* Localizable.strings */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = Localizable.strings; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
+		8CDE80B24A9BE52553A1993F /* Localizable.strings */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = Localizable.strings; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
+		8D918BE96EA22F2705FC1133 /* Localizable.strings */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = Localizable.strings; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
 		93849C64D5B1551382770CBD /* WatchApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WatchApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9740EEB21CF90195004384FC /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = Flutter/Debug.xcconfig; sourceTree = "<group>"; };
 		9740EEB31CF90195004384FC /* Generated.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Generated.xcconfig; path = Flutter/Generated.xcconfig; sourceTree = "<group>"; };
@@ -95,6 +112,7 @@
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9C64823B3E92C095F637BA58 /* MoodCalendarWatchApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MoodCalendarWatchApp.swift; sourceTree = "<group>"; };
 		9C80878D9E3173DFA1D9B3A0 /* Pods-RunnerTests.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.profile.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.profile.xcconfig"; sourceTree = "<group>"; };
+		A1E429E7E42E14959D7E0D84 /* Localizable.strings */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = Localizable.strings; path = it.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A4D7B1072297F54A0D000495 /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B4103BD9DA284B3E44732C2F /* WatchApp.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = WatchApp.xcconfig; sourceTree = "<group>"; };
 		BC07AB9E55D11A991F59C398 /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -147,6 +165,7 @@
 			children = (
 				331C807B294A618700263BE5 /* RunnerTests.swift */,
 				0855EA164038A93D6816F0EF /* WatchInboxStoreTests.swift */,
+				5417F318D26ED9469EFE3A2B /* WatchModelTests.swift */,
 			);
 			path = RunnerTests;
 			sourceTree = "<group>";
@@ -240,6 +259,11 @@
 				14565BB7DCA907F908047769 /* ContentView.swift */,
 				9C64823B3E92C095F637BA58 /* MoodCalendarWatchApp.swift */,
 				A4D7B1072297F54A0D000495 /* Assets.xcassets */,
+				5C2A1B1594562093B6577BE8 /* MoodGridView.swift */,
+				680D7BBCBEDF35BC15565F95 /* PhoneLink.swift */,
+				5585AFA721ADEE8112B15BA4 /* WatchModel.swift */,
+				4053BC483964E374D0503C9E /* WatchModels.swift */,
+				FF69DBEADED03441A9D7C4C4 /* Localizable.strings */,
 			);
 			name = WatchApp;
 			path = WatchApp;
@@ -339,6 +363,10 @@
 			knownRegions = (
 				en,
 				Base,
+				es,
+				de,
+				fr,
+				it,
 			);
 			mainGroup = 97C146E51CF9000F007C117D;
 			productRefGroup = 97C146EF1CF9000F007C117D /* Products */;
@@ -377,6 +405,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F655DBDBF670BA3A57F7756A /* Assets.xcassets in Resources */,
+				E4AC8759F3B191A618053EF5 /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -502,6 +531,9 @@
 			files = (
 				331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */,
 				85B39156251977A4EE704BCD /* WatchInboxStoreTests.swift in Sources */,
+				F5D91CA85F58AC9EC597C589 /* WatchModelTests.swift in Sources */,
+				DE3CF8085323FCF1C5BD6FB6 /* WatchModel.swift in Sources */,
+				DDCC3A54502FA87EBDE6F659 /* WatchModels.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -511,6 +543,10 @@
 			files = (
 				98BD6A1E6418063D4D966162 /* ContentView.swift in Sources */,
 				DBEEF462EF652A6024CC706E /* MoodCalendarWatchApp.swift in Sources */,
+				BC84B35D64F7E0D610842F5B /* MoodGridView.swift in Sources */,
+				B759AC28EE3127579BAC0A3D /* PhoneLink.swift in Sources */,
+				5159B436A9FB6F200BC76BE2 /* WatchModel.swift in Sources */,
+				1A6BEAB305D1DB6A14BAA876 /* WatchModels.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -556,6 +592,18 @@
 				97C147001CF9000F007C117D /* Base */,
 			);
 			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		FF69DBEADED03441A9D7C4C4 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				7648FFA847E1D95C6AF28E11 /* Localizable.strings */,
+				8D918BE96EA22F2705FC1133 /* Localizable.strings */,
+				8CDE80B24A9BE52553A1993F /* Localizable.strings */,
+				82C05EBFC3E17ACA9D359D5F /* Localizable.strings */,
+				A1E429E7E42E14959D7E0D84 /* Localizable.strings */,
+			);
+			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

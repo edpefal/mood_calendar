@@ -1,0 +1,4 @@
+/* Strings of the Apple Watch app. Mood names come from the iPhone. */
+"watch.title" = "How are you feeling?";
+"watch.pending" = "Syncing with iPhone";
+"watch.empty" = "Open Mood Calendar on your iPhone to get started.";

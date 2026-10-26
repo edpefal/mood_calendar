@@ -53,11 +53,10 @@ Restricciones que condicionan el diseño:
    Hay una sola copia de datos. Entre elecciones del reloj para la misma fecha, gana la de mayor `chosenAt`. *Limitación conocida:* las Mood Entries del iPhone no guardan hora, así que una elección muy vieja del reloj, entregada tarde, sobrescribiría un cambio posterior hecho en el iPhone. Se acepta porque `transferUserInfo` entrega en cuanto hay alcance y el caso es raro; guardar una marca de tiempo en `MoodModel` exigiría una migración de Hive que no justifica esta versión.
 
 8. **Interfaz del reloj.**
-   SwiftUI: cuadrícula de dos columnas con la carita y su nombre, el mood de hoy resaltado con un aro, retroalimentación háptica y una confirmación breve al tocar, e indicación de "pendiente" hasta que el iPhone publique el mood de hoy. Estado vacío cuando aún no hay estado. Respeta Dynamic Type y VoiceOver (cada mood es un botón con etiqueta). Los colores pastel por mood vienen de la misma regla que `MoodDefinitionResolver.backgroundGradientForMood` (`MaterialColor.shade50`/`shade200`), enviados o replicados como valores fijos de los moods base y premium en el catálogo de assets del reloj.
+   SwiftUI: cuadrícula de dos columnas con la carita y su nombre, el mood de hoy resaltado con un aro, retroalimentación háptica y una confirmación breve al tocar, e indicación de "pendiente" hasta que el iPhone publique el mood de hoy. Estado vacío cuando aún no hay estado. Respeta Dynamic Type y VoiceOver (cada mood es un botón con etiqueta). **En la primera versión no hay colores pastel por mood:** las baldosas son oscuras y neutras (el reloj es OLED) y el mood de hoy se marca con un aro del color de marca. Llevar los pasteles al reloj exigiría enviarlos o replicarlos y no cambia el contrato; queda como mejora posterior.
 
 9. **Íconos.**
-   Los SVG de `assets/icon/` se llevan al catálogo de assets del reloj: como SVG vectorial si el spike confirma que watchOS 9 los soporta, o como PNG @2x/@3x generados con un script reproducible (`tool/watch/`) si no. **Spike:** un `imageset` SVG compila con `actool` para watchOS 9.0 (queda por ver en pantalla, en tarea 6.2); si el render falla se usan PNG. `brave.svg` (1 MB) nunca se copia: se rasteriza a un PNG pequeño y se revisa a ojo. Faltan además el ícono de la app de reloj y los tamaños que pide App Store Connect.
-
+   Los SVG de `assets/icon/` se rasterizan a PNG @2x/@3x en el catálogo de assets del reloj con `tool/watch/export_mood_icons.sh` (requiere `rsvg-convert`). Se eligió PNG sobre SVG porque garantiza el render en todo watchOS soportado y porque `brave.svg` (1 MB) pasa a pesar 14 KB sin tratarlo aparte. 
 10. **Release y verificación.**
     El spike debe demostrar que el archive con el reloj embebido pasa `scripts/build_ios_release.sh` y sus tres verificaciones. `verify_ios_archive_no_ad_id.sh` ya recorre binarios y `Info.plist`, y es probable que se aplique también al del reloj (sin `AdSupport` ni `NSUserTrackingUsageDescription`). `verify_ios_archive_key.sh` y `verify_ios_archive_crash_reporting.sh` miran `Runner.app` y sus dSYM y deben tolerar la carpeta `Watch/`. Si alguna falla, se adapta con un cambio mínimo y se documenta en `CLAUDE.md`.
 
@@ -77,7 +76,7 @@ Restricciones que condicionan el diseño:
 - [WatchConnectivity en simuladores es inconsistente] → Cerrar con pruebas en dispositivos reales y TestFlight antes de enviar a revisión.
 - [Una elección vieja entregada tarde sobrescribe un cambio posterior del iPhone] → Aceptado y documentado (decisión 7).
 - [App Store Connect exige capturas de Watch, ícono propio y revisión más larga] → Previsto en las tareas; confirmar en ASC los tamaños vigentes antes de generar capturas.
-- [El PNG de `brave` puede verse mal al rasterizarlo] → Revisarlo a ojo y, si hace falta, esperar a regenerar el SVG (backlog) antes de ofrecer ese mood en el reloj.
+- [El PNG de `brave` puede verse mal al rasterizarlo] → Revisado: a 132 px se ve bien (14 KB).
 - [Un reloj con watchOS 9 exige un iPhone con iOS 16, así que la función no llega a quien tenga iOS 15] → Esperable; la app del iPhone sigue funcionando igual en iOS 15.
 
 - [El runtime de watchOS es obligatorio para compilar el esquema `Runner` en simulador] → Hallazgo del spike: `xcodebuild` se niega ("watchOS 26.2 must be installed") y `flutter build ios --simulator` exige `-d <id de simulador>`. Cada desarrollador necesita `xcodebuild -downloadPlatform watchOS` (varios GB); documentarlo en `CLAUDE.md` (tarea 8.1).
@@ -95,6 +94,6 @@ Restricciones que condicionan el diseño:
 
 ## Open Questions
 
-- ~~Mínimo de watchOS y SVG en el catálogo~~ Resuelto en el spike: watchOS 9.0 y SVG compila; falta ver el render en el reloj (tarea 6.2).
+- ~~Mínimo de watchOS y SVG en el catálogo~~ Resuelto: watchOS 9.0; los íconos van como PNG.
 - Tamaños y cantidad de capturas de Apple Watch que pide hoy App Store Connect para la versión.
 - Si el aro del mood de hoy y los colores pastel por mood se envían desde el iPhone o se fijan en el catálogo del reloj; no cambia el contrato de elecciones ni el desglose de tareas.

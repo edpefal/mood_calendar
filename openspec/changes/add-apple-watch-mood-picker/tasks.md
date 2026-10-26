@@ -25,21 +25,21 @@
 
 ## 4. App SwiftUI del reloj
 
-- [ ] 4.1 Implementar el cliente de `WCSession` del reloj: recibir `applicationContext`, guardar el último estado en `UserDefaults` del reloj y enviar elecciones con `transferUserInfo`.
-- [ ] 4.2 Construir la pantalla principal: cuadrícula de dos columnas con carita y nombre, mood de hoy resaltado, háptica y confirmación breve al tocar.
-- [ ] 4.3 Implementar el estado "pendiente de sincronizar" (se quita cuando el iPhone publica el mood de hoy) y el estado vacío "abre Mood Calendar en el iPhone".
-- [ ] 4.4 Textos fijos del reloj localizados en inglés, español, alemán, francés e italiano; etiquetas de VoiceOver por mood y soporte de Dynamic Type.
-- [ ] 4.5 Confirmar que el reloj no usa la red ni incluye Firebase ni `AdSupport`, y que no ofrece compras ni enlaces a la tienda.
+- [x] 4.1 Implementar el cliente de `WCSession` del reloj: recibir `applicationContext`, guardar el último estado en `UserDefaults` del reloj y enviar elecciones con `transferUserInfo`.
+- [x] 4.2 Construir la pantalla principal: cuadrícula de dos columnas con carita y nombre, mood de hoy resaltado, háptica y confirmación breve al tocar.
+- [x] 4.3 Implementar el estado "pendiente de sincronizar" (se quita cuando el iPhone publica el mood de hoy) y el estado vacío "abre Mood Calendar en el iPhone".
+- [x] 4.4 Textos fijos del reloj localizados en inglés, español, alemán, francés e italiano; etiquetas de VoiceOver por mood y soporte de Dynamic Type.
+- [x] 4.5 Confirmar que el reloj no usa la red ni incluye Firebase ni `AdSupport`, y que no ofrece compras ni enlaces a la tienda.
 
 ## 5. Íconos y assets
 
-- [ ] 5.1 Script reproducible en `tool/watch/` que lleva los SVG de `assets/icon/` al catálogo del reloj (SVG o PNG según 1.4), excluyendo `brave.svg`.
-- [ ] 5.2 Rasterizar `brave` a un PNG pequeño solo para el reloj, revisarlo a ojo y decidir si se ofrece o se espera a regenerar el SVG.
-- [ ] 5.3 Ícono de la app de reloj (todos los tamaños que exige Xcode y App Store Connect) y colores pastel por mood alineados con `MoodDefinitionResolver.backgroundGradientForMood`.
+- [x] 5.1 Script reproducible `tool/watch/export_mood_icons.sh` que rasteriza los SVG de `assets/icon/` a PNG @2x/@3x en el catálogo del reloj (PNG por fiabilidad de render; incluye `brave`).
+- [x] 5.2 Revisar a ojo el PNG de `brave` rasterizado (14 KB a 132 px): se ve bien y se ofrece como el resto.
+- [x] 5.3 Ícono de la app de reloj (todos los tamaños que exige Xcode y App Store Connect) (los colores pastel por mood quedan fuera de la primera versión, ver `design.md` decisión 8).
 
 ## 6. Pruebas manuales
 
-- [ ] 6.1 Documentar en `docs/` cómo emparejar un simulador de iPhone con uno de Watch (`xcrun simctl`) y correr ambas apps.
+- [x] 6.1 Documentar en `docs/` cómo emparejar un simulador de iPhone con uno de Watch (`xcrun simctl`) y correr ambas apps. Hecho en `docs/watch-testing.md`.
 - [ ] 6.2 Probar en simuladores emparejados: elegir un mood, nota conservada, iPhone con la app cerrada, reloj sin alcance y compra de un mood premium que aparece en el reloj.
 - [ ] 6.3 Probar en un iPhone y un Apple Watch reales (TestFlight): entrega en cola, idioma del iPhone en el reloj, varias elecciones del mismo día y reinstalación de la app del reloj.
 - [ ] 6.4 Verificar a mano que registrar desde el reloj no dispara el pedido de calificación y que la elección aparece en el calendario, el resumen, la racha y la exportación.
