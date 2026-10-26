@@ -40,20 +40,20 @@
 ## 6. Pruebas manuales
 
 - [x] 6.1 Documentar en `docs/` cómo emparejar un simulador de iPhone con uno de Watch (`xcrun simctl`) y correr ambas apps. Hecho en `docs/watch-testing.md`.
-- [ ] 6.2 Probar en simuladores emparejados: elegir un mood, nota conservada, iPhone con la app cerrada, reloj sin alcance y compra de un mood premium que aparece en el reloj.
+- [ ] 6.2 (Parcial: la interfaz del reloj y el estado vacío se verificaron en el simulador, en los cinco idiomas, y la lógica con XCTest y pruebas de Dart; la sincronización de punta a punta no se pudo ver en simuladores: el iPhone reporta `appInstalled: NO`, ver `docs/watch-testing.md`) Probar en simuladores emparejados: elegir un mood, nota conservada, iPhone con la app cerrada, reloj sin alcance y compra de un mood premium que aparece en el reloj.
 - [ ] 6.3 Probar en un iPhone y un Apple Watch reales (TestFlight): entrega en cola, idioma del iPhone en el reloj, varias elecciones del mismo día y reinstalación de la app del reloj.
 - [ ] 6.4 Verificar a mano que registrar desde el reloj no dispara el pedido de calificación y que la elección aparece en el calendario, el resumen, la racha y la exportación.
 
 ## 7. App Store Connect y release
 
 - [ ] 7.1 Confirmar en App Store Connect los tamaños y la cantidad de capturas de Apple Watch que pide hoy la versión.
-- [ ] 7.2 Añadir a `tool/screenshots/` las capturas de Apple Watch (simulador de Watch con la barra de estado limpia) y generarlas en los cinco idiomas.
+- [x] 7.2 Añadir a `tool/screenshots/` las capturas de Apple Watch (simulador de Watch) y generarlas en los cinco idiomas. Hecho con `tool/screenshots/capture_watch.py`: una captura de la cuadrícula por idioma (416×496, Series 11 de 46 mm); el simulador de Watch no permite fijar la hora, así que la barra muestra la hora real.
 - [ ] 7.3 Preparar la versión (≈1.9.0): notas de la versión, texto promocional, capturas de Watch y revisión de App Privacy (debe seguir igual).
 - [ ] 7.4 Subir la versión en un PR aparte, construir con `scripts/build_ios_release.sh` y enviar a revisión.
 
 ## 8. Documentación y cierre
 
-- [ ] 8.1 Actualizar `CLAUDE.md`: arquitectura (carpeta `lib/features/watch/`, target del reloj, buzón), sección de release (verificaciones con el reloj) y comandos de prueba con simuladores emparejados.
-- [ ] 8.2 Actualizar `backlog.md` (función completada; complicación, notas y app independiente como mejoras futuras) y el estado de la versión.
+- [x] 8.1 Actualizar `CLAUDE.md`: arquitectura (carpeta `lib/features/watch/`, target del reloj, buzón), sección de release (verificaciones con el reloj) y comandos de prueba con simuladores emparejados.
+- [ ] 8.2 Actualizar `backlog.md` (hecho el punto de publicación y las mejoras futuras; falta marcar la función completada al publicarla; complicación, notas y app independiente como mejoras futuras) y el estado de la versión.
 - [ ] 8.3 Abrir los PR en ramas aparte (spike, Dart y nativo, reloj, release) con commits `feat(watch)`/`chore(ios)`, esperar "Analyze and Test", mergear y borrar las ramas.
 - [ ] 8.4 Archivar el change con `/opsx:archive` sincronizando el spec `watch-mood-picker` a `openspec/specs/`.

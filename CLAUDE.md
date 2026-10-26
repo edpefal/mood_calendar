@@ -9,6 +9,7 @@ Flutter app para registrar y revisar estados de ánimo diarios, con un catálogo
 - **Declaraciones de privacidad al día**: App Privacy de Apple (Device ID, Purchase History, Product Interaction y Crash Data; no vinculados, sin rastreo) y Data safety de Play (interacciones en la app, ID de dispositivo, historial de compras y registros de fallos). Ver "Privacidad y declaraciones de las tiendas".
 - **Sitio** `https://moodcalendar.app` activo (política de privacidad, términos y soporte en inglés y español). Ver "Sitio web".
 - **OpenSpec**: 14 specs vigentes y **ningún change activo**.
+- **Apple Watch**: implementada en el change `add-apple-watch-mood-picker` (elegir el mood de hoy desde el reloj). Pendiente de probar la sincronización en un iPhone y un Apple Watch reales, de las capturas de Watch y de publicarla (versión ≈1.9.0). Ver "Apple Watch".
 - **Pendiente**: notificaciones RTDN de Google Play hacia RevenueCat, respaldo de `~/my-release-key.jks` fuera del equipo y el toggle de Crashlytics (ver `backlog.md`).
 
 ## Stack
@@ -27,7 +28,7 @@ Flutter app para registrar y revisar estados de ánimo diarios, con un catálogo
 
 ## Arquitectura
 
-Clean Architecture con tres features (`mood`, `purchases` y `settings`):
+Clean Architecture con cuatro features (`mood`, `purchases`, `settings` y `watch`):
 
 ```
 lib/
@@ -45,6 +46,7 @@ lib/
     │   ├── data/         # datasources (Hive), models, repositories, services (export JSON, pedido de calificación)
     │   ├── domain/       # entities, usecases, repositories, services (resolver, streak calculator, orden del selector, política de calificación)
     │   └── presentation/ # screens, widgets, bloc (Cubits)
+    ├── watch/            # Apple Watch (solo iOS): canal de plataforma, casos de uso que aplican las elecciones del reloj y publican el estado, coordinador y WatchSyncHost
     ├── purchases/        # RevenueCat datasource, MoodEntitlementsRepository (+ Noop), PurchasesCubit, MoodStoreScreen, purchase sheets
     └── settings/         # solo presentation: SettingsScreen + SettingsCubit (recordatorio diario con autoguardado, exportar historial, calificar, privacidad, versión); la persistencia vive en core/settings/
 ```
@@ -53,7 +55,9 @@ lib/
 
 Fuera de `lib/`:
 
-- `scripts/` — builds de release y verificaciones de los artefactos (llave de RevenueCat, Crashlytics, sin ID de publicidad).
+- `scripts/` — builds de release y verificaciones de los artefactos (llave de RevenueCat, Crashlytics, sin ID de publicidad, también sobre la app del reloj).
+- `ios/WatchApp/` — app de Apple Watch (SwiftUI) y `ios/Runner/Watch/` (puente WatchConnectivity del iPhone). Ver "Apple Watch".
+- `tool/watch/` — scripts del target del reloj (`add_watch_target.rb`) y de sus íconos (`export_mood_icons.sh`).
 - `site/` — sitio web estático de `moodcalendar.app` (ver "Sitio web").
 - `aso/` — material de la ficha de las tiendas (reporte ASO, headers de App Store, gráficos de funciones de Play).
 - `tool/screenshots/` — generadores de capturas y arte de las tiendas (ver las secciones de screenshots).
@@ -110,6 +114,21 @@ Cada uno tiene su spec en `openspec/specs/`; leerla antes de cambiarlo.
 - **Calificación** (`rating-prompt`): pedido automático tras guardar con el 3.er y el 7.º día con entradas (máx. 2 en la vida de la instalación, ≥30 días entre intentos), siempre desde el calendario y nunca tras un guardado fallido. La fila "Calificar" de Settings es manual y no cuenta como intento.
 - **Settings** (`settings-screen`): recordatorio diario con **autoguardado** (sin botón Guardar; los cambios se encolan y, si fallan, se revierten con un mensaje), exportar historial, calificar, política de privacidad y versión. Es el único lugar donde se configura el recordatorio; el calendario ya no tiene la campana. Es la cuarta pestaña del bottom bar, no una pantalla apilada.
 - **Exportar historial** (`mood-history-export`): Settings > "Tus datos" genera un JSON v1 (`formatVersion`, `generatedAt`, `entryCount`, `entries[{date, mood, note}]`) y abre la hoja de compartir (anclada a la fila en iPad). `mood` es el id estable (`calm`), nunca la ruta del asset ni `intensity`; un mood desconocido se exporta tal cual en vez de caer en *happy*. El archivo va al directorio temporal y solo se conserva el último.
+
+## Apple Watch
+
+El reloj (solo iOS) permite elegir el mood de **hoy** con un toque. Spec en `openspec/specs/watch-mood-picker/` (o el change `add-apple-watch-mood-picker` mientras siga activo); contrato de sincronización en `docs/watch-sync-contract.md` y pruebas en `docs/watch-testing.md`.
+
+- **El iPhone es la única fuente de verdad (Hive).** El reloj no guarda historial: muestra el último estado que publicó el iPhone (moods **desbloqueados** en el orden del selector, nombres ya localizados por `AppStrings` y el mood de hoy) y manda solo `{id, fecha local, mood, chosenAt}`, nunca `intensity` (ADR 0001). No hay compras en el reloj.
+- **Transporte**: `updateApplicationContext` hacia el reloj y `transferUserInfo` (cola persistente) hacia el iPhone. Swift (`WatchBridge`, `WatchInboxStore`) guarda las elecciones en un buzón en `UserDefaults` porque Hive solo es accesible desde Dart; Dart (`ProcessWatchInboxUseCase`) las aplica conservando la nota del día y **solo después** las confirma (`ackInbox`). `WCSession` se activa en `AppDelegate` al arrancar, antes de Dart.
+- **Cableado** (`lib/main.dart`): solo en iOS; `WatchSyncHost` arranca el coordinador, lo reactiva al volver a primer plano o cambiar el idioma y recarga `MoodCubit`/`CalendarCubit` con `fetchAll`/`refresh` (no con `save`, para no disparar el cambio de pestaña, el pedido de calificación ni analíticas). El reloj no emite eventos de analíticas.
+- **Validación**: `MoodEntitlementsRepository.isUnlocked` devuelve `true` para ids desconocidos, así que el id se valida contra el catálogo antes de preguntar si está desbloqueado. `MoodEntry.mood` guarda la **ruta del asset**, no el id.
+- **Target** (`ios/WatchApp/`, bundle `com.artlab.moodcalendar.watchkitapp`, watchOS 9.0): se crea y se mantiene con `ruby tool/watch/add_watch_target.rb` (gema `xcodeproj` de CocoaPods; idempotente; correrlo al añadir archivos). Tiene `SUPPORTED_PLATFORMS = "watchos watchsimulator"`: sin eso el archive compila el reloj con el SDK de iPhone y falla. La versión del reloj sale de `FLUTTER_BUILD_NAME`/`FLUTTER_BUILD_NUMBER` y debe coincidir con la del iPhone.
+- **Íconos**: `tool/watch/export_mood_icons.sh` rasteriza `assets/icon/*.svg` a PNG @2x/@3x (`brew install librsvg`); incluye `brave`, que así pesa 14 KB.
+- **Requisitos de desarrollo**: el runtime de watchOS (`xcodebuild -downloadPlatform watchOS`, varios GB) es obligatorio hasta para compilar `Runner` en simulador, y `flutter build ios --simulator`/`flutter run` piden `-d <udid>`. En simuladores WatchConnectivity no es fiable (el iPhone ve `appInstalled: NO`); la sincronización de punta a punta se prueba en dispositivos reales.
+- **Release**: el archive incluye `Runner.app/Watch/WatchApp.app` y `verify_ios_archive_no_ad_id.sh` también revisa su binario y su `Info.plist`. Todo `main` que contenga el target lo publica en el siguiente IPA: no mergear cambios del reloj a medias.
+- **Privacidad**: sin cambios. El reloj no usa la red ni lleva Firebase, RevenueCat ni `AdSupport`.
+- **Fuera de la primera versión**: complicación en la esfera, app independiente, notas, días pasados, colores pastel por mood y acciones en la notificación del recordatorio (ver `backlog.md`).
 
 ## Compras in-app (RevenueCat)
 
@@ -254,7 +273,7 @@ Cambios no triviales siguen el flujo OpenSpec: proponer (`/opsx:propose`) → im
 
 ## Testing
 
-- Tests unitarios y de widget en `test/` (hoy 262 en 27 archivos): repositorio, resolver, streak calculator, orden del selector, summary usecase, política y servicio de calificación, exportador JSON, `MoodCubit`, `MoodScreen`, `PurchasesCubit` (incluye los eventos de compras), `SettingsCubit` y `SettingsScreen` (incluye el interruptor de datos de uso), y la telemetría (`AnalyticsAppTelemetry`, `initializeAnalytics`, `initializeCrashReporting`). Los fakes están en `test/support/`: `fake_mood_entitlements_repository.dart` (compras), `fake_crash_reporter.dart` (fallos y `RecordingLogger`) y `fake_analytics_reporter.dart` (analíticas). Las pantallas que usan `SettingsScreen.forApp()` necesitan un `RepositoryProvider<AnalyticsReporter>` (en tests, `NoopAnalyticsReporter`).
+- Tests unitarios y de widget en `test/` (hoy 289 en 32 archivos): repositorio, resolver, streak calculator, orden del selector, summary usecase, política y servicio de calificación, exportador JSON, `MoodCubit`, `MoodScreen`, `PurchasesCubit` (incluye los eventos de compras), `SettingsCubit` y `SettingsScreen` (incluye el interruptor de datos de uso), y la telemetría (`AnalyticsAppTelemetry`, `initializeAnalytics`, `initializeCrashReporting`). Los fakes están en `test/support/`: `fake_mood_entitlements_repository.dart` (compras), `fake_crash_reporter.dart` (fallos y `RecordingLogger`) y `fake_analytics_reporter.dart` (analíticas), `fake_watch_channel.dart` (buzón del reloj) e `in_memory_mood_repository.dart`. La lógica de Swift se prueba con XCTest en `ios/RunnerTests/` (buzón del iPhone y modelo del reloj). Las pantallas que usan `SettingsScreen.forApp()` necesitan un `RepositoryProvider<AnalyticsReporter>` (en tests, `NoopAnalyticsReporter`).
 - Las pantallas con efectos de plataforma reciben esos efectos inyectados para poder probarlos sin plugins: `SettingsScreen` toma `openUrl` y `shareFile`, `SettingsCubit` toma `scheduleReminder`/`cancelReminder`/`loadAppVersion`, el exportador toma `directoryProvider`.
 - Siguen sin cubrirse la programación real de notificaciones (`LocalNotificationService` solo prueba el idioma) ni la navegación por notificación (pendiente en `backlog.md`).
 
