@@ -1,10 +1,10 @@
 ## 1. Spike: el target de watchOS dentro del proyecto
 
-- [ ] 1.1 Crear desde Xcode el target "Watch App" (SwiftUI, watchOS 9.0, bundle id `com.artlab.moodcalendar.watchkitapp`) embebido en `Runner`, con el mismo equipo de firma, y revisar el diff de `ios/Runner.xcodeproj/project.pbxproj`.
-- [ ] 1.2 Comprobar que `flutter build ios --simulator` (debug) y `flutter run` en un simulador de iPhone siguen compilando y que `pod install` no cambia nada inesperado en `Podfile.lock`.
-- [ ] 1.3 Generar un archive real con `REVENUECAT_IOS_API_KEY=<key> STORE_VERIFIED=1 scripts/build_ios_release.sh` y comprobar que pasa `verify_ios_archive_key.sh`, `verify_ios_archive_crash_reporting.sh` y `verify_ios_archive_no_ad_id.sh` con `Watch/` dentro de `Runner.app`; adaptar los scripts con cambios mínimos si alguno falla y anotarlo.
-- [ ] 1.4 Decidir con evidencia el mínimo de watchOS y si el catálogo de assets del reloj acepta SVG; registrar ambos en `design.md` (Decisiones 1 y 9) y cerrar las dos primeras preguntas abiertas.
-- [ ] 1.5 Si el spike falla de forma que no se resuelve con cambios pequeños, detenerse y replantear con el usuario antes de seguir.
+- [x] 1.1 Crear desde Xcode el target "Watch App" (SwiftUI, watchOS 9.0, bundle id `com.artlab.moodcalendar.watchkitapp`) embebido en `Runner`, con el mismo equipo de firma, y revisar el diff de `ios/Runner.xcodeproj/project.pbxproj`. Hecho con `tool/watch/add_watch_target.rb` (gema `xcodeproj` de CocoaPods, idempotente) en vez de la interfaz de Xcode: el diff son solo líneas añadidas.
+- [x] 1.2 Comprobar que `flutter build ios --simulator` (debug) y `flutter run` en un simulador de iPhone siguen compilando y que `pod install` no cambia nada inesperado en `Podfile.lock`. Hecho con `flutter build ios --simulator -d <id>` (necesita el runtime de watchOS instalado); `Podfile.lock` no cambió. `flutter run` se prueba en la tarea 6.2.
+- [x] 1.3 Generar un archive real con `REVENUECAT_IOS_API_KEY=<key> STORE_VERIFIED=1 scripts/build_ios_release.sh` y comprobar que pasa `verify_ios_archive_key.sh`, `verify_ios_archive_crash_reporting.sh` y `verify_ios_archive_no_ad_id.sh` con `Watch/` dentro de `Runner.app`; adaptar los scripts con cambios mínimos si alguno falla y anotarlo. Hecho: las tres pasan; `verify_ios_archive_no_ad_id.sh` ahora también revisa el binario y el `Info.plist` del reloj. El archive solo se hizo como prueba y no se subió.
+- [x] 1.4 Decidir con evidencia el mínimo de watchOS y si el catálogo de assets del reloj acepta SVG; registrar ambos en `design.md` (Decisiones 1 y 9) y cerrar las dos primeras preguntas abiertas.
+- [x] 1.5 Si el spike falla de forma que no se resuelve con cambios pequeños, detenerse y replantear con el usuario antes de seguir. No hizo falta: los dos problemas del spike (runtime de watchOS y `SUPPORTED_PLATFORMS`) se resolvieron sin replantear.
 
 ## 2. Contrato y canal nativo en el iPhone
 

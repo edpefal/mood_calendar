@@ -27,7 +27,7 @@ Restricciones que condicionan el diseño:
 ## Decisions
 
 1. **App de reloj companion de un solo target (watchOS 9.0 como mínimo).**
-   Un target "Watch App" embebido en `Runner`, con bundle id `com.artlab.moodcalendar.watchkitapp`. watchOS 9 cubre relojes recientes sin forzar iOS 17 (watchOS 10 exigiría iPhone con iOS 17). Por eso la interfaz usa una cuadrícula de dos columnas con desplazamiento por la corona digital, disponible desde watchOS 6, y no `TabView` vertical (watchOS 10). El spike confirma el mínimo. *Alternativas:* watchOS 10+ (más cómodo, excluye iPhones con iOS 15 y 16); app independiente con almacenamiento propio (descartada: obliga a sincronizar dos copias).
+   Un target "Watch App" embebido en `Runner`, con bundle id `com.artlab.moodcalendar.watchkitapp`. watchOS 9 cubre relojes recientes sin forzar iOS 17 (watchOS 10 exigiría iPhone con iOS 17). Por eso la interfaz usa una cuadrícula de dos columnas con desplazamiento por la corona digital, disponible desde watchOS 6, y no `TabView` vertical (watchOS 10). **Spike (2026-10-26): confirmado.** El target compila para simulador y dispositivo con watchOS 9.0, el archive se firma y exporta, y `Runner.app/Watch/WatchApp.app` entra en el IPA con la misma versión y número de build que el iPhone. *Alternativas:* watchOS 10+ (más cómodo, excluye iPhones con iOS 15 y 16); app independiente con almacenamiento propio (descartada: obliga a sincronizar dos copias).
 
 2. **Transporte: `applicationContext` hacia el reloj y `transferUserInfo` hacia el iPhone.**
    - iPhone → reloj: `updateApplicationContext` con el último estado (`version`, `locale`, `moods: [{id, name}]` ordenados, `today: id | null`). Es "último valor gana" y se entrega aunque la app del reloj esté cerrada.
@@ -56,7 +56,7 @@ Restricciones que condicionan el diseño:
    SwiftUI: cuadrícula de dos columnas con la carita y su nombre, el mood de hoy resaltado con un aro, retroalimentación háptica y una confirmación breve al tocar, e indicación de "pendiente" hasta que el iPhone publique el mood de hoy. Estado vacío cuando aún no hay estado. Respeta Dynamic Type y VoiceOver (cada mood es un botón con etiqueta). Los colores pastel por mood vienen de la misma regla que `MoodDefinitionResolver.backgroundGradientForMood` (`MaterialColor.shade50`/`shade200`), enviados o replicados como valores fijos de los moods base y premium en el catálogo de assets del reloj.
 
 9. **Íconos.**
-   Los SVG de `assets/icon/` se llevan al catálogo de assets del reloj: como SVG vectorial si el spike confirma que watchOS 9 los soporta, o como PNG @2x/@3x generados con un script reproducible (`tool/watch/`) si no. `brave.svg` (1 MB) nunca se copia: se rasteriza a un PNG pequeño y se revisa a ojo. Faltan además el ícono de la app de reloj y los tamaños que pide App Store Connect.
+   Los SVG de `assets/icon/` se llevan al catálogo de assets del reloj: como SVG vectorial si el spike confirma que watchOS 9 los soporta, o como PNG @2x/@3x generados con un script reproducible (`tool/watch/`) si no. **Spike:** un `imageset` SVG compila con `actool` para watchOS 9.0 (queda por ver en pantalla, en tarea 6.2); si el render falla se usan PNG. `brave.svg` (1 MB) nunca se copia: se rasteriza a un PNG pequeño y se revisa a ojo. Faltan además el ícono de la app de reloj y los tamaños que pide App Store Connect.
 
 10. **Release y verificación.**
     El spike debe demostrar que el archive con el reloj embebido pasa `scripts/build_ios_release.sh` y sus tres verificaciones. `verify_ios_archive_no_ad_id.sh` ya recorre binarios y `Info.plist`, y es probable que se aplique también al del reloj (sin `AdSupport` ni `NSUserTrackingUsageDescription`). `verify_ios_archive_key.sh` y `verify_ios_archive_crash_reporting.sh` miran `Runner.app` y sus dSYM y deben tolerar la carpeta `Watch/`. Si alguna falla, se adapta con un cambio mínimo y se documenta en `CLAUDE.md`.
@@ -80,6 +80,10 @@ Restricciones que condicionan el diseño:
 - [El PNG de `brave` puede verse mal al rasterizarlo] → Revisarlo a ojo y, si hace falta, esperar a regenerar el SVG (backlog) antes de ofrecer ese mood en el reloj.
 - [Un reloj con watchOS 9 exige un iPhone con iOS 16, así que la función no llega a quien tenga iOS 15] → Esperable; la app del iPhone sigue funcionando igual en iOS 15.
 
+- [El runtime de watchOS es obligatorio para compilar el esquema `Runner` en simulador] → Hallazgo del spike: `xcodebuild` se niega ("watchOS 26.2 must be installed") y `flutter build ios --simulator` exige `-d <id de simulador>`. Cada desarrollador necesita `xcodebuild -downloadPlatform watchOS` (varios GB); documentarlo en `CLAUDE.md` (tarea 8.1).
+- [Un IPA de cualquier release incluye el reloj apenas el target llegue a `main`] → Hallazgo del spike: el target vacío de prueba viajaría en un release. No mergear el target a `main` hasta que la app del reloj sea funcional; acumular el trabajo en una rama de funcionalidad y mergear de una vez (o detrás de la primera versión que lo publique).
+- [El archive compilaba el reloj con el SDK de iPhone] → Corregido en `tool/watch/add_watch_target.rb` con `SUPPORTED_PLATFORMS = "watchos watchsimulator"`; sin eso, `actool` fallaba con "AppIcon did not have any applicable content".
+
 ## Migration Plan
 
 1. Rama `feat/watch-spike` con solo el target vacío y la verificación del archive; si pasa, seguir.
@@ -91,6 +95,6 @@ Restricciones que condicionan el diseño:
 
 ## Open Questions
 
-- Confirmar en el spike el mínimo de watchOS (9.0 propuesto) y si los SVG funcionan en el catálogo de assets del reloj o hay que usar PNG.
+- ~~Mínimo de watchOS y SVG en el catálogo~~ Resuelto en el spike: watchOS 9.0 y SVG compila; falta ver el render en el reloj (tarea 6.2).
 - Tamaños y cantidad de capturas de Apple Watch que pide hoy App Store Connect para la versión.
 - Si el aro del mood de hoy y los colores pastel por mood se envían desde el iPhone o se fijan en el catálogo del reloj; no cambia el contrato de elecciones ni el desglose de tareas.
