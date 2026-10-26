@@ -8,11 +8,11 @@
 
 ## 2. Contrato y canal nativo en el iPhone
 
-- [ ] 2.1 Definir el contrato en un solo documento corto (`docs/watch-sync-contract.md`): estado publicado (`version`, `locale`, `moods[{id,name}]`, `today`) y elección enviada (`id`, `date`, `mood`, `chosenAt`), con ejemplos.
-- [ ] 2.2 Implementar en Swift el almacén del buzón (arreglo JSON versionado en `UserDefaults`, deduplicación por `id`, lectura y confirmación por ids) como lógica pura y testeable.
-- [ ] 2.3 Implementar el puente de `WCSession` en el iPhone: activación en `AppDelegate.application(_:didFinishLaunchingWithOptions:)`, recepción de `didReceiveUserInfo` hacia el buzón y publicación de `updateApplicationContext`.
-- [ ] 2.4 Registrar el `MethodChannel` (`readInbox`, `ackInbox`, `publishState`) y el aviso de elección nueva en `didInitializeImplicitFlutterEngine`, sin bloquear el arranque.
-- [ ] 2.5 Pruebas XCTest del almacén del buzón en `RunnerTests` (deduplicar, confirmar solo lo aplicado, sobrevivir a un reinicio simulado), si resultan baratas.
+- [x] 2.1 Definir el contrato en un solo documento corto (`docs/watch-sync-contract.md`): estado publicado (`version`, `locale`, `moods[{id,name}]`, `today`) y elección enviada (`id`, `date`, `mood`, `chosenAt`), con ejemplos.
+- [x] 2.2 Implementar en Swift el almacén del buzón (arreglo JSON versionado en `UserDefaults`, deduplicación por `id`, lectura y confirmación por ids) como lógica pura y testeable.
+- [x] 2.3 Implementar el puente de `WCSession` en el iPhone: activación en `AppDelegate.application(_:didFinishLaunchingWithOptions:)`, recepción de `didReceiveUserInfo` hacia el buzón y publicación de `updateApplicationContext`.
+- [x] 2.4 Registrar el `MethodChannel` (`readInbox`, `ackInbox`, `publishState`) y el aviso de elección nueva en `didInitializeImplicitFlutterEngine`, sin bloquear el arranque.
+- [x] 2.5 Pruebas XCTest del almacén del buzón en `RunnerTests` (deduplicar, confirmar solo lo aplicado, sobrevivir a un reinicio simulado), si resultan baratas.
 
 ## 3. Caso de uso y cableado en Dart
 
