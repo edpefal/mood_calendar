@@ -55,7 +55,7 @@ Para que el reloj sepa que su elección ya fue procesada (aplicada o descartada)
 
 ### D8. Productos, ofertas y entitlement en las tiendas
 - **iOS (App Store Connect)**: grupo "Mood Calendar Premium"; suscripciones `premium_weekly` (1 semana), `premium_monthly` (1 mes) y `premium_annual` (1 año), con orden de niveles anual > mensual > semanal; precio base USD $0.99 / $2.99 / $14.99 con equivalencias automáticas por territorio; oferta de introducción gratis de 3 días en las tres para clientes nuevos; nombre y descripción visibles en los 5 idiomas; captura de revisión de la pantalla Premium. Compartir en Familia desactivado.
-- **Android (Play Console)**: suscripción `premium` con planes base `weekly`, `monthly` y `annual` (renovación automática, mismo precio base) y una oferta de prueba gratis de 3 días para clientes nuevos en cada uno.
+- **Android (Play Console)**: suscripción `premium` con planes base `weekly`, `monthly` y `annual` (renovación automática, mismo precio base) y una oferta de prueba gratis de 3 días para clientes nuevos en cada uno. En RevenueCat los productos de Android se registran como `premium:weekly`, `premium:monthly` y `premium:annual` (`<suscripción>:<plan base>`).
 - **RevenueCat**: productos importados en las dos apps, entitlement `premium` con los 6 productos adjuntos y los paquetes `$rc_weekly`, `$rc_monthly`, `$rc_annual` añadidos a `default` (los 18 paquetes viejos se quedan hasta retirarlos de la venta).
 - Se hace por API y paso a paso con confirmación del usuario. En Play, la ubicación de las credenciales la indica el usuario; la app nunca las busca. La versión de producción de Play se confirma a mano.
 
