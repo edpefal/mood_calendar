@@ -6,12 +6,13 @@
 
 ## 2. Productos y configuración en las tiendas (cada paso se muestra al usuario antes de ejecutarlo)
 
-- [ ] 2.1 App Store Connect: crear el grupo "Mood Calendar Premium" y las suscripciones `premium_weekly`, `premium_monthly` y `premium_annual` (niveles anual > mensual > semanal, Compartir en Familia desactivado)
-- [ ] 2.2 App Store Connect: precio base USD $0.99 / $2.99 / $14.99 con equivalencias por territorio, oferta de introducción gratis de 3 días para clientes nuevos en los tres productos
-- [ ] 2.3 App Store Connect: nombre y descripción de cada plan en inglés, español, alemán, francés e italiano, y captura de revisión de la pantalla Premium
-- [ ] 2.4 Play Console / API de Play: crear la suscripción `premium` con los planes base `weekly`, `monthly` y `annual`, mismo precio base y oferta de prueba gratis de 3 días para clientes nuevos (pedir al usuario la ubicación de las credenciales; no buscarlas)
-- [ ] 2.5 RevenueCat: importar los productos en las apps iOS y Android, crear el entitlement `premium`, adjuntarle los 6 productos y añadir los paquetes `$rc_weekly`, `$rc_monthly` y `$rc_annual` a la oferta `default` sin quitar los 18 paquetes viejos
-- [ ] 2.6 Comprobar con una compilación de desarrollo que la oferta `default` devuelve los 3 paquetes nuevos y que 1.9.0 (TestFlight) sigue cargando su tienda sin errores
+- [x] 2.1 App Store Connect: crear el grupo "Mood Calendar Premium" y las suscripciones `premium_weekly`, `premium_monthly` y `premium_annual` (niveles anual > mensual > semanal, Compartir en Familia desactivado). Hecho el 2026-10-31 por API; antes de poner precios Apple exige crear la disponibilidad de cada suscripción (las 175 regiones de la app).
+- [x] 2.2 App Store Connect: precio base USD $0.99 / $2.99 / $14.99 con equivalencias por territorio, oferta de introducción gratis de 3 días para clientes nuevos en los tres productos. Hecho: precio en 175 de 175 regiones y prueba gratis en 175 de 175 por suscripción (la oferta de introducción se crea región por región; unas 500 llamadas por cada una, a ~4 s cada una).
+- [x] 2.3 App Store Connect: nombre y descripción de cada plan en inglés, español, alemán, francés e italiano. Hecho; las tres suscripciones siguen en `MISSING_METADATA` hasta subir la captura de revisión (2.7).
+- [x] 2.4 Play Console / API de Play: crear la suscripción `premium` con los planes base `weekly`, `monthly` y `annual`, mismo precio base y oferta de prueba gratis de 3 días para clientes nuevos. Hecho por API con la cuenta de servicio `play-publisher` (la ruta la autorizó el usuario); planes y ofertas `trial` activos. Play exige un listado en el idioma por defecto de la app; el idioma por defecto pasó de `es-419` a `en-US` por decisión del usuario (se subió el ícono de 512×512 al listado en inglés).
+- [x] 2.5 RevenueCat: importar los productos en las apps iOS y Android, crear el entitlement `premium`, adjuntarle los 6 productos y añadir los paquetes `$rc_weekly`, `$rc_monthly` y `$rc_annual` a la oferta `default` sin quitar los 18 paquetes viejos. Hecho: iOS `premium_weekly|monthly|annual`, Android `premium:weekly|monthly|annual`; la oferta `default` sigue siendo la actual.
+- [x] 2.6 Comprobar que la 1.9.0 (TestFlight, build 37) sigue cargando su tienda sin errores con los paquetes nuevos en `default`. Confirmado por el usuario el 2026-10-31. Que la oferta devuelve los 3 paquetes nuevos se comprueba con la app de la 1.10.0 (grupo 4).
+- [ ] 2.7 App Store Connect: subir la captura de revisión de la pantalla Premium a las tres suscripciones, cuando la pantalla exista (grupo 4)
 
 ## 3. Dominio y datos de compras
 
