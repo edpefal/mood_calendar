@@ -46,14 +46,14 @@
 
 ## 7. App Store Connect y release
 
-- [ ] 7.1 Confirmar en App Store Connect los tamaños y la cantidad de capturas de Apple Watch que pide hoy la versión.
+- [x] 7.1 Confirmar en App Store Connect los tamaños y la cantidad de capturas de Apple Watch que pide hoy la versión. Confirmado subiéndolas por API: el conjunto `APP_WATCH_SERIES_10` acepta 416×496 (PNG sin transparencia); se subió una captura por idioma.
 - [x] 7.2 Añadir a `tool/screenshots/` las capturas de Apple Watch (simulador de Watch) y generarlas en los cinco idiomas. Hecho con `tool/screenshots/capture_watch.py`: una captura de la cuadrícula por idioma (416×496, Series 11 de 46 mm); el simulador de Watch no permite fijar la hora, así que la barra muestra la hora real.
-- [ ] 7.3 Preparar la versión (≈1.9.0): notas de la versión, texto promocional, capturas de Watch y revisión de App Privacy (debe seguir igual).
-- [ ] 7.4 Subir la versión en un PR aparte, construir con `scripts/build_ios_release.sh` y enviar a revisión.
+- [x] 7.3 Preparar la versión (≈1.9.0): notas de la versión, texto promocional, descripción con la sección "Apple Watch", capturas de Watch y notas para el revisor, en los 5 idiomas. App Privacy no cambia. Hubo que responder además el cuestionario de clasificación por edad (sigue en 4+).
+- [x] 7.4 Subir la versión, construir con `scripts/build_ios_release.sh` y enviar a revisión. El bump a 1.9.0+37 fue un commit del PR #113 (no un PR aparte); el build 37 es el de TestFlight y se envió a revisión el 2026-10-31.
 
 ## 8. Documentación y cierre
 
 - [x] 8.1 Actualizar `CLAUDE.md`: arquitectura (carpeta `lib/features/watch/`, target del reloj, buzón), sección de release (verificaciones con el reloj) y comandos de prueba con simuladores emparejados.
-- [ ] 8.2 Actualizar `backlog.md` (hecho el punto de publicación y las mejoras futuras; falta marcar la función completada al publicarla; complicación, notas y app independiente como mejoras futuras) y el estado de la versión.
-- [ ] 8.3 Abrir los PR en ramas aparte (spike, Dart y nativo, reloj, release) con commits `feat(watch)`/`chore(ios)`, esperar "Analyze and Test", mergear y borrar las ramas.
+- [x] 8.2 Actualizar `backlog.md` (publicación en revisión; complicación, notas y app independiente como mejoras futuras) y el estado de la versión en `CLAUDE.md`. La marca de función completada queda para cuando Apple apruebe la 1.9.0.
+- [x] 8.3 Abrir el PR con los commits `feat(watch)`/`chore(ios)`, esperar "Analyze and Test", mergear y borrar la rama. Se hizo en un único PR (#113) con los 7 commits, por decisión del usuario.
 - [ ] 8.4 Archivar el change con `/opsx:archive` sincronizando el spec `watch-mood-picker` a `openspec/specs/`.
