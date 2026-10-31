@@ -1,8 +1,8 @@
 ## 1. Prerrequisitos y rama
 
-- [ ] 1.1 Confirmar que `add-apple-watch-mood-picker` está publicado (1.9.0), mergeado a `main` y archivado; si no, no empezar la implementación (este change solo tiene los artefactos)
-- [ ] 1.2 Crear la rama `feat/premium-subscription` desde `main` actualizado y comprobar `flutter analyze` y `flutter test` en verde
-- [ ] 1.3 Revisar en RevenueCat (gráficos de ventas no consumibles y de ingresos) si hubo compras reales del intervalo 1.8.x–1.9.0 y anotar el resultado en el PR
+- [x] 1.1 Confirmar que `add-apple-watch-mood-picker` está mergeado a `main` y archivado (PR #113 y #116). La 1.9.0 sigue en revisión de Apple; se empieza igualmente por decisión del usuario, y si Apple pide cambios se corrigen con un change nuevo.
+- [x] 1.2 Crear la rama `feat/premium-subscription` desde `main` actualizado y comprobar `flutter analyze` y `flutter test` en verde. Línea base: analyze sin incidencias y 289 tests en verde.
+- [x] 1.3 Revisar en RevenueCat (gráficos de ventas no consumibles y de ingresos) si hubo compras reales del intervalo 1.8.x–1.9.0 y anotar el resultado en el PR. Resultado a 2026-10-31: 0 compras no consumibles y $0 de ingresos desde la creación del proyecto (2026-09-25).
 
 ## 2. Productos y configuración en las tiendas (cada paso se muestra al usuario antes de ejecutarlo)
 
@@ -16,28 +16,28 @@
 
 ## 3. Dominio y datos de compras
 
-- [ ] 3.1 Crear `SubscriptionPlan`, `SubscriptionPlanType` y `SubscriptionStatus` en `lib/features/purchases/domain/entities/`; borrar `MoodPack` y `MoodOffer`
-- [ ] 3.2 Reescribir `MoodEntitlementsRepository` (D2): `availablePlans`, `purchasePlan`, `subscriptionStatus`, `restorePurchases`, `unlockedPremiumMoodIds`, `isUnlocked`
-- [ ] 3.3 Reescribir `MoodEntitlementsRepositoryImpl`: `premium` activo desbloquea todos los ids premium del catálogo; si no, se leen los `mood_*` heredados; paquetes por `PackageType`; `SubscriptionStatus` desde `CustomerInfo`
-- [ ] 3.4 Elegibilidad de la prueba: `checkTrialOrIntroductoryPriceEligibility` en iOS y opciones de suscripción en Android; cualquier error o estado desconocido ⇒ no elegible
-- [ ] 3.5 Cálculo del ahorro del plan anual con los precios numéricos de la tienda (sin porcentajes fijos); adaptar `NoopMoodEntitlementsRepository` y los fakes de `test/support/`
-- [ ] 3.6 Tests de Dart del repositorio: `premium` desbloquea todo; `mood_*` heredados sin suscripción; suscripción más heredados; vencimiento; paquetes ausentes; elegibilidad; errores de compra; restaurar
+- [x] 3.1 Crear `SubscriptionPlan`, `SubscriptionPlanType` y `SubscriptionStatus` en `lib/features/purchases/domain/entities/`; borrar `MoodPack` y `MoodOffer` Hecho: `SubscriptionPlan`, `SubscriptionPlanType` y `SubscriptionStatus`; `MoodPack` y `MoodOffer` borrados.
+- [x] 3.2 Reescribir `MoodEntitlementsRepository` (D2): `availablePlans`, `purchasePlan`, `subscriptionStatus`, `restorePurchases`, `unlockedPremiumMoodIds`, `isUnlocked` Hecho: `availablePlans`, `purchasePlan`, `subscriptionStatus`, `restorePurchases`, `unlockedPremiumMoodIds` e `isUnlocked`.
+- [x] 3.3 Reescribir `MoodEntitlementsRepositoryImpl`: `premium` activo desbloquea todos los ids premium del catálogo; si no, se leen los `mood_*` heredados; paquetes por `PackageType`; `SubscriptionStatus` desde `CustomerInfo` Hecho; el plan se deduce del producto de iOS (`premium_weekly`) o del plan base de Android (`weekly`).
+- [x] 3.4 Elegibilidad de la prueba: `checkTrialOrIntroductoryPriceEligibility` en iOS y opciones de suscripción en Android; cualquier error o estado desconocido ⇒ no elegible Hecho en el datasource: iOS con `checkTrialOrIntroductoryPriceEligibility` y Android con la fase gratis de la opción por defecto. La elegibilidad de Android se confirma en la pista interna (9.3).
+- [x] 3.5 Cálculo del ahorro del plan anual con los precios numéricos de la tienda (sin porcentajes fijos); adaptar `NoopMoodEntitlementsRepository` y los fakes de `test/support/` Hecho (`annualSavingsPercent`, `NoopMoodEntitlementsRepository` y el fake de `test/support/`); el entrypoint de capturas también se adaptó.
+- [x] 3.6 Tests de Dart del repositorio: `premium` desbloquea todo; `mood_*` heredados sin suscripción; suscripción más heredados; vencimiento; paquetes ausentes; elegibilidad; errores de compra; restaurar 27 tests del repositorio (incluye planes, elegibilidad, heredados, vencimiento, compra y restauración).
 
 ## 4. Cubit y pantalla Premium
 
-- [ ] 4.1 Reescribir `PurchasesCubit`/`PurchasesState` (planes, plan seleccionado, estado de suscripción, `actionStatus`, reintento de carga) con los parámetros `plan` y `source` en la telemetría
-- [ ] 4.2 Crear `PremiumScreen` y `PremiumPlansView` (escaparate de caritas, tarjetas de plan con el anual preseleccionado y "Mejor valor", botón principal, texto legal con enlaces a Términos y Privacidad, "Restaurar compras") y el estado de suscrito con plan, fecha y "Gestionar suscripción"
-- [ ] 4.3 Conservar la recuperación cuando los planes no cargan (error, reintentar, reintento al volver a la pestaña) y la accesibilidad (`Semantics` en todo control)
-- [ ] 4.4 Crear `showPremiumSheet(context, source)`; borrar `MoodStoreScreen`, `mood_purchase_sheet.dart` y `pack_purchase_sheet.dart`
-- [ ] 4.5 Pestaña "Premium": nombre, icono (estrella o diamante outlined) y etiqueta de accesibilidad en `MainShell`/`FloatingTabBar`; quitar el acceso a la tienda del header
-- [ ] 4.6 Tests de widget: planes y selección, texto del botón según elegibilidad, estado de suscrito y en prueba, error con reintento, restaurar, iPad y texto al 200 %
+- [x] 4.1 Reescribir `PurchasesCubit`/`PurchasesState` (planes, plan seleccionado, estado de suscripción, `actionStatus`, reintento de carga) con los parámetros `plan` y `source` en la telemetría Hecho: `selectPlan`, `purchaseSelectedPlan`, `trackPremiumOpened(PremiumSource)` y estado `restored` para distinguir una restauración.
+- [x] 4.2 Crear `PremiumScreen` y `PremiumPlansView` (escaparate de caritas, tarjetas de plan con el anual preseleccionado y "Mejor valor", botón principal, texto legal con enlaces a Términos y Privacidad, "Restaurar compras") y el estado de suscrito con plan, fecha y "Gestionar suscripción" Hecho en `PremiumScreen` y `PremiumPlansView` (`premium_plans_view.dart`).
+- [x] 4.3 Conservar la recuperación cuando los planes no cargan (error, reintentar, reintento al volver a la pestaña) y la accesibilidad (`Semantics` en todo control) Hecho: error con reintento, reintento al volver a la pestaña, `Semantics` en las tarjetas y botones.
+- [x] 4.4 Crear `showPremiumSheet(context, source)`; borrar `MoodStoreScreen`, `mood_purchase_sheet.dart` y `pack_purchase_sheet.dart` Hecho: `showPremiumSheet`; `MoodStoreScreen` y las dos hojas de compra borradas.
+- [x] 4.5 Pestaña "Premium": nombre, icono (estrella o diamante outlined) y etiqueta de accesibilidad en `MainShell`/`FloatingTabBar`; quitar el acceso a la tienda del header Hecho: pestaña `MainTab.premium` con el icono `diamond_outlined`; el header ya no tenía acceso a la tienda.
+- [x] 4.6 Tests de widget: planes y selección, texto del botón según elegibilidad, estado de suscrito y en prueba, error con reintento, restaurar, iPad y texto al 200 % 30 tests de la pantalla (planes, texto del botón, suscrito, errores, restaurar, enlaces y 200 % de texto en los 5 idiomas a 390 pt). Falta revisar iPad a ojo en simulador (9.4).
 
 ## 5. Selector de moods
 
-- [ ] 5.1 Función `canSaveWithMood` (D5) con tests unitarios: mood desbloqueado, mismo mood de la entrada existente, mood distinto bloqueado, fecha sin entrada
-- [ ] 5.2 `MoodScreen`: abrir `showPremiumSheet(source: lockedMood)` al tocar el mood bloqueado seleccionado, en la hoja de cuadrícula y al guardar con un mood bloqueado distinto; permitir guardar la nota con el mismo mood caducado
-- [ ] 5.3 Actualizar los tests de `mood_screen_test.dart` y `mood_picker_order_test.dart` (suscripción reordena al volver, restaurar reordena al volver, conservar la selección sin guardar)
-- [ ] 5.4 Verificar que el calendario, el resumen mensual y la exportación siguen mostrando las entradas con moods premium cuando la suscripción vence
+- [x] 5.1 Función `canSaveWithMood` (D5) con tests unitarios: mood desbloqueado, mismo mood de la entrada existente, mood distinto bloqueado, fecha sin entrada Hecho: `canSaveWithMood` con 5 tests.
+- [x] 5.2 `MoodScreen`: abrir `showPremiumSheet(source: lockedMood)` al tocar el mood bloqueado seleccionado, en la hoja de cuadrícula y al guardar con un mood bloqueado distinto; permitir guardar la nota con el mismo mood caducado Hecho en `mood_screen.dart` (mood seleccionado, hoja de cuadrícula y Guardar).
+- [x] 5.3 Actualizar los tests de `mood_screen_test.dart` y `mood_picker_order_test.dart` (suscripción reordena al volver, restaurar reordena al volver, conservar la selección sin guardar) Hecho; 3 tests nuevos de quien deja de pagar.
+- [x] 5.4 Verificar que el calendario, el resumen mensual y la exportación siguen mostrando las entradas con moods premium cuando la suscripción vence Verificado por código y tests: el calendario, el resumen y la exportación no leen los entitlements, solo `MoodScreen`, `MoodPickerOrder` y el reloj.
 
 ## 6. Apple Watch
 
@@ -47,9 +47,9 @@
 
 ## 7. Analíticas y cadenas
 
-- [ ] 7.1 Añadir `plan` a `analyticsParameterAllowlist`; enviar `source` en `store_opened` y `plan` en `purchase_started`/`purchase_completed`; tests de `AnalyticsAppTelemetry` y del cubit (sin ids de moods)
-- [ ] 7.2 Cadenas nuevas en `app_strings.dart` y en los 5 idiomas (nombre de la pestaña, planes, "Mejor valor", botones, texto legal, estado de suscrito, errores) y retirar las de Packs, compras sueltas y avisos de solape
-- [ ] 7.3 Revisar la fijación de idioma de los enlaces de Términos y Privacidad (`/terms/`, `/es/terms/`, etc.)
+- [x] 7.1 Añadir `plan` a `analyticsParameterAllowlist`; enviar `source` en `store_opened` y `plan` en `purchase_started`/`purchase_completed`; tests de `AnalyticsAppTelemetry` y del cubit (sin ids de moods) Hecho (`plan` en la lista de parámetros; tests de `AnalyticsAppTelemetry` y del cubit).
+- [x] 7.2 Cadenas nuevas en `app_strings.dart` y en los 5 idiomas (nombre de la pestaña, planes, "Mejor valor", botones, texto legal, estado de suscrito, errores) y retirar las de Packs, compras sueltas y avisos de solape Hecho en los 5 idiomas; se borraron las cadenas de Packs, compras sueltas y avisos de solape.
+- [x] 7.3 Revisar la fijación de idioma de los enlaces de Términos y Privacidad (`/terms/`, `/es/terms/`, etc.) Hecho: los enlaces usan `/terms/` y `/privacy/`, y las versiones `/es/` si el idioma del dispositivo es español.
 
 ## 8. Sitio, documentos y especificaciones
 

@@ -50,14 +50,6 @@ abstract class AppStrings {
   String moodName(String moodId) =>
       moodNames[moodId] ?? const AppStringsEn().moodNames[moodId] ?? moodId;
 
-  /// Títulos de los Packs por id (`afecto`, `confianza`, `cuerpo`, `intenso`).
-  Map<String, String> get packNames;
-
-  /// Título del Pack en el idioma activo, con fallback a inglés y, si el Pack
-  /// no tiene cadena propia, al título del producto de la tienda ([fallback]).
-  String packName(String packId, {required String fallback}) =>
-      packNames[packId] ?? const AppStringsEn().packNames[packId] ?? fallback;
-
   String get notificationChannelName;
   String get notificationChannelDescription;
   String get reminderNotificationTitle;
@@ -130,20 +122,45 @@ abstract class AppStrings {
   String get noteSheetDoneButton;
   String get noteSheetPlaceholder;
 
+  // Premium (suscripción)
+  String get premiumTitle;
+  String get openPremiumTooltip;
+  String get premiumHeadline;
+  String get premiumSubheadline;
+  String get premiumMoodsTitle;
+  String get weeklyPlanLabel;
+  String get monthlyPlanLabel;
+  String get annualPlanLabel;
+  String get weekUnit;
+  String get monthUnit;
+  String get yearUnit;
+  String get bestValueLabel;
+  String savePercentLabel(int percent);
+  String get startTrialButtonLabel;
+  String subscribeButtonLabel(String price);
+
+  /// Texto legal con prueba: precio, periodo (`unit`) y tienda (`store`).
+  String subscriptionLegalTrial(String price, String unit, String store);
+  String subscriptionLegalPaid(String price, String unit, String store);
+  String get termsLinkLabel;
+  String get privacyLinkLabel;
+  String get premiumActiveTitle;
+  String premiumPlanLine(String plan);
+  String premiumRenewsOn(String date);
+  String premiumTrialEndsOn(String date);
+  String premiumEndsOn(String date);
+  String get manageSubscriptionButtonLabel;
+  String get closeLabel;
+  String planCardSemanticLabel(String plan, String priceLine);
+
+  /// Precio y periodo, p. ej. "$14.99 / year".
+  String planPriceLine(String price, String unit) => '$price / $unit';
+
   // Tienda / paywall
-  String get storeTitle;
-  String get openStoreTooltip;
-  String get storeMoodsSectionTitle;
-  String get storePacksSectionTitle;
   String get storeLoading;
   String get storeLoadError;
   String get storeRetry;
-  String get storeEmptyMoods;
-  String get storeEmptyPacks;
   String get moodUnlockedLabel;
-  String buyMoodButtonLabel(String moodLabel, String price);
-  String packIncludesMoods(String moodLabels);
-  String buyPackButtonLabel(String packLabel, String price);
   String get restorePurchasesButtonLabel;
   String get restoringPurchases;
   String get restoreSuccessMessage;
@@ -152,8 +169,6 @@ abstract class AppStrings {
   String get purchaseNetworkErrorMessage;
   String get purchaseProductUnavailableMessage;
   String get purchaseUnknownErrorMessage;
-  String get packOverlapWarningTitle;
-  String packOverlapWarningMessage(String moodLabels);
   String get continueLabel;
   String get cancelLabel;
 }

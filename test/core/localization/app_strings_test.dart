@@ -89,7 +89,7 @@ void main() {
         final labels = [
           strings.openMoodPickerTooltip,
           strings.openCalendarTooltip,
-          strings.openStoreTooltip,
+          strings.openPremiumTooltip,
           strings.openSettingsTooltip,
         ];
         expect(strings.calendarTitle, isNotEmpty, reason: locale.languageCode);
@@ -100,34 +100,81 @@ void main() {
     });
   });
 
-  group('AppStrings.packName', () {
-    const packIds = ['afecto', 'confianza', 'cuerpo', 'intenso'];
-
-    test('every pack has a non-empty title in every supported language', () {
+  group('Premium subscription strings', () {
+    test('every language has all of them, with the price and period filled in',
+        () {
       for (final locale in AppStrings.supportedLocales) {
         final strings = AppStrings.forLocale(locale);
-        for (final id in packIds) {
-          expect(
-            strings.packNames[id],
-            isNotNull,
-            reason: '$id missing in ${locale.languageCode}',
-          );
-          expect(strings.packName(id, fallback: 'store'), isNotEmpty);
+        final reason = locale.languageCode;
+        final labels = [
+          strings.premiumTitle,
+          strings.premiumHeadline,
+          strings.premiumSubheadline,
+          strings.premiumMoodsTitle,
+          strings.weeklyPlanLabel,
+          strings.monthlyPlanLabel,
+          strings.annualPlanLabel,
+          strings.weekUnit,
+          strings.monthUnit,
+          strings.yearUnit,
+          strings.bestValueLabel,
+          strings.startTrialButtonLabel,
+          strings.termsLinkLabel,
+          strings.privacyLinkLabel,
+          strings.premiumActiveTitle,
+          strings.manageSubscriptionButtonLabel,
+          strings.closeLabel,
+        ];
+        expect(labels, everyElement(isNotEmpty), reason: reason);
+        expect(
+          {
+            strings.weeklyPlanLabel,
+            strings.monthlyPlanLabel,
+            strings.annualPlanLabel
+          },
+          hasLength(3),
+          reason: reason,
+        );
+        expect(strings.savePercentLabel(58), contains('58'), reason: reason);
+        expect(strings.subscribeButtonLabel(r'$14.99'), contains(r'$14.99'),
+            reason: reason);
+        for (final legal in [
+          strings.subscriptionLegalTrial(
+              r'$14.99', strings.yearUnit, 'App Store'),
+          strings.subscriptionLegalPaid(
+              r'$14.99', strings.yearUnit, 'App Store'),
+        ]) {
+          expect(legal, contains(r'$14.99'), reason: reason);
+          expect(legal, contains(strings.yearUnit), reason: reason);
+          expect(legal, contains('App Store'), reason: reason);
+          expect(legal, contains('24'), reason: reason);
         }
+        expect(strings.subscriptionLegalTrial('1', 'x', 's'), contains('3'),
+            reason: reason);
+        expect(strings.premiumRenewsOn('D'), contains('D'), reason: reason);
+        expect(strings.premiumTrialEndsOn('D'), contains('D'), reason: reason);
+        expect(strings.premiumEndsOn('D'), contains('D'), reason: reason);
+        expect(strings.premiumPlanLine('P'), contains('P'), reason: reason);
+        expect(strings.planCardSemanticLabel('P', 'L'),
+            allOf(contains('P'), contains('L')),
+            reason: reason);
       }
     });
 
-    test('returns the localized title and ignores the store title', () {
-      final es = AppStrings.forLocale(const Locale('es'));
-      expect(es.packName('confianza', fallback: 'Store title (unreviewed)'),
-          'Pack de Confianza');
-      final de = AppStrings.forLocale(const Locale('de'));
-      expect(de.packName('cuerpo', fallback: 'x'), 'Körper-Paket');
+    test('the legal text without a trial never mentions it', () {
+      final strings = AppStrings.forLocale(const Locale('en'));
+
+      expect(strings.subscriptionLegalPaid(r'$2.99', 'month', 'Google Play'),
+          isNot(contains('free')));
+      expect(strings.subscriptionLegalTrial(r'$2.99', 'month', 'Google Play'),
+          contains('Free for 3 days'));
     });
 
-    test('uses the store title only for a pack without its own string', () {
-      final strings = AppStrings.forLocale(const Locale('fr'));
-      expect(strings.packName('nuevo', fallback: 'Nuevo Pack'), 'Nuevo Pack');
+    test('plan price lines combine price and period', () {
+      expect(
+          AppStrings.forLocale(const Locale('en'))
+              .planPriceLine(r'$14.99', 'year'),
+          r'$14.99 / year');
     });
   });
 
