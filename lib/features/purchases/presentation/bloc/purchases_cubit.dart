@@ -6,22 +6,36 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/telemetry/app_telemetry.dart';
 import '../../../../core/telemetry/app_telemetry_events.dart';
 import '../../../mood/domain/entities/mood_definition.dart';
-import '../../domain/entities/mood_offer.dart';
-import '../../domain/entities/mood_pack.dart';
 import '../../domain/entities/purchase_failure.dart';
+import '../../domain/entities/subscription_plan.dart';
+import '../../domain/entities/subscription_status.dart';
 import '../../domain/repositories/mood_entitlements_repository.dart';
 
 part 'purchases_state.dart';
+
+/// Desde dónde se abrió la pantalla Premium, para las analíticas (sin ids de
+/// moods): la pestaña o el toque en un mood bloqueado.
+enum PremiumSource {
+  tab('tab'),
+  lockedMood('locked_mood');
+
+  const PremiumSource(this.analyticsValue);
+  final String analyticsValue;
+}
 
 class PurchasesCubit extends Cubit<PurchasesState> {
   final MoodEntitlementsRepository repository;
   final AppTelemetry? telemetry;
   StreamSubscription<Set<String>>? _unlockedSubscription;
+  StreamSubscription<SubscriptionStatus>? _statusSubscription;
 
   PurchasesCubit(this.repository, {this.telemetry})
       : super(const PurchasesState()) {
     _unlockedSubscription = repository.unlockedPremiumMoodIds().listen((ids) {
       emit(state.copyWith(unlockedMoodIds: ids));
+    });
+    _statusSubscription = repository.subscriptionStatus().listen((status) {
+      emit(state.copyWith(subscription: status));
     });
     loadCatalog();
   }
@@ -29,6 +43,7 @@ class PurchasesCubit extends Cubit<PurchasesState> {
   @override
   Future<void> close() {
     _unlockedSubscription?.cancel();
+    _statusSubscription?.cancel();
     return super.close();
   }
 
@@ -42,15 +57,8 @@ class PurchasesCubit extends Cubit<PurchasesState> {
   Future<void> loadCatalog() async {
     emit(state.copyWith(isLoadingCatalog: true, catalogError: null));
     try {
-      final offers = await repository.availableMoodOffers();
-      final packs = await repository.availablePacks();
-      emit(
-        state.copyWith(
-          offers: offers,
-          packs: packs,
-          isLoadingCatalog: false,
-        ),
-      );
+      final plans = await repository.availablePlans();
+      emit(state.copyWith(plans: plans, isLoadingCatalog: false));
     } catch (e, stackTrace) {
       telemetry?.recordError(
         'load_store_catalog_failed',
@@ -62,49 +70,71 @@ class PurchasesCubit extends Cubit<PurchasesState> {
     }
   }
 
-  /// Moods de [packId] que el usuario ya tiene `unlocked`, para el aviso de
-  /// solape antes de confirmar la compra del pack.
-  List<String> overlappingMoodIdsForPack(String packId) {
-    final pack = state.packs.where((p) => p.id == packId).firstOrNull;
-    if (pack == null) {
-      return const [];
+  void selectPlan(SubscriptionPlanType plan) {
+    emit(state.copyWith(selectedPlan: plan));
+  }
+
+  /// La pantalla Premium se abrió (pestaña u hoja). Sin ids de moods.
+  void trackPremiumOpened(PremiumSource source) {
+    telemetry?.trackEvent(
+      AppTelemetryEvents.storeOpened,
+      properties: {'source': source.analyticsValue},
+    );
+  }
+
+  /// Compra el plan elegido (o el anual por defecto).
+  Future<void> purchaseSelectedPlan() {
+    final plan = state.effectiveSelectedPlan;
+    if (plan == null) {
+      return Future.value();
     }
-    return pack.moodIds.where(isMoodUnlocked).toList();
+    return purchasePlan(plan.type);
   }
 
-  /// La pestaña de la tienda se abrió. Sin ids de moods ni de Packs.
-  void trackStoreOpened() {
-    telemetry?.trackEvent(AppTelemetryEvents.storeOpened);
-  }
-
-  Future<void> purchaseMood(String moodId) =>
-      _runPurchaseAction(() => repository.purchaseMood(moodId));
-
-  Future<void> purchasePack(String packId) =>
-      _runPurchaseAction(() => repository.purchasePack(packId));
+  Future<void> purchasePlan(SubscriptionPlanType plan) => _runPurchaseAction(
+        () => repository.purchasePlan(plan),
+        plan: plan,
+      );
 
   Future<void> restorePurchases() => _runPurchaseAction(
         () => repository.restorePurchases(),
         isRestore: true,
       );
 
-  // Los eventos de compras nunca llevan el id del mood ni del Pack.
+  // Los eventos de compras nunca llevan el id de un mood. Solo `purchase_started`
+  // y `purchase_completed` llevan el plan (semanal, mensual o anual).
   Future<void> _runPurchaseAction(
     Future<void> Function() action, {
     bool isRestore = false,
+    SubscriptionPlanType? plan,
   }) async {
     emit(state.copyWith(actionStatus: PurchaseActionStatus.inProgress));
+    final planProperties = <String, Object?>{
+      if (plan != null) 'plan': plan.name,
+    };
     if (!isRestore) {
-      telemetry?.trackEvent(AppTelemetryEvents.purchaseStarted);
+      telemetry?.trackEvent(
+        AppTelemetryEvents.purchaseStarted,
+        properties: planProperties,
+      );
     }
     try {
       await action();
-      telemetry?.trackEvent(
-        isRestore
-            ? AppTelemetryEvents.purchasesRestored
-            : AppTelemetryEvents.purchaseCompleted,
+      if (isRestore) {
+        telemetry?.trackEvent(AppTelemetryEvents.purchasesRestored);
+      } else {
+        telemetry?.trackEvent(
+          AppTelemetryEvents.purchaseCompleted,
+          properties: planProperties,
+        );
+      }
+      emit(
+        state.copyWith(
+          actionStatus: isRestore
+              ? PurchaseActionStatus.restored
+              : PurchaseActionStatus.success,
+        ),
       );
-      emit(state.copyWith(actionStatus: PurchaseActionStatus.success));
     } on PurchaseException catch (e) {
       final status = _statusForReason(e.reason);
       if (!isRestore) {
@@ -139,8 +169,4 @@ class PurchasesCubit extends Cubit<PurchasesState> {
   void acknowledgeActionStatus() {
     emit(state.copyWith(actionStatus: PurchaseActionStatus.idle));
   }
-}
-
-extension _FirstOrNull<T> on Iterable<T> {
-  T? get firstOrNull => isEmpty ? null : first;
 }

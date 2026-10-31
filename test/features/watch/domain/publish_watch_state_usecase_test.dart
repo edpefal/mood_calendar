@@ -84,4 +84,16 @@ void main() {
     expect(map.keys, containsAll(['version', 'locale', 'today', 'moods']));
     expect((map['moods']! as List).first, {'id': 'calm', 'name': 'Calm'});
   });
+
+  test('publica los ids de las elecciones procesadas y, por defecto, ninguno',
+      () async {
+    final channel = FakeWatchChannel();
+    final publish = build([_entry(now, 'calm', 2)], channel);
+
+    await publish();
+    await publish(handledChoiceIds: ['a', 'b']);
+
+    expect(channel.published.first.toMap()['handledChoiceIds'], isEmpty);
+    expect(channel.published.last.toMap()['handledChoiceIds'], ['a', 'b']);
+  });
 }

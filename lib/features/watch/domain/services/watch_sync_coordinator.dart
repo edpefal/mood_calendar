@@ -34,6 +34,11 @@ class WatchSyncCoordinator {
   final _subscriptions = <StreamSubscription<Object?>>[];
   Future<void> _queue = Future<void>.value();
   Timer? _publishTimer;
+
+  /// Ids de las últimas elecciones procesadas, que cada estado publicado lleva
+  /// al reloj (acotado: el reloj solo necesita las recientes).
+  final _recentHandledIds = <String>[];
+  static const _maxHandledIds = 20;
   bool _started = false;
   bool _disposed = false;
 
@@ -71,9 +76,20 @@ class WatchSyncCoordinator {
   Future<void> _process() async {
     try {
       final result = await processInbox();
+      if (result.handledIds.isNotEmpty) {
+        _recentHandledIds.addAll(result.handledIds);
+        if (_recentHandledIds.length > _maxHandledIds) {
+          _recentHandledIds.removeRange(
+            0,
+            _recentHandledIds.length - _maxHandledIds,
+          );
+        }
+        // También si todas se descartaron: el reloj debe enterarse de que su
+        // elección ya no está pendiente y de los moods que hoy ofrece.
+        schedulePublish();
+      }
       if (result.applied > 0 && !_applied.isClosed) {
         _applied.add(result.applied);
-        schedulePublish();
       }
     } catch (error, stackTrace) {
       logger.error(
@@ -87,7 +103,7 @@ class WatchSyncCoordinator {
 
   Future<void> _publish() async {
     try {
-      await publishState();
+      await publishState(handledChoiceIds: List.of(_recentHandledIds));
     } catch (error, stackTrace) {
       logger.error(
         'Error publishing state to Apple Watch',

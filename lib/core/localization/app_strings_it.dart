@@ -189,15 +189,68 @@ class AppStringsIt extends AppStrings {
   @override
   String get noteSheetPlaceholder => 'Raccontami della tua giornata...';
 
+  // Premium (suscripción)
+  @override
+  String get premiumTitle => 'Premium';
+  @override
+  String get openPremiumTooltip => 'Apri Premium';
+  @override
+  String get premiumHeadline => 'Sblocca tutti gli umori premium';
+  @override
+  String get premiumSubheadline =>
+      'Scegli esattamente come ti senti con tutto il catalogo.';
+  @override
+  String get premiumMoodsTitle => 'Umori premium';
+  @override
+  String get weeklyPlanLabel => 'Settimanale';
+  @override
+  String get monthlyPlanLabel => 'Mensile';
+  @override
+  String get annualPlanLabel => 'Annuale';
+  @override
+  String get weekUnit => 'settimana';
+  @override
+  String get monthUnit => 'mese';
+  @override
+  String get yearUnit => 'anno';
+  @override
+  String get bestValueLabel => 'Migliore offerta';
+  @override
+  String savePercentLabel(int percent) => 'Risparmia il $percent%';
+  @override
+  String get startTrialButtonLabel => 'Prova 3 giorni gratis';
+  @override
+  String subscribeButtonLabel(String price) => 'Abbonati · $price';
+  @override
+  String subscriptionLegalTrial(String price, String unit, String store) =>
+      'Gratis per 3 giorni, poi $price a $unit. Si rinnova automaticamente a meno che tu non annulli almeno 24 ore prima della fine del periodo. Gestisci o annulla quando vuoi nelle impostazioni degli abbonamenti di $store.';
+  @override
+  String subscriptionLegalPaid(String price, String unit, String store) =>
+      '$price a $unit. Si rinnova automaticamente a meno che tu non annulli almeno 24 ore prima della fine del periodo. Gestisci o annulla quando vuoi nelle impostazioni degli abbonamenti di $store.';
+  @override
+  String get termsLinkLabel => 'Termini di utilizzo';
+  @override
+  String get privacyLinkLabel => 'Informativa sulla privacy';
+  @override
+  String get premiumActiveTitle => 'Premium è attivo';
+  @override
+  String premiumPlanLine(String plan) => 'Piano $plan';
+  @override
+  String premiumRenewsOn(String date) => 'Si rinnova il $date';
+  @override
+  String premiumTrialEndsOn(String date) =>
+      'La prova gratuita termina il $date';
+  @override
+  String premiumEndsOn(String date) => 'Termina il $date';
+  @override
+  String get manageSubscriptionButtonLabel => 'Gestisci abbonamento';
+  @override
+  String get closeLabel => 'Chiudi';
+  @override
+  String planCardSemanticLabel(String plan, String priceLine) =>
+      'Piano $plan, $priceLine';
+
   // Negozio / paywall
-  @override
-  String get storeTitle => 'Negozio degli umori';
-  @override
-  String get openStoreTooltip => 'Apri il negozio';
-  @override
-  String get storeMoodsSectionTitle => 'Umori premium';
-  @override
-  String get storePacksSectionTitle => 'Pacchetti';
   @override
   String get storeLoading => 'Caricamento del negozio...';
   @override
@@ -206,19 +259,7 @@ class AppStringsIt extends AppStrings {
   @override
   String get storeRetry => 'Riprova';
   @override
-  String get storeEmptyMoods => 'Nessun umore premium disponibile al momento.';
-  @override
-  String get storeEmptyPacks => 'Nessun pacchetto disponibile al momento.';
-  @override
   String get moodUnlockedLabel => 'Sbloccato';
-  @override
-  String buyMoodButtonLabel(String moodLabel, String price) =>
-      'Acquista $moodLabel · $price';
-  @override
-  String packIncludesMoods(String moodLabels) => 'Include: $moodLabels';
-  @override
-  String buyPackButtonLabel(String packLabel, String price) =>
-      'Acquista $packLabel · $price';
   @override
   String get restorePurchasesButtonLabel => 'Ripristina acquisti';
   @override
@@ -240,11 +281,6 @@ class AppStringsIt extends AppStrings {
   @override
   String get purchaseUnknownErrorMessage =>
       'Qualcosa è andato storto con il tuo acquisto. Riprova.';
-  @override
-  String get packOverlapWarningTitle => 'Ne possiedi già alcuni';
-  @override
-  String packOverlapWarningMessage(String moodLabels) =>
-      'Possiedi già $moodLabels, ma puoi comunque acquistare questo pacchetto al prezzo pieno.';
   @override
   String get continueLabel => 'Continua';
   @override
@@ -271,13 +307,5 @@ class AppStringsIt extends AppStrings {
         'crying': 'Piangendo',
         'scared': 'Spaventato',
         'stressed': 'Stressato',
-      };
-
-  @override
-  Map<String, String> get packNames => const {
-        'afecto': 'Pacchetto Affetto',
-        'confianza': 'Pacchetto Fiducia',
-        'cuerpo': 'Pacchetto Corpo',
-        'intenso': 'Pacchetto Intenso',
       };
 }

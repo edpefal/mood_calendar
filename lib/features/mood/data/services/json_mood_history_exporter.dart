@@ -26,8 +26,7 @@ class JsonMoodHistoryExporter implements MoodHistoryExporter {
   })  : _repository = repository,
         _logger = logger,
         _telemetry = telemetry,
-        _directoryProvider =
-            directoryProvider ?? getTemporaryDirectory,
+        _directoryProvider = directoryProvider ?? getTemporaryDirectory,
         _now = now ?? DateTime.now;
 
   final MoodRepository _repository;

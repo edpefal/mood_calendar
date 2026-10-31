@@ -1,7 +1,7 @@
 import '../../../mood/domain/entities/mood_definition.dart';
-import '../../domain/entities/mood_offer.dart';
-import '../../domain/entities/mood_pack.dart';
 import '../../domain/entities/purchase_failure.dart';
+import '../../domain/entities/subscription_plan.dart';
+import '../../domain/entities/subscription_status.dart';
 import '../../domain/repositories/mood_entitlements_repository.dart';
 
 /// Used when RevenueCat was not configured (e.g. missing
@@ -23,17 +23,13 @@ class NoopMoodEntitlementsRepository implements MoodEntitlementsRepository {
   Stream<Set<String>> unlockedPremiumMoodIds() => const Stream.empty();
 
   @override
-  Future<List<MoodOffer>> availableMoodOffers() async => const [];
+  Stream<SubscriptionStatus> subscriptionStatus() => const Stream.empty();
 
   @override
-  Future<List<MoodPack>> availablePacks() async => const [];
+  Future<List<SubscriptionPlan>> availablePlans() async => const [];
 
   @override
-  Future<void> purchaseMood(String moodId) =>
-      throw const PurchaseException(PurchaseFailureReason.productUnavailable);
-
-  @override
-  Future<void> purchasePack(String packId) =>
+  Future<void> purchasePlan(SubscriptionPlanType plan) =>
       throw const PurchaseException(PurchaseFailureReason.productUnavailable);
 
   @override

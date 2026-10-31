@@ -165,6 +165,31 @@ void main() {
     expect(result.applied, 0);
     expect(channel.acks, isEmpty);
   });
+
+  test('devuelve los ids de todas las elecciones procesadas, aplicadas o no',
+      () async {
+    final repository = InMemoryMoodRepository();
+    final channel = FakeWatchChannel(inbox: [
+      _choice('ok', 'calm'),
+      _choice('locked', 'anxious'),
+      _choice('unknown', 'nope'),
+    ]);
+
+    final result = await build(repository, channel)();
+
+    expect(result.applied, 1);
+    expect(result.ignored, 2);
+    expect(result.handledIds, ['ok', 'locked', 'unknown']);
+  });
+
+  test('con el buzón vacío no hay ids procesados', () async {
+    final result = await build(
+      InMemoryMoodRepository(),
+      FakeWatchChannel(),
+    )();
+
+    expect(result.handledIds, isEmpty);
+  });
 }
 
 const _catalog = {
