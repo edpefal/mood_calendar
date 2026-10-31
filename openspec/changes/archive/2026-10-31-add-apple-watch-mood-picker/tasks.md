@@ -56,4 +56,4 @@
 - [x] 8.1 Actualizar `CLAUDE.md`: arquitectura (carpeta `lib/features/watch/`, target del reloj, buzón), sección de release (verificaciones con el reloj) y comandos de prueba con simuladores emparejados.
 - [x] 8.2 Actualizar `backlog.md` (publicación en revisión; complicación, notas y app independiente como mejoras futuras) y el estado de la versión en `CLAUDE.md`. La marca de función completada queda para cuando Apple apruebe la 1.9.0.
 - [x] 8.3 Abrir el PR con los commits `feat(watch)`/`chore(ios)`, esperar "Analyze and Test", mergear y borrar la rama. Se hizo en un único PR (#113) con los 7 commits, por decisión del usuario.
-- [ ] 8.4 Archivar el change con `/opsx:archive` sincronizando el spec `watch-mood-picker` a `openspec/specs/`.
+- [x] 8.4 Archivar el change con `/opsx:archive` sincronizando el spec `watch-mood-picker` a `openspec/specs/`. Archivado mientras la 1.9.0 seguía en revisión de Apple, por decisión del usuario; si la revisión pide cambios, se corrigen con un change nuevo.
