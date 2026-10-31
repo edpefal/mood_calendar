@@ -41,9 +41,9 @@
 
 ## 6. Apple Watch
 
-- [ ] 6.1 `ProcessWatchInboxUseCase`: si procesa alguna elección descartada o aplicada, publicar el estado con `handledChoiceIds` (últimos 20); `PublishWatchStateUseCase` incluye el campo
-- [ ] 6.2 Reloj (`WatchModels.swift`, `WatchModel.swift`): leer `handledChoiceIds` y quitar la marca pendiente cuando contiene el id de la elección; un estado que no la menciona conserva la marca
-- [ ] 6.3 Tests de Dart y XCTest para ambos lados; actualizar `docs/watch-sync-contract.md` y `docs/watch-testing.md`
+- [x] 6.1 `ProcessWatchInboxUseCase`: si procesa alguna elección descartada o aplicada, publicar el estado con `handledChoiceIds` (últimos 20); `PublishWatchStateUseCase` incluye el campo Hecho: `WatchInboxResult.handledIds` y el campo `handledChoiceIds` en el estado; el coordinador conserva los últimos 20 y republica aunque todas las elecciones se hayan descartado.
+- [x] 6.2 Reloj (`WatchModels.swift`, `WatchModel.swift`): leer `handledChoiceIds` y quitar la marca pendiente cuando contiene el id de la elección; un estado que no la menciona conserva la marca Hecho: `WatchAppState.handledChoiceIds`, `PendingChoice.id` (opcional, para elecciones guardadas por la versión anterior) y la regla en `WatchModel`.
+- [x] 6.3 Tests de Dart y XCTest para ambos lados; actualizar `docs/watch-sync-contract.md` y `docs/watch-testing.md` Hecho: 6 tests nuevos de Dart (33 en total en `test/features/watch`) y 6 de Swift (16 en `WatchModelTests`, todos pasan con `xcodebuild test`); contrato y guía de pruebas actualizados.
 
 ## 7. Analíticas y cadenas
 
