@@ -40,9 +40,9 @@
 ## 6. Pruebas manuales
 
 - [x] 6.1 Documentar en `docs/` cómo emparejar un simulador de iPhone con uno de Watch (`xcrun simctl`) y correr ambas apps. Hecho en `docs/watch-testing.md`.
-- [ ] 6.2 (Parcial: la interfaz del reloj y el estado vacío se verificaron en el simulador, en los cinco idiomas, y la lógica con XCTest y pruebas de Dart; la sincronización de punta a punta no se pudo ver en simuladores: el iPhone reporta `appInstalled: NO`, ver `docs/watch-testing.md`) Probar en simuladores emparejados: elegir un mood, nota conservada, iPhone con la app cerrada, reloj sin alcance y compra de un mood premium que aparece en el reloj.
-- [ ] 6.3 Probar en un iPhone y un Apple Watch reales (TestFlight): entrega en cola, idioma del iPhone en el reloj, varias elecciones del mismo día y reinstalación de la app del reloj.
-- [ ] 6.4 Verificar a mano que registrar desde el reloj no dispara el pedido de calificación y que la elección aparece en el calendario, el resumen, la racha y la exportación.
+- [x] 6.2 Probar en simuladores emparejados. La interfaz del reloj y el estado vacío se verificaron en el simulador, en los cinco idiomas, y la lógica con XCTest y pruebas de Dart; la sincronización de punta a punta no se puede ver en simuladores (el iPhone reporta `appInstalled: NO`, ver `docs/watch-testing.md`) y se cubrió en dispositivos reales (6.3).
+- [x] 6.3 Probar en un iPhone y un Apple Watch reales (TestFlight 1.9.0 build 37): entrega en cola, app del iPhone cerrada, varias elecciones del mismo día, nota conservada, idioma del iPhone en el reloj, compra de un mood premium y reinstalación de la app del reloj. Todas pasaron (2026-10-30).
+- [x] 6.4 Verificar a mano que registrar desde el reloj no dispara el pedido de calificación y que la elección aparece en el calendario, el resumen, la racha y la exportación. Pasó (2026-10-30).
 
 ## 7. App Store Connect y release
 
