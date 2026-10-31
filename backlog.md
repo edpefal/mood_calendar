@@ -49,11 +49,14 @@ Backlog activo del proyecto, actualizado contra el estado actual del repo.
 
 ## Alta prioridad
 
-- Publicar la app de Apple Watch (≈1.9.0).
-  Implementada en el change `add-apple-watch-mood-picker`. Falta: probar la sincronización en un iPhone y un Apple Watch reales (TestFlight): entrega en cola, idioma, varias elecciones del mismo día y compra de un mood; capturas de Watch (`tool/screenshots/capture_watch.py`) y la ficha de App Store Connect; subir la versión, construir con `scripts/build_ios_release.sh` y enviar a revisión. Mejoras posteriores: complicación en la esfera, notas por dictado, colores pastel por mood, acciones en la notificación del recordatorio y app independiente.
+- Cerrar la publicación de la app de Apple Watch (1.9.0).
+  Implementada, mergeada (PR #113) y probada en dispositivos reales; la 1.9.0 (build 37) está en revisión de Apple desde el 2026-10-31. Falta: al aprobarse, comprobar que el reloj aparece en la ficha pública, archivar el change `add-apple-watch-mood-picker` con `/opsx:archive` (sincroniza el spec `watch-mood-picker`) y actualizar `CLAUDE.md`. Mejoras posteriores: complicación en la esfera, notas por dictado, colores pastel por mood, acciones en la notificación del recordatorio y app independiente.
+
+- Reemplazar las compras sueltas y los Packs por una suscripción (1.10.0).
+  Change `replace-mood-purchases-with-subscription`: semanal, mensual y anual con prueba de 3 días, un entitlement `premium` y los `mood_*` heredados siguen valiendo. Se implementa cuando el change del reloj esté archivado. Fuera de la primera versión: plan vitalicio, ofertas promocionales o de reconquista, Compartir en Familia, paywalls y experimentos de RevenueCat, y avisos dentro de la app por vencimiento o reintento de cobro.
 
 - Cerrar el lanzamiento de la 1.8.5 (iOS y Android).
-  Android ya está publicado en Google Play (confirmado el 2026-10-24); falta verificar qué `versionCode` sirve en producción. En iOS, comprobar el estado de la 1.8.5 (build 36) en App Store Connect: estaba en revisión. Al aprobarse: comprobar en Firebase → Analytics que llegan usuarios reales y anotar el estado en `CLAUDE.md` ("Estado actual"). Opcional: recapturar los slides en español, que muestran los textos anteriores a la corrección de acentos; al regenerarlos, revisar en `compose.py` que el slide 5 (recordatorios) enmarque bien la captura de Settings a pantalla completa.
+  Android ya está publicado en Google Play (confirmado el 2026-10-24); falta verificar qué `versionCode` sirve en producción. iOS 1.8.5 (build 36) ya está publicada (`READY_FOR_SALE`, comprobado el 2026-10-31). Falta comprobar en Firebase → Analytics que llegan usuarios reales. Opcional: recapturar los slides en español, que muestran los textos anteriores a la corrección de acentos; al regenerarlos, revisar en `compose.py` que el slide 5 (recordatorios) enmarque bien la captura de Settings a pantalla completa.
 
 - Configurar las notificaciones en tiempo real (RTDN) de Google Play hacia RevenueCat.
   Elegir el tema `play-notifications` en RevenueCat, pegarlo en Play Console → Monetización y enviar una notificación de prueba. No bloquea nada: hace que reembolsos y cancelaciones lleguen más rápido.
@@ -123,7 +126,8 @@ Sale de `aso/aso_report.md` (auditoría del 2026-10-02). Lo ya hecho está en "C
 
 ## Orden sugerido de ejecución
 
-1. Cerrar el lanzamiento de la 1.8.5 y mantener `CLAUDE.md` al día con cada release.
-2. Cubrir con pruebas el flujo de recordatorios y apertura desde notificaciones.
-3. Mejorar UX y manejo de errores en plataforma y estados offline.
-4. Iterar en producto: historial, edición/borrado, accesibilidad e insights.
+1. Cerrar la publicación de la 1.9.0 (reloj), mantener `CLAUDE.md` al día con cada release y verificar los datos de la 1.8.5.
+2. Implementar la suscripción (1.10.0) cuando el change del reloj esté archivado.
+3. Cubrir con pruebas el flujo de recordatorios y apertura desde notificaciones.
+4. Mejorar UX y manejo de errores en plataforma y estados offline.
+5. Iterar en producto: historial, edición/borrado, accesibilidad e insights.

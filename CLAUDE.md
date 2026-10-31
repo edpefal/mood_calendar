@@ -2,15 +2,15 @@
 
 Flutter app para registrar y revisar estados de ánimo diarios, con un catálogo de moods gratuitos + moods premium de pago (RevenueCat). Se publica en iOS (plataforma principal, deployment target **iOS 15.0**) y en Android, con el mismo identificador `com.artlab.moodcalendar`.
 
-## Estado actual (2026-10-24)
+## Estado actual (2026-10-31)
 
-- **Versión**: `pubspec.yaml` está en `1.8.5+36`. iOS: la 1.8.4 (build 31) está publicada y la **1.8.5 (build 36) está en revisión de Apple** (lanzamiento automático al aprobarse). Android: la app **ya está publicada en Google Play** (confirmado el 2026-10-24; la ficha pública responde). La 1.8.5 (versionCode 36) fue la primera publicación en producción; no se ha verificado qué versionCode sirve hoy. Al publicarse iOS 1.8.5, actualizar esta sección.
+- **Versión**: `pubspec.yaml` está en `1.9.0+37`. iOS: la **1.8.5 (build 36) está publicada** (`READY_FOR_SALE`, comprobado el 2026-10-31) y la **1.9.0 (build 37, con la app de Apple Watch) está en revisión de Apple** desde el 2026-10-31 (lanzamiento automático al aprobarse). Android: la app **ya está publicada en Google Play** (confirmado el 2026-10-24; la ficha pública responde) en la 1.8.5 (versionCode 36), sin el reloj; no se ha verificado qué versionCode sirve hoy. Al aprobarse la 1.9.0, actualizar esta sección.
 - **Analíticas medidas**: Firebase Analytics funciona (eventos vistos en Analytics → Realtime desde builds de TestFlight y de la pista interna). Los `GoogleService-Info.plist` y `google-services.json` siguen trayendo Analytics como deshabilitado aunque la propiedad de GA (`mood-calendar-fee5c`) está vinculada, y aun así funciona: no hace falta regenerarlos.
 - **Declaraciones de privacidad al día**: App Privacy de Apple (Device ID, Purchase History, Product Interaction y Crash Data; no vinculados, sin rastreo) y Data safety de Play (interacciones en la app, ID de dispositivo, historial de compras y registros de fallos). Ver "Privacidad y declaraciones de las tiendas".
 - **Sitio** `https://moodcalendar.app` activo (política de privacidad, términos y soporte en inglés y español). Ver "Sitio web".
-- **OpenSpec**: 14 specs vigentes y **ningún change activo**.
-- **Apple Watch**: implementada en el change `add-apple-watch-mood-picker` (elegir el mood de hoy desde el reloj). Pendiente de probar la sincronización en un iPhone y un Apple Watch reales, de las capturas de Watch y de publicarla (versión ≈1.9.0). Ver "Apple Watch".
-- **Pendiente**: notificaciones RTDN de Google Play hacia RevenueCat, respaldo de `~/my-release-key.jks` fuera del equipo y el toggle de Crashlytics (ver `backlog.md`).
+- **OpenSpec**: 14 specs vigentes y **dos changes activos**: `add-apple-watch-mood-picker` (implementado y probado en dispositivos; se archiva cuando Apple apruebe la 1.9.0) y `replace-mood-purchases-with-subscription` (solo los artefactos: reemplaza las compras sueltas y los Packs por una suscripción semanal, mensual y anual; se implementa después del reloj, en la 1.10.0).
+- **Apple Watch**: implementada en el change `add-apple-watch-mood-picker` (elegir el mood de hoy desde el reloj), mergeada en `main` (PR #113) y probada en un iPhone y un Apple Watch reales con TestFlight (2026-10-30). La 1.9.0 (build 37) está en revisión de Apple desde el 2026-10-31. Ver "Apple Watch".
+- **Pendiente**: archivar el change del reloj al aprobarse la 1.9.0, la suscripción (1.10.0), notificaciones RTDN de Google Play hacia RevenueCat, respaldo de `~/my-release-key.jks` fuera del equipo y el toggle de Crashlytics (ver `backlog.md`).
 
 ## Stack
 
@@ -127,6 +127,7 @@ El reloj (solo iOS) permite elegir el mood de **hoy** con un toque. Spec en `ope
 - **Íconos**: `tool/watch/export_mood_icons.sh` rasteriza `assets/icon/*.svg` a PNG @2x/@3x (`brew install librsvg`); incluye `brave`, que así pesa 14 KB.
 - **Requisitos de desarrollo**: el runtime de watchOS (`xcodebuild -downloadPlatform watchOS`, varios GB) es obligatorio hasta para compilar `Runner` en simulador, y `flutter build ios --simulator`/`flutter run` piden `-d <udid>`. En simuladores WatchConnectivity no es fiable (el iPhone ve `appInstalled: NO`); la sincronización de punta a punta se prueba en dispositivos reales.
 - **Release**: el archive incluye `Runner.app/Watch/WatchApp.app` y `verify_ios_archive_no_ad_id.sh` también revisa su binario y su `Info.plist`. Todo `main` que contenga el target lo publica en el siguiente IPA: no mergear cambios del reloj a medias.
+- **Ficha de App Store Connect**: las capturas del reloj van en el conjunto `APP_WATCH_SERIES_10` (416×496, las que genera `tool/screenshots/capture_watch.py`); Apple no admite transparencia, así que las PNG RGBA se aplanan a RGB antes de subirlas.
 - **Privacidad**: sin cambios. El reloj no usa la red ni lleva Firebase, RevenueCat ni `AdSupport`.
 - **Fuera de la primera versión**: complicación en la esfera, app independiente, notas, días pasados, colores pastel por mood y acciones en la notificación del recordatorio (ver `backlog.md`).
 
@@ -207,7 +208,7 @@ Igual que el de iOS: se niega a correr sin la llave (debe empezar con `goog_`), 
 
 1. **Bump**: rama `chore/bump-...` y PR con la versión en `pubspec.yaml` (`<nombre>+<build>`); tras el merge, trabajar desde `main` limpio.
 2. **Builds**: `scripts/build_ios_release.sh` y `scripts/build_android_release.sh` (secciones anteriores). Las llaves públicas de RevenueCat salen del MCP (`list-projects` → `list-apps` → `list-app-public-api-keys`).
-3. **iOS**: subir el IPA con `altool` y esperar a que el build quede `VALID`. La versión de App Store Connect se crea por la API (`appStoreVersions`, `releaseType: AFTER_APPROVAL`, copyright `Mood Calendar`): hay que fijar `whatsNew`, el texto promocional (no se hereda), `supportUrl` y, en el `appInfo` nuevo, `privacyPolicyUrl` (solo editable con una versión en preparación; en la publicada da 409). Las capturas, descripción y palabras clave sí se heredan. Adjuntar el build y enviar a revisión.
+3. **iOS**: subir el IPA con `altool` y esperar a que el build quede `VALID`. La versión de App Store Connect se crea por la API (`appStoreVersions`, `releaseType: AFTER_APPROVAL`, copyright `Mood Calendar`): hay que fijar `whatsNew`, el texto promocional (no se hereda), `supportUrl` y, en el `appInfo` nuevo, `privacyPolicyUrl` (solo editable con una versión en preparación; en la publicada da 409). Las capturas, descripción y palabras clave sí se heredan. Adjuntar el build y enviar a revisión. Si App Store Connect responde "You must respond to the required age ratings questions", se contesta la `ageRatingDeclaration` del `appInfo` en preparación (por API o en App Information > Age Rating); la declaración vigente es: sin redes sociales, sin anuncios, temas de salud o bienestar sí, clasificación 4+. Un envío a revisión pedido desde una sesión de Claude Code puede bloquearlo el clasificador de permisos: en ese caso se envía a mano en App Store Connect ("Add for Review").
 4. **Android**: subir el `.aab` a la pista interna con la API de Play (edit → `bundles` → `tracks/internal` → `validate` → `commit`). La cuenta de servicio **no puede** confirmar una versión de producción (403 en `validate`): la versión de producción, con las notas por idioma, se crea a mano en Play Console con el bundle ya subido.
 5. **Declaraciones**: si cambia qué datos recoge la app, actualizar antes App Privacy, Data safety y la política (ver la sección siguiente).
 
