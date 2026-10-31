@@ -70,9 +70,9 @@ class PremiumPlansView extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(strings.premiumSubheadline),
-                const SizedBox(height: 20),
+                const SizedBox(height: 16),
                 _MoodShowcase(unlockedMoodIds: state.unlockedMoodIds),
-                const SizedBox(height: 24),
+                const SizedBox(height: 16),
                 ..._body(context, strings, state),
                 const SizedBox(height: 8),
                 OutlinedButton(
@@ -329,9 +329,15 @@ class _MoodShowcase extends StatelessWidget {
 
   final Set<String> unlockedMoodIds;
 
+  static const _itemWidth = 88.0;
+  static const _iconSize = 40.0;
+
   @override
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
+    // Fila horizontal: así los planes y el botón quedan a la vista sin tener
+    // que desplazar la pantalla. La altura sigue al tamaño de texto del sistema.
+    final textHeight = MediaQuery.textScalerOf(context).scale(34);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -343,13 +349,16 @@ class _MoodShowcase extends StatelessWidget {
               ?.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 8),
-        Wrap(
-          spacing: 12,
-          runSpacing: 12,
-          children: [
-            for (final mood in premiumMoodDefinitions)
-              SizedBox(
-                width: 72,
+        SizedBox(
+          height: _iconSize + 8 + textHeight + 8,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: premiumMoodDefinitions.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 4),
+            itemBuilder: (context, index) {
+              final mood = premiumMoodDefinitions[index];
+              return SizedBox(
+                width: _itemWidth,
                 child: Column(
                   children: [
                     Stack(
@@ -357,16 +366,19 @@ class _MoodShowcase extends StatelessWidget {
                       children: [
                         SvgPicture.asset(
                           mood.assetPath,
-                          height: 40,
-                          width: 40,
+                          height: _iconSize,
+                          width: _iconSize,
                           semanticsLabel: strings.moodName(mood.id),
                         ),
                         if (unlockedMoodIds.contains(mood.id))
                           const Positioned(
                             right: -6,
                             bottom: -4,
-                            child: Icon(Icons.check_circle,
-                                size: 16, color: _brand),
+                            child: Icon(
+                              Icons.check_circle,
+                              size: 16,
+                              color: _brand,
+                            ),
                           ),
                       ],
                     ),
@@ -380,8 +392,9 @@ class _MoodShowcase extends StatelessWidget {
                     ),
                   ],
                 ),
-              ),
-          ],
+              );
+            },
+          ),
         ),
       ],
     );

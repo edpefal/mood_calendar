@@ -30,7 +30,7 @@
 - [x] 4.3 Conservar la recuperación cuando los planes no cargan (error, reintentar, reintento al volver a la pestaña) y la accesibilidad (`Semantics` en todo control) Hecho: error con reintento, reintento al volver a la pestaña, `Semantics` en las tarjetas y botones.
 - [x] 4.4 Crear `showPremiumSheet(context, source)`; borrar `MoodStoreScreen`, `mood_purchase_sheet.dart` y `pack_purchase_sheet.dart` Hecho: `showPremiumSheet`; `MoodStoreScreen` y las dos hojas de compra borradas.
 - [x] 4.5 Pestaña "Premium": nombre, icono (estrella o diamante outlined) y etiqueta de accesibilidad en `MainShell`/`FloatingTabBar`; quitar el acceso a la tienda del header Hecho: pestaña `MainTab.premium` con el icono `diamond_outlined`; el header ya no tenía acceso a la tienda.
-- [x] 4.6 Tests de widget: planes y selección, texto del botón según elegibilidad, estado de suscrito y en prueba, error con reintento, restaurar, iPad y texto al 200 % 30 tests de la pantalla (planes, texto del botón, suscrito, errores, restaurar, enlaces y 200 % de texto en los 5 idiomas a 390 pt). Falta revisar iPad a ojo en simulador (9.4).
+- [x] 4.6 Tests de widget: planes y selección, texto del botón según elegibilidad, estado de suscrito y en prueba, error con reintento, restaurar, iPad y texto al 200 % 30 tests de la pantalla (planes, texto del botón, suscrito, errores, restaurar, enlaces y 200 % de texto en los 5 idiomas a 390 pt). Revisada a ojo en un iPhone 17 (390 pt de ancho): planes, botón, texto legal y enlaces caben en la primera pantalla gracias a que el escaparate de moods es una fila horizontal; la hoja se ajusta a su contenido. Falta iPad y el resto de idiomas en dispositivo (9.4).
 
 ## 5. Selector de moods
 
