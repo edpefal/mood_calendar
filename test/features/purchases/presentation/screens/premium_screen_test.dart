@@ -9,6 +9,7 @@ import 'package:mood_calendar/features/purchases/domain/entities/purchase_failur
 import 'package:mood_calendar/features/purchases/domain/entities/subscription_plan.dart';
 import 'package:mood_calendar/features/purchases/presentation/bloc/purchases_cubit.dart';
 import 'package:mood_calendar/features/purchases/presentation/screens/premium_screen.dart';
+import 'package:mood_calendar/features/purchases/presentation/widgets/premium_plans_view.dart';
 
 import '../../../../support/fake_mood_entitlements_repository.dart';
 
@@ -485,6 +486,81 @@ void main() {
 
       expect(find.text(strings.monthlyPlanLabel), findsOneWidget);
       expect(find.text(strings.premiumActiveTitle), findsNothing);
+    });
+  });
+
+  group('mood row hints that it scrolls', () {
+    void useIphoneWidth(WidgetTester tester) {
+      tester.view.physicalSize = const Size(390 * 3, 844 * 3);
+      tester.view.devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+    }
+
+    testWidgets('the next mood peeks in, cut by the edge of the row',
+        (tester) async {
+      useIphoneWidth(tester);
+      await tester.pumpWidget(buildApp(FakeMoodEntitlementsRepository()));
+      await tester.pumpAndSettle();
+
+      final row = tester.getRect(find.byKey(const Key('premium-moods-row')));
+      final first = tester.getRect(find.byKey(const Key('premium-mood-0')));
+      final third = tester.getRect(find.byKey(const Key('premium-mood-2')));
+      final fourth = tester.getRect(find.byKey(const Key('premium-mood-3')));
+
+      expect(first.left, greaterThanOrEqualTo(row.left));
+      expect(third.right, lessThanOrEqualTo(row.right));
+      // El cuarto empieza dentro de la fila pero no cabe entero.
+      expect(fourth.left, lessThan(row.right));
+      expect(fourth.right, greaterThan(row.right));
+      // Y no es una migaja: se ve una parte apreciable.
+      expect(row.right - fourth.left, greaterThan(30));
+    });
+
+    testWidgets('every premium mood can be reached by swiping', (tester) async {
+      useIphoneWidth(tester);
+      await tester.pumpWidget(buildApp(FakeMoodEntitlementsRepository()));
+      await tester.pumpAndSettle();
+
+      await tester.dragUntilVisible(
+        find.byKey(const Key('premium-mood-13')),
+        find.byKey(const Key('premium-moods-row')),
+        const Offset(-150, 0),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text(strings.moodName('stressed')), findsOneWidget);
+      final row = tester.getRect(find.byKey(const Key('premium-moods-row')));
+      final last = tester.getRect(find.byKey(const Key('premium-mood-13')));
+      expect(last.right, lessThanOrEqualTo(row.right + 0.5));
+    });
+
+    test('the edge with more moods fades and the edge at the end does not', () {
+      expect(
+        premiumShowcaseFade(canScrollLeft: false, canScrollRight: true),
+        [Colors.black, Colors.black, Colors.black, Colors.transparent],
+      );
+      expect(
+        premiumShowcaseFade(canScrollLeft: true, canScrollRight: true),
+        [Colors.transparent, Colors.black, Colors.black, Colors.transparent],
+      );
+      expect(
+        premiumShowcaseFade(canScrollLeft: true, canScrollRight: false),
+        [Colors.transparent, Colors.black, Colors.black, Colors.black],
+      );
+    });
+
+    testWidgets('at 200% text the cells grow so names stay readable',
+        (tester) async {
+      useIphoneWidth(tester);
+      tester.platformDispatcher.textScaleFactorTestValue = 2;
+      addTearDown(tester.platformDispatcher.clearAllTestValues);
+      await tester.pumpWidget(buildApp(FakeMoodEntitlementsRepository()));
+      await tester.pumpAndSettle();
+
+      final first = tester.getRect(find.byKey(const Key('premium-mood-0')));
+
+      expect(first.width, greaterThanOrEqualTo(88 * 2));
+      expect(tester.takeException(), isNull);
     });
   });
 

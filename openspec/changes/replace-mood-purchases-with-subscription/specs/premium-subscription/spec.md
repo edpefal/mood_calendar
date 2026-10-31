@@ -42,6 +42,10 @@ La pantalla Premium SHALL mostrar los tres planes como tarjetas, con el plan anu
 - **WHEN** el usuario abre la pantalla Premium
 - **THEN** ve las caritas de los Moods premium con su nombre en el idioma del dispositivo
 
+#### Scenario: El escaparate indica que se desliza
+- **WHEN** el escaparate tiene más Moods de los que caben en pantalla
+- **THEN** el último Mood visible queda cortado por el borde y ese borde se desvanece mientras haya más contenido por ver, de modo que se note que se puede deslizar
+
 ### Requirement: Prueba gratis de 3 días según elegibilidad
 Cada plan SHALL ofrecer una prueba gratis de 3 días. El botón principal SHALL decir "Probar 3 días gratis" únicamente cuando la tienda confirma que el usuario es elegible para la prueba. Si el usuario ya la usó, o la elegibilidad no se puede comprobar, el botón SHALL decir "Suscribirme" junto con el precio y la pantalla NO SHALL mencionar la prueba.
 

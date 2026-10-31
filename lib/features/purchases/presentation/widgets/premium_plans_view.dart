@@ -324,20 +324,69 @@ class _PlanCard extends StatelessWidget {
   }
 }
 
-class _MoodShowcase extends StatelessWidget {
+/// Colores de la máscara del escaparate: el borde donde todavía hay moods por
+/// ver se desvanece, para que se note que la fila se desliza. Donde ya no hay
+/// más contenido el borde queda opaco.
+@visibleForTesting
+List<Color> premiumShowcaseFade({
+  required bool canScrollLeft,
+  required bool canScrollRight,
+}) =>
+    [
+      canScrollLeft ? Colors.transparent : Colors.black,
+      Colors.black,
+      Colors.black,
+      canScrollRight ? Colors.transparent : Colors.black,
+    ];
+
+class _MoodShowcase extends StatefulWidget {
   const _MoodShowcase({required this.unlockedMoodIds});
 
   final Set<String> unlockedMoodIds;
 
-  static const _itemWidth = 88.0;
+  @override
+  State<_MoodShowcase> createState() => _MoodShowcaseState();
+}
+
+class _MoodShowcaseState extends State<_MoodShowcase> {
   static const _iconSize = 40.0;
+  static const _separator = 4.0;
+
+  /// Cuántas celdas se ven a la vez: tres y media, así la cuarta queda cortada
+  /// en el borde y se nota que hay más a la derecha.
+  static const _visibleItems = 3.6;
+
+  /// Ancho mínimo de una celda con el texto a tamaño normal; sin él, nombres
+  /// largos como "Affectionate" se parten a mitad de palabra.
+  static const _minItemWidth = 88.0;
+
+  bool _canScrollLeft = false;
+
+  // Siempre hay más moods de los que caben, así que al empezar se puede
+  // deslizar a la derecha.
+  bool _canScrollRight = true;
+
+  bool _onScroll(ScrollNotification notification) {
+    final metrics = notification.metrics;
+    final left = metrics.pixels > 1;
+    final right = metrics.pixels < metrics.maxScrollExtent - 1;
+    if (left != _canScrollLeft || right != _canScrollRight) {
+      setState(() {
+        _canScrollLeft = left;
+        _canScrollRight = right;
+      });
+    }
+    return false;
+  }
 
   @override
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
-    // Fila horizontal: así los planes y el botón quedan a la vista sin tener
-    // que desplazar la pantalla. La altura sigue al tamaño de texto del sistema.
+    final textScale = MediaQuery.textScalerOf(context).scale(1);
+    // La altura y el ancho mínimo siguen al tamaño de texto del sistema.
     final textHeight = MediaQuery.textScalerOf(context).scale(34);
+    final minWidth = _minItemWidth * textScale.clamp(1.0, 2.0);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -349,54 +398,94 @@ class _MoodShowcase extends StatelessWidget {
               ?.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 8),
-        SizedBox(
-          height: _iconSize + 8 + textHeight + 8,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            itemCount: premiumMoodDefinitions.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 4),
-            itemBuilder: (context, index) {
-              final mood = premiumMoodDefinitions[index];
-              return SizedBox(
-                width: _itemWidth,
-                child: Column(
-                  children: [
-                    Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        SvgPicture.asset(
-                          mood.assetPath,
-                          height: _iconSize,
-                          width: _iconSize,
-                          semanticsLabel: strings.moodName(mood.id),
-                        ),
-                        if (unlockedMoodIds.contains(mood.id))
-                          const Positioned(
-                            right: -6,
-                            bottom: -4,
-                            child: Icon(
-                              Icons.check_circle,
-                              size: 16,
-                              color: _brand,
-                            ),
-                          ),
-                      ],
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final fitted =
+                (constraints.maxWidth - _separator * 3) / _visibleItems;
+            final itemWidth = fitted < minWidth ? minWidth : fitted;
+            return SizedBox(
+              height: _iconSize + 8 + textHeight + 8,
+              child: NotificationListener<ScrollNotification>(
+                onNotification: _onScroll,
+                child: ShaderMask(
+                  blendMode: BlendMode.dstIn,
+                  shaderCallback: (bounds) => LinearGradient(
+                    colors: premiumShowcaseFade(
+                      canScrollLeft: _canScrollLeft,
+                      canScrollRight: _canScrollRight,
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      strings.moodName(mood.id),
-                      style: Theme.of(context).textTheme.bodySmall,
-                      textAlign: TextAlign.center,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+                    stops: const [0, 0.08, 0.88, 1],
+                  ).createShader(bounds),
+                  child: ListView.separated(
+                    key: const Key('premium-moods-row'),
+                    scrollDirection: Axis.horizontal,
+                    itemCount: premiumMoodDefinitions.length,
+                    separatorBuilder: (_, __) =>
+                        const SizedBox(width: _separator),
+                    itemBuilder: (context, index) => _MoodShowcaseItem(
+                      key: Key('premium-mood-$index'),
+                      mood: premiumMoodDefinitions[index],
+                      width: itemWidth,
+                      isUnlocked: widget.unlockedMoodIds
+                          .contains(premiumMoodDefinitions[index].id),
                     ),
-                  ],
+                  ),
                 ),
-              );
-            },
-          ),
+              ),
+            );
+          },
         ),
       ],
+    );
+  }
+}
+
+class _MoodShowcaseItem extends StatelessWidget {
+  const _MoodShowcaseItem({
+    super.key,
+    required this.mood,
+    required this.width,
+    required this.isUnlocked,
+  });
+
+  final MoodDefinition mood;
+  final double width;
+  final bool isUnlocked;
+
+  @override
+  Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
+    return SizedBox(
+      width: width,
+      child: Column(
+        children: [
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              SvgPicture.asset(
+                mood.assetPath,
+                height: _MoodShowcaseState._iconSize,
+                width: _MoodShowcaseState._iconSize,
+                semanticsLabel: strings.moodName(mood.id),
+              ),
+              if (isUnlocked)
+                const Positioned(
+                  right: -6,
+                  bottom: -4,
+                  child: Icon(Icons.check_circle, size: 16, color: _brand),
+                ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            strings.moodName(mood.id),
+            style: Theme.of(context).textTheme.bodySmall,
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
     );
   }
 }
