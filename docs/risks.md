@@ -152,3 +152,26 @@ impacto/esfuerzo parece ser:
 
 1. Dar resultado claro al flujo de restore.
 2. Evitar cerrar el modal de compra antes de confirmación real.
+
+## Suscripción Premium (1.10.0)
+
+Riesgos aceptados al pasar de compras sueltas a una suscripción semanal, mensual y anual (change `replace-mood-purchases-with-subscription`). El documento anterior de esta página describe una implementación previa de compras; para la vigente, ver `CLAUDE.md` ("Compras in-app").
+
+### Sin validación de recibos propia
+RevenueCat es la fuente de verdad y el cliente confía en su `CustomerInfo`. Sigue valiendo el riesgo de la sección 1 de arriba: no hay backend propio que valide recibos.
+
+### Caducidad sin conexión
+RevenueCat cachea el último `CustomerInfo` y evalúa la caducidad con fechas firmadas, pero sin red el estado puede ser el último conocido. Una suscripción vencida puede seguir desbloqueando moods hasta la siguiente conexión y, al revés, una renovada puede tardar en reflejarse.
+- Se acepta: lo único que está en juego es poder crear entradas nuevas con moods premium; el historial nunca se toca.
+
+### Reembolsos y fallos de pago en Android
+Las notificaciones en tiempo real de Google Play hacia RevenueCat (RTDN) siguen pendientes (`backlog.md`). Sin ellas, un reembolso o una cancelación puede tardar en llegar a RevenueCat.
+
+### El reloj puede mostrar moods que ya no están desbloqueados
+El reloj muestra el último estado que publicó el iPhone. Si la suscripción vence con la app cerrada, el reloj puede ofrecer un mood premium hasta que el iPhone se abra. El iPhone descarta esa elección sin cambiar ninguna entrada y el siguiente estado la da por procesada (`handledChoiceIds`); ver `docs/watch-sync-contract.md`.
+
+### La prueba gratis y los usuarios de versiones anteriores
+Quien se suscribe desde la 1.10.0 no ve sus moods desbloqueados en un dispositivo con la 1.8.x o la 1.9.0 (solo leen los entitlements `mood_*`). Se acepta: la suscripción se compra y se usa en la versión nueva.
+
+### Precio frente a las compras sueltas
+Un mensual de $2.99 supera el coste de comprar todo suelto (≈ $8 con los Packs) en pocos meses. Sin compras reales hasta octubre de 2026 no hay compradores con los que comparar; los precios viven en las tiendas y se pueden cambiar sin tocar la app.

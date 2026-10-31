@@ -53,9 +53,9 @@
 
 ## 8. Sitio, documentos y especificaciones
 
-- [ ] 8.1 Reescribir la sección 3 de `site/terms` y `site/es/terms` y la línea de RevenueCat de `site/privacy` y `site/es/privacy`; actualizar sus fechas
-- [ ] 8.2 Actualizar `PRODUCT.md` (moods premium por suscripción; la web sigue sin precios), `CONTEXT.md` (glosario), `docs/risks.md` (caducidad offline), marcar el ADR 0002 como "Reemplazado" y actualizar `CLAUDE.md` y `backlog.md` (lo que queda fuera de v1)
-- [ ] 8.3 Validar con `openspec validate replace-mood-purchases-with-subscription` y revisar que no queden referencias a Packs o compras sueltas en `lib/`, `test/` y `site/` (salvo la lectura de `mood_*`)
+- [x] 8.1 Reescribir la sección 3 de `site/terms` y `site/es/terms` y la línea de RevenueCat de `site/privacy` y `site/es/privacy`; actualizar sus fechas Hecho el 2026-10-31. El texto cubre también las versiones anteriores que aún venden moods sueltos, porque el sitio se publica antes que la 1.10.0.
+- [x] 8.2 Actualizar `PRODUCT.md` (moods premium por suscripción; la web sigue sin precios), `CONTEXT.md` (glosario), `docs/risks.md` (caducidad offline), marcar el ADR 0002 como "Reemplazado" y actualizar `CLAUDE.md` y `backlog.md` (lo que queda fuera de v1) Hecho (`PRODUCT.md`, `CONTEXT.md`, `docs/risks.md` con una sección nueva, ADR 0002 marcado como reemplazado, `CLAUDE.md` y `backlog.md`).
+- [x] 8.3 Validar con `openspec validate replace-mood-purchases-with-subscription` y revisar que no queden referencias a Packs o compras sueltas en `lib/`, `test/` y `site/` (salvo la lectura de `mood_*`) `openspec validate --strict` pasa; solo queda la lectura de `mood_*` como referencia a Packs en `lib/`.
 
 ## 9. Pruebas en dispositivo y en tiendas
 

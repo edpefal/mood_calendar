@@ -112,7 +112,7 @@ def rows(bs, tol=24):
 
 
 def tab_buttons():
-    """Bottom bar tabs, left to right: [mood picker, calendar, store, settings]."""
+    """Bottom bar tabs, left to right: [mood picker, calendar, premium, settings]."""
     groups = [g for g in rows(buttons()) if len(g) == 4]
     return sorted(groups[-1], key=lambda b: b[0]) if groups else []
 
