@@ -49,6 +49,9 @@ Backlog activo del proyecto, actualizado contra el estado actual del repo.
 
 ## Alta prioridad
 
+- Publicar la app de Apple Watch (≈1.9.0).
+  Implementada en el change `add-apple-watch-mood-picker`. Falta: probar la sincronización en un iPhone y un Apple Watch reales (TestFlight): entrega en cola, idioma, varias elecciones del mismo día y compra de un mood; capturas de Watch (`tool/screenshots/capture_watch.py`) y la ficha de App Store Connect; subir la versión, construir con `scripts/build_ios_release.sh` y enviar a revisión. Mejoras posteriores: complicación en la esfera, notas por dictado, colores pastel por mood, acciones en la notificación del recordatorio y app independiente.
+
 - Cerrar el lanzamiento de la 1.8.5 (iOS y Android).
   Android ya está publicado en Google Play (confirmado el 2026-10-24); falta verificar qué `versionCode` sirve en producción. En iOS, comprobar el estado de la 1.8.5 (build 36) en App Store Connect: estaba en revisión. Al aprobarse: comprobar en Firebase → Analytics que llegan usuarios reales y anotar el estado en `CLAUDE.md` ("Estado actual"). Opcional: recapturar los slides en español, que muestran los textos anteriores a la corrección de acentos; al regenerarlos, revisar en `compose.py` que el slide 5 (recordatorios) enmarque bien la captura de Settings a pantalla completa.
 

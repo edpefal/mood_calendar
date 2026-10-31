@@ -30,6 +30,17 @@ for fw in "$APP"/Frameworks/*.framework; do
   [[ -f "$fw/$name" ]] && binaries+=("$fw/$name")
 done
 
+# The embedded Apple Watch app (Runner.app/Watch/*.app) gets the same checks.
+for watch_app in "$APP"/Watch/*.app; do
+  [[ -d "$watch_app" ]] || continue
+  watch_exec=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$watch_app/Info.plist" 2>/dev/null || true)
+  [[ -n "$watch_exec" && -f "$watch_app/$watch_exec" ]] && binaries+=("$watch_app/$watch_exec")
+  if /usr/libexec/PlistBuddy -c 'Print :NSUserTrackingUsageDescription' "$watch_app/Info.plist" >/dev/null 2>&1; then
+    echo "ERROR: $watch_app Info.plist declares NSUserTrackingUsageDescription (ATT prompt)." >&2
+    bad=1
+  fi
+done
+
 for binary in "${binaries[@]}"; do
   # grep -c reads all input, so pipefail never trips on a SIGPIPE (grep -q would
   # hide a real AdSupport link behind a false "not found").

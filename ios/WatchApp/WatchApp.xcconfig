@@ -1,0 +1,2 @@
+// Only the version numbers come from Flutter; the watch target links no Pods.
+#include "../Flutter/Generated.xcconfig"

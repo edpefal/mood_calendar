@@ -43,6 +43,13 @@ import 'features/purchases/data/repositories/mood_entitlements_repository_impl.d
 import 'features/purchases/data/repositories/noop_mood_entitlements_repository.dart';
 import 'features/purchases/domain/repositories/mood_entitlements_repository.dart';
 import 'features/purchases/presentation/bloc/purchases_cubit.dart';
+import 'features/watch/data/method_channel_watch_channel.dart';
+import 'features/watch/data/noop_watch_channel.dart';
+import 'features/watch/domain/repositories/watch_channel.dart';
+import 'features/watch/domain/services/watch_sync_coordinator.dart';
+import 'features/watch/domain/usecases/process_watch_inbox_usecase.dart';
+import 'features/watch/domain/usecases/publish_watch_state_usecase.dart';
+import 'features/watch/presentation/watch_sync_host.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 final mainShellKey = GlobalKey<MainShellState>();
@@ -181,9 +188,32 @@ void main() async {
     moodEntitlementsRepository = const NoopMoodEntitlementsRepository();
   }
 
+  // Apple Watch: solo iOS. Procesar el buzón y publicar el estado no espera
+  // nada del usuario y arranca después de runApp (WatchSyncHost).
+  final isIos = defaultTargetPlatform == TargetPlatform.iOS;
+  final WatchChannel watchChannel =
+      isIos ? MethodChannelWatchChannel() : const NoopWatchChannel();
+  final watchSync = WatchSyncCoordinator(
+    processInbox: ProcessWatchInboxUseCase(
+      repository: repository,
+      channel: watchChannel,
+      isUnlocked: moodEntitlementsRepository.isUnlocked,
+    ),
+    publishState: PublishWatchStateUseCase(
+      repository: repository,
+      channel: watchChannel,
+      isUnlocked: moodEntitlementsRepository.isUnlocked,
+      strings: () => AppStrings.forLocale(PlatformDispatcher.instance.locale),
+    ),
+    channel: watchChannel,
+    unlockedMoodIds: moodEntitlementsRepository.unlockedPremiumMoodIds(),
+    logger: appLogger,
+  );
+
   runApp(
     MultiRepositoryProvider(
       providers: [
+        RepositoryProvider<WatchSyncCoordinator>.value(value: watchSync),
         RepositoryProvider<AppLogger>.value(value: appLogger),
         RepositoryProvider<AnalyticsReporter>.value(
           value: analyticsReporter ?? const NoopAnalyticsReporter(),
@@ -226,7 +256,7 @@ void main() async {
             ),
           ),
         ],
-        child: const MyApp(),
+        child: isIos ? const WatchSyncHost(child: MyApp()) : const MyApp(),
       ),
     ),
   );
