@@ -8,9 +8,9 @@ Flutter app para registrar y revisar estados de ánimo diarios, con un catálogo
 - **Analíticas medidas**: Firebase Analytics funciona (eventos vistos en Analytics → Realtime desde builds de TestFlight y de la pista interna). Los `GoogleService-Info.plist` y `google-services.json` siguen trayendo Analytics como deshabilitado aunque la propiedad de GA (`mood-calendar-fee5c`) está vinculada, y aun así funciona: no hace falta regenerarlos.
 - **Declaraciones de privacidad al día**: App Privacy de Apple (Device ID, Purchase History, Product Interaction y Crash Data; no vinculados, sin rastreo) y Data safety de Play (interacciones en la app, ID de dispositivo, historial de compras y registros de fallos). Ver "Privacidad y declaraciones de las tiendas".
 - **Sitio** `https://moodcalendar.app` activo (política de privacidad, términos y soporte en inglés y español). Ver "Sitio web".
-- **OpenSpec**: 14 specs vigentes y **dos changes activos**: `add-apple-watch-mood-picker` (implementado y probado en dispositivos; se archiva cuando Apple apruebe la 1.9.0) y `replace-mood-purchases-with-subscription` (solo los artefactos: reemplaza las compras sueltas y los Packs por una suscripción semanal, mensual y anual; se implementa después del reloj, en la 1.10.0).
+- **OpenSpec**: 15 specs vigentes y **un change activo**: `replace-mood-purchases-with-subscription` (reemplaza las compras sueltas y los Packs por una suscripción semanal, mensual y anual; las tiendas y RevenueCat ya están configuradas y falta implementar la app, en la 1.10.0). El change del reloj (`add-apple-watch-mood-picker`) está archivado.
 - **Apple Watch**: implementada en el change `add-apple-watch-mood-picker` (elegir el mood de hoy desde el reloj), mergeada en `main` (PR #113) y probada en un iPhone y un Apple Watch reales con TestFlight (2026-10-30). La 1.9.0 (build 37) está en revisión de Apple desde el 2026-10-31. Ver "Apple Watch".
-- **Pendiente**: archivar el change del reloj al aprobarse la 1.9.0, la suscripción (1.10.0), notificaciones RTDN de Google Play hacia RevenueCat, respaldo de `~/my-release-key.jks` fuera del equipo y el toggle de Crashlytics (ver `backlog.md`).
+- **Pendiente**: la suscripción (1.10.0), notificaciones RTDN de Google Play hacia RevenueCat, respaldo de `~/my-release-key.jks` fuera del equipo y el toggle de Crashlytics (ver `backlog.md`).
 
 ## Stack
 
@@ -73,7 +73,7 @@ Fuera de `lib/`:
 - `docs/risks.md` — riesgos aceptados de IAP (sin validación de recibos en backend, etc.).
 - `docs/brainstorms/` y `docs/plans/` — requisitos y plan de las compras de moods (abril 2026); contexto histórico, no vigente.
 - `backlog.md` — backlog activo.
-- `openspec/` — workflow spec-driven: `openspec/specs/` contiene los specs vigentes (`branded-launch-screen`, `bottom-navigation`, `calendar-navigation`, `daily-note-capture`, `ios-simulator-ui-testing`, `localization-architecture`, `monthly-mood-summary`, `mood-history-export`, `mood-store`, `premium-moods`, `rating-prompt`, `settings-screen`, `usage-analytics`, `crash-reporting`) y `openspec/changes/archive/` el historial de changes con su proposal/design/tasks. Consultarlo antes de tocar un área con historia.
+- `openspec/` — workflow spec-driven: `openspec/specs/` contiene los specs vigentes (`branded-launch-screen`, `bottom-navigation`, `calendar-navigation`, `daily-note-capture`, `ios-simulator-ui-testing`, `localization-architecture`, `monthly-mood-summary`, `mood-history-export`, `mood-store`, `premium-moods`, `rating-prompt`, `settings-screen`, `usage-analytics`, `crash-reporting`, `watch-mood-picker`) y `openspec/changes/archive/` el historial de changes con su proposal/design/tasks. Consultarlo antes de tocar un área con historia.
 
 ## Localización
 
@@ -117,7 +117,7 @@ Cada uno tiene su spec en `openspec/specs/`; leerla antes de cambiarlo.
 
 ## Apple Watch
 
-El reloj (solo iOS) permite elegir el mood de **hoy** con un toque. Spec en `openspec/specs/watch-mood-picker/` (o el change `add-apple-watch-mood-picker` mientras siga activo); contrato de sincronización en `docs/watch-sync-contract.md` y pruebas en `docs/watch-testing.md`.
+El reloj (solo iOS) permite elegir el mood de **hoy** con un toque. Spec en `openspec/specs/watch-mood-picker/` (historial en `openspec/changes/archive/*-add-apple-watch-mood-picker/`); contrato de sincronización en `docs/watch-sync-contract.md` y pruebas en `docs/watch-testing.md`.
 
 - **El iPhone es la única fuente de verdad (Hive).** El reloj no guarda historial: muestra el último estado que publicó el iPhone (moods **desbloqueados** en el orden del selector, nombres ya localizados por `AppStrings` y el mood de hoy) y manda solo `{id, fecha local, mood, chosenAt}`, nunca `intensity` (ADR 0001). No hay compras en el reloj.
 - **Transporte**: `updateApplicationContext` hacia el reloj y `transferUserInfo` (cola persistente) hacia el iPhone. Swift (`WatchBridge`, `WatchInboxStore`) guarda las elecciones en un buzón en `UserDefaults` porque Hive solo es accesible desde Dart; Dart (`ProcessWatchInboxUseCase`) las aplica conservando la nota del día y **solo después** las confirma (`ackInbox`). `WCSession` se activa en `AppDelegate` al arrancar, antes de Dart.
