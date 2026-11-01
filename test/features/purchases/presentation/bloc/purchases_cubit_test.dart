@@ -63,6 +63,41 @@ void main() {
     expect(recorded.stackTrace, isNotNull);
   });
 
+  test('an empty plan list is reported as a catalog failure without an error',
+      () async {
+    final telemetry = _RecordingTelemetry();
+    final cubit = PurchasesCubit(
+      FakeMoodEntitlementsRepository(plans: const []),
+      telemetry: telemetry,
+    );
+    addTearDown(cubit.close);
+
+    await Future<void>.delayed(Duration.zero);
+
+    expect(cubit.state.plans, isEmpty);
+    expect(cubit.state.catalogError, isNull);
+    expect(cubit.state.isLoadingCatalog, isFalse);
+    expect(telemetry.errors, hasLength(1));
+    final recorded = telemetry.errors.single;
+    expect(recorded.name, 'load_store_catalog_failed');
+    expect(recorded.reason, 'empty_plans');
+    expect(recorded.error, isNull);
+  });
+
+  test('a catalog with plans records no error', () async {
+    final telemetry = _RecordingTelemetry();
+    final cubit = PurchasesCubit(
+      FakeMoodEntitlementsRepository(),
+      telemetry: telemetry,
+    );
+    addTearDown(cubit.close);
+
+    await Future<void>.delayed(Duration.zero);
+
+    expect(cubit.state.plans, defaultTestPlans);
+    expect(telemetry.errors, isEmpty);
+  });
+
   test('a retry after a failure clears the error and loads the plans',
       () async {
     final telemetry = _RecordingTelemetry();

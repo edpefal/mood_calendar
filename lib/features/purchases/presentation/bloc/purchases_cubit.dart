@@ -58,6 +58,15 @@ class PurchasesCubit extends Cubit<PurchasesState> {
     emit(state.copyWith(isLoadingCatalog: true, catalogError: null));
     try {
       final plans = await repository.availablePlans();
+      if (plans.isEmpty) {
+        // Sin excepción pero sin planes: la tienda no devolvió los productos
+        // de la suscripción. La pantalla muestra el mismo error, así que se
+        // reporta aparte de un fallo de `getOfferings`.
+        telemetry?.recordError(
+          'load_store_catalog_failed',
+          reason: 'empty_plans',
+        );
+      }
       emit(state.copyWith(plans: plans, isLoadingCatalog: false));
     } catch (e, stackTrace) {
       telemetry?.recordError(
