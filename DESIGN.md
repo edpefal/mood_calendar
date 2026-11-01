@@ -2,23 +2,23 @@
 name: Mood Calendar (sitio web)
 description: Un selector de moods de bolsillo hecho web: caritas sobre pasteles, calma y privacidad.
 colors:
-  brand: "#5F3DC4"
-  brand-signal: "#6C63FF"
-  brand-deep: "#3B2494"
-  ink: "#1F1637"
-  ink-soft: "#2C2650"
-  paper: "#FAF8FF"
-  muted: "#554E70"
-  line: "#E6E1F5"
+  brand: "#00727D"
+  brand-signal: "#00838F"
+  brand-deep: "#004A52"
+  ink: "#0B2A2E"
+  ink-soft: "#1B3F44"
+  paper: "#F6FBFB"
+  muted: "#4A6468"
+  line: "#D9E8EA"
   card: "#FFFFFF"
-  night: "#14111F"
-  night-card: "#1D1930"
-  night-text: "#F1EEFC"
-  night-muted: "#B8B2CE"
-  night-heading: "#E4DEFF"
-  night-link: "#B3A8FF"
-  night-line: "#2E2946"
-  bezel: "#17102E"
+  night: "#0C1618"
+  night-card: "#13242A"
+  night-text: "#E6F4F5"
+  night-muted: "#A9C2C5"
+  night-heading: "#BDEEF3"
+  night-link: "#5CC8D4"
+  night-line: "#1F3A40"
+  bezel: "#0E1B1E"
   happy-from: "#E8F5E9"
   happy-to: "#A5D6A7"
   calm-from: "#E3F2FD"
@@ -93,40 +93,40 @@ components:
 
 **Creative North Star: "El selector de bolsillo"**
 
-La web se comporta como la app: una carita grande al centro, un pastel que cambia con ella y todo lo demás en calma. El sitio no explica la app, la deja usar: lo primero que ve una persona es el mismo gesto de elegir cómo se siente, con el color propio de cada mood. Alrededor, la página guarda silencio: aire, un solo mensaje por bloque y una sola pieza de color de marca (el púrpura de la privacidad) para cerrar.
+La web se comporta como la app: una carita grande al centro, un pastel que cambia con ella y todo lo demás en calma. El sitio no explica la app, la deja usar: lo primero que ve una persona es el mismo gesto de elegir cómo se siente, con el color propio de cada mood. Alrededor, la página guarda silencio: aire, un solo mensaje por bloque y una sola pieza de color de marca (el cian de la privacidad) para cerrar.
 
-El tono es tranquilo y confiable. Tranquilo, porque casi nada se mueve (solo la carita y su fondo, y sin movimiento si el sistema lo pide). Confiable, porque la privacidad se dice sin adornos ni promesas vagas, sobre el púrpura sólido de la marca. Las caritas llevan toda la expresividad; el resto es tipografía, espacio y planos de color.
+El tono es tranquilo y confiable. Tranquilo, porque casi nada se mueve (solo la carita y su fondo, y sin movimiento si el sistema lo pide). Confiable, porque la privacidad se dice sin adornos ni promesas vagas, sobre el cian sólido de la marca. Las caritas llevan toda la expresividad; el resto es tipografía, espacio y planos de color.
 
 **Key Characteristics:**
 - Móvil primero: la primera pantalla de 390 pt contiene titular, carita, selector y los dos badges.
-- Color de dos fuentes: los pasteles de cada mood (los de la app) y el púrpura de marca, nunca mezclados en la misma superficie.
+- Color de dos fuentes: los pasteles de cada mood (los de la app) y el cian de marca, nunca mezclados en la misma superficie.
 - Planos y suaves: superficies planas; solo el teléfono lleva sombra.
 - Funciona sin JavaScript y sin movimiento; el script solo añade el cambio de color, nombre y contador.
 - Sin recursos de terceros: Poppins autoalojada y nada que cargue desde otro dominio.
 
 ## Colors
 
-Una paleta de dos voces: pasteles de mood en el héroe y púrpura de marca en el cierre, sobre un papel lavanda muy claro (o un negro violáceo en modo oscuro).
+Una paleta de dos voces: pasteles de mood en el héroe y cian de marca en el cierre, sobre un papel azulado muy claro (o un negro verdoso en modo oscuro).
 
 ### Primary
-- **Violeta de Marca** (#5F3DC4): botones y enlaces en claro, inicio del bloque de privacidad y fondo del ícono. Es el color de la app y de la tienda.
-- **Violeta Señal** (#6C63FF): extremo del degradado de marca y anillo de foco.
-- **Violeta Profundo** (#3B2494): titulares de sección, el selector ‹ n / 5 › y el final del degradado de privacidad.
+- **Cian de Marca** (#00727D): botones y enlaces en claro, inicio del bloque de privacidad. Es el color de la app y de la tienda.
+- **Cian Señal** (#00838F): extremo del degradado de marca, fondo del ícono y anillo de foco en claro (#3CB6C3 en oscuro).
+- **Cian Profundo** (#004A52): titulares de sección, el selector ‹ n / 5 › y el final del degradado de privacidad.
 
 ### Secondary
 - **Pasteles de mood**: cada mood base va de un tono muy claro a uno medio, tomados de la escala 50 y 200 de los colores Material de la app. Feliz verde (#E8F5E9 → #A5D6A7), Tranquilo azul (#E3F2FD → #90CAF9), Neutral gris (#FAFAFA → #EEEEEE), Triste naranja (#FFF3E0 → #FFCC80) y Enojado rojo (#FFEBEE → #EF9A9A). Solo se usan como fondo del héroe, en diagonal de arriba-izquierda a abajo-derecha.
 
 ### Neutral
-- **Tinta de Noche Suave** (#1F1637): texto principal en claro y titular sobre pastel.
-- **Tinta Secundaria** (#2C2650): línea de apoyo bajo el titular, sobre pastel.
-- **Papel Lavanda** (#FAF8FF): fondo en claro.
-- **Gris Violeta** (#554E70): texto de apoyo y pie.
-- **Línea Lila** (#E6E1F5): divisores y borde del pie.
-- **Noche Violeta** (#14111F), con tarjeta (#1D1930), texto (#F1EEFC), apoyo (#B8B2CE), titular (#E4DEFF), enlace (#B3A8FF) y línea (#2E2946): el modo oscuro.
-- **Bisel del Teléfono** (#17102E): marco del teléfono, el mismo en claro y en oscuro.
+- **Tinta de Noche Suave** (#0B2A2E): texto principal en claro y titular sobre pastel.
+- **Tinta Secundaria** (#1B3F44): línea de apoyo bajo el titular, sobre pastel.
+- **Papel Hielo** (#F6FBFB): fondo en claro.
+- **Gris Cian** (#4A6468): texto de apoyo y pie.
+- **Línea Cian** (#D9E8EA): divisores y borde del pie.
+- **Noche Cian** (#0C1618), con tarjeta (#13242A), texto (#E6F4F5), apoyo (#A9C2C5), titular (#BDEEF3), enlace (#5CC8D4) y línea (#1F3A40): el modo oscuro.
+- **Bisel del Teléfono** (#0E1B1E): marco del teléfono, el mismo en claro y en oscuro.
 
 ### Named Rules
-**The Two Voices Rule.** Un pastel de mood y el púrpura de marca nunca comparten superficie: el pastel pertenece al selector, el púrpura al cierre de privacidad. Mezclarlos diluye a ambos.
+**The Two Voices Rule.** Un pastel de mood y el cian de marca nunca comparten superficie: el pastel pertenece al selector, el cian al cierre de privacidad. Mezclarlos diluye a ambos.
 
 **The Mood Owns The Hero Rule.** El fondo del héroe es siempre el degradado del mood seleccionado; no se fija un color de marca encima de él.
 
@@ -175,20 +175,20 @@ Formas redondas y sin esquinas duras. Los controles circulares son de 48 px (50%
 ### Selector de caritas
 - **Estructura:** lista horizontal con `scroll-snap`; cada carita ocupa el 80% de su ancho y las vecinas se ven a 40% de escala y 50% de opacidad.
 - **Estado actual:** la carita central a escala completa; el cambio dura 0.6 s con una curva exponencial de salida y se anula con movimiento reducido.
-- **Controles:** botones circulares de 48 px con chevron de trazo 2.5 px y contador `n / 5` en Violeta Profundo.
+- **Controles:** botones circulares de 48 px con chevron de trazo 2.5 px y contador `n / 5` en Cian Profundo.
 - **Sin JavaScript:** una fila de caritas que se desliza a mano.
 
 ### Teléfono
 - Marco de 10 px en Bisel del Teléfono, corte inferior sin borde y la captura limpia del calendario; ancho máximo de 300 px y alto de 480 px.
 
 ### Bloque de privacidad
-- Degradado de Violeta Profundo a Violeta de Marca a todo el ancho, titular blanco de hasta 16ch y tres puntos separados por una línea blanca al 28%. Texto de apoyo en #EDE9FF (contraste 6:1 o más).
+- Degradado de Cian Profundo a Cian de Marca a todo el ancho, titular blanco de hasta 16ch y tres puntos separados por una línea blanca al 28%. Texto de apoyo en #DDF3F5 (contraste 6:1 o más).
 
 ### Badges de tienda
 - Los oficiales de App Store y Google Play, tal cual los entregan Apple y Google, a 48 px de alto. No se recolorean ni se recortan. El de Google Play lleva un margen negativo para compensar su espacio libre.
 
 ### Enlaces y pie
-- Enlaces subrayados con desplazamiento de 0.2em, en Violeta de Marca (claro) o #B3A8FF (oscuro). El pie y la cabecera son idénticos en las ocho páginas, con objetivos táctiles de al menos 44 px.
+- Enlaces subrayados con desplazamiento de 0.2em, en Cian de Marca (claro) o #5CC8D4 (oscuro). El pie y la cabecera son idénticos en las ocho páginas, con objetivos táctiles de al menos 44 px.
 
 ## Do's and Don'ts
 
@@ -200,7 +200,7 @@ Formas redondas y sin esquinas duras. Los controles circulares son de 48 px (50%
 - **Do** mantener la edición en inglés y en español a la vez, con el mismo marcado.
 
 ### Don't:
-- **Don't** mezclar un pastel de mood con el púrpura de marca en la misma superficie.
+- **Don't** mezclar un pastel de mood con el cian de marca en la misma superficie.
 - **Don't** poner sombra a nada que no sea el teléfono, ni sombras de color.
 - **Don't** usar texto con degradado, ni tarjetas idénticas de ícono más título como estructura de página.
 - **Don't** afirmar que todos los moods son gratis ni mostrar precios; la web dice "gratis para descargar y usar".
