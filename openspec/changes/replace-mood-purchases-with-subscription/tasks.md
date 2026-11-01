@@ -61,7 +61,7 @@
 
 - [ ] 9.1 iOS con cuenta sandbox y TestFlight: comprar cada plan con prueba de 3 días, renovación acelerada, caducidad, restaurar tras reinstalar y una compra heredada con la suscripción vencida
 - [ ] 9.2 Reloj con la suscripción activa y caducada: el estado se actualiza, la elección de un mood bloqueado se descarta y la marca pendiente desaparece
-- [ ] 9.3 Android en la pista interna con una cuenta de prueba de licencias: los mismos casos que 9.1 y verificación de la elegibilidad de la prueba
+- [x] 9.3 Android en la pista interna con una cuenta de prueba de licencias: los mismos casos que 9.1 y verificación de la elegibilidad de la prueba. Hecho el 2026-11-01 con la build 39 en un teléfono (cuenta de México): compra del plan anual con prueba de 3 días, renovaciones aceleradas, caducidad, restaurar tras reinstalar, mood heredado con la suscripción vencida y planes mensual y semanal. Antes hubo que dar de alta las 174 regiones de los planes base y de la oferta `trial` en Play (solo estaban ET, MN y US).
 - [ ] 9.4 Pantalla Premium y hoja en iPad y con texto al 200 %, en los 5 idiomas; confirmar que no aparece sin que el usuario la pida
 - [ ] 9.5 `flutter analyze`, `flutter test` y `xcodebuild test` en verde; los scripts `verify_*` del archive de iOS y del bundle de Android pasan
 
