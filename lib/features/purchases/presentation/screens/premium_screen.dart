@@ -5,6 +5,7 @@ import '../../../../core/localization/app_strings.dart';
 import '../bloc/purchases_cubit.dart';
 import '../widgets/premium_links.dart';
 import '../widgets/premium_plans_view.dart';
+import '../../../../core/theme/brand_colors.dart';
 
 /// Tercera pestaña del bottom bar: la suscripción Premium.
 class PremiumScreen extends StatefulWidget {
@@ -56,11 +57,11 @@ class _PremiumScreenState extends State<PremiumScreen> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        iconTheme: const IconThemeData(color: Color(0xFF5F3DC4)),
+        iconTheme: const IconThemeData(color: brandInk),
         title: Text(
           strings.premiumTitle,
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: const Color(0xFF5F3DC4),
+                color: brandInk,
                 fontWeight: FontWeight.bold,
               ),
         ),

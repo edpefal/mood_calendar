@@ -15,6 +15,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:mood_calendar/core/telemetry/analytics_reporter.dart';
 import 'package:mood_calendar/core/localization/app_strings.dart';
+import 'package:mood_calendar/core/theme/brand_colors.dart';
 import 'package:mood_calendar/core/logging/app_logger.dart';
 import 'package:mood_calendar/core/logging/logger_app_logger.dart';
 import 'package:mood_calendar/core/notifications/local_notification_service.dart';
@@ -58,9 +59,12 @@ const List<String?> _previousMonthMoods = [
 const Map<String, String> _todayNote = {
   'en': 'Coffee with Ana and a long walk by the river. A really good day.',
   'es': 'Café con Ana y un largo paseo junto al río. Un día muy bueno.',
-  'de': 'Kaffee mit Ana und ein langer Spaziergang am Fluss. Ein richtig guter Tag.',
-  'fr': 'Un café avec Ana et une longue promenade au bord de la rivière. Une très bonne journée.',
-  'it': 'Un caffè con Ana e una lunga passeggiata lungo il fiume. Una giornata davvero bella.',
+  'de':
+      'Kaffee mit Ana und ein langer Spaziergang am Fluss. Ein richtig guter Tag.',
+  'fr':
+      'Un café avec Ana et une longue promenade au bord de la rivière. Une très bonne journée.',
+  'it':
+      'Un caffè con Ana e una lunga passeggiata lungo il fiume. Una giornata davvero bella.',
 };
 
 class _AllUnlockedEntitlementsRepository implements MoodEntitlementsRepository {
@@ -247,7 +251,10 @@ class _ScreenshotApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final baseTheme = ThemeData(
-      colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+      colorScheme: ColorScheme.fromSeed(seedColor: brandInk).copyWith(
+        surface: brandSurface,
+        surfaceContainerLow: brandSurfaceCard,
+      ),
       useMaterial3: true,
     );
     final poppinsTextTheme = GoogleFonts.poppinsTextTheme(baseTheme.textTheme);

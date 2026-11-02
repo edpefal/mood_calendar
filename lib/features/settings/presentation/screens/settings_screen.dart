@@ -15,10 +15,9 @@ import '../../../mood/data/services/rating_prompt_service.dart';
 import '../../../mood/domain/usecases/export_mood_history_usecase.dart';
 import '../bloc/settings_cubit.dart';
 import '../bloc/settings_state.dart';
+import '../../../../core/theme/brand_colors.dart';
 
 const privacyPolicyUrl = 'https://moodcalendar.app/privacy/';
-
-const _brandColor = Color(0xFF5F3DC4);
 
 /// Opens [url] outside the app; returns whether it could be opened.
 typedef UrlOpener = Future<bool> Function(Uri url);
@@ -104,11 +103,11 @@ class SettingsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        iconTheme: const IconThemeData(color: _brandColor),
+        iconTheme: const IconThemeData(color: brandInk),
         title: Text(
           strings.settingsTitle,
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: _brandColor,
+                color: brandInk,
                 fontWeight: FontWeight.bold,
               ),
         ),
@@ -194,7 +193,7 @@ class SettingsScreen extends StatelessWidget {
                     contentPadding: EdgeInsets.zero,
                     leading: const Icon(
                       Icons.info_outline_rounded,
-                      color: _brandColor,
+                      color: brandInk,
                     ),
                     title: Text(strings.appVersionTitle),
                     trailing: Text(
@@ -286,7 +285,7 @@ class _ExportHistoryRowState extends State<_ExportHistoryRow> {
       excludeSemantics: true,
       child: ListTile(
         contentPadding: EdgeInsets.zero,
-        leading: const Icon(Icons.ios_share_rounded, color: _brandColor),
+        leading: const Icon(Icons.ios_share_rounded, color: brandInk),
         title: Text(
           _isExporting ? strings.exportingHistory : strings.exportHistoryTitle,
         ),
@@ -326,7 +325,7 @@ class _LinkRow extends StatelessWidget {
       excludeSemantics: true,
       child: ListTile(
         contentPadding: EdgeInsets.zero,
-        leading: Icon(icon, color: _brandColor),
+        leading: Icon(icon, color: brandInk),
         title: Text(title),
         onTap: onTap,
       ),

@@ -16,6 +16,7 @@ import '../bloc/calendar_cubit.dart';
 import '../bloc/mood_cubit.dart';
 import '../widgets/mood_grid_sheet.dart';
 import '../widgets/note_editor_sheet.dart';
+import '../../../../core/theme/brand_colors.dart';
 
 class MoodScreen extends StatefulWidget {
   final DateTime? selectedDate;
@@ -454,7 +455,7 @@ class _MoodScreenState extends State<MoodScreen>
                                               .titleLarge
                                               ?.copyWith(
                                                 fontWeight: FontWeight.bold,
-                                                color: const Color(0xFF5F3DC4),
+                                                color: brandInk,
                                               ),
                                         ),
                                       ],
@@ -584,7 +585,7 @@ class _MoodScreenState extends State<MoodScreen>
                                           tooltip: strings.moodGridButtonLabel,
                                           icon: const Icon(
                                             Icons.grid_view_rounded,
-                                            color: Color(0xFF5F3DC4),
+                                            color: brandInk,
                                           ),
                                           onPressed: _openMoodGrid,
                                         ),
@@ -702,7 +703,7 @@ class _CarouselMood extends StatelessWidget {
                       const Icon(
                         Icons.lock_rounded,
                         size: 40,
-                        color: Color(0xFF5F3DC4),
+                        color: brandInk,
                       ),
                   ],
                 ),
@@ -746,7 +747,7 @@ class _CarouselArrow extends StatelessWidget {
       child: IconButton(
         tooltip: tooltip,
         icon: Icon(icon, size: 28),
-        color: const Color(0xFF5F3DC4),
+        color: brandInk,
         onPressed: onPressed,
       ),
     );
@@ -766,8 +767,6 @@ class _NoteButton extends StatelessWidget {
   final String label;
   final bool hasNote;
   final VoidCallback onTap;
-
-  static const _brandColor = Color(0xFF5F3DC4);
 
   @override
   Widget build(BuildContext context) {
@@ -797,7 +796,7 @@ class _NoteButton extends StatelessWidget {
                         ? Icons.sticky_note_2_rounded
                         : Icons.sticky_note_2_outlined,
                     size: 20,
-                    color: _brandColor,
+                    color: brandInk,
                   ),
                   if (hasNote)
                     Positioned(
@@ -807,7 +806,7 @@ class _NoteButton extends StatelessWidget {
                         width: 9,
                         height: 9,
                         decoration: BoxDecoration(
-                          color: _brandColor,
+                          color: brandInk,
                           shape: BoxShape.circle,
                           border: Border.all(color: Colors.white, width: 1.5),
                         ),
@@ -819,7 +818,7 @@ class _NoteButton extends StatelessWidget {
               Text(
                 label,
                 style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      color: _brandColor,
+                      color: brandInk,
                       fontWeight: FontWeight.w600,
                     ),
               ),
