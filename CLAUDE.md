@@ -151,10 +151,11 @@ El reloj (solo iOS) permite elegir el mood de **hoy** con un toque. Spec en `ope
 
 ## Sistema de diseño
 
-- Color de marca: púrpura `#5F3DC4` → `#6C63FF` (gradiente); launch screen con fondo `#8C52FF` coincidiendo con el ícono.
+- Color de marca: Ocean Cyan `#00727D` → `#00838F` (gradiente), definido una sola vez en `lib/core/theme/brand_colors.dart` (`brandInk`, `brandGradientStart`, `brandGradientEnd`): usarlo siempre, nunca un literal. El blanco sobre ambos extremos debe dar contraste ≥ 4.5 (lo comprueba `test/core/theme/brand_colors_test.dart`). Las superficies son blancos cálidos (`brandSurface`, `brandSurfaceCard`) para equilibrar el cian. El launch screen es blanco con el ícono centrado; el ícono es el trazo blanco de la carita sobre `#00838F` plano.
+- El color significa algo en esta app: cada mood tiene su tono (verde Happy, azul Calm, rojo Angry…), así que el color de marca no debe parecerse a ellos.
 - Botón primario estándar: `GradientPillButton` (`lib/core/widgets/`) — usarlo en vez de `FilledButton`/`OutlinedButton` de Material.
 - Fondos/cards ligados a un mood usan `MoodDefinitionResolver.backgroundGradientForMood(mood)`.
-- Títulos de AppBar en bold + color de marca; headers de sección en bold sin color de marca. Íconos de navegación con tinte púrpura.
+- Títulos de AppBar en bold + color de marca; headers de sección en bold sin color de marca. Íconos de navegación con el color de marca.
 - Todo control interactivo debe tener label de `Semantics`.
 
 ## Comandos útiles

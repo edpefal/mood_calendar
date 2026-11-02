@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../core/localization/app_strings.dart';
 import '../../domain/entities/mood_definition.dart';
+import '../../../../core/theme/brand_colors.dart';
 
 /// Abre la hoja con todos los moods en la cuadrícula y devuelve el mood
 /// tocado (o `null` si se cierra sin elegir). [moods] ya viene en el orden
@@ -39,8 +40,6 @@ class MoodGridSheet extends StatelessWidget {
   final List<MoodDefinition> moods;
   final String selectedId;
   final bool Function(MoodDefinition mood) isLocked;
-
-  static const _brand = Color(0xFF5F3DC4);
   static const _spacing = 8.0;
 
   @override
@@ -129,10 +128,9 @@ class _MoodCell extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
-            color:
-                selected ? MoodGridSheet._brand.withValues(alpha: 0.10) : null,
+            color: selected ? brandInk.withValues(alpha: 0.10) : null,
             border: Border.all(
-              color: selected ? MoodGridSheet._brand : Colors.transparent,
+              color: selected ? brandInk : Colors.transparent,
               width: 2,
             ),
           ),
@@ -155,7 +153,7 @@ class _MoodCell extends StatelessWidget {
                     const Icon(
                       Icons.lock_rounded,
                       size: 24,
-                      color: MoodGridSheet._brand,
+                      color: brandInk,
                     ),
                 ],
               ),

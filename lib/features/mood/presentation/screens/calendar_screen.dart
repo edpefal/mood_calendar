@@ -9,6 +9,7 @@ import '../../data/services/rating_prompt_service.dart';
 import '../../domain/services/mood_definition_resolver.dart';
 import '../bloc/calendar_cubit.dart';
 import '../widgets/monthly_mood_summary_card.dart';
+import '../../../../core/theme/brand_colors.dart';
 
 class CalendarScreen extends StatefulWidget {
   /// Día cuya entrada se acaba de guardar; se resalta con una animación.
@@ -119,7 +120,7 @@ class _CalendarScreenState extends State<CalendarScreen>
         title: Text(
           strings.calendarTitle,
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: const Color(0xFF5F3DC4),
+                color: brandInk,
                 fontWeight: FontWeight.bold,
               ),
         ),
@@ -410,7 +411,7 @@ class _CalendarHeader extends StatelessWidget {
           tooltip: strings.previousMonthTooltip,
           icon: const Icon(
             Icons.chevron_left_rounded,
-            color: Color(0xFF5F3DC4),
+            color: brandInk,
           ),
           onPressed: onPreviousMonth,
         ),
@@ -420,7 +421,7 @@ class _CalendarHeader extends StatelessWidget {
             textAlign: TextAlign.center,
             overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: const Color(0xFF5F3DC4),
+                  color: brandInk,
                   fontWeight: FontWeight.w700,
                 ),
           ),
@@ -430,9 +431,7 @@ class _CalendarHeader extends StatelessWidget {
           tooltip: strings.nextMonthTooltip,
           icon: Icon(
             Icons.chevron_right_rounded,
-            color: onNextMonth == null
-                ? Colors.grey[400]
-                : const Color(0xFF5F3DC4),
+            color: onNextMonth == null ? Colors.grey[400] : brandInk,
           ),
           onPressed: onNextMonth,
         ),

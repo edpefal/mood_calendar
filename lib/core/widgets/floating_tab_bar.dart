@@ -1,8 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-
-const Color _brandColor = Color(0xFF5F3DC4);
+import '../theme/brand_colors.dart';
 
 // Relleno y desenfoque bajos a propósito: el contenido que pasa por debajo del
 // bar debe seguir siendo reconocible (spec `bottom-navigation`).
@@ -135,11 +134,11 @@ class _TabButton extends StatelessWidget {
               height: 48,
               decoration: BoxDecoration(
                 color: selected
-                    ? _brandColor.withValues(alpha: 0.14)
+                    ? brandInk.withValues(alpha: 0.14)
                     : Colors.transparent,
                 borderRadius: BorderRadius.circular(24),
               ),
-              child: Icon(item.icon, color: _brandColor, size: 26),
+              child: Icon(item.icon, color: brandInk, size: 26),
             ),
           ),
         ),
