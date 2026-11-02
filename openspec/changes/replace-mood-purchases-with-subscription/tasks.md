@@ -59,11 +59,11 @@
 
 ## 9. Pruebas en dispositivo y en tiendas
 
-- [ ] 9.1 iOS con cuenta sandbox y TestFlight: comprar cada plan con prueba de 3 días, renovación acelerada, caducidad, restaurar tras reinstalar y una compra heredada con la suscripción vencida
-- [ ] 9.2 Reloj con la suscripción activa y caducada: el estado se actualiza, la elección de un mood bloqueado se descarta y la marca pendiente desaparece
+- [x] 9.1 iOS con cuenta sandbox y TestFlight: comprar cada plan con prueba de 3 días, renovación acelerada, caducidad, restaurar tras reinstalar y una compra heredada con la suscripción vencida Omitido por decisión del usuario el 2026-11-02 (se da por suficiente la prueba en Android). Evidencia parcial en RevenueCat: un cliente de iOS con `premium_weekly` en sandbox compró, activó el entitlement `premium` y sigue renovándose. No se probaron la caducidad limpia ni restaurar tras reinstalar en iOS.
+- [x] 9.2 Reloj con la suscripción activa y caducada: el estado se actualiza, la elección de un mood bloqueado se descarta y la marca pendiente desaparece Omitido por decisión del usuario el 2026-11-02: el reloj no se probó con la suscripción activa y caducada.
 - [x] 9.3 Android en la pista interna con una cuenta de prueba de licencias: los mismos casos que 9.1 y verificación de la elegibilidad de la prueba. Hecho el 2026-11-01 con la build 39 en un teléfono (cuenta de México): compra del plan anual con prueba de 3 días, renovaciones aceleradas, caducidad, restaurar tras reinstalar, mood heredado con la suscripción vencida y planes mensual y semanal. Antes hubo que dar de alta las 174 regiones de los planes base y de la oferta `trial` en Play (solo estaban ET, MN y US).
-- [ ] 9.4 Pantalla Premium y hoja en iPad y con texto al 200 %, en los 5 idiomas; confirmar que no aparece sin que el usuario la pida
-- [ ] 9.5 `flutter analyze`, `flutter test` y `xcodebuild test` en verde; los scripts `verify_*` del archive de iOS y del bundle de Android pasan
+- [x] 9.4 Pantalla Premium y hoja en iPad y con texto al 200 %, en los 5 idiomas; confirmar que no aparece sin que el usuario la pida Omitido por decisión del usuario el 2026-11-02: iPad, texto al 200 % y los 5 idiomas solo están cubiertos por los tests de widget.
+- [x] 9.5 `flutter analyze`, `flutter test` y `xcodebuild test` en verde; los scripts `verify_*` del archive de iOS y del bundle de Android pasan Hecho el 2026-11-02: `flutter analyze`, `flutter test` (356) y `xcodebuild test -only-testing:RunnerTests` en verde; los `verify_*` pasaron en las builds 39 de iOS y Android.
 
 ## 10. Publicación
 
