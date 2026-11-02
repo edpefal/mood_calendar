@@ -38,7 +38,7 @@ def render(loc):
     @font-face{{font-family:P;font-weight:700;src:url(file://{HERE}/fonts/poppins-700.woff2)}}
     @font-face{{font-family:P;font-weight:500;src:url(file://{HERE}/fonts/poppins-500.woff2)}}
     html,body{{margin:0;width:{W}px;height:{H}px;overflow:hidden}}
-    body{{background:linear-gradient(135deg,#5F3DC4,#6C63FF);font-family:P;color:#fff;
+    body{{background:linear-gradient(135deg,#00525A,#00727D);font-family:P;color:#fff;
      display:flex;flex-direction:column;align-items:center;justify-content:center;gap:90px}}
     .top{{display:flex;align-items:center;gap:150px}}
     .top img{{width:640px;height:640px;border-radius:144px;box-shadow:0 40px 120px #0004}}
@@ -68,7 +68,7 @@ def render_play(loc):
     @font-face{{font-family:P;font-weight:700;src:url(file://{HERE}/fonts/poppins-700.woff2)}}
     @font-face{{font-family:P;font-weight:500;src:url(file://{HERE}/fonts/poppins-500.woff2)}}
     html,body{{margin:0;width:{pw}px;height:{ph}px;overflow:hidden}}
-    body{{background:linear-gradient(135deg,#5F3DC4,#6C63FF);font-family:P;color:#fff;
+    body{{background:linear-gradient(135deg,#00525A,#00727D);font-family:P;color:#fff;
      display:flex;flex-direction:column;align-items:center;justify-content:center;gap:70px}}
     .top{{display:flex;align-items:center;gap:90px}}
     .top img{{width:300px;height:300px;border-radius:68px;box-shadow:0 20px 60px #0004}}

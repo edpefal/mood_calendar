@@ -27,12 +27,12 @@ CANVAS = {'iphone': (1320, 2868), 'ipad': (2064, 2752), 'android': (1080, 1920)}
 
 # (screen file, background gradient, dark text?)
 SLIDES = [
-    ('01_calendar', 'calendar', ('#E8E1FF', '#F7E6FF'), True),
+    ('01_calendar', 'calendar', ('#D6F0F2', '#EEF9F9'), True),
     ('02_moods', 'picker', ('#FFE1EC', '#FFC9DC'), True),
     ('03_summary', 'calendar', ('#DDF5E4', '#C4EBD0'), True),
     ('04_notes', 'note', ('#FFF0D3', '#FFDDA8'), True),
     ('05_reminders', 'reminders', ('#DDF1F7', '#C6E6F0'), True),
-    ('06_privacy', 'calendar', ('#5F3DC4', '#6C63FF'), False),
+    ('06_privacy', 'calendar', ('#00727D', '#00838F'), False),
 ]
 
 TEXT = {
@@ -151,7 +151,7 @@ def phone_html(img_path, top, shift=0, zoom=1.0, fill=None):
     return f'''
     <div style="position:absolute;left:{left}px;top:{top}px;width:{fw}px;height:{screen_h + 2 * bz}px;
          background:#0c0b12;border-radius:{L['frame_radius']}px;
-         box-shadow:0 50px 120px rgba(36,18,110,.38),0 0 0 3px #26242f inset;">
+         box-shadow:0 50px 120px rgba(0,40,46,.38),0 0 0 3px #26242f inset;">
       <div style="position:absolute;left:{bz}px;top:{bz}px;width:{sw}px;height:{screen_h}px;overflow:hidden;{bg}
            border-radius:{L['frame_radius'] - bz}px;">
         <img src="file://{img_path}" style="position:absolute;left:-{(iw - sw) // 2}px;top:-{off}px;width:{iw}px;height:{ih}px;display:block;">
@@ -165,7 +165,7 @@ def page(slide_id, screen, bg, dark, locale):
     sub = None
     if isinstance(text, tuple):
         text, sub = text
-    color = '#2A1A6B' if dark else '#FFFFFF'
+    color = '#00363C' if dark else '#FFFFFF'
     size = head_size(text)
     shot = os.path.join(BUILD, 'shots', DEVICE, locale, screen + '.png')
     body = ''

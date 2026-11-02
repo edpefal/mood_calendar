@@ -39,7 +39,7 @@ La app se descarga desde las tiendas. La web (`site/`) es un sitio estático bil
 ## Brand Commitments
 
 - Nombre: Mood Calendar. Ícono y lema de las tiendas en `AppIcon 1024` y `aso/header/`.
-- Color de marca: púrpura `#5F3DC4` a `#6C63FF` (degradado) y fondo del launch screen `#8C52FF`.
+- Color de marca: Ocean Cyan `#00727D` a `#00838F` (degradado). El ícono usa `#00838F` con la carita blanca; el launch screen es blanco con el ícono centrado.
 - Tipografía de la app y de las tiendas: Poppins (licencia OFL, ya en `tool/screenshots/fonts/`).
 - Las caritas de `assets/icon/` y los pasteles por mood son parte de la identidad. `brave.svg` pesa 1 MB y no se usa en la web.
 

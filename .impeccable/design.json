@@ -6,7 +6,7 @@
     "colorMeta": {
       "brand": {
         "role": "primary",
-        "displayName": "Violeta de Marca",
+        "displayName": "Cian de Marca",
         "canonical": "oklch(48% 0.198 288)",
         "tonalRamp": [
           "#130042",
@@ -21,7 +21,7 @@
       },
       "brand-signal": {
         "role": "primary",
-        "displayName": "Violeta Señal",
+        "displayName": "Cian Señal",
         "canonical": "oklch(60% 0.224 280)",
         "tonalRamp": [
           "#11004C",
@@ -36,7 +36,7 @@
       },
       "brand-deep": {
         "role": "primary",
-        "displayName": "Violeta Profundo",
+        "displayName": "Cian Profundo",
         "canonical": "oklch(37% 0.171 284)",
         "tonalRamp": [
           "#0E003B",
@@ -66,7 +66,7 @@
       },
       "paper": {
         "role": "neutral",
-        "displayName": "Papel Lavanda",
+        "displayName": "Papel Hielo",
         "canonical": "oklch(98% 0.009 299)",
         "tonalRamp": [
           "#0B0B0E",
@@ -81,7 +81,7 @@
       },
       "muted": {
         "role": "neutral",
-        "displayName": "Gris Violeta",
+        "displayName": "Gris Cian",
         "canonical": "oklch(44% 0.056 293)",
         "tonalRamp": [
           "#0C071A",
@@ -96,7 +96,7 @@
       },
       "line": {
         "role": "neutral",
-        "displayName": "Línea Lila",
+        "displayName": "Línea Cian",
         "canonical": "oklch(92% 0.027 297)",
         "tonalRamp": [
           "#0C0912",
@@ -111,7 +111,7 @@
       },
       "night": {
         "role": "neutral",
-        "displayName": "Noche Violeta",
+        "displayName": "Noche Cian",
         "canonical": "oklch(19% 0.028 293)",
         "tonalRamp": [
           "#0B0913",
@@ -250,7 +250,7 @@
       "refersTo": "picker-nav-button",
       "description": "Botones ‹ › y contador del selector de caritas.",
       "html": "<div class=\"ds-nav\"><button class=\"ds-nav-btn\" aria-label=\"Previous\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M15 5l-7 7 7 7\"/></svg></button><span class=\"ds-nav-count\">2 / 5</span><button class=\"ds-nav-btn\" aria-label=\"Next\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M9 5l7 7-7 7\"/></svg></button></div>",
-      "css": ".ds-nav{display:flex;align-items:center;justify-content:center;gap:6px;padding:16px;background:linear-gradient(135deg,#E3F2FD,#90CAF9);color:#3B2494;font:600 1.0625rem Poppins,system-ui,sans-serif;font-variant-numeric:tabular-nums}.ds-nav-btn{width:48px;height:48px;border:0;border-radius:50%;background:transparent;color:inherit;display:grid;place-items:center;cursor:pointer}.ds-nav-btn:hover{background:rgba(255,255,255,.55)}.ds-nav-btn:focus-visible{outline:3px solid #6C63FF;outline-offset:3px}.ds-nav-btn svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}.ds-nav-count{min-width:3.6em;text-align:center}"
+      "css": ".ds-nav{display:flex;align-items:center;justify-content:center;gap:6px;padding:16px;background:linear-gradient(135deg,#E3F2FD,#90CAF9);color:#004A52;font:600 1.0625rem Poppins,system-ui,sans-serif;font-variant-numeric:tabular-nums}.ds-nav-btn{width:48px;height:48px;border:0;border-radius:50%;background:transparent;color:inherit;display:grid;place-items:center;cursor:pointer}.ds-nav-btn:hover{background:rgba(255,255,255,.55)}.ds-nav-btn:focus-visible{outline:3px solid #00838F;outline-offset:3px}.ds-nav-btn svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}.ds-nav-count{min-width:3.6em;text-align:center}"
     },
     {
       "name": "Mood Face (current)",
@@ -272,7 +272,7 @@
       "refersTo": "phone-frame",
       "description": "Marco del teléfono, cortado por abajo, con la única sombra del sistema.",
       "html": "<div class=\"ds-phone\"><div class=\"ds-screen\"></div></div>",
-      "css": ".ds-phone{width:200px;height:240px;overflow:hidden;border:10px solid #17102E;border-bottom:0;border-radius:46px 46px 0 0;background:#17102E;box-shadow:0 36px 60px -28px rgba(0,0,0,.5),0 12px 24px -12px rgba(0,0,0,.3);margin:0 auto}.ds-screen{height:100%;border-radius:36px 36px 0 0;background:#FAF8FF}"
+      "css": ".ds-phone{width:200px;height:240px;overflow:hidden;border:10px solid #0E1B1E;border-bottom:0;border-radius:46px 46px 0 0;background:#0E1B1E;box-shadow:0 36px 60px -28px rgba(0,0,0,.5),0 12px 24px -12px rgba(0,0,0,.3);margin:0 auto}.ds-screen{height:100%;border-radius:36px 36px 0 0;background:#F6FBFB}"
     },
     {
       "name": "Privacy Block",
@@ -280,15 +280,15 @@
       "refersTo": "privacy-block",
       "description": "Cierre de marca: titular blanco y tres puntos separados por una línea.",
       "html": "<section class=\"ds-priv\"><h2>Your entries never leave your phone.</h2><ul><li><strong>No account</strong><span>No sign-up and no password.</span></li><li><strong>Everything on your device</strong><span>Export them any time.</span></li></ul></section>",
-      "css": ".ds-priv{padding:32px 20px;background:linear-gradient(135deg,#3B2494,#5F3DC4);color:#fff;font:500 1rem/1.55 Poppins,system-ui,sans-serif}.ds-priv h2{margin:0 0 20px;max-width:16ch;font:700 1.9rem/1.15 Poppins,system-ui,sans-serif;letter-spacing:-.02em}.ds-priv ul{list-style:none;margin:0;padding:0}.ds-priv li{padding:14px 0;border-top:1px solid rgba(255,255,255,.28)}.ds-priv strong{display:block;font-weight:600;font-size:1.1875rem}.ds-priv span{color:#EDE9FF}"
+      "css": ".ds-priv{padding:32px 20px;background:linear-gradient(135deg,#004A52,#00727D);color:#fff;font:500 1rem/1.55 Poppins,system-ui,sans-serif}.ds-priv h2{margin:0 0 20px;max-width:16ch;font:700 1.9rem/1.15 Poppins,system-ui,sans-serif;letter-spacing:-.02em}.ds-priv ul{list-style:none;margin:0;padding:0}.ds-priv li{padding:14px 0;border-top:1px solid rgba(255,255,255,.28)}.ds-priv strong{display:block;font-weight:600;font-size:1.1875rem}.ds-priv span{color:#DDF3F5}"
     },
     {
       "name": "Section Heading",
       "kind": "custom",
       "refersTo": "headline",
-      "description": "Titular de sección en Violeta Profundo sobre papel.",
+      "description": "Titular de sección en Cian Profundo sobre papel.",
       "html": "<div class=\"ds-sec\"><h2>Your month, in full color.</h2><p>See every day at a glance.</p></div>",
-      "css": ".ds-sec{padding:24px 20px;background:#FAF8FF;text-align:center;font:500 1.0625rem/1.65 Poppins,system-ui,sans-serif}.ds-sec h2{margin:0 0 12px;font:700 1.9rem/1.15 Poppins,system-ui,sans-serif;letter-spacing:-.02em;color:#3B2494}.ds-sec p{margin:0;color:#554E70}"
+      "css": ".ds-sec{padding:24px 20px;background:#F6FBFB;text-align:center;font:500 1.0625rem/1.65 Poppins,system-ui,sans-serif}.ds-sec h2{margin:0 0 12px;font:700 1.9rem/1.15 Poppins,system-ui,sans-serif;letter-spacing:-.02em;color:#004A52}.ds-sec p{margin:0;color:#4A6468}"
     }
   ],
   "narrative": {
@@ -296,7 +296,7 @@
     "overview": "La web se comporta como la app: una carita grande al centro, un pastel que cambia con ella y todo lo demás en calma. Tono tranquilo y confiable; las caritas llevan toda la expresividad y el resto es tipografía, espacio y planos de color.",
     "keyCharacteristics": [
       "Móvil primero: titular, carita, selector y badges en 390 pt.",
-      "Dos voces de color: pasteles de mood y púrpura de marca, nunca en la misma superficie.",
+      "Dos voces de color: pasteles de mood y cian de marca, nunca en la misma superficie.",
       "Planos y suaves: solo el teléfono lleva sombra.",
       "Funciona sin JavaScript y sin movimiento.",
       "Sin recursos de terceros."
@@ -304,7 +304,7 @@
     "rules": [
       {
         "name": "The Two Voices Rule",
-        "body": "Un pastel de mood y el púrpura de marca nunca comparten superficie.",
+        "body": "Un pastel de mood y el cian de marca nunca comparten superficie.",
         "section": "colors"
       },
       {
@@ -336,7 +336,7 @@
       "Do mantener la edición en inglés y en español a la vez."
     ],
     "donts": [
-      "Don't mezclar un pastel de mood con el púrpura de marca en la misma superficie.",
+      "Don't mezclar un pastel de mood con el cian de marca en la misma superficie.",
       "Don't poner sombra a nada que no sea el teléfono, ni sombras de color.",
       "Don't usar texto con degradado ni tarjetas idénticas de ícono más título.",
       "Don't afirmar que todos los moods son gratis ni mostrar precios.",
