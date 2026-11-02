@@ -15,10 +15,10 @@
 
 ## 3. Verificación visual de la app
 
-- [ ] 3.1 En un simulador limpio (no el de capturas compartido), revisar selector, calendario, tienda/Premium, ajustes y el bottom bar: botón principal, flechas, títulos, racha y píldora de la pestaña activa
-- [ ] 3.2 Revisar los widgets que heredan del seed (`Switch`, selector de hora, `SnackBar`, diálogos y hojas)
+- [x] 3.1 En un simulador limpio (no el de capturas compartido), revisar selector, calendario, tienda/Premium, ajustes y el bottom bar: botón principal, flechas, títulos, racha y píldora de la pestaña activa
+- [x] 3.2 Revisar los widgets que heredan del seed (`Switch`, selector de hora, `SnackBar`, diálogos y hojas)
 - [ ] 3.3 Comprobar en iPad y con texto al 200 % que no hay desbordes (solo cambió el color, pero se verifica de todos modos)
-- [ ] 3.4 En el calendario con datos reales, confirmar que el teal de marca no se confunde con el azul de Calm ni con el verde de Happy
+- [x] 3.4 En el calendario con datos reales, confirmar que el teal de marca no se confunde con el azul de Calm ni con el verde de Happy
 
 ## 4. Ícono y launch
 
