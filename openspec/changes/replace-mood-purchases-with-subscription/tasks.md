@@ -12,7 +12,7 @@
 - [x] 2.4 Play Console / API de Play: crear la suscripción `premium` con los planes base `weekly`, `monthly` y `annual`, mismo precio base y oferta de prueba gratis de 3 días para clientes nuevos. Hecho por API con la cuenta de servicio `play-publisher` (la ruta la autorizó el usuario); planes y ofertas `trial` activos. Play exige un listado en el idioma por defecto de la app; el idioma por defecto pasó de `es-419` a `en-US` por decisión del usuario (se subió el ícono de 512×512 al listado en inglés).
 - [x] 2.5 RevenueCat: importar los productos en las apps iOS y Android, crear el entitlement `premium`, adjuntarle los 6 productos y añadir los paquetes `$rc_weekly`, `$rc_monthly` y `$rc_annual` a la oferta `default` sin quitar los 18 paquetes viejos. Hecho: iOS `premium_weekly|monthly|annual`, Android `premium:weekly|monthly|annual`; la oferta `default` sigue siendo la actual.
 - [x] 2.6 Comprobar que la 1.9.0 (TestFlight, build 37) sigue cargando su tienda sin errores con los paquetes nuevos en `default`. Confirmado por el usuario el 2026-10-31. Que la oferta devuelve los 3 paquetes nuevos se comprueba con la app de la 1.10.0 (grupo 4).
-- [ ] 2.7 App Store Connect: subir la captura de revisión de la pantalla Premium a las tres suscripciones, cuando la pantalla exista (grupo 4)
+- [x] 2.7 App Store Connect: subir la captura de revisión de la pantalla Premium a las tres suscripciones, cuando la pantalla exista (grupo 4) Confirmado el 2026-11-02 por la API de App Store Connect: las tres suscripciones tienen la captura de revisión (`COMPLETE`, 1206×2622) y están en `READY_TO_SUBMIT`; muestra la pantalla Premium real con los precios de EE. UU.
 
 ## 3. Dominio y datos de compras
 
