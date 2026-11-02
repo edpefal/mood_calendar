@@ -76,6 +76,7 @@ android {
             if (keyPropertiesFile.exists() && keyProperties.containsKey('keyAlias')) {
                 signingConfig signingConfigs.release
             }
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
 }
