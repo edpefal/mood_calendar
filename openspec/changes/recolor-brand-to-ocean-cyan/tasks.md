@@ -22,29 +22,29 @@
 
 ## 4. Ícono y launch
 
-- [ ] 4.1 Rediseñar `assets/icon/app_icon.png` (fondo Ocean Cyan, misma carita blanca; sin transparencia en iOS)
-- [ ] 4.2 Correr `dart run flutter_launcher_icons` y revisar el diff de `AppIcon.appiconset` y de los `mipmap-*`
-- [ ] 4.3 Regenerar `ios/Runner/Assets.xcassets/LaunchImage.imageset` y `android/app/src/main/res/drawable/launch_icon.png` con el ícono nuevo sobre fondo blanco
+- [x] 4.1 Rediseñar `assets/icon/app_icon.png` (fondo Ocean Cyan plano, misma carita blanca; sin transparencia en iOS; decidido plano por ahora, PR #121)
+- [x] 4.2 Correr `dart run flutter_launcher_icons` y revisar el diff de `AppIcon.appiconset` y de los `mipmap-*`
+- [x] 4.3 Regenerar `ios/Runner/Assets.xcassets/LaunchImage.imageset` y `android/app/src/main/res/drawable/launch_icon.png` con el ícono nuevo sobre fondo blanco
 - [ ] 4.4 Comprobar el arranque en simulador iOS y emulador Android: launch screen blanco con el ícono nuevo, sin parpadeo morado
-- [ ] 4.5 Corregir la frase de `CLAUDE.md` y `PRODUCT.md` sobre el "fondo del launch screen `#8C52FF`" (el launch screen es blanco)
+- [x] 4.5 Corregir la frase de `CLAUDE.md` y `PRODUCT.md` sobre el "fondo del launch screen `#8C52FF`" (el launch screen es blanco)
 
 ## 5. Sitio
 
-- [ ] 5.1 `site/style.css`: reemplazar los tokens de marca y la escala nocturna (`night-heading`, `night-link`…) por tonos cian que cumplan AA sobre `night` y `night-card`
-- [ ] 5.2 `site/index.html` y `site/es/index.html`: reemplazar los hex incrustados (fondos de héroe, `theme-color`, íconos) y revisar que las dos versiones sigan iguales
-- [ ] 5.3 Regenerar `site/img/og-en.jpg` y `og-es.jpg` desde el header nuevo, y `calendar-<idioma>-{390,780}.webp` con la UI nueva de la app
-- [ ] 5.4 Actualizar `DESIGN.md` y `.impeccable/design.json` con los valores finales, y la fecha de "última actualización" de la política solo si cambia texto legal (no cambia)
+- [x] 5.1 `site/style.css`: reemplazar los tokens de marca y la escala nocturna (`night-heading`, `night-link`…) por tonos cian que cumplan AA sobre `night` y `night-card`
+- [x] 5.2 `site/index.html` y `site/es/index.html`: reemplazar los hex incrustados (fondos de héroe, `theme-color`, íconos) y revisar que las dos versiones sigan iguales
+- [x] 5.3 Regenerar `site/img/og-en.jpg` y `og-es.jpg` desde el header nuevo, y `calendar-<idioma>-{390,780}.webp` con la UI nueva de la app
+- [x] 5.4 Actualizar `DESIGN.md` y `.impeccable/design.json` con los valores finales, y la fecha de "última actualización" de la política solo si cambia texto legal (no cambia)
 - [ ] 5.5 Revisar el sitio en 390 pt y 1280 pt, claro y oscuro, y contrastes de enlaces y botones
 
 ## 6. Arte de tienda
 
-- [ ] 6.1 `tool/screenshots/header.py`: degradado de fondo y tinta; regenerar `aso/header/<idioma>/` y `aso/play/<idioma>/feature_1024x500.png` para los 5 idiomas
-- [ ] 6.2 `tool/screenshots/compose.py`: titulares (`#2A1A6B`), sombra del marco, fondo del slide 1 (lavanda) y slide 6 (`#5F3DC4 → #6C63FF`); conservar los demás pasteles por slide
+- [x] 6.1 `tool/screenshots/header.py`: degradado de fondo y tinta; regenerar `aso/header/<idioma>/` y `aso/play/<idioma>/feature_1024x500.png` para los 5 idiomas
+- [x] 6.2 `tool/screenshots/compose.py`: titulares (`#2A1A6B`), sombra del marco, fondo del slide 1 (lavanda) y slide 6 (`#5F3DC4 → #6C63FF`); conservar los demás pasteles por slide
 - [ ] 6.3 Recapturar con la app nueva (`capture.py` para iPhone e iPad, `capture_android.py` para Android) y recomponer; revisar los 5 idiomas
 - [ ] 6.4 Subir el ícono, las capturas y los gráficos a App Store Connect y Play Console cuando la versión con el ícono nuevo esté aprobada (acción manual del usuario)
 
 ## 7. Documentación y specs
 
-- [ ] 7.1 `CLAUDE.md`: color de marca, sección "Sistema de diseño" y la nota del launch screen; `PRODUCT.md`: "Brand Commitments"
+- [x] 7.1 `CLAUDE.md`: color de marca, sección "Sistema de diseño" y la nota del launch screen; `PRODUCT.md`: "Brand Commitments"
 - [ ] 7.2 `/opsx:sync` o `/opsx:archive` para aplicar el delta de `bottom-navigation` (verificar que el texto base ya es el de la suscripción)
 - [ ] 7.3 Actualizar la sección "Estado actual" de `CLAUDE.md` con el estado del change
