@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../core/localization/app_strings.dart';
 import '../../domain/entities/monthly_mood_summary.dart';
 import '../../domain/services/mood_definition_resolver.dart';
+import '../../../../core/theme/brand_colors.dart';
 
 class MonthlyMoodSummaryCard extends StatelessWidget {
   final MonthlyMoodSummary? summary;
@@ -150,10 +151,7 @@ class _StatCard extends StatelessWidget {
     final effectiveGradient = gradient ??
         (highlight
             ? const LinearGradient(
-                colors: [
-                  Color(0xFF5F3DC4),
-                  Color(0xFF6C63FF),
-                ],
+                colors: [brandGradientStart, brandGradientEnd],
                 begin: Alignment.centerLeft,
                 end: Alignment.centerRight,
               )
@@ -205,13 +203,13 @@ class _EmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 0,
-      color: Colors.deepPurple.shade50,
+      color: brandInk.withValues(alpha: 0.10),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
-            Icon(icon, color: Colors.deepPurple),
+            Icon(icon, color: brandInk),
             const SizedBox(width: 12),
             Expanded(
               child: Text(

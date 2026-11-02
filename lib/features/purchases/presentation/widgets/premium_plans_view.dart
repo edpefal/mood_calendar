@@ -10,8 +10,8 @@ import '../../domain/entities/subscription_plan.dart';
 import '../../domain/entities/subscription_status.dart';
 import '../bloc/purchases_cubit.dart';
 import 'premium_links.dart';
+import '../../../../core/theme/brand_colors.dart';
 
-const _brand = Color(0xFF5F3DC4);
 const _contentMaxWidth = 480.0;
 
 /// Contenido de la suscripción Premium, compartido por la pestaña y por la
@@ -77,8 +77,8 @@ class PremiumPlansView extends StatelessWidget {
                 const SizedBox(height: 8),
                 OutlinedButton(
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: _brand,
-                    side: const BorderSide(color: _brand),
+                    foregroundColor: brandInk,
+                    side: const BorderSide(color: brandInk),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -264,7 +264,7 @@ class _PlanCard extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: isSelected ? _brand : Theme.of(context).dividerColor,
+                color: isSelected ? brandInk : Theme.of(context).dividerColor,
                 width: isSelected ? 2 : 1,
               ),
             ),
@@ -274,7 +274,7 @@ class _PlanCard extends StatelessWidget {
                   isSelected
                       ? Icons.radio_button_checked
                       : Icons.radio_button_off,
-                  color: isSelected ? _brand : null,
+                  color: isSelected ? brandInk : null,
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -472,7 +472,7 @@ class _MoodShowcaseItem extends StatelessWidget {
                 const Positioned(
                   right: -6,
                   bottom: -4,
-                  child: Icon(Icons.check_circle, size: 16, color: _brand),
+                  child: Icon(Icons.check_circle, size: 16, color: brandInk),
                 ),
             ],
           ),

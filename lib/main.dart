@@ -50,6 +50,7 @@ import 'features/watch/domain/services/watch_sync_coordinator.dart';
 import 'features/watch/domain/usecases/process_watch_inbox_usecase.dart';
 import 'features/watch/domain/usecases/publish_watch_state_usecase.dart';
 import 'features/watch/presentation/watch_sync_host.dart';
+import 'core/theme/brand_colors.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 final mainShellKey = GlobalKey<MainShellState>();
@@ -283,7 +284,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final baseTheme = ThemeData(
-      colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+      colorScheme: ColorScheme.fromSeed(seedColor: brandInk),
       useMaterial3: true,
     );
     final poppinsTextTheme = GoogleFonts.poppinsTextTheme(baseTheme.textTheme);

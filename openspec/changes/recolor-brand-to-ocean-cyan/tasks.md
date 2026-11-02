@@ -1,17 +1,17 @@
 ## 1. Prerrequisitos y rama
 
-- [ ] 1.1 Confirmar que `replace-mood-purchases-with-subscription` está mergeado a `main` (si no, no empezar: toca los mismos archivos y el mismo requisito de `bottom-navigation`)
-- [ ] 1.2 Crear la rama `style/brand-ocean-cyan` desde `main` actualizado y comprobar `flutter analyze` y `flutter test` en verde
-- [ ] 1.3 Confirmar con el usuario el hex final (`#00727D → #00838F`) y el ícono (carita blanca sobre fondo plano o degradado) mirando el mock "G · Ocean Cyan" antes de tocar nada
+- [x] 1.1 Confirmar que `replace-mood-purchases-with-subscription` está mergeado a `main` (si no, no empezar: toca los mismos archivos y el mismo requisito de `bottom-navigation`)
+- [x] 1.2 Crear la rama `style/brand-ocean-cyan` desde `main` actualizado y comprobar `flutter analyze` y `flutter test` en verde
+- [x] 1.3 Confirmar con el usuario el hex final (`#00727D → #00838F`) y el ícono (carita blanca sobre fondo plano o degradado) mirando el mock "G · Ocean Cyan" antes de tocar nada
 
 ## 2. Token de marca en la app
 
-- [ ] 2.1 Crear `lib/core/theme/brand_colors.dart` con `brandInk`, `brandGradientStart`, `brandGradientEnd` y `brandGradient`
-- [ ] 2.2 Sustituir los literales `0xFF5F3DC4` y `0xFF6C63FF` y los `_brandColor`/`_brand` privados por el token en `floating_tab_bar.dart`, `gradient_pill_button.dart`, `mood_screen.dart`, `calendar_screen.dart`, `monthly_mood_summary_card.dart`, `mood_grid_sheet.dart`, `settings_screen.dart` y las pantallas de `purchases/` que existan tras la suscripción
-- [ ] 2.3 `main.dart`: `ColorScheme.fromSeed(seedColor: brandInk)`
-- [ ] 2.4 `monthly_mood_summary_card.dart`: reemplazar `Colors.deepPurple` y `Colors.deepPurple.shade50` de los chips vacíos por el token tintado (D4)
-- [ ] 2.5 Verificar con `grep` que no quedan `5F3DC4`, `6C63FF` ni `deepPurple` en `lib/` fuera de `mood_definition.dart`
-- [ ] 2.6 `flutter analyze` y `flutter test`; añadir un test del token si hay una forma barata (p. ej. contraste ≥ 4.5 de blanco sobre `brandGradientStart` y `brandGradientEnd`)
+- [x] 2.1 Crear `lib/core/theme/brand_colors.dart` con `brandInk`, `brandGradientStart`, `brandGradientEnd` y `brandGradient`
+- [x] 2.2 Sustituir los literales `0xFF5F3DC4` y `0xFF6C63FF` y los `_brandColor`/`_brand` privados por el token en `floating_tab_bar.dart`, `gradient_pill_button.dart`, `mood_screen.dart`, `calendar_screen.dart`, `monthly_mood_summary_card.dart`, `mood_grid_sheet.dart`, `settings_screen.dart` y las pantallas de `purchases/` que existan tras la suscripción
+- [x] 2.3 `main.dart`: `ColorScheme.fromSeed(seedColor: brandInk)`
+- [x] 2.4 `monthly_mood_summary_card.dart`: reemplazar `Colors.deepPurple` y `Colors.deepPurple.shade50` de los chips vacíos por el token tintado (D4)
+- [x] 2.5 Verificar con `grep` que no quedan `5F3DC4`, `6C63FF` ni `deepPurple` en `lib/` fuera de `mood_definition.dart`
+- [x] 2.6 `flutter analyze` y `flutter test`; añadir un test del token si hay una forma barata (p. ej. contraste ≥ 4.5 de blanco sobre `brandGradientStart` y `brandGradientEnd`)
 
 ## 3. Verificación visual de la app
 

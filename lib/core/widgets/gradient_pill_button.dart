@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import '../theme/brand_colors.dart';
 
 /// Primary pill-shaped button with the app's brand gradient
-/// (`#5F3DC4` → `#6C63FF`), used across screens as the standard
+/// (`#00727D` → `#00838F`), used across screens as the standard
 /// primary action button.
 class GradientPillButton extends StatelessWidget {
   const GradientPillButton({
@@ -43,10 +44,7 @@ class GradientPillButton extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
                 gradient: const LinearGradient(
-                  colors: [
-                    Color(0xFF5F3DC4),
-                    Color(0xFF6C63FF),
-                  ],
+                  colors: [brandGradientStart, brandGradientEnd],
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
                 ),
