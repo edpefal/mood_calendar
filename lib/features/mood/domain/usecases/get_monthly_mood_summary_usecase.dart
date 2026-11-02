@@ -38,8 +38,8 @@ class GetMonthlyMoodSummaryUseCase {
     for (final entry in entries) {
       countByMood[entry.mood] = (countByMood[entry.mood] ?? 0) + 1;
     }
-    final maxCount =
-        countByMood.values.fold<int>(0, (max, count) => count > max ? count : max);
+    final maxCount = countByMood.values
+        .fold<int>(0, (max, count) => count > max ? count : max);
     final tiedMoods = countByMood.entries
         .where((e) => e.value == maxCount)
         .map((e) => e.key)

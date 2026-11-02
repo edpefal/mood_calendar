@@ -171,8 +171,8 @@ void main() {
       await buildService().openStoreListing();
 
       expect(requester.openListingCalls, 1);
-      expect(telemetry.events.single.name,
-          AppTelemetryEvents.ratingManualOpened);
+      expect(
+          telemetry.events.single.name, AppTelemetryEvents.ratingManualOpened);
     });
 
     test('does not change the automatic attempts state', () async {

@@ -50,3 +50,14 @@ flutter test test/features/watch
 xcodebuild test -workspace ios/Runner.xcworkspace -scheme Runner \
   -destination "platform=iOS Simulator,id=<udid>" -only-testing:RunnerTests
 ```
+
+## Suscripción vencida (1.10.0)
+
+Los moods premium los desbloquea la suscripción (o una compra suelta de una versión anterior). Para ver cómo se comporta el reloj cuando deja de estar activa:
+
+1. Con una suscripción de sandbox activa, comprueba que el reloj ofrece los moods premium.
+2. Cierra la app del iPhone y deja vencer la suscripción (en sandbox, la renovación acelerada de la semanal tarda unos minutos).
+3. En el reloj, que todavía muestra el estado viejo, elige un mood premium. Verás "Sincronizando con el iPhone".
+4. Abre la app del iPhone: descarta la elección sin cambiar ninguna entrada, publica el estado nuevo y el reloj quita la marca "pendiente" y solo ofrece los moods base.
+
+Las pruebas automáticas lo cubren en Dart (`watch_sync_coordinator_test.dart`) y en Swift (`WatchModelTests`: `testPendingIsDroppedWhenThePhoneReportsItProcessedThatChoice`).

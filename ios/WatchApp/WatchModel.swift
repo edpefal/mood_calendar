@@ -42,22 +42,31 @@ final class WatchModel: ObservableObject {
   /// Registers the choice for today and returns the user info to send.
   func choose(_ mood: WatchMood, at date: Date = Date()) -> [String: Any] {
     let day = WatchDate.localString(date)
-    savePending(PendingChoice(mood: mood.id, date: day))
+    let id = UUID().uuidString
+    savePending(PendingChoice(mood: mood.id, date: day, id: id))
     return [
-      "id": UUID().uuidString,
+      "id": id,
       "date": day,
       "mood": mood.id,
       "chosenAt": date.timeIntervalSince1970 * 1000,
     ]
   }
 
-  /// Drops the pending marker once the iPhone reports that mood for today, or
-  /// when the day has changed (a stale choice must not stay highlighted).
+  /// Drops the pending marker once the iPhone reports that mood for today, once
+  /// the iPhone says it processed this very choice (it may have discarded it,
+  /// e.g. a mood that is no longer unlocked), or when the day has changed (a
+  /// stale choice must not stay highlighted). A state that does not mention the
+  /// choice, such as one sent after a language change, keeps the marker.
   private func reconcilePending() {
     guard let pending else { return }
-    if pending.date != today() || state?.today == pending.mood {
+    if pending.date != today() || state?.today == pending.mood || isHandled(pending) {
       savePending(nil)
     }
+  }
+
+  private func isHandled(_ pending: PendingChoice) -> Bool {
+    guard let id = pending.id else { return false }
+    return state?.handledChoiceIds.contains(id) == true
   }
 
   private func savePending(_ value: PendingChoice?) {

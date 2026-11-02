@@ -1,18 +1,18 @@
-import '../entities/mood_offer.dart';
-import '../entities/mood_pack.dart';
+import '../entities/subscription_plan.dart';
+import '../entities/subscription_status.dart';
 
 abstract class MoodEntitlementsRepository {
   bool isUnlocked(String moodId);
 
+  /// Ids de los moods premium desbloqueados: todos con una suscripción activa,
+  /// o solo los de compras sueltas hechas en versiones anteriores.
   Stream<Set<String>> unlockedPremiumMoodIds();
 
-  Future<List<MoodOffer>> availableMoodOffers();
+  Stream<SubscriptionStatus> subscriptionStatus();
 
-  Future<List<MoodPack>> availablePacks();
+  Future<List<SubscriptionPlan>> availablePlans();
 
-  Future<void> purchaseMood(String moodId);
-
-  Future<void> purchasePack(String packId);
+  Future<void> purchasePlan(SubscriptionPlanType plan);
 
   Future<void> restorePurchases();
 }

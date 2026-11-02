@@ -24,13 +24,18 @@ final class WatchModelTests: XCTestCase {
     WatchModel(defaults: defaults, today: { self.day })
   }
 
-  private func context(today: String? = nil, version: Int = 1) -> [String: Any] {
+  private func context(
+    today: String? = nil,
+    version: Int = 1,
+    handled: [String]? = nil
+  ) -> [String: Any] {
     var context: [String: Any] = [
       "version": version,
       "locale": "es",
       "moods": [["id": "calm", "name": "Tranquilo"], ["id": "happy", "name": "Feliz"]],
     ]
     if let today { context["today"] = today }
+    if let handled { context["handledChoiceIds"] = handled }
     return context
   }
 
@@ -120,6 +125,73 @@ final class WatchModelTests: XCTestCase {
     let second = makeModel()
     XCTAssertEqual(second.state?.moods.count, 2)
     XCTAssertEqual(second.pending?.mood, "calm")
+  }
+
+  func testHandledChoiceIdsAreOptionalAndParsed() {
+    XCTAssertEqual(WatchAppState(context: context())?.handledChoiceIds, [])
+    XCTAssertEqual(
+      WatchAppState(context: context(handled: ["a", "b"]))?.handledChoiceIds,
+      ["a", "b"]
+    )
+  }
+
+  func testChooseReturnsTheIdItKeepsInThePendingChoice() {
+    let model = makeModel()
+    let info = model.choose(WatchMood(id: "calm", name: "Calm"))
+
+    XCTAssertEqual(model.pending?.id, info["id"] as? String)
+  }
+
+  func testPendingIsDroppedWhenThePhoneReportsItProcessedThatChoice() {
+    // The iPhone discarded the choice (the mood is no longer unlocked) and says
+    // so by listing its id, even though today's mood does not match.
+    let model = makeModel()
+    day = WatchDate.localString()
+    let info = model.choose(WatchMood(id: "brave", name: "Brave"))
+    let id = info["id"] as! String
+
+    model.apply(context: context(today: "happy", handled: [id]))
+
+    XCTAssertFalse(model.isPending)
+    XCTAssertEqual(model.todayMood, "happy")
+  }
+
+  func testPendingStaysWhenTheStateDoesNotMentionTheChoice() {
+    // E.g. a state published after a language change while the choice is still
+    // queued: it must not clear the marker early.
+    let model = makeModel()
+    day = WatchDate.localString()
+    _ = model.choose(WatchMood(id: "calm", name: "Calm"))
+
+    model.apply(context: context(today: "happy", handled: ["some-other-id"]))
+
+    XCTAssertTrue(model.isPending)
+    XCTAssertEqual(model.todayMood, "calm")
+  }
+
+  func testPendingStaysWhenAnOlderChoiceWasHandled() {
+    let model = makeModel()
+    day = WatchDate.localString()
+    let first = model.choose(WatchMood(id: "calm", name: "Calm"))["id"] as! String
+    _ = model.choose(WatchMood(id: "sad", name: "Sad"))
+
+    model.apply(context: context(today: "calm", handled: [first]))
+
+    XCTAssertEqual(model.pending?.mood, "sad")
+  }
+
+  func testAPendingChoiceSavedBeforeIdsExistStillLoads() throws {
+    // A choice persisted by the previous app version has no id.
+    let legacy = #"{"mood":"calm","date":"\#(WatchDate.localString())"}"#
+    defaults.set(Data(legacy.utf8), forKey: WatchModel.pendingKey)
+    day = WatchDate.localString()
+
+    let model = makeModel()
+
+    XCTAssertEqual(model.pending?.mood, "calm")
+    XCTAssertNil(model.pending?.id)
+    model.apply(context: context(today: "happy", handled: ["x"]))
+    XCTAssertTrue(model.isPending)
   }
 
   func testLocalDateFormat() {

@@ -69,7 +69,8 @@ class FloatingTabBar extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(height / 2),
               child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: _blurSigma, sigmaY: _blurSigma),
+                filter:
+                    ImageFilter.blur(sigmaX: _blurSigma, sigmaY: _blurSigma),
                 child: Container(
                   height: height,
                   padding: const EdgeInsets.symmetric(horizontal: 8),

@@ -6,10 +6,11 @@ import '../../../../core/localization/app_strings.dart';
 import '../../../../core/widgets/floating_tab_bar.dart';
 import '../../../../core/widgets/gradient_pill_button.dart';
 import '../../../purchases/presentation/bloc/purchases_cubit.dart';
-import '../../../purchases/presentation/widgets/mood_purchase_sheet.dart';
+import '../../../purchases/presentation/widgets/premium_sheet.dart';
 import '../../domain/entities/mood_definition.dart';
 import '../../domain/entities/mood_entry.dart';
 import '../../domain/services/mood_definition_resolver.dart';
+import '../../domain/services/can_save_with_mood.dart';
 import '../../domain/services/mood_picker_order.dart';
 import '../bloc/calendar_cubit.dart';
 import '../bloc/mood_cubit.dart';
@@ -67,6 +68,11 @@ class _MoodScreenState extends State<MoodScreen>
   int _currentPage = 0;
   int _carouselGeneration = 0;
   final TextEditingController _noteController = TextEditingController();
+
+  /// Mood (ruta del asset) de la entrada ya guardada en la fecha del selector,
+  /// si la hay. Permite guardar solo la nota aunque ese mood haya dejado de
+  /// estar desbloqueado.
+  String? _savedMoodAssetPath;
   bool isLoading = true;
   bool _isSaving = false;
   bool _didHydrateInitialState = false;
@@ -188,6 +194,7 @@ class _MoodScreenState extends State<MoodScreen>
   }
 
   void _applyMoodEntry(MoodEntry? entry) {
+    _savedMoodAssetPath = entry?.mood;
     final moodIndex = entry == null
         ? 0
         : _orderedMoods.indexWhere((mood) => mood.assetPath == entry.mood);
@@ -293,7 +300,7 @@ class _MoodScreenState extends State<MoodScreen>
   }
 
   void _openPurchaseFlow(MoodDefinition mood) {
-    showMoodPurchaseSheet(context, moodId: mood.id);
+    showPremiumSheet(context, source: PremiumSource.lockedMood);
   }
 
   void _openNoteEditor() {
@@ -308,7 +315,11 @@ class _MoodScreenState extends State<MoodScreen>
     if (_isSaving) {
       return;
     }
-    if (_isMoodLocked(selectedMood)) {
+    if (!canSaveWithMood(
+      mood: selectedMood,
+      isUnlocked: !_isMoodLocked(selectedMood),
+      savedMoodAssetPath: _savedMoodAssetPath,
+    )) {
       _openPurchaseFlow(selectedMood);
       return;
     }

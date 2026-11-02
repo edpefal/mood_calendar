@@ -21,6 +21,7 @@ class WatchState {
     required this.locale,
     required this.today,
     required this.moods,
+    this.handledChoiceIds = const [],
   });
 
   static const int version = 1;
@@ -34,10 +35,16 @@ class WatchState {
   /// Solo los moods desbloqueados, en el orden de uso del selector.
   final List<WatchMoodOption> moods;
 
+  /// Ids de las últimas elecciones del reloj que el iPhone ya procesó, ya fueran
+  /// aplicadas o descartadas (p. ej. un mood que dejó de estar desbloqueado).
+  /// Así el reloj sabe que puede quitar su marca "pendiente".
+  final List<String> handledChoiceIds;
+
   Map<String, Object?> toMap() => {
         'version': version,
         'locale': locale,
         'today': today,
         'moods': [for (final mood in moods) mood.toMap()],
+        'handledChoiceIds': handledChoiceIds,
       };
 }

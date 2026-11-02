@@ -4,13 +4,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../features/mood/presentation/screens/calendar_screen.dart';
 import '../../features/mood/presentation/screens/mood_screen.dart';
 import '../../features/purchases/presentation/bloc/purchases_cubit.dart';
-import '../../features/purchases/presentation/screens/mood_store_screen.dart';
+import '../../features/purchases/presentation/screens/premium_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
 import '../localization/app_strings.dart';
 import '../widgets/floating_tab_bar.dart';
 
 /// Pestañas del bottom bar, en el orden en que se muestran.
-enum MainTab { moodPicker, calendar, store, settings }
+enum MainTab { moodPicker, calendar, premium, settings }
 
 /// Raíz de la app: cuatro pestañas que conservan su estado y un bar flotante.
 ///
@@ -61,8 +61,8 @@ class MainShellState extends State<MainShell> {
   }
 
   void _selectTab(MainTab tab) {
-    if (tab == MainTab.store && _tab != MainTab.store) {
-      context.read<PurchasesCubit>().trackStoreOpened();
+    if (tab == MainTab.premium && _tab != MainTab.premium) {
+      context.read<PurchasesCubit>().trackPremiumOpened(PremiumSource.tab);
     }
     _tab = tab;
     _visited.add(tab);
@@ -87,8 +87,8 @@ class MainShellState extends State<MainShell> {
           saveToken: _saveToken,
           onDaySelected: showMoodPicker,
         );
-      case MainTab.store:
-        return MoodStoreScreen(isActive: _tab == MainTab.store);
+      case MainTab.premium:
+        return PremiumScreen(isActive: _tab == MainTab.premium);
       case MainTab.settings:
         return SettingsScreen.forApp();
     }
@@ -134,8 +134,8 @@ class MainShellState extends State<MainShell> {
                 label: strings.openCalendarTooltip,
               ),
               FloatingTabItem(
-                icon: Icons.storefront_outlined,
-                label: strings.openStoreTooltip,
+                icon: Icons.diamond_outlined,
+                label: strings.openPremiumTooltip,
               ),
               FloatingTabItem(
                 icon: Icons.settings_outlined,

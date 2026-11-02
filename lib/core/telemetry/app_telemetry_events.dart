@@ -32,5 +32,5 @@ class AppTelemetryEvents {
   };
 
   /// Únicos parámetros que se reenvían a Analytics.
-  static const analyticsParameterAllowlist = {'has_note', 'source'};
+  static const analyticsParameterAllowlist = {'has_note', 'source', 'plan'};
 }

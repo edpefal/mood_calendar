@@ -156,4 +156,52 @@ void main() {
       isA<MoodEntry>().having((e) => e.note, 'note', isNull),
     );
   });
+
+  test(
+      'una elección de un mood bloqueado se descarta y el reloj recibe un '
+      'estado que la da por procesada', () async {
+    build();
+    coordinator.start();
+    await _settle();
+    final before = channel.published.length;
+
+    channel.deliver(_choice('locked-1', 'anxious'));
+    await _settle();
+
+    expect(repository.entries, isEmpty);
+    expect(channel.acks.last, ['locked-1']);
+    expect(channel.published.length, greaterThan(before));
+    expect(channel.published.last.handledChoiceIds, ['locked-1']);
+    expect(
+      channel.published.last.moods.map((mood) => mood.id),
+      isNot(contains('anxious')),
+    );
+  });
+
+  test('los ids procesados se acumulan y solo se conservan los 20 últimos',
+      () async {
+    build();
+    coordinator.start();
+    await _settle();
+
+    for (var i = 0; i < 25; i++) {
+      channel.deliver(_choice('c$i', 'anxious'));
+      await _settle();
+    }
+
+    final handled = channel.published.last.handledChoiceIds;
+    expect(handled, hasLength(20));
+    expect(handled.first, 'c5');
+    expect(handled.last, 'c24');
+  });
+
+  test('una elección que no se pudo guardar no se da por procesada', () async {
+    repository.failNextSaves = 1;
+    build(inbox: [_choice('a', 'calm')]);
+
+    coordinator.start();
+    await _settle();
+
+    expect(channel.published.last.handledChoiceIds, isEmpty);
+  });
 }

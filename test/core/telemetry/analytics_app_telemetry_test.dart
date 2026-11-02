@@ -74,6 +74,36 @@ void main() {
     expect(reporter.events.single.parameters, {'source': 'notification'});
   });
 
+  test('the subscription plan and where Premium was opened are forwarded', () {
+    telemetry.trackEvent(
+      AppTelemetryEvents.purchaseStarted,
+      properties: {'plan': 'annual'},
+    );
+    telemetry.trackEvent(
+      AppTelemetryEvents.storeOpened,
+      properties: {'source': 'locked_mood'},
+    );
+
+    expect(reporter.events[0].name, 'purchase_started');
+    expect(reporter.events[0].parameters, {'plan': 'annual'});
+    expect(reporter.events[1].name, 'store_opened');
+    expect(reporter.events[1].parameters, {'source': 'locked_mood'});
+  });
+
+  test('a purchase event never carries a mood or a pack id', () {
+    telemetry.trackEvent(
+      AppTelemetryEvents.purchaseCompleted,
+      properties: {
+        'plan': 'weekly',
+        'mood': 'brave',
+        'mood_id': 'brave',
+        'pack_id': 'confianza'
+      },
+    );
+
+    expect(reporter.events.single.parameters, {'plan': 'weekly'});
+  });
+
   test('every allowlisted event is forwarded and blocked keys never leave', () {
     for (final name in AppTelemetryEvents.analyticsAllowlist) {
       telemetry.trackEvent(name, properties: {

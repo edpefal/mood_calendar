@@ -4,13 +4,22 @@ import '../../../mood/domain/repositories/mood_repository.dart';
 import '../repositories/watch_channel.dart';
 
 class WatchInboxResult {
-  const WatchInboxResult({required this.applied, required this.ignored});
+  const WatchInboxResult({
+    required this.applied,
+    required this.ignored,
+    this.handledIds = const [],
+  });
 
   /// Mood Entries creadas o cambiadas.
   final int applied;
 
   /// Elecciones descartadas por no cumplir el contrato o por estar bloqueadas.
   final int ignored;
+
+  /// Ids de todas las elecciones procesadas (aplicadas o descartadas) y ya
+  /// confirmadas al canal; se publican al reloj para que quite su marca
+  /// "pendiente".
+  final List<String> handledIds;
 }
 
 /// Aplica en Hive las elecciones que llegaron del Apple Watch.
@@ -77,8 +86,13 @@ class ProcessWatchInboxUseCase {
       applied++;
     }
 
-    await channel.ackInbox([for (final choice in choices) choice.id]);
-    return WatchInboxResult(applied: applied, ignored: ignored);
+    final handledIds = [for (final choice in choices) choice.id];
+    await channel.ackInbox(handledIds);
+    return WatchInboxResult(
+      applied: applied,
+      ignored: ignored,
+      handledIds: handledIds,
+    );
   }
 
   Future<Map<DateTime, MoodEntry>> _entriesByDate() async {

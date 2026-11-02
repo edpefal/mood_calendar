@@ -70,8 +70,7 @@ class MonthlyMoodSummaryCard extends StatelessWidget {
                 height: 32,
                 width: 32,
                 fit: BoxFit.contain,
-                semanticsLabel:
-                    _moodLabelFromPath(context, mostCommonMoodPath),
+                semanticsLabel: _moodLabelFromPath(context, mostCommonMoodPath),
                 errorBuilder: (context, error, stackTrace) =>
                     Icon(Icons.mood, size: 32, color: moodTextColor),
               ),
@@ -159,8 +158,7 @@ class _StatCard extends StatelessWidget {
                 end: Alignment.centerRight,
               )
             : null);
-    final effectiveTextColor =
-        textColor ?? (highlight ? Colors.white : null);
+    final effectiveTextColor = textColor ?? (highlight ? Colors.white : null);
     final titleStyle = Theme.of(context).textTheme.titleSmall?.copyWith(
           fontWeight: FontWeight.bold,
           color: effectiveTextColor,

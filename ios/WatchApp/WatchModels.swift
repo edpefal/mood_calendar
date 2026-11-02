@@ -14,6 +14,10 @@ struct WatchAppState: Equatable {
   let today: String?
   let moods: [WatchMood]
 
+  /// Ids of the latest watch choices the iPhone already processed, applied or
+  /// discarded. Optional in the contract: an older state simply has none.
+  let handledChoiceIds: [String]
+
   /// Returns nil when the context does not follow the contract or comes from a
   /// newer version than this app understands.
   init?(context: [String: Any]) {
@@ -23,6 +27,7 @@ struct WatchAppState: Equatable {
     else { return nil }
     locale = context["locale"] as? String ?? "en"
     today = context["today"] as? String
+    handledChoiceIds = context["handledChoiceIds"] as? [String] ?? []
     moods = rawMoods.compactMap { raw in
       guard let id = raw["id"] as? String, let name = raw["name"] as? String else { return nil }
       return WatchMood(id: id, name: name)
@@ -34,6 +39,10 @@ struct WatchAppState: Equatable {
 struct PendingChoice: Codable, Equatable {
   let mood: String
   let date: String
+
+  /// Id of the choice sent to the iPhone. Missing in choices saved by an
+  /// earlier version of the app.
+  var id: String? = nil
 }
 
 enum WatchDate {

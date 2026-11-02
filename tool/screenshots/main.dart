@@ -40,8 +40,8 @@ import 'package:mood_calendar/features/mood/presentation/bloc/mood_cubit.dart';
 import 'package:mood_calendar/core/navigation/main_shell.dart';
 import 'package:mood_calendar/features/purchases/data/datasources/revenue_cat_datasource.dart';
 import 'package:mood_calendar/features/purchases/data/repositories/mood_entitlements_repository_impl.dart';
-import 'package:mood_calendar/features/purchases/domain/entities/mood_offer.dart';
-import 'package:mood_calendar/features/purchases/domain/entities/mood_pack.dart';
+import 'package:mood_calendar/features/purchases/domain/entities/subscription_plan.dart';
+import 'package:mood_calendar/features/purchases/domain/entities/subscription_status.dart';
 import 'package:mood_calendar/features/purchases/domain/repositories/mood_entitlements_repository.dart';
 import 'package:mood_calendar/features/purchases/presentation/bloc/purchases_cubit.dart';
 
@@ -75,16 +75,15 @@ class _AllUnlockedEntitlementsRepository implements MoodEntitlementsRepository {
   }
 
   @override
-  Future<List<MoodOffer>> availableMoodOffers() async => const [];
+  Stream<SubscriptionStatus> subscriptionStatus() async* {
+    yield SubscriptionStatus.inactive;
+  }
 
   @override
-  Future<List<MoodPack>> availablePacks() async => const [];
+  Future<List<SubscriptionPlan>> availablePlans() async => const [];
 
   @override
-  Future<void> purchaseMood(String moodId) async {}
-
-  @override
-  Future<void> purchasePack(String packId) async {}
+  Future<void> purchasePlan(SubscriptionPlanType plan) async {}
 
   @override
   Future<void> restorePurchases() async {}

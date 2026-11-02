@@ -1,5 +1,7 @@
 # Pack composition is frozen at creation
 
+**Estado: Reemplazado.** Los moods premium ya no se venden sueltos ni en Packs: se desbloquean con una suscripción (change `replace-mood-purchases-with-subscription`, versión 1.10.0). Esta decisión sigue explicando por qué los Packs comprados en versiones anteriores conservan su composición y siguen desbloqueando esos moods mediante sus entitlements `mood_*`, pero no se crearán Packs nuevos.
+
 Un Pack es un Purchase no consumible que desbloquea varios Moods premium a la vez con descuento. Dado que el catálogo de Moods va a seguir creciendo indefinidamente, surgió la pregunta de qué pasa si un Mood nuevo encaja temáticamente con un Pack ya existente.
 
 Se decidió que la composición de un Pack (qué Moods incluye) queda **congelada en el momento en que se publica** y nunca se modifica después. Si un Mood nuevo encaja con el tema de un Pack existente, se crea un Pack nuevo (con su propio precio y su propio identificador de producto); el Pack original no cambia.

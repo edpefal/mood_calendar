@@ -24,7 +24,7 @@ class PublishWatchStateUseCase {
   final AppStrings Function() strings;
   final DateTime Function() _now;
 
-  Future<void> call() async {
+  Future<void> call({List<String> handledChoiceIds = const []}) async {
     final entries = await repository.getMoods();
     final localized = strings();
 
@@ -51,6 +51,7 @@ class PublishWatchStateUseCase {
           for (final mood in ordered)
             WatchMoodOption(id: mood.id, name: localized.moodName(mood.id)),
         ],
+        handledChoiceIds: handledChoiceIds,
       ),
     );
   }

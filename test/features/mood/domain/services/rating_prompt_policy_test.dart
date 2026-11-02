@@ -105,7 +105,8 @@ void main() {
       );
     });
 
-    test('does not request again at 3 days once the first attempt was made', () {
+    test('does not request again at 3 days once the first attempt was made',
+        () {
       expect(
         decide(
           days: 3,

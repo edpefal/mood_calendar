@@ -63,8 +63,10 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1027445865703',
     projectId: 'mood-calendar-fee5c',
     storageBucket: 'mood-calendar-fee5c.firebasestorage.app',
-    androidClientId: '1027445865703-9caekvjdb7ocglc7qrflasj41cn21lo8.apps.googleusercontent.com',
-    iosClientId: '1027445865703-tqvkdj9imigldvpiiem0cnei19tlc29e.apps.googleusercontent.com',
+    androidClientId:
+        '1027445865703-9caekvjdb7ocglc7qrflasj41cn21lo8.apps.googleusercontent.com',
+    iosClientId:
+        '1027445865703-tqvkdj9imigldvpiiem0cnei19tlc29e.apps.googleusercontent.com',
     iosBundleId: 'com.artlab.moodcalendar',
   );
 }

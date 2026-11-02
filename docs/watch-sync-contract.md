@@ -1,6 +1,6 @@
 # Contrato de sincronización iPhone ↔ Apple Watch
 
-Fuente de verdad: el iPhone (Hive). El reloj no guarda historial. Spec: `openspec/specs/watch-mood-picker/` (o el change `add-apple-watch-mood-picker` mientras esté activo) y `design.md` del change.
+Fuente de verdad: el iPhone (Hive). El reloj no guarda historial. Spec: `openspec/specs/watch-mood-picker/` y el historial del change en `openspec/changes/archive/*-add-apple-watch-mood-picker/`.
 
 Transporte: WatchConnectivity.
 
@@ -16,7 +16,8 @@ Transporte: WatchConnectivity.
   "moods": [
     { "id": "calm", "name": "Tranquilo" },
     { "id": "happy", "name": "Feliz" }
-  ]
+  ],
+  "handledChoiceIds": ["5c1b8f3e-0a7e-4a52-9d5f-3b7a9c0e41d2"]
 }
 ```
 
@@ -24,6 +25,7 @@ Transporte: WatchConnectivity.
 - `locale`: código de idioma de los nombres (`en`, `es`, `de`, `fr`, `it`); solo informativo.
 - `today`: id del mood de hoy, o `null` si hoy no tiene Mood Entry.
 - `moods`: solo los desbloqueados, ya en el orden de uso del selector del iPhone, con el nombre localizado por `AppStrings`.
+- `handledChoiceIds` (opcional, hasta 20): ids de las últimas elecciones del reloj que el iPhone ya procesó, **aplicadas o descartadas** (p. ej. un mood que dejó de estar desbloqueado porque la suscripción venció con la app cerrada). El reloj quita la marca "pendiente" de su elección cuando su id aparece aquí, además de cuando `today` ya es ese mood o cambia el día. Un estado que no menciona esa elección (por ejemplo, el que se publica tras un cambio de idioma mientras sigue en cola) **no** la quita. El campo es aditivo: no sube `version` y un reloj o iPhone que no lo conoce lo ignora.
 
 ## Reloj → iPhone: elección (`transferUserInfo`)
 
@@ -38,7 +40,7 @@ Cola persistente: sobrevive a que el iPhone esté lejos o la app cerrada.
 - `mood`: id estable del mood (`calm`). Nunca `intensity` ni rutas de assets (ADR 0001).
 - `chosenAt`: milisegundos desde epoch en el reloj; ordena elecciones del mismo día (gana la última).
 
-No hay notas ni otro campo. Un `mood` desconocido o bloqueado se ignora en el iPhone sin error.
+No hay notas ni otro campo. Un `mood` desconocido o bloqueado se ignora en el iPhone sin error, no cambia ninguna Mood Entry y se confirma al reloj en el siguiente estado (`handledChoiceIds`), que además ya no ofrece los moods bloqueados.
 
 ## Buzón del iPhone (puente nativo ↔ Dart)
 

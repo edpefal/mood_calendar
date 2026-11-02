@@ -28,7 +28,7 @@ La app se descarga desde las tiendas. La web (`site/`) es un sitio estático bil
 
 ## Capabilities and Constraints
 
-- Moods: 5 base gratis (`happy`, `calm`, `neutral`, `sad`, `angry`) y 14 premium de compra individual o por Packs. La web comunica "gratis para descargar y usar" y no afirma que todos los moods sean gratis. Por decisión del producto no menciona precios, Packs ni la tienda de moods.
+- Moods: 5 base gratis (`happy`, `calm`, `neutral`, `sad`, `angry`) y 14 premium que se desbloquean con una suscripción opcional (semanal, mensual o anual, con 3 días de prueba); quien compró moods o Packs en versiones anteriores los conserva. La web comunica "gratis para descargar y usar" y no afirma que todos los moods sean gratis. Por decisión del producto no menciona precios, la suscripción ni la tienda de moods; los Términos de uso y la política de privacidad sí describen la suscripción.
 - Funciones: elegir mood con nota opcional, calendario mensual a color, mood más frecuente y mejor racha, recordatorio diario, exportar el historial en JSON.
 - Analíticas anónimas de uso (con interruptor en Ajustes) y reporte de fallos; nada de las entradas sale del dispositivo. Todo lo que la web diga sobre privacidad debe coincidir con la política (`site/privacy/`) y con las declaraciones de las tiendas.
 - La web no carga fuentes, scripts ni analíticas de terceros. Se edita siempre en inglés y en español, con el mismo contenido y estructura.

@@ -48,9 +48,7 @@ void main() {
     expect(summary.lastEntry?.date.day, 15);
   });
 
-  test(
-      'picks the mood with the highest count when there is no tie',
-      () async {
+  test('picks the mood with the highest count when there is no tie', () async {
     final repository = _InMemoryMoodRepository(
       moods: [
         MoodEntry(

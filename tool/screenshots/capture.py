@@ -9,7 +9,7 @@ Writes build/screenshots/shots/<device>/<locale>/<picker|note|calendar|reminders
 Buttons are found by position (not label) so it works in every language.
 The note editor is opened with the pill in the picker header (top-right).
 The four tabs of the bottom bar are the bottom-most row of buttons:
-[mood picker, calendar, store, settings].
+[mood picker, calendar, premium, settings].
 """
 import json
 import os
@@ -88,7 +88,7 @@ def rows(bs):
 
 
 def tab_buttons():
-    """Bottom bar tabs, left to right: [mood picker, calendar, store, settings]."""
+    """Bottom bar tabs, left to right: [mood picker, calendar, premium, settings]."""
     groups = [g for g in rows(buttons()) if len(g) == 4]
     return sorted(groups[-1], key=lambda b: b[0]) if groups else []
 

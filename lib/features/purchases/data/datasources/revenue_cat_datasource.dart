@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 class RevenueCatDatasource {
@@ -10,7 +11,8 @@ class RevenueCatDatasource {
     return Purchases.configure(PurchasesConfiguration(apiKey));
   }
 
-  Stream<CustomerInfo> get customerInfoUpdates => _customerInfoController.stream;
+  Stream<CustomerInfo> get customerInfoUpdates =>
+      _customerInfoController.stream;
 
   void startListening() {
     _listener = (customerInfo) {
@@ -44,4 +46,27 @@ class RevenueCatDatasource {
   }
 
   Future<CustomerInfo> restorePurchases() => Purchases.restorePurchases();
+
+  /// Qué paquetes ofrecen hoy una prueba gratis a este usuario, por id de
+  /// producto. En iOS la elegibilidad la confirma Apple (una sola vez por
+  /// Apple ID y grupo de suscripción); en Android, Google Play solo incluye la
+  /// oferta de prueba en el producto si el usuario puede usarla.
+  Future<Map<String, bool>> trialEligibility(List<Package> packages) async {
+    final productIds =
+        packages.map((package) => package.storeProduct.identifier).toList();
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      final eligibility =
+          await Purchases.checkTrialOrIntroductoryPriceEligibility(productIds);
+      return {
+        for (final id in productIds)
+          id: eligibility[id]?.status ==
+              IntroEligibilityStatus.introEligibilityStatusEligible,
+      };
+    }
+    return {
+      for (final package in packages)
+        package.storeProduct.identifier:
+            package.storeProduct.defaultOption?.freePhase != null,
+    };
+  }
 }

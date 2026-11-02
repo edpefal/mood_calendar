@@ -14,8 +14,7 @@ class MoodStreakCalculator {
     for (int i = 1; i < sortedDates.length; i++) {
       final previousDate = sortedDates[i - 1];
       final currentDate = sortedDates[i];
-      final isConsecutive =
-          currentDate.difference(previousDate).inDays == 1;
+      final isConsecutive = currentDate.difference(previousDate).inDays == 1;
 
       if (isConsecutive) {
         currentStreak++;

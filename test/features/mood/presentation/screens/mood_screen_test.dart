@@ -32,7 +32,6 @@ import 'package:mood_calendar/features/mood/presentation/widgets/mood_grid_sheet
 import 'package:mood_calendar/features/purchases/presentation/bloc/purchases_cubit.dart';
 import 'package:mood_calendar/features/settings/presentation/screens/settings_screen.dart';
 
-import 'package:mood_calendar/features/purchases/domain/entities/mood_offer.dart';
 import '../../../../support/drag_page.dart';
 import '../../../../support/fake_mood_entitlements_repository.dart';
 
@@ -311,11 +310,9 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(moodRepository.savedEntries, isEmpty);
-    // The purchase bottom sheet opened instead of saving (the fake
-    // repository returns no offers, so it shows the empty-catalog message).
-    expect(find.text('No hay ánimos premium disponibles por ahora.'),
-        findsOneWidget);
-    expect(find.text('Cancelar'), findsOneWidget);
+    // The Premium sheet opened instead of saving.
+    expect(find.text('Desbloquea todos los moods premium'), findsOneWidget);
+    expect(find.byTooltip('Cerrar'), findsOneWidget);
   });
 
   Widget buildApp({
@@ -827,7 +824,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Feliz'), findsOneWidget);
 
-      await entitlements.purchaseMood('anxious');
+      await entitlements.unlockMood('anxious');
       await tester.pumpAndSettle();
 
       expect(find.text('Feliz'), findsOneWidget);
@@ -875,7 +872,7 @@ void main() {
       await leaveAndReturn(
         tester,
         active,
-        whileAway: () => entitlements.purchaseMood('anxious'),
+        whileAway: () => entitlements.unlockMood('anxious'),
       );
 
       // The selected mood stays, but anxious is now the first of the carousel.
@@ -940,7 +937,7 @@ void main() {
       await leaveAndReturn(
         tester,
         active,
-        whileAway: () => entitlements.purchaseMood('anxious'),
+        whileAway: () => entitlements.unlockMood('anxious'),
       );
 
       expect(find.text('Tranquilo'), findsOneWidget);
@@ -986,6 +983,71 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Ansioso'), findsOneWidget);
+    });
+
+    group('a premium mood that is no longer unlocked', () {
+      final day = DateTime(2026, 3, 10);
+
+      testWidgets('saving the same mood keeps the note and opens no sheet',
+          (tester) async {
+        moodRepository.savedEntries.add(MoodEntry(
+          date: day,
+          mood: 'assets/icon/brave.svg',
+          note: 'un día valiente',
+          intensity: 1,
+        ));
+
+        await tester.pumpWidget(buildOrderedApp(selectedDate: day));
+        await tester.pumpAndSettle();
+        expect(find.text('Valiente'), findsOneWidget);
+
+        await tester.tap(find.text('Guardar'));
+        await tester.pumpAndSettle();
+
+        expect(moodRepository.savedEntries, hasLength(2));
+        expect(moodRepository.savedEntries.last.mood, 'assets/icon/brave.svg');
+        expect(moodRepository.savedEntries.last.note, 'un día valiente');
+        expect(find.text('Desbloquea todos los moods premium'), findsNothing);
+      });
+
+      testWidgets(
+          'choosing another locked mood opens the sheet instead of saving',
+          (tester) async {
+        moodRepository.savedEntries.add(MoodEntry(
+          date: day,
+          mood: 'assets/icon/brave.svg',
+          intensity: 1,
+        ));
+
+        await tester.pumpWidget(buildOrderedApp(selectedDate: day));
+        await tester.pumpAndSettle();
+        await dragPage(tester, forward: false);
+        await tester.pumpAndSettle();
+        expect(find.text('Ansioso'), findsOneWidget);
+
+        await tester.tap(find.text('Guardar'));
+        await tester.pumpAndSettle();
+
+        expect(moodRepository.savedEntries, hasLength(1));
+        expect(find.text('Desbloquea todos los moods premium'), findsOneWidget);
+      });
+
+      testWidgets('a date without an entry cannot start one with a locked mood',
+          (tester) async {
+        await tester.pumpWidget(buildOrderedApp(selectedDate: day));
+        await tester.pumpAndSettle();
+        for (var i = 0; i < 6; i++) {
+          await dragPage(tester);
+          await tester.pumpAndSettle();
+        }
+        expect(find.text('Valiente'), findsOneWidget);
+
+        await tester.tap(find.text('Guardar'));
+        await tester.pumpAndSettle();
+
+        expect(moodRepository.savedEntries, isEmpty);
+        expect(find.text('Desbloquea todos los moods premium'), findsOneWidget);
+      });
     });
 
     group('mood grid sheet', () {
@@ -1145,7 +1207,7 @@ void main() {
           await tester.pumpAndSettle();
           // Locked: the sheet opens the purchase flow and keeps the pick, so
           // reach the end with the arrow instead.
-          await tester.tap(find.text('Cancelar'));
+          await tester.tap(find.byTooltip('Cerrar'));
           await tester.pumpAndSettle();
           for (var i = 0; i < total - 1; i++) {
             await tapArrow(tester, es.nextMoodLabel);
@@ -1178,8 +1240,7 @@ void main() {
           await tester.pumpAndSettle();
 
           expect(find.text('6 / $total'), findsOneWidget);
-          expect(find.text('No hay ánimos premium disponibles por ahora.'),
-              findsNothing);
+          expect(find.text('Desbloquea todos los moods premium'), findsNothing);
         });
 
         testWidgets('tapping the selected locked mood opens the purchase flow',
@@ -1193,8 +1254,8 @@ void main() {
           await tester.tap(find.text(es.moodName('anxious')));
           await tester.pumpAndSettle();
 
-          expect(find.text('No hay ánimos premium disponibles por ahora.'),
-              findsOneWidget);
+          expect(
+              find.text('Desbloquea todos los moods premium'), findsOneWidget);
         });
       });
 
@@ -1258,8 +1319,7 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.byType(MoodGridSheet), findsNothing);
-        expect(find.text('No hay ánimos premium disponibles por ahora.'),
-            findsOneWidget);
+        expect(find.text('Desbloquea todos los moods premium'), findsOneWidget);
         expect(find.text('1 / $total'), findsOneWidget);
       });
 
@@ -1280,7 +1340,7 @@ void main() {
         await openGrid(tester);
         final before = gridOrder(tester);
 
-        await entitlements.purchaseMood('anxious');
+        await entitlements.unlockMood('anxious');
         await tester.pumpAndSettle();
 
         expect(gridOrder(tester), before);
@@ -1395,77 +1455,55 @@ void main() {
     testWidgets('the store tab retries a catalog that failed at startup',
         (tester) async {
       final entitlements = FakeMoodEntitlementsRepository(
-        offers: const [
-          MoodOffer(
-            moodId: 'anxious',
-            displayPrice: r'$0.99',
-            productId: 'mood_anxious_unlock',
-          ),
-        ],
         failCatalogLoads: 1,
       );
       await tester.pumpWidget(buildApp(entitlements: entitlements));
       await tester.pumpAndSettle();
       expect(entitlements.catalogLoadCount, 1);
 
-      await openTab(tester, strings.openStoreTooltip);
+      await openTab(tester, strings.openPremiumTooltip);
 
       expect(find.text(strings.storeLoadError), findsNothing);
-      expect(find.text(strings.moodName('anxious')), findsOneWidget);
+      expect(find.text(strings.annualPlanLabel), findsOneWidget);
       expect(entitlements.catalogLoadCount, 2);
     });
 
     testWidgets('returning to the store tab retries after a failed retry',
         (tester) async {
       final entitlements = FakeMoodEntitlementsRepository(
-        offers: const [
-          MoodOffer(
-            moodId: 'anxious',
-            displayPrice: r'$0.99',
-            productId: 'mood_anxious_unlock',
-          ),
-        ],
         // Falla al arrancar y también en el reintento de la primera visita.
         failCatalogLoads: 2,
       );
       await tester.pumpWidget(buildApp(entitlements: entitlements));
       await tester.pumpAndSettle();
 
-      await openTab(tester, strings.openStoreTooltip);
+      await openTab(tester, strings.openPremiumTooltip);
       expect(find.text(strings.storeLoadError), findsOneWidget);
       expect(entitlements.catalogLoadCount, 2);
 
       await openTab(tester, strings.openCalendarTooltip);
-      await openTab(tester, strings.openStoreTooltip);
+      await openTab(tester, strings.openPremiumTooltip);
 
       expect(find.text(strings.storeLoadError), findsNothing);
-      expect(find.text(strings.moodName('anxious')), findsOneWidget);
+      expect(find.text(strings.annualPlanLabel), findsOneWidget);
       expect(entitlements.catalogLoadCount, 3);
     });
 
     testWidgets('returning to the store tab does not reload a loaded catalog',
         (tester) async {
-      final entitlements = FakeMoodEntitlementsRepository(
-        offers: const [
-          MoodOffer(
-            moodId: 'anxious',
-            displayPrice: r'$0.99',
-            productId: 'mood_anxious_unlock',
-          ),
-        ],
-      );
+      final entitlements = FakeMoodEntitlementsRepository();
       await tester.pumpWidget(buildApp(entitlements: entitlements));
       await tester.pumpAndSettle();
 
-      await openTab(tester, strings.openStoreTooltip);
+      await openTab(tester, strings.openPremiumTooltip);
       await openTab(tester, strings.openCalendarTooltip);
-      await openTab(tester, strings.openStoreTooltip);
+      await openTab(tester, strings.openPremiumTooltip);
 
       expect(entitlements.catalogLoadCount, 1);
-      expect(find.text(strings.moodName('anxious')), findsOneWidget);
+      expect(find.text(strings.annualPlanLabel), findsOneWidget);
     });
 
-    for (final otherTab in ['calendar', 'store', 'settings']) {
+    for (final otherTab in ['calendar', 'premium', 'settings']) {
       testWidgets(
           'a purchase made from the $otherTab tab reorders the picker on return',
           (tester) async {
@@ -1491,11 +1529,11 @@ void main() {
           tester,
           switch (otherTab) {
             'calendar' => strings.openCalendarTooltip,
-            'store' => strings.openStoreTooltip,
+            'premium' => strings.openPremiumTooltip,
             _ => strings.openSettingsTooltip,
           },
         );
-        await entitlements.purchaseMood('anxious');
+        await entitlements.unlockMood('anxious');
         await tester.pumpAndSettle();
         await openTab(tester, strings.openMoodPickerTooltip);
 
@@ -1517,7 +1555,8 @@ void main() {
           tester.getCenter(find.byTooltip(strings.openMoodPickerTooltip));
       final calendar =
           tester.getCenter(find.byTooltip(strings.openCalendarTooltip));
-      final store = tester.getCenter(find.byTooltip(strings.openStoreTooltip));
+      final store =
+          tester.getCenter(find.byTooltip(strings.openPremiumTooltip));
       final settings =
           tester.getCenter(find.byTooltip(strings.openSettingsTooltip));
 
@@ -1534,7 +1573,7 @@ void main() {
 
       // Each destination is reachable only through the bar.
       expect(find.byTooltip(strings.openCalendarTooltip), findsOneWidget);
-      expect(find.byTooltip(strings.openStoreTooltip), findsOneWidget);
+      expect(find.byTooltip(strings.openPremiumTooltip), findsOneWidget);
       expect(find.byTooltip(strings.openSettingsTooltip), findsOneWidget);
     });
 
@@ -1628,7 +1667,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Tranquilo'), findsOneWidget);
 
-      await openTab(tester, strings.openStoreTooltip);
+      await openTab(tester, strings.openPremiumTooltip);
       await openTab(tester, strings.openMoodPickerTooltip);
 
       expect(find.text('Tranquilo'), findsOneWidget);
