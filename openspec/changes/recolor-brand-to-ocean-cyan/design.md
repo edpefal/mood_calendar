@@ -57,3 +57,7 @@ Hechos que condicionan el enfoque:
 
 - Ícono en degradado `#00727D → #00838F` en vez de plano, si el plano se ve apagado (decidir con el ícono real en la pantalla de inicio de un iPhone).
 - Qué versión lleva el cambio (1.10.x o una 1.11.0) una vez cerrada la suscripción.
+
+
+## D6. Superficies cálidas
+El fondo de las pantallas (`surface` `#FBFAF7`) y el color por defecto de `Card` (`surfaceContainerLow` `#F4F1EA`) son blancos cálidos definidos en `brand_colors.dart`: el cian sobre un blanco azulado frío se sentía clínico y el amarillo de los moods lo equilibra. Ícono: trazo blanco sobre `#00838F` plano (decidido por ahora).

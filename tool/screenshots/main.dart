@@ -251,7 +251,10 @@ class _ScreenshotApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final baseTheme = ThemeData(
-      colorScheme: ColorScheme.fromSeed(seedColor: brandInk),
+      colorScheme: ColorScheme.fromSeed(seedColor: brandInk).copyWith(
+        surface: brandSurface,
+        surfaceContainerLow: brandSurfaceCard,
+      ),
       useMaterial3: true,
     );
     final poppinsTextTheme = GoogleFonts.poppinsTextTheme(baseTheme.textTheme);
