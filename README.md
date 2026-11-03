@@ -3,17 +3,19 @@
 Mood Calendar es una app Flutter para registrar el estado de ánimo de cada día, añadir una nota y revisar el mes en un calendario de colores. Los datos viven solo en el dispositivo. Está disponible en iOS y Android (mismo identificador, `com.artlab.moodcalendar`) y en cinco idiomas: inglés, español, alemán, francés e italiano.
 
 - Sitio: <https://moodcalendar.app> (política de privacidad, términos y soporte)
-- Versión actual: `1.8.5+36` (ver `pubspec.yaml`)
+- Versión actual: `1.10.1+41` (ver `pubspec.yaml`). La 1.9.0 (con la app de Apple Watch) está publicada en iOS; la 1.10.0 (suscripción Premium) espera la aprobación de las tiendas y la 1.10.1 (nueva imagen de marca) está en pruebas. El estado al día está en `CLAUDE.md`.
 
 ## Qué hace
 
 - **Registro diario**: carrusel de moods con flechas y una cuadrícula para saltar a uno concreto, y una nota opcional por día.
-- **Catálogo de 19 moods**: 5 gratuitos y 14 premium de compra única, sueltos o en Packs (Confianza, Afecto, Cuerpo e Intenso). Las compras pasan por RevenueCat (App Store y Google Play).
+- **Catálogo de 19 moods**: 5 gratuitos y 14 premium. Los premium se desbloquean con una suscripción semanal, mensual o anual (3 días de prueba gratis para clientes nuevos) que también abre los moods futuros; quien compró moods sueltos o Packs en versiones anteriores los conserva. Las compras pasan por RevenueCat (App Store y Google Play).
 - **Calendario mensual** con navegación entre meses y un resumen con el mood más frecuente y la mejor racha.
 - **Recordatorio diario** local, con hora configurable y autoguardado.
 - **Exportar el historial** en JSON y compartirlo con la hoja del sistema.
 - **Calificar la app** de forma automática (en hitos de uso) y manual desde Ajustes.
-- Cuatro pestañas en un bottom bar flotante: selector, calendario, tienda y ajustes.
+- **Apple Watch** (solo iOS): elegir el mood de hoy desde el reloj con un toque; el iPhone sigue siendo la única fuente de verdad.
+- Cuatro pestañas en un bottom bar flotante: selector, calendario, Premium y ajustes.
+- Marca **Ocean Cyan** (`#00727D → #00838F`) con superficies cálidas, definida una sola vez en `lib/core/theme/brand_colors.dart`.
 
 El idioma sigue al del dispositivo (el inglés es el fallback).
 
@@ -22,7 +24,7 @@ El idioma sigue al del dispositivo (el inglés es el fallback).
 - No hay cuentas ni backend: las entradas (mood, nota, fecha) no salen del dispositivo.
 - **Firebase Analytics** mide el uso de forma anónima (instalaciones activas, sesiones, versión y una lista cerrada de eventos), solo en builds de release. Se puede apagar en Ajustes → "Compartir datos de uso anónimos". No usa el ID de publicidad ni pide permiso de rastreo.
 - **Firebase Crashlytics** reporta fallos de forma anónima, solo en release.
-- **RevenueCat** gestiona las compras.
+- **RevenueCat** gestiona la suscripción y las compras heredadas.
 
 Los detalles están en la [política de privacidad](https://moodcalendar.app/privacy/) y, para quien mantiene el proyecto, en las secciones de privacidad de `CLAUDE.md`.
 
@@ -30,7 +32,8 @@ Los detalles están en la [política de privacidad](https://moodcalendar.app/pri
 
 - Flutter 3.x (el CI usa 3.32.1), Dart `>=3.6.0 <4.0.0`. iOS 15.0 como mínimo.
 - Estado con `flutter_bloc` (Cubit); persistencia local con `hive`.
-- Compras con `purchases_flutter` (RevenueCat).
+- Suscripción y compras con `purchases_flutter` (RevenueCat).
+- App de Apple Watch en SwiftUI (`ios/WatchApp/`, WatchConnectivity), solo iOS.
 - Firebase: `firebase_core`, `firebase_crashlytics` y `firebase_analytics`.
 - Notificaciones locales con `flutter_local_notifications` y `timezone`.
 - UI con `flutter_svg`, `google_fonts` (Poppins) y `lottie`.
@@ -39,7 +42,7 @@ Los detalles están en la [política de privacidad](https://moodcalendar.app/pri
 
 ## Arquitectura
 
-Clean Architecture con tres features (`mood`, `purchases`, `settings`) y un `core/` compartido:
+Clean Architecture con cuatro features (`mood`, `purchases`, `settings` y `watch`) y un `core/` compartido:
 
 ```text
 lib/
@@ -51,11 +54,13 @@ lib/
     rating/         # Pedido de calificación (in_app_review)
     settings/       # Preferencias en Hive (recordatorio, datos de uso, calificación)
     telemetry/      # AppTelemetry; reporte de fallos (Crashlytics) y analíticas (Firebase)
+    theme/          # Color de marca y superficies (brand_colors.dart)
     widgets/        # Widgets compartidos
   features/
     mood/           # data / domain / presentation: registro, calendario, resumen, exportación
-    purchases/      # RevenueCat, entitlements, Tienda y hojas de compra
+    purchases/      # RevenueCat, entitlements, pestaña Premium y hoja de suscripción
     settings/       # Pantalla de Ajustes y su cubit
+    watch/          # Apple Watch (solo iOS): canal de plataforma, casos de uso y coordinador
   main.dart
 ```
 
@@ -72,6 +77,8 @@ El resto de carpetas del repo:
 | Carpeta | Contenido |
 |---|---|
 | `scripts/` | Builds de release de iOS y Android y sus verificaciones |
+| `ios/WatchApp/` | App de Apple Watch (SwiftUI); el puente del iPhone está en `ios/Runner/Watch/` |
+| `tool/watch/` | Scripts del target del reloj y de sus íconos |
 | `site/` | Sitio web estático de `moodcalendar.app` (Vercel) |
 | `aso/` | Material de las fichas de las tiendas |
 | `tool/screenshots/` | Generadores de capturas y arte de App Store y Google Play |
@@ -118,7 +125,7 @@ Los scripts exigen la llave de RevenueCat, la pasan con `--dart-define` y compru
 
 ## Pruebas y CI
 
-Hay 262 pruebas unitarias y de widget en `test/`: repositorios, resolver y orden del selector, resumen y rachas, calificación, exportación, cubits de moods, compras y ajustes, pantallas principales y la telemetría (analíticas y reporte de fallos). Los fakes viven en `test/support/`.
+Hay 358 pruebas unitarias y de widget en 34 archivos de `test/`: repositorios, resolver y orden del selector, resumen y rachas, calificación, exportación, cubits de moods, compras y ajustes, pantallas principales, el contraste del color de marca y la telemetría (analíticas y reporte de fallos). Los fakes viven en `test/support/`. La lógica de Swift (buzón del iPhone y modelo del reloj) se prueba con XCTest en `ios/RunnerTests/`. Para compilar `Runner` en simulador hace falta el runtime de watchOS (`xcodebuild -downloadPlatform watchOS`).
 
 `.github/workflows/ci.yml` corre `flutter pub get`, `flutter analyze` y `flutter test` en cada push a `main`, en cada pull request y a mano. El repo protege `main`: los PR necesitan que pase el check "Analyze and Test".
 
@@ -131,7 +138,9 @@ Hay 262 pruebas unitarias y de widget en `test/`: repositorios, resolver y orden
 ## Documentación
 
 - `CLAUDE.md` — guía de trabajo del proyecto: estado actual, reglas de arquitectura, compras, releases, privacidad y sitio web.
-- `CONTEXT.md` — glosario del dominio (Mood vs Mood Entry, Tier, Unlocked, Pack, Intensity...).
+- `CONTEXT.md` — glosario del dominio (Mood vs Mood Entry, Tier, Unlocked, Subscription, Intensity...).
+- `PRODUCT.md` y `DESIGN.md` — contexto de producto y sistema visual del sitio y la marca.
+- `docs/watch-sync-contract.md` y `docs/watch-testing.md` — sincronización y pruebas del Apple Watch.
 - `openspec/specs/` — comportamiento vigente de cada área; `openspec/changes/archive/` — el historial.
 - `docs/adr/` — decisiones de arquitectura; `docs/risks.md` — riesgos aceptados de las compras.
 - `backlog.md` — trabajo pendiente.
