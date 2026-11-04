@@ -49,8 +49,8 @@ Backlog activo del proyecto, actualizado contra el estado actual del repo.
 
 ## Alta prioridad
 
-- Publicar la 1.10.1 (nueva imagen de marca Ocean Cyan).
-  Change `recolor-brand-to-ocean-cyan`: el código, el sitio, el ícono y el arte ya están en `main`; el build 1.10.1 (41) está en TestFlight desde el 2026-11-03. Falta probarlo en dispositivo (ícono, arranque, Premium con planes reales, una compra sandbox y el reloj), recapturar las capturas de tienda en los 5 idiomas (`capture.py`, `capture_android.py`, `compose.py`), subirlas a App Store Connect y Play, subir el build a Play y enviar a revisión.
+- Siguiente change visual y publicación de la versión con la nueva marca (1.10.1 o posterior).
+  El recolor Ocean Cyan está en `main` y el build 1.10.1 (42) está en TestFlight desde el 2026-11-04, probado por el usuario. No se publica todavía: se agruparán más cambios visuales en un change nuevo y entonces se sube la versión a Play, se recapturan las capturas de tienda en los 5 idiomas (`capture.py`, `capture_android.py`, `compose.py`, `header.py`), se suben el ícono, las capturas y los gráficos a App Store Connect y Play, y se envía a revisión. Pendiente también de ese cierre: revisar el modo oscuro y los 390 pt del sitio, y el arranque con el ícono nuevo en Android.
 
 - Comprobar que el reloj aparece en la ficha pública de la 1.9.0 y revisar el modo oscuro del sitio (`moodcalendar.app`).
   La 1.9.0 está publicada (`READY_FOR_SALE`). Mejoras del reloj para más adelante: complicación en la esfera, notas por dictado, colores pastel por mood, acciones en la notificación del recordatorio y app independiente.
@@ -129,7 +129,7 @@ Sale de `aso/aso_report.md` (auditoría del 2026-10-02). Lo ya hecho está en "C
 
 ## Orden sugerido de ejecución
 
-1. Publicar la 1.10.1 (recolor), mantener `CLAUDE.md` al día con cada release y vigilar la suscripción (1.10.0).
+1. Hacer el siguiente change visual y publicar la versión con la nueva marca, mantener `CLAUDE.md` al día con cada release y vigilar la suscripción (1.10.0).
 2. Conectar las notificaciones RTDN de Google Play hacia RevenueCat y respaldar `~/my-release-key.jks`.
 3. Cubrir con pruebas el flujo de recordatorios y apertura desde notificaciones.
 4. Mejorar UX y manejo de errores en plataforma y estados offline.
