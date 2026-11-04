@@ -67,8 +67,8 @@
 
 ## 10. Publicación
 
-- [ ] 10.1 Subir la versión a 1.10.0 (+build) en un PR aparte y, ya en `main`, construir con `scripts/build_ios_release.sh` y `scripts/build_android_release.sh` (`STORE_VERIFIED=1` solo tras 9.1–9.4 y con confirmación del usuario)
-- [ ] 10.2 App Store Connect: versión 1.10.0 con las notas de versión, el párrafo de suscripción en la descripción (5 idiomas), las suscripciones adjuntas a la versión, y las notas para el revisor con la ruta a la pantalla y la cuenta sandbox; enviar a revisión
-- [ ] 10.3 Play Console: subir el `.aab`, añadir el párrafo de suscripción a la ficha y confirmar a mano la versión de producción
-- [ ] 10.4 Con la 1.10.0 publicada: retirar de la venta los 18 productos de compras sueltas en las dos tiendas y quitar sus 18 paquetes de la oferta `default` en RevenueCat (conservar entitlements y productos para restaurar)
-- [ ] 10.5 Actualizar la sección "Estado actual" de `CLAUDE.md`, marcar el backlog y archivar el change con `/opsx:archive`
+- [x] 10.1 Subir la versión a 1.10.0 (+build) en un PR aparte y, ya en `main`, construir con `scripts/build_ios_release.sh` y `scripts/build_android_release.sh` (`STORE_VERIFIED=1` solo tras 9.1–9.4 y con confirmación del usuario)
+- [x] 10.2 App Store Connect: versión 1.10.0 con las notas de versión, el párrafo de suscripción en la descripción (5 idiomas), las suscripciones adjuntas a la versión, y las notas para el revisor con la ruta a la pantalla y la cuenta sandbox; enviar a revisión
+- [x] 10.3 Play Console: subir el `.aab`, añadir el párrafo de suscripción a la ficha y confirmar a mano la versión de producción
+- [x] 10.4 Con la 1.10.0 publicada: retirar de la venta los 18 productos de compras sueltas en las dos tiendas y quitar sus 18 paquetes de la oferta `default` en RevenueCat (conservar entitlements y productos para restaurar). Hecho el 2026-11-04: ninguna compra real de los 18 en producción; paquetes borrados de `default`, productos inactivos en Play y retirados de la venta en App Store Connect
+- [x] 10.5 Actualizar la sección "Estado actual" de `CLAUDE.md`, marcar el backlog y archivar el change con `/opsx:archive`

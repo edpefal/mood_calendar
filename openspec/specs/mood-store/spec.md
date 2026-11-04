@@ -1,134 +1,82 @@
 # mood-store Specification
 
 ## Purpose
-Da a los usuarios un lugar dedicado para descubrir el catálogo de moods premium, comprarlos individualmente o en Pack con descuento, y restaurar compras previas.
+Da a los usuarios la pestaña Premium donde descubrir el catálogo de moods premium (con los desbloqueados marcados), y restaurar compras previas. Los planes de suscripción y su compra se especifican en `premium-subscription`.
 ## Requirements
-### Requirement: Catálogo comprable en la Tienda
-La pantalla de Tienda SHALL mostrar el catálogo completo de Moods premium disponibles para compra individual y todos los Packs disponibles, incluyendo su precio y qué Moods incluye cada Pack. SHALL indicar claramente cuáles Moods ya están `unlocked` para el usuario.
+### Requirement: Escaparate de moods premium en la pantalla Premium
+La pantalla Premium SHALL mostrar los Moods premium del catálogo como escaparate, con su nombre localizado, e indicar cuáles están `unlocked` para el usuario. Los planes de suscripción y su compra se especifican en `premium-subscription`. La pantalla NO SHALL mostrar precios por Mood ni Packs.
 
-#### Scenario: Usuario abre la Tienda
-- **WHEN** el usuario abre la pantalla de Tienda
-- **THEN** ve todos los Moods premium con su precio y estado de desbloqueo, y todos los Packs disponibles con su precio y los Moods que incluyen
+#### Scenario: Usuario abre la pestaña Premium
+- **WHEN** el usuario abre la pestaña Premium sin suscripción activa
+- **THEN** ve el escaparate de los Moods premium y los planes de suscripción con el precio de la tienda
 
-### Requirement: Compra individual de un Mood
-El usuario SHALL poder comprar un Mood premium individual desde la Tienda, o desde el flujo de compra iniciado al tocar un Mood bloqueado en el carrusel diario. Al completarse la compra, ese Mood SHALL pasar a `unlocked` para el usuario.
-
-#### Scenario: Compra individual exitosa
-- **WHEN** el usuario completa la compra de un Mood premium individual
-- **THEN** ese Mood pasa a estar `unlocked` inmediatamente y queda disponible para seleccionar en el carrusel
-
-#### Scenario: Compra individual cancelada o fallida
-- **WHEN** el usuario cancela la compra o esta falla
-- **THEN** el Mood permanece sin `unlocked` y no se le cobra nada al usuario
-
-### Requirement: Compra de un Pack
-El usuario SHALL poder comprar un Pack desde la Tienda a su precio fijo. Al completarse la compra, todos los Moods incluidos en ese Pack SHALL pasar a `unlocked` para el usuario, sin importar si alguno ya estaba `unlocked` previamente.
-
-#### Scenario: Compra de Pack exitosa
-- **WHEN** el usuario completa la compra de un Pack
-- **THEN** todos los Moods de ese Pack quedan `unlocked` para el usuario
-
-### Requirement: Aviso de solape antes de comprar un Pack
-Antes de confirmar la compra de un Pack que incluye uno o más Moods que el usuario ya tiene `unlocked`, el sistema SHALL advertir al usuario de ese solape. El aviso SHALL NOT bloquear la compra ni modificar su precio.
-
-#### Scenario: Pack con solape parcial
-- **WHEN** el usuario intenta comprar un Pack donde ya tiene `unlocked` al menos uno, pero no todos, de sus Moods
-- **THEN** el sistema muestra una advertencia indicando cuáles Moods ya tiene, pero permite continuar con la compra al precio fijo del Pack
-
-#### Scenario: Pack sin solape
-- **WHEN** el usuario intenta comprar un Pack donde no tiene `unlocked` ninguno de sus Moods
-- **THEN** el sistema no muestra ninguna advertencia de solape
+#### Scenario: Mood desbloqueado por una compra heredada
+- **WHEN** el usuario compró el Mood `brave` en una versión anterior y abre la pestaña Premium
+- **THEN** `brave` aparece marcado como desbloqueado en el escaparate
 
 ### Requirement: Restaurar compras
-La Tienda SHALL ofrecer una acción de restaurar compras que recupere el estado `unlocked` de todos los Moods y Packs previamente comprados por el usuario con su cuenta de la tienda de la plataforma.
+La pantalla Premium SHALL ofrecer una acción de restaurar compras que recupere el estado `unlocked` de la suscripción activa y de los Moods comprados individualmente o en Pack en versiones anteriores, con la cuenta de la tienda de la plataforma. La acción SHALL estar disponible con y sin suscripción activa.
 
 #### Scenario: Restaurar en un dispositivo nuevo
-- **WHEN** el usuario, en un dispositivo nuevo o tras reinstalar la app, ejecuta "Restaurar compras" con la misma cuenta de App Store usada para comprar
-- **THEN** todos los Moods y Packs comprados previamente vuelven a estar `unlocked`
+- **WHEN** el usuario, en un dispositivo nuevo o tras reinstalar la app, ejecuta "Restaurar compras" con la misma cuenta de la tienda usada para suscribirse
+- **THEN** la suscripción activa vuelve a desbloquear todos los Moods premium
+
+#### Scenario: Restaurar compras heredadas
+- **WHEN** el usuario ejecuta "Restaurar compras" y su cuenta tiene un Pack comprado en una versión anterior
+- **THEN** los Moods de ese Pack vuelven a estar `unlocked`
+
+#### Scenario: Sin nada que restaurar
+- **WHEN** el usuario ejecuta "Restaurar compras" y su cuenta no tiene suscripción ni compras anteriores
+- **THEN** la app termina la acción sin cambiar el estado de ningún Mood y sin mostrar un error
 
 ### Requirement: Nombres de Mood localizados en la tienda
-La tienda y las hojas de compra SHALL mostrar los nombres de los Moods premium (incluidos los de la lista de Moods de un Pack) y los títulos de los Packs en el idioma activo del dispositivo, con fallback a inglés. Los títulos de los Packs SHALL salir de las cadenas de la app, no del título del producto de la tienda. Solo para un Pack cuyo identificador no tenga cadena propia, el sistema SHALL mostrar el título del producto de la tienda.
+La pantalla Premium SHALL mostrar los nombres de los Moods premium en el idioma activo del dispositivo, con fallback a inglés. Los textos de los planes y la información legal SHALL seguir la misma regla de idioma.
 
-#### Scenario: Tienda en alemán
-- **WHEN** el dispositivo está en alemán y se abre la tienda
-- **THEN** las filas de moods premium muestran sus nombres en alemán (por ejemplo "Mutig" para `brave`)
+#### Scenario: Pantalla Premium en alemán
+- **WHEN** el dispositivo está en alemán y se abre la pestaña Premium
+- **THEN** el escaparate muestra los nombres de los Moods en alemán (por ejemplo "Mutig" para `brave`) y los textos de los planes en alemán
 
-#### Scenario: Hoja de compra de Pack
-- **WHEN** se abre la hoja de un Pack en francés
-- **THEN** la lista de Moods incluidos muestra los nombres en francés
+#### Scenario: Idioma no soportado
+- **WHEN** el dispositivo está en un idioma que la app no soporta
+- **THEN** los nombres y los textos aparecen en inglés
 
-#### Scenario: Título de un Pack en el idioma del dispositivo
-- **WHEN** el dispositivo está en español y se abre la tienda
-- **THEN** el Pack `confianza` se muestra como "Pack de Confianza" aunque el producto de la tienda devuelva otro texto
+### Requirement: Premium es una pestaña del bottom bar
+La pantalla Premium SHALL abrirse desde la tercera pestaña del bottom bar, con el nombre "Premium" y su icono. La pantalla principal NO SHALL mostrar un icono de tienda en su header, y la pantalla Premium NO SHALL mostrar un botón de regresar. La hoja de suscripción que se abre al tocar un Mood bloqueado SHALL cubrir el bottom bar mientras esté abierta.
 
-#### Scenario: Título del Pack sin sufijos de la tienda
-- **WHEN** la tienda devuelve un título con texto añadido, por ejemplo "(unreviewed)"
-- **THEN** la Tienda y la hoja de compra muestran el nombre de la app, sin ese texto
+#### Scenario: Abrir Premium
+- **WHEN** el usuario toca la pestaña Premium
+- **THEN** se muestra la pantalla Premium
 
-#### Scenario: Pack sin cadena propia
-- **WHEN** aparece un Pack cuyo identificador no tiene cadena en la app
-- **THEN** se muestra el título del producto de la tienda
-
-### Requirement: La Tienda es una pestaña del bottom bar
-La Tienda SHALL abrirse desde la tercera pestaña del bottom bar, con un icono de tienda. La pantalla principal NO SHALL mostrar un icono de tienda en su header, y la Tienda NO SHALL mostrar un botón de regresar. Las hojas de compra de Moods y de Packs SHALL cubrir el bottom bar mientras estén abiertas.
-
-#### Scenario: Abrir la Tienda
-- **WHEN** el usuario toca la pestaña de tienda
-- **THEN** se muestra la pantalla de Tienda con su catálogo
-
-#### Scenario: Hoja de compra
-- **WHEN** el usuario abre la hoja de compra de un Mood o de un Pack desde la Tienda
+#### Scenario: Hoja de suscripción
+- **WHEN** el usuario toca un Mood bloqueado en el selector y se abre la hoja de suscripción
 - **THEN** el bottom bar queda cubierto por la hoja hasta que se cierra
 
-### Requirement: Recuperación cuando el catálogo no carga
-Si el catálogo de la Tienda no se puede cargar, la pantalla SHALL mostrar un mensaje de error junto con un control para reintentar, y NO SHALL quedarse en ese estado sin una forma de recuperarse. Al activar el control, la Tienda SHALL mostrar un estado de carga y volver a pedir el catálogo. Al volver a la pestaña de la Tienda con el catálogo en error, la app SHALL reintentar la carga una vez por visita. Un reintento fallido SHALL volver a mostrar el error con el control disponible.
+### Requirement: El control de reintento es accesible
+El control para reintentar la carga de los planes SHALL tener una etiqueta de accesibilidad y SHALL mostrarse en el idioma del dispositivo.
+
+#### Scenario: Control en otro idioma
+- **WHEN** el dispositivo está en alemán, francés, italiano o español y los planes no cargaron
+- **THEN** el control de reintentar aparece con su texto en ese idioma y con etiqueta de accesibilidad
+
+### Requirement: Recuperación cuando los planes no cargan
+Si los planes de suscripción de la pantalla Premium no se pueden cargar, la pantalla SHALL mostrar un mensaje de error junto con un control para reintentar, y NO SHALL quedarse en ese estado sin una forma de recuperarse. Al activar el control, la pantalla SHALL mostrar un estado de carga y volver a pedir los planes. Al volver a la pestaña Premium con los planes en error, la app SHALL reintentar la carga una vez por visita. Un reintento fallido SHALL volver a mostrar el error con el control disponible.
 
 #### Scenario: Reintento manual exitoso
-- **WHEN** el catálogo no cargó y el usuario toca el control de reintentar y la carga ahora tiene éxito
-- **THEN** la Tienda muestra el catálogo completo en lugar del error
+- **WHEN** los planes no cargaron y el usuario toca el control de reintentar y la carga ahora tiene éxito
+- **THEN** la pantalla muestra los planes en lugar del error
 
 #### Scenario: Reintento manual fallido
-- **WHEN** el catálogo no cargó y el usuario toca el control de reintentar y la carga vuelve a fallar
-- **THEN** la Tienda muestra otra vez el mensaje de error con el control para reintentar
+- **WHEN** los planes no cargaron y el usuario toca el control de reintentar y la carga vuelve a fallar
+- **THEN** la pantalla muestra otra vez el mensaje de error con el control para reintentar
 
 #### Scenario: Estado de carga durante el reintento
 - **WHEN** el usuario toca el control de reintentar
-- **THEN** la Tienda muestra un estado de carga hasta que el reintento termina
+- **THEN** la pantalla muestra un estado de carga hasta que el reintento termina
 
 #### Scenario: Reintento automático al volver a la pestaña
-- **WHEN** el catálogo está en error y el usuario cambia a otra pestaña y regresa a la Tienda
-- **THEN** la app reintenta cargar el catálogo sin que el usuario toque nada
+- **WHEN** los planes están en error y el usuario cambia a otra pestaña y regresa a Premium
+- **THEN** la app reintenta cargar los planes sin que el usuario toque nada
 
-#### Scenario: Sin recarga si el catálogo ya cargó
-- **WHEN** el catálogo ya se cargó y el usuario cambia a otra pestaña y regresa a la Tienda
-- **THEN** la Tienda conserva el catálogo y no lo vuelve a pedir
-
-### Requirement: El control de reintento es accesible
-El control para reintentar la carga del catálogo SHALL tener una etiqueta de accesibilidad y SHALL mostrarse en el idioma del dispositivo.
-
-#### Scenario: Control en otro idioma
-- **WHEN** el dispositivo está en alemán, francés, italiano o español y el catálogo falló
-- **THEN** el control de reintentar aparece con su texto en ese idioma y con etiqueta de accesibilidad
-
-### Requirement: Packs de la primera ola
-La Tienda SHALL ofrecer, además de Pack Confianza, tres Packs de 3 Moods cada uno: **Afecto** (`affectionate`, `hugging`, `laughing`), **Cuerpo** (`sleepy`, `sick`, `hurt`) e **Intenso** (`crying`, `scared`, `stressed`). La composición de cada Pack SHALL quedar congelada al publicarse y SHALL NOT modificarse después. La Tienda SHALL ofrecer también cada uno de los 9 Moods nuevos como compra individual. El precio objetivo es $0.99 por Mood y $1.99 por Pack (el mismo de Pack Confianza); el precio mostrado SHALL ser el que devuelve la tienda del sistema, nunca un valor fijo en el código. Pack Confianza y los Moods existentes SHALL conservar su composición y su precio.
-
-#### Scenario: La Tienda lista los packs nuevos
-- **WHEN** el usuario abre la Tienda con el catálogo cargado
-- **THEN** ve Pack Confianza y los Packs Afecto, Cuerpo e Intenso, cada uno con los Moods que incluye y su precio de la tienda del sistema
-
-#### Scenario: Comprar un pack nuevo desbloquea sus tres moods
-- **WHEN** el usuario completa la compra del Pack Cuerpo
-- **THEN** `sleepy`, `sick` y `hurt` quedan `unlocked` y el resto de los moods nuevos no
-
-#### Scenario: Comprar un mood nuevo suelto
-- **WHEN** el usuario completa la compra individual de `crying`
-- **THEN** `crying` queda `unlocked` y ningún otro Mood cambia de estado
-
-#### Scenario: Solape entre un mood suelto y un pack nuevo
-- **WHEN** el usuario ya tiene `hugging` y abre la compra del Pack Afecto
-- **THEN** la Tienda advierte que `hugging` ya está desbloqueado, no bloquea la compra y no ajusta el precio
-
-#### Scenario: Pack Confianza no cambia
-- **WHEN** se publican los Packs nuevos
-- **THEN** Pack Confianza sigue incluyendo exactamente `brave`, `confident` y `romantic`
+#### Scenario: Sin recarga si los planes ya cargaron
+- **WHEN** los planes ya se cargaron y el usuario cambia a otra pestaña y regresa a Premium
+- **THEN** la pantalla conserva los planes y no los vuelve a pedir
