@@ -25,7 +25,7 @@
 - [x] 4.1 Rediseñar `assets/icon/app_icon.png` (fondo Ocean Cyan plano, misma carita blanca; sin transparencia en iOS; decidido plano por ahora, PR #121)
 - [x] 4.2 Correr `dart run flutter_launcher_icons` y revisar el diff de `AppIcon.appiconset` y de los `mipmap-*`
 - [x] 4.3 Regenerar `ios/Runner/Assets.xcassets/LaunchImage.imageset` y `android/app/src/main/res/drawable/launch_icon.png` con el ícono nuevo sobre fondo blanco
-- [ ] 4.4 Comprobar el arranque en simulador iOS y emulador Android: launch screen blanco con el ícono nuevo, sin parpadeo morado
+- [x] 4.4 Comprobar el arranque en simulador iOS y emulador Android: launch screen blanco con el ícono nuevo, sin parpadeo morado. Omitido por decisión del usuario el 2026-11-04: probó el build 1.10.1 (42) en TestFlight (ícono nuevo del iPhone y del reloj) y dio por terminadas las pruebas; no se verificó el arranque en el emulador de Android
 - [x] 4.5 Corregir la frase de `CLAUDE.md` y `PRODUCT.md` sobre el "fondo del launch screen `#8C52FF`" (el launch screen es blanco)
 
 ## 5. Sitio
@@ -34,14 +34,14 @@
 - [x] 5.2 `site/index.html` y `site/es/index.html`: reemplazar los hex incrustados (fondos de héroe, `theme-color`, íconos) y revisar que las dos versiones sigan iguales
 - [x] 5.3 Regenerar `site/img/og-en.jpg` y `og-es.jpg` desde el header nuevo, y `calendar-<idioma>-{390,780}.webp` con la UI nueva de la app
 - [x] 5.4 Actualizar `DESIGN.md` y `.impeccable/design.json` con los valores finales, y la fecha de "última actualización" de la política solo si cambia texto legal (no cambia)
-- [ ] 5.5 Revisar el sitio en 390 pt y 1280 pt, claro y oscuro, y contrastes de enlaces y botones
+- [x] 5.5 Revisar el sitio en 390 pt y 1280 pt, claro y oscuro, y contrastes de enlaces y botones. Omitido por decisión del usuario el 2026-11-04: solo se revisó en escritorio (1280 pt, claro) y se comprobó que no quedan tonos morados; el modo oscuro y los 390 pt quedan sin revisar
 
 ## 6. Arte de tienda
 
 - [x] 6.1 `tool/screenshots/header.py`: degradado de fondo y tinta; regenerar `aso/header/<idioma>/` y `aso/play/<idioma>/feature_1024x500.png` para los 5 idiomas
 - [x] 6.2 `tool/screenshots/compose.py`: titulares (`#2A1A6B`), sombra del marco, fondo del slide 1 (lavanda) y slide 6 (`#5F3DC4 → #6C63FF`); conservar los demás pasteles por slide
-- [ ] 6.3 Recapturar con la app nueva (`capture.py` para iPhone e iPad, `capture_android.py` para Android) y recomponer; revisar los 5 idiomas
-- [ ] 6.4 Subir el ícono, las capturas y los gráficos a App Store Connect y Play Console cuando la versión con el ícono nuevo esté aprobada (acción manual del usuario)
+- [x] 6.3 Recapturar con la app nueva (`capture.py` para iPhone e iPad, `capture_android.py` para Android) y recomponer; revisar los 5 idiomas. Diferido por decisión del usuario el 2026-11-04: las capturas de tienda se recapturarán en el siguiente change visual, para no hacerlo dos veces
+- [x] 6.4 Subir el ícono, las capturas y los gráficos a App Store Connect y Play Console cuando la versión con el ícono nuevo esté aprobada (acción manual del usuario). Diferido por decisión del usuario el 2026-11-04: junto con 6.3, en el siguiente change visual; no se envía ninguna versión nueva a revisión por ahora
 
 ## 7. Documentación y specs
 
