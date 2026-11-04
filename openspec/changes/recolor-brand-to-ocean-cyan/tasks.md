@@ -46,5 +46,5 @@
 ## 7. Documentación y specs
 
 - [x] 7.1 `CLAUDE.md`: color de marca, sección "Sistema de diseño" y la nota del launch screen; `PRODUCT.md`: "Brand Commitments"
-- [ ] 7.2 `/opsx:sync` o `/opsx:archive` para aplicar el delta de `bottom-navigation` (verificar que el texto base ya es el de la suscripción)
-- [ ] 7.3 Actualizar la sección "Estado actual" de `CLAUDE.md` con el estado del change
+- [x] 7.2 `/opsx:sync` o `/opsx:archive` para aplicar el delta de `bottom-navigation` (verificar que el texto base ya es el de la suscripción)
+- [x] 7.3 Actualizar la sección "Estado actual" de `CLAUDE.md` con el estado del change

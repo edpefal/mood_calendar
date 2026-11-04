@@ -2,23 +2,29 @@
 
 ## Purpose
 Define el bottom bar flotante que da acceso permanente al selector de moods, al calendario, a la tienda y a los ajustes, y cómo se comporta (apariencia, estado de las pestañas y cambios automáticos de pestaña).
-
 ## Requirements
-
 ### Requirement: Cuatro pestañas en un bottom bar
-La app SHALL mostrar un bottom bar con cuatro pestañas, de izquierda a derecha: selector de moods, calendario, tienda y ajustes. Los iconos SHALL ser de estilo outlined en el púrpura de marca; el de moods SHALL ser una carita sonriente de contorno, no un emoji SVG. Las pestañas de calendario, tienda y ajustes SHALL usar los mismos iconos que tenían como botones del header. Los botones de tienda, calendario y ajustes SHALL dejar de mostrarse en el header del selector.
+La app SHALL mostrar un bottom bar con cuatro pestañas, de izquierda a derecha: selector de moods, calendario, Premium y ajustes. Los iconos SHALL ser de estilo outlined en el color de marca de la app; el de moods SHALL ser una carita sonriente de contorno, no un emoji SVG; el de Premium SHALL ser una estrella o un diamante de contorno. Las pestañas de calendario y ajustes SHALL usar los mismos iconos que tenían como botones del header. Los botones de calendario y ajustes y cualquier acceso a la tienda SHALL dejar de mostrarse en el header del selector.
 
 #### Scenario: Orden y contenido
 - **WHEN** la app muestra su pantalla principal
-- **THEN** el bottom bar muestra, de izquierda a derecha, moods, calendario, tienda y ajustes
+- **THEN** el bottom bar muestra, de izquierda a derecha, moods, calendario, Premium y ajustes
 
 #### Scenario: El header del selector ya no tiene esos botones
 - **WHEN** el usuario está en la pestaña del selector de moods
-- **THEN** el header no muestra botones de tienda, calendario ni ajustes
+- **THEN** el header no muestra botones de Premium, calendario ni ajustes
 
 #### Scenario: Cambiar de pestaña
 - **WHEN** el usuario toca una pestaña distinta de la activa
 - **THEN** la app muestra el contenido de esa pestaña y la marca como activa
+
+#### Scenario: Nombre de la pestaña en cada idioma
+- **WHEN** el dispositivo está en inglés, español, alemán, francés o italiano
+- **THEN** la pestaña Premium muestra su nombre en ese idioma y tiene etiqueta de accesibilidad
+
+#### Scenario: Íconos en el color de marca
+- **WHEN** el bottom bar se muestra en cualquier pestaña
+- **THEN** los iconos de las cuatro pestañas usan el mismo color de marca que los títulos y los botones principales de la app, y ese color no es el de ningún mood base
 
 ### Requirement: Apariencia del bar como cápsula translúcida flotante
 El bar SHALL mostrarse como una cápsula flotante con bordes totalmente redondeados, separada de los bordes laterales e inferior de la pantalla, con fondo translúcido y un desenfoque suave del contenido que pasa por debajo. El contenido situado detrás del bar SHALL seguir siendo reconocible a través de él (sus formas y colores se distinguen, aunque suavizados), sin comprometer la legibilidad de los iconos de las pestañas. La pestaña activa SHALL distinguirse con una píldora translúcida detrás de su icono. En pantallas anchas el bar SHALL tener un ancho máximo de entre 400 y 440 pt y quedar centrado horizontalmente.
