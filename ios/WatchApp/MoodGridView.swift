@@ -38,7 +38,8 @@ struct MoodGridView: View {
 }
 
 struct MoodTile: View {
-  static let accent = Color(red: 0x6C / 255, green: 0x63 / 255, blue: 0xFF / 255)
+  // Ocean Cyan brand end (#00838F), same as brandGradientEnd in the iPhone app.
+  static let accent = Color(red: 0x00 / 255, green: 0x83 / 255, blue: 0x8F / 255)
 
   let mood: WatchMood
   let isSelected: Bool
