@@ -49,11 +49,14 @@ Backlog activo del proyecto, actualizado contra el estado actual del repo.
 
 ## Alta prioridad
 
-- Cerrar la publicación de la app de Apple Watch (1.9.0).
-  Implementada, mergeada (PR #113) y probada en dispositivos reales; la 1.9.0 (build 37) está en revisión de Apple desde el 2026-10-31. Falta: al aprobarse, comprobar que el reloj aparece en la ficha pública y actualizar `CLAUDE.md`. El change `add-apple-watch-mood-picker` ya está archivado y su spec `watch-mood-picker` sincronizado; si Apple pide cambios, se corrigen con un change nuevo. Mejoras posteriores: complicación en la esfera, notas por dictado, colores pastel por mood, acciones en la notificación del recordatorio y app independiente.
+- Publicar la 1.10.1 (nueva imagen de marca Ocean Cyan).
+  Change `recolor-brand-to-ocean-cyan`: el código, el sitio, el ícono y el arte ya están en `main`; el build 1.10.1 (41) está en TestFlight desde el 2026-11-03. Falta probarlo en dispositivo (ícono, arranque, Premium con planes reales, una compra sandbox y el reloj), recapturar las capturas de tienda en los 5 idiomas (`capture.py`, `capture_android.py`, `compose.py`), subirlas a App Store Connect y Play, subir el build a Play y enviar a revisión.
 
-- Reemplazar las compras sueltas y los Packs por una suscripción (1.10.0).
-  Change `replace-mood-purchases-with-subscription`: semanal, mensual y anual con prueba de 3 días, un entitlement `premium` y los `mood_*` heredados siguen valiendo. Las tiendas y RevenueCat ya están configurados (grupo 2); falta implementar la app. Fuera de la primera versión: plan vitalicio, ofertas promocionales o de reconquista, Compartir en Familia, paywalls y experimentos de RevenueCat, y avisos dentro de la app por vencimiento o reintento de cobro.
+- Comprobar que el reloj aparece en la ficha pública de la 1.9.0 y revisar el modo oscuro del sitio (`moodcalendar.app`).
+  La 1.9.0 está publicada (`READY_FOR_SALE`). Mejoras del reloj para más adelante: complicación en la esfera, notas por dictado, colores pastel por mood, acciones en la notificación del recordatorio y app independiente.
+
+- Vigilar la suscripción publicada (1.10.0).
+  Publicada en las dos tiendas desde el 2026-11-03; los 18 productos de compras sueltas se retiraron el 2026-11-04 (ninguna compra real). Seguir Crashlytics y RevenueCat unos días: que desaparezca el `TypeToken` y que no haya errores nuevos de la tienda. Fuera de la primera versión: plan vitalicio, ofertas promocionales o de reconquista, Compartir en Familia, paywalls y experimentos de RevenueCat, y avisos dentro de la app por vencimiento o reintento de cobro.
 
 - Cerrar el lanzamiento de la 1.8.5 (iOS y Android).
   Android ya está publicado en Google Play (confirmado el 2026-10-24); falta verificar qué `versionCode` sirve en producción. iOS 1.8.5 (build 36) ya está publicada (`READY_FOR_SALE`, comprobado el 2026-10-31). Falta comprobar en Firebase → Analytics que llegan usuarios reales. Opcional: recapturar los slides en español, que muestran los textos anteriores a la corrección de acentos; al regenerarlos, revisar en `compose.py` que el slide 5 (recordatorios) enmarque bien la captura de Settings a pantalla completa.
@@ -126,8 +129,8 @@ Sale de `aso/aso_report.md` (auditoría del 2026-10-02). Lo ya hecho está en "C
 
 ## Orden sugerido de ejecución
 
-1. Cerrar la publicación de la 1.9.0 (reloj), mantener `CLAUDE.md` al día con cada release y verificar los datos de la 1.8.5.
-2. Implementar la suscripción (1.10.0) cuando el change del reloj esté archivado.
+1. Publicar la 1.10.1 (recolor), mantener `CLAUDE.md` al día con cada release y vigilar la suscripción (1.10.0).
+2. Conectar las notificaciones RTDN de Google Play hacia RevenueCat y respaldar `~/my-release-key.jks`.
 3. Cubrir con pruebas el flujo de recordatorios y apertura desde notificaciones.
 4. Mejorar UX y manejo de errores en plataforma y estados offline.
 5. Iterar en producto: historial, edición/borrado, accesibilidad e insights.
