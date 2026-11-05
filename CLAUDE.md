@@ -25,7 +25,7 @@ Flutter app para registrar y revisar estados de ánimo diarios, con un catálogo
 - **Compras in-app**: purchases_flutter (RevenueCat) en iOS y Android (Android ya publicado en Google Play)
 - **Generación de código**: freezed, json_serializable, hive_generator → correr con `flutter pub run build_runner build`
 - **Notificaciones**: flutter_local_notifications + timezone
-- **UI**: flutter_svg (emojis SVG), google_fonts (Poppins), lottie, fl_chart (gráficas de Insights)
+- **UI**: flutter_svg (emojis SVG), google_fonts (Poppins), lottie, fl_chart (gráficas de Insights; fijado en 1.1.0 porque el CI usa Flutter 3.32.1, que fija `vector_math` 2.1.4 y desde la 1.1.1 `fl_chart` pide ^2.2.0)
 - **Utilidades de plataforma**: in_app_review (pedir/abrir calificación), url_launcher (política de privacidad), package_info_plus (versión en Settings), share_plus (hoja de compartir al exportar el historial)
 - **CI/CD**: `.github/workflows/ci.yml` corre `flutter analyze` + `flutter test` en cada push a `main` y en cada PR. No hay despliegue automático: los builds de iOS y Android se generan con los scripts de `scripts/` y se suben a mano (el workflow de despliegue de Android por tag se eliminó: nunca llegó a funcionar de punta a punta y los tags ya no publican nada)
 

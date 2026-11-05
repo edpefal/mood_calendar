@@ -48,7 +48,7 @@ Una tarjeta Premium bloqueada muestra una ilustración estática (asset o `Custo
 ### 6. Gráficas con `fl_chart`; Year in Pixels con widgets
 La tendencia (`LineChart` con puntos coloreados por categoría y huecos en los días sin entrada) y las barras por día de la semana (`BarChart`) usan el paquete `fl_chart`. Year in Pixels es una cuadrícula de cuadros de color, que `fl_chart` no ofrece, y se construye con widgets (`GridView`/`CustomPaint`). Las tres llevan `Semantics` que resume la gráfica (spec: descripción accesible), porque `fl_chart` dibuja en un canvas sin árbol de accesibilidad, y los colores salen de `BrandPalette`, nunca de los valores por defecto del paquete.
 - **Por qué**: ejes, escalas, huecos en la serie y animación de entrada ya resueltos; menos código propio que mantener y probar.
-- **Costo asumido**: una dependencia nueva, solo Dart, sin plugins nativos ni acceso a red o a datos; no cambia App Privacy, Data safety ni la política. Se fija la versión en `pubspec.yaml` y se confirma que compila con Dart `>=3.6.0` y Flutter 3.32 (CI) y en iOS 15.
+- **Costo asumido**: una dependencia nueva, solo Dart, sin plugins nativos ni acceso a red o a datos; no cambia App Privacy, Data safety ni la política. La versión se fija en `1.1.0`: el CI usa Flutter 3.32.1, que fija `vector_math` 2.1.4, y desde la 1.1.1 `fl_chart` pide `^2.2.0` (lo detectó el CI del PR del Bloque 2). Subirla exige subir antes el Flutter del CI.
 - **Alternativa descartada**: dibujar todo con `CustomPaint`; evitaba la dependencia, pero obligaba a escribir ejes, escalas y huecos a mano.
 
 ### 7. Detalle del día como hoja modal compartida
