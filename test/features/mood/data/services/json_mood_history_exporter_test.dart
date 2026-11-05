@@ -93,6 +93,23 @@ void main() {
     expect(raw, isNot(contains('assets/')));
   });
 
+  test('never writes the time an entry was logged', () async {
+    final exporter = buildExporter([
+      MoodEntry(
+        date: DateTime(2026, 4, 1),
+        mood: 'assets/icon/calm.svg',
+        intensity: 2,
+        loggedAt: DateTime(2026, 4, 1, 21, 2),
+      ),
+    ]);
+
+    final result = await exporter.exportHistory();
+    final raw = await File(result.filePath).readAsString();
+
+    expect(raw, isNot(contains('loggedAt')));
+    expect(raw, isNot(contains('21:02')));
+  });
+
   test('sorts entries by date ascending whatever the stored order', () async {
     final result = await buildExporter([
       entry(DateTime(2026, 4, 3), 'assets/icon/sad.svg'),

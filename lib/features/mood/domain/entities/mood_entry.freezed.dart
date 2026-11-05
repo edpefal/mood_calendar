@@ -25,6 +25,10 @@ mixin _$MoodEntry {
   String? get note => throw _privateConstructorUsedError;
   int get intensity => throw _privateConstructorUsedError;
 
+  /// When the entry was recorded (device-local time). Null for entries saved
+  /// before it existed; the repository keeps it while the mood is unchanged.
+  DateTime? get loggedAt => throw _privateConstructorUsedError;
+
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
   $MoodEntryCopyWith<MoodEntry> get copyWith =>
@@ -36,7 +40,12 @@ abstract class $MoodEntryCopyWith<$Res> {
   factory $MoodEntryCopyWith(MoodEntry value, $Res Function(MoodEntry) then) =
       _$MoodEntryCopyWithImpl<$Res, MoodEntry>;
   @useResult
-  $Res call({DateTime date, String mood, String? note, int intensity});
+  $Res call(
+      {DateTime date,
+      String mood,
+      String? note,
+      int intensity,
+      DateTime? loggedAt});
 }
 
 /// @nodoc
@@ -56,6 +65,7 @@ class _$MoodEntryCopyWithImpl<$Res, $Val extends MoodEntry>
     Object? mood = null,
     Object? note = freezed,
     Object? intensity = null,
+    Object? loggedAt = freezed,
   }) {
     return _then(_value.copyWith(
       date: null == date
@@ -74,6 +84,10 @@ class _$MoodEntryCopyWithImpl<$Res, $Val extends MoodEntry>
           ? _value.intensity
           : intensity // ignore: cast_nullable_to_non_nullable
               as int,
+      loggedAt: freezed == loggedAt
+          ? _value.loggedAt
+          : loggedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
     ) as $Val);
   }
 }
@@ -86,7 +100,12 @@ abstract class _$$MoodEntryImplCopyWith<$Res>
       __$$MoodEntryImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({DateTime date, String mood, String? note, int intensity});
+  $Res call(
+      {DateTime date,
+      String mood,
+      String? note,
+      int intensity,
+      DateTime? loggedAt});
 }
 
 /// @nodoc
@@ -104,6 +123,7 @@ class __$$MoodEntryImplCopyWithImpl<$Res>
     Object? mood = null,
     Object? note = freezed,
     Object? intensity = null,
+    Object? loggedAt = freezed,
   }) {
     return _then(_$MoodEntryImpl(
       date: null == date
@@ -122,6 +142,10 @@ class __$$MoodEntryImplCopyWithImpl<$Res>
           ? _value.intensity
           : intensity // ignore: cast_nullable_to_non_nullable
               as int,
+      loggedAt: freezed == loggedAt
+          ? _value.loggedAt
+          : loggedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
     ));
   }
 }
@@ -133,7 +157,8 @@ class _$MoodEntryImpl implements _MoodEntry {
       {required this.date,
       required this.mood,
       this.note,
-      required this.intensity});
+      required this.intensity,
+      this.loggedAt});
 
   factory _$MoodEntryImpl.fromJson(Map<String, dynamic> json) =>
       _$$MoodEntryImplFromJson(json);
@@ -147,9 +172,14 @@ class _$MoodEntryImpl implements _MoodEntry {
   @override
   final int intensity;
 
+  /// When the entry was recorded (device-local time). Null for entries saved
+  /// before it existed; the repository keeps it while the mood is unchanged.
+  @override
+  final DateTime? loggedAt;
+
   @override
   String toString() {
-    return 'MoodEntry(date: $date, mood: $mood, note: $note, intensity: $intensity)';
+    return 'MoodEntry(date: $date, mood: $mood, note: $note, intensity: $intensity, loggedAt: $loggedAt)';
   }
 
   @override
@@ -161,12 +191,15 @@ class _$MoodEntryImpl implements _MoodEntry {
             (identical(other.mood, mood) || other.mood == mood) &&
             (identical(other.note, note) || other.note == note) &&
             (identical(other.intensity, intensity) ||
-                other.intensity == intensity));
+                other.intensity == intensity) &&
+            (identical(other.loggedAt, loggedAt) ||
+                other.loggedAt == loggedAt));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, date, mood, note, intensity);
+  int get hashCode =>
+      Object.hash(runtimeType, date, mood, note, intensity, loggedAt);
 
   @JsonKey(ignore: true)
   @override
@@ -187,7 +220,8 @@ abstract class _MoodEntry implements MoodEntry {
       {required final DateTime date,
       required final String mood,
       final String? note,
-      required final int intensity}) = _$MoodEntryImpl;
+      required final int intensity,
+      final DateTime? loggedAt}) = _$MoodEntryImpl;
 
   factory _MoodEntry.fromJson(Map<String, dynamic> json) =
       _$MoodEntryImpl.fromJson;
@@ -200,6 +234,11 @@ abstract class _MoodEntry implements MoodEntry {
   String? get note;
   @override
   int get intensity;
+  @override
+
+  /// When the entry was recorded (device-local time). Null for entries saved
+  /// before it existed; the repository keeps it while the mood is unchanged.
+  DateTime? get loggedAt;
   @override
   @JsonKey(ignore: true)
   _$$MoodEntryImplCopyWith<_$MoodEntryImpl> get copyWith =>

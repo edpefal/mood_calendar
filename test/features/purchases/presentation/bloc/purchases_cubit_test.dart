@@ -328,10 +328,11 @@ void main() {
       expect(telemetry.tracked.single.properties, isEmpty);
     });
 
-    test('the sheet sources are locked_mood and settings, with no tab', () {
+    test('the sheet sources are locked_mood, settings and insights, no tab',
+        () {
       expect(
         PremiumSource.values.map((source) => source.analyticsValue),
-        ['locked_mood', 'settings'],
+        ['locked_mood', 'settings', 'insights'],
       );
     });
 

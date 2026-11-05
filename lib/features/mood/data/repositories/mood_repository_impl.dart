@@ -22,11 +22,18 @@ class MoodRepositoryImpl implements MoodRepository {
       tag: 'MoodRepository',
     );
 
+    // Editing the note keeps the time the mood was first logged; a new mood
+    // (or a first entry) takes the time it arrives with.
+    final previous = moodBox.get(MoodStorageKeys.forDate(normalizedDate));
+    final loggedAt = previous != null && previous.mood == entry.mood
+        ? previous.loggedAt
+        : entry.loggedAt;
     final model = MoodModel(
       date: normalizedDate,
       mood: entry.mood,
       note: entry.note,
       intensity: entry.intensity,
+      loggedAt: loggedAt,
     );
     await moodBox.put(MoodStorageKeys.forDate(normalizedDate), model);
     logger.debug(
@@ -74,6 +81,7 @@ class MoodRepositoryImpl implements MoodRepository {
         mood: mood.mood,
         note: mood.note,
         intensity: mood.intensity,
+        loggedAt: mood.loggedAt,
       );
 
       if (rawKey != normalizedKey || mood.date != normalizedDate) {
@@ -113,6 +121,7 @@ class MoodRepositoryImpl implements MoodRepository {
       mood: model.mood,
       note: model.note,
       intensity: intensity,
+      loggedAt: model.loggedAt,
     );
   }
 }

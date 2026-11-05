@@ -57,6 +57,7 @@ class ProcessWatchInboxUseCase {
 
     // La última elección válida de cada fecha.
     final latestByDate = <DateTime, MoodDefinition>{};
+    final chosenAtByDate = <DateTime, DateTime>{};
     var ignored = 0;
     for (final choice in sorted) {
       final date = _parseDate(choice.date);
@@ -66,6 +67,8 @@ class ProcessWatchInboxUseCase {
         continue;
       }
       latestByDate[date] = definition;
+      chosenAtByDate[date] =
+          DateTime.fromMillisecondsSinceEpoch(choice.chosenAt);
     }
 
     var applied = 0;
@@ -81,6 +84,7 @@ class ProcessWatchInboxUseCase {
           mood: definition.assetPath,
           note: existing?.note,
           intensity: definition.intensity,
+          loggedAt: chosenAtByDate[date],
         ),
       );
       applied++;

@@ -230,4 +230,35 @@ abstract class AppStrings {
   String get trialFreeLabel;
   String get trialTimelineToday;
   String trialTimelineCharge(String date, String price);
+
+  String get calendarViewYearTooltip;
+  String get chooseMonthYearLabel;
+  String get previousYearTooltip;
+  String get nextYearTooltip;
+  String get monthSoFarTitle;
+  String categoryShareLabel(String category, int percent);
+  String categoryDistributionSemantics(String shares);
+  String get currentStreakTitle;
+  String streakDaysUnit(int days);
+  String currentStreakSemantics(int days);
+  String dayDetailCategoryAndTime(String category, String time);
+  String get dayDetailNoteTitle;
+  String dayDetailSemantics(String date);
+
+  String insightsMonthTitle(String monthName);
+  String insightsEntriesCount(int count);
+  String get trendTitle;
+  String trendRangeChip(int days);
+  String trendRangeLabel(int days);
+  String trendChartSemantics(int days, int entries, String category);
+  String get insightsNotEnoughTitle;
+  String get insightsNotEnoughBody;
+  String get weekdayTitle;
+  List<String> get weekdayLongNames;
+  String weekdayBarSemantics(String weekday, String category);
+  String weekdayNoDataSemantics(String weekday);
+  String yearInPixelsTitle(int year);
+  String yearInPixelsSemantics(int year, int logged);
+  String get seeWithPremium;
+  String lockedCardSemantics(String title);
 }

@@ -40,9 +40,14 @@ class LogScreen extends StatefulWidget {
     this.onOpenSettings,
     this.onRequestDate,
     this.clock,
+    this.startEditing = false,
   });
 
   final DateTime? selectedDate;
+
+  /// Opens the grid already editing the date's entry instead of the Saved
+  /// card (the "Edit" of the calendar's day detail). Ignored without an entry.
+  final bool startEditing;
 
   /// Whether the Log tab is the visible one. The rating prompt is skipped
   /// when the user already left it.
@@ -75,6 +80,7 @@ class _LogScreenState extends State<LogScreen> {
   bool _isSaving = false;
   MoodEntry? _pendingSave;
   bool _didHydrate = false;
+  late bool _pendingStartEditing = widget.startEditing;
 
   DateTime get _now => (widget.clock ?? DateTime.now)();
   DateTime get _date {
@@ -148,6 +154,10 @@ class _LogScreenState extends State<LogScreen> {
       if (justSaved) _pendingSave = null;
       if (entry == null) {
         _editing = false;
+      } else if (_pendingStartEditing) {
+        _pendingStartEditing = false;
+        _editing = true;
+        _adopt(entry);
       } else if (justSaved) {
         _editing = false;
         _adopt(entry);

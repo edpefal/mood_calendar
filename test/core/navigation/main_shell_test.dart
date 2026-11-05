@@ -7,6 +7,7 @@ import 'package:mood_calendar/features/insights/presentation/screens/insights_sc
 import 'package:mood_calendar/features/mood/domain/entities/mood_entry.dart';
 import 'package:mood_calendar/features/mood/presentation/screens/calendar_screen.dart';
 import 'package:mood_calendar/features/mood/presentation/screens/log_screen.dart';
+import 'package:mood_calendar/features/mood/presentation/widgets/day_detail_sheet.dart';
 import 'package:mood_calendar/features/settings/presentation/screens/settings_screen.dart';
 import 'package:mood_calendar/main.dart';
 
@@ -207,28 +208,131 @@ void main() {
       handle.dispose();
     });
 
-    testWidgets('a day with an entry opens the Log on its card',
-        (tester) async {
+    group('a day with an entry', () {
       final day = DateTime(now.year, now.month, 1);
-      repository.entries.add(
-        MoodEntry(
-          date: day,
-          mood: 'assets/icon/calm.svg',
-          note: 'first of the month',
-          intensity: 2,
-        ),
-      );
+
+      void addEntry({DateTime? loggedAt, String? note = 'first of the month'}) {
+        repository.entries.add(
+          MoodEntry(
+            date: day,
+            mood: 'assets/icon/calm.svg',
+            note: note,
+            intensity: 2,
+            loggedAt: loggedAt,
+          ),
+        );
+      }
+
+      Future<void> openDetail(WidgetTester tester) async {
+        await pumpShell(tester);
+        await openTab(tester, strings.tabCalendar);
+        final handle = tester.ensureSemantics();
+        await tester.tap(find.bySemanticsLabel(
+          RegExp(strings.formatFullDate(day)),
+        ));
+        await tester.pumpAndSettle();
+        handle.dispose();
+      }
+
+      testWidgets('opens the detail sheet without leaving the calendar',
+          (tester) async {
+        addEntry();
+        await openDetail(tester);
+
+        expect(shellKey.currentState!.currentTab, MainTab.calendar);
+        expect(find.byType(DayDetailSheet), findsOneWidget);
+        expect(find.text('first of the month'), findsOneWidget);
+        expect(find.text(strings.categoryPeaceful), findsWidgets);
+        expect(find.text(strings.editEntryButton), findsOneWidget);
+      });
+
+      testWidgets('shows the time when it was logged that same day',
+          (tester) async {
+        addEntry(loggedAt: DateTime(now.year, now.month, 1, 21, 2));
+        await openDetail(tester);
+
+        expect(find.text('${strings.categoryPeaceful} · logged at 9:02 PM'),
+            findsOneWidget);
+      });
+
+      testWidgets('hides the time when it was logged on another day',
+          (tester) async {
+        addEntry(loggedAt: DateTime(now.year, now.month, 2, 9, 30));
+        await openDetail(tester);
+
+        expect(find.textContaining('logged at'), findsNothing);
+        expect(find.text(strings.categoryPeaceful), findsWidgets);
+      });
+
+      testWidgets('shows no time for an entry saved before it existed',
+          (tester) async {
+        addEntry();
+        await openDetail(tester);
+
+        expect(find.textContaining('logged at'), findsNothing);
+      });
+
+      testWidgets('Edit opens the Log editing that entry', (tester) async {
+        addEntry();
+        await openDetail(tester);
+
+        await tester.tap(find.text(strings.editEntryButton));
+        await tester.pumpAndSettle();
+
+        expect(shellKey.currentState!.currentTab, MainTab.log);
+        expect(shellKey.currentState!.logDate, day);
+        expect(find.byType(DayDetailSheet), findsNothing);
+        expect(find.text(strings.save), findsOneWidget);
+        expect(find.text(strings.editEntryButton), findsNothing);
+      });
+
+      testWidgets('closing the detail changes nothing', (tester) async {
+        addEntry();
+        await openDetail(tester);
+
+        await tester.tap(find.byTooltip(strings.closeLabel));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(DayDetailSheet), findsNothing);
+        expect(shellKey.currentState!.currentTab, MainTab.calendar);
+        expect(shellKey.currentState!.logDate, today);
+      });
+    });
+
+    testWidgets('the year button opens Insights', (tester) async {
+      await pumpShell(tester);
+      await openTab(tester, strings.tabCalendar);
+
+      await tester.tap(find.byTooltip(strings.calendarViewYearTooltip));
+      await tester.pumpAndSettle();
+
+      expect(shellKey.currentState!.currentTab, MainTab.insights);
+    });
+
+    testWidgets('the month picker jumps to a past month and blocks future ones',
+        (tester) async {
       await pumpShell(tester);
       await openTab(tester, strings.tabCalendar);
       final handle = tester.ensureSemantics();
 
-      await tester.tap(find.bySemanticsLabel(
-        RegExp(strings.formatFullDate(day)),
-      ));
+      await tester.tap(find.bySemanticsLabel(strings.chooseMonthYearLabel));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip(strings.previousYearTooltip));
       await tester.pumpAndSettle();
 
-      expect(find.text('first of the month'), findsOneWidget);
-      expect(find.text(strings.editEntryButton), findsOneWidget);
+      // The next-year arrow is back on the current year, so it is not blocked
+      // here; going forward again must land on the current year and stop.
+      await tester.tap(find.byTooltip(strings.nextYearTooltip));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip(strings.nextYearTooltip),
+          warnIfMissed: false);
+      await tester.pumpAndSettle();
+      expect(find.text('${now.year}'), findsWidgets);
+
+      await tester.tap(find.bySemanticsLabel(strings.monthNames[0]));
+      await tester.pumpAndSettle();
+
+      expect(find.text('${strings.monthNames[0]} ${now.year}'), findsOneWidget);
       handle.dispose();
     });
 

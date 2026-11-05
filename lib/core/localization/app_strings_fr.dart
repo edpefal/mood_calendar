@@ -431,4 +431,84 @@ class AppStringsFr extends AppStrings {
   @override
   String trialTimelineCharge(String date, String price) =>
       '$date · Premier prélèvement de $price';
+
+  @override
+  String get calendarViewYearTooltip => "Voir l'année";
+  @override
+  String get chooseMonthYearLabel => "Choisir le mois et l'année";
+  @override
+  String get previousYearTooltip => 'Année précédente';
+  @override
+  String get nextYearTooltip => 'Année suivante';
+  @override
+  String get monthSoFarTitle => "Ton mois jusqu'ici";
+  @override
+  String categoryShareLabel(String category, int percent) =>
+      '$category $percent %';
+  @override
+  String categoryDistributionSemantics(String shares) =>
+      'Catégories d’humeur ce mois-ci : $shares';
+  @override
+  String get currentStreakTitle => 'Série en cours';
+  @override
+  String streakDaysUnit(int days) => days == 1 ? 'jour' : 'jours';
+  @override
+  String currentStreakSemantics(int days) =>
+      "Série en cours : $days ${days == 1 ? 'jour' : 'jours'}";
+  @override
+  String dayDetailCategoryAndTime(String category, String time) =>
+      '$category · enregistré à $time';
+  @override
+  String get dayDetailNoteTitle => 'Note';
+  @override
+  String dayDetailSemantics(String date) => 'Détails du $date';
+
+  @override
+  String insightsMonthTitle(String monthName) =>
+      'Résumé de ${monthName.toLowerCase()}';
+  @override
+  String insightsEntriesCount(int count) =>
+      "$count ${count == 1 ? 'entrée' : 'entrées'}";
+  @override
+  String get trendTitle => 'Tendance';
+  @override
+  String trendRangeChip(int days) => '$days j';
+  @override
+  String trendRangeLabel(int days) => '$days derniers jours';
+  @override
+  String trendChartSemantics(int days, int entries, String category) =>
+      'Tendance de l’humeur, $days derniers jours, $entries entrées, surtout $category';
+  @override
+  String get insightsNotEnoughTitle => 'Pas encore assez de données';
+  @override
+  String get insightsNotEnoughBody =>
+      'Enregistre encore quelques jours pour le voir.';
+  @override
+  String get weekdayTitle => 'Humeur selon le jour de la semaine';
+  @override
+  List<String> get weekdayLongNames => const [
+        'lundi',
+        'mardi',
+        'mercredi',
+        'jeudi',
+        'vendredi',
+        'samedi',
+        'dimanche'
+      ];
+  @override
+  String weekdayBarSemantics(String weekday, String category) =>
+      '$weekday : surtout $category';
+  @override
+  String weekdayNoDataSemantics(String weekday) =>
+      '$weekday : pas assez d’entrées';
+  @override
+  String yearInPixelsTitle(int year) => 'L’année en pixels · $year';
+  @override
+  String yearInPixelsSemantics(int year, int logged) =>
+      "L’année en pixels $year : $logged ${logged == 1 ? 'jour enregistré' : 'jours enregistrés'}";
+  @override
+  String get seeWithPremium => 'Voir avec Premium';
+  @override
+  String lockedCardSemantics(String title) =>
+      '$title. Verrouillé. Voir avec Premium';
 }
