@@ -13,8 +13,28 @@ Registro histórico de qué Mood eligió el usuario en una fecha concreta. Una v
 _Avoid_: Mood (ver arriba — es la plantilla, no el registro)
 
 **Tier** (`base` | `premium`):
-Propiedad fija del Mood en el catálogo: si es gratis para siempre (`base`) o requiere una suscripción (`premium`). No depende del usuario — es la misma para todos.
+Propiedad fija del Mood en el catálogo: si es gratis para siempre (`base`) o requiere una suscripción (`premium`). No depende del usuario — es la misma para todos — ni de su Category.
 _Avoid_: Free, gratis (como nombre del campo — se confunde con el estado de desbloqueo del usuario)
+
+**Category** (`Positive` | `Peaceful` | `Neutral` | `Hard`):
+Agrupación fija de los Moods que usa el Log, el calendario y el reloj. Cada Mood pertenece a exactamente una, independiente de su Tier y de su `intensity`. Define el orden de pantalla (Positive, Peaceful, Neutral, Hard), el tinte con que se pinta el Mood (con la excepción de `angry`, rojo) y su Level. El color nunca sustituye al nombre de la categoría.
+_Avoid_: Tipo, grupo, valencia (la categoría no es una escala de mejor a peor)
+
+**Level** (alto | medio | bajo):
+Puntaje de tres niveles que heredan todos los Moods de su Category: Positive y Peaceful, alto; Neutral, medio; Hard, bajo. Es el único valor numérico que usan los análisis (ver `docs/adr/0003-category-level-scoring.md`); un Mood nunca tiene un Level propio.
+_Avoid_: Score, puntaje por Mood, intensity
+
+**Log**:
+La pantalla central de la app donde se registra el Mood del día: una cuadrícula agrupada por Category y, tras guardar, el estado Saved. Es la pestaña inicial y conserva su fecha entre pestañas.
+_Avoid_: Selector, picker, carrusel (nombres del diseño anterior)
+
+**Saved**:
+Estado del Log tras un guardado exitoso (o al abrir una fecha que ya tiene Mood Entry): confirma con la racha actual y muestra la tarjeta del Mood, su Category y la nota, con un botón Edit. Guardar ya no cambia de pestaña.
+_Avoid_: Confirmación, éxito (como nombre del estado)
+
+**Subscription sheet** (hoja de suscripción):
+Hoja inferior que ofrece los tres planes. Solo se abre cuando el usuario la pide: al tocar un Mood premium bloqueado o la fila Premium de Settings. Reemplaza a la antigua pestaña Premium, que ya no existe.
+_Avoid_: Paywall, pantalla Premium, tienda
 
 **Unlocked**:
 Estado por usuario: si ese usuario tiene acceso para usar un Mood concreto. Todo Mood `base` está unlocked trivialmente para cualquiera; un Mood `premium` está unlocked solo si el usuario tiene una **Subscription** activa o si compró ese Mood en una versión anterior (directo o vía Pack).
@@ -33,7 +53,7 @@ El Mood que más días se registró dentro de un mes — reemplaza al antiguo pr
 _Avoid_: Average mood, representative mood, promedio (conceptos del modelo anterior — ya no existen)
 
 **Intensity**:
-Identificador numérico interno por Mood, sin relación con qué tan "bueno" o "malo" es. No se debe usar para ordenar, comparar ni promediar Moods entre sí — su único rol histórico es distinguir un Mood de otro dentro de un `Mood Entry` guardado.
+Identificador numérico interno por Mood, sin relación con qué tan "bueno" o "malo" es. No se debe usar para ordenar, comparar, puntuar ni promediar Moods entre sí (el puntaje sale de la Category, ver Level) — su único rol histórico es distinguir un Mood de otro dentro de un `Mood Entry` guardado.
 _Avoid_: Score, valencia, valor emocional (implican una escala de mejor/peor que ya no existe)
 
 **Pack** (heredado):

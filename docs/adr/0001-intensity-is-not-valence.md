@@ -1,5 +1,7 @@
 # Intensity is an identifier, not a valence score — monthly summary uses mode, not mean
 
+**Estado: Reemplazado** por el [ADR 0003](0003-category-level-scoring.md). `intensity` sigue siendo solo un identificador; lo nuevo es que el puntaje para los análisis sale de la categoría del Mood (3 niveles), no de `intensity`.
+
 Hasta ahora `intensity` (1–5) era a la vez el identificador de un Mood y su posición en una escala de valencia emocional lineal (happy=1 → angry=5), y el resumen mensual promediaba ese número para calcular un "mood representativo del mes".
 
 Al introducir moods premium con IAP, el catálogo de Moods pasó a ser abierto y creciente (nuevos moods se agregan indefinidamente), y varios de los moods nuevos (ej. "confident", "romantic", "shy") no caen de forma natural en una sola recta feliz↔enojado. Forzarlos a un punto de esa escala habría hecho que el promedio mensual produjera resultados engañosos (ej. un mes de puro "confident" podía dar un promedio "peor" que un mes de puro "angry", solo por el orden en que se agregó ese mood al catálogo).
