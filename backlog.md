@@ -49,6 +49,9 @@ Backlog activo del proyecto, actualizado contra el estado actual del repo.
 
 ## Alta prioridad
 
+- Palabras frecuentes de las notas y "tu mes en una imagen" (Insights).
+  Marcadas Pro en el diseño de referencia (`b968c1cf-8592-4534-8a8c-db17961bb6fc`), quedaron fuera del Bloque 2. Las palabras frecuentes tocan el texto de las notas y deben decidirse junto con el bloqueo biométrico del Bloque 3 (privacidad); la imagen del mes necesita hoja de compartir. Cada una es un change aparte.
+
 - Cerrar el rediseño (Bloques 2 y 3) antes de publicar el Bloque 1.
   El Bloque 1 (sistema visual, Log por categorías, 4 pestañas, paywall como hoja y Ajustes) está implementado en `feat/redesign-block-1`, pero **no puede publicarse solo**: el paywall anuncia notas protegidas con biometría (Bloque 3) y Insights es un estado vacío (Bloque 2). Requisito previo a publicar, que hay que pedir aparte porque toca las tiendas: quitar la prueba gratis del plan mensual y del semanal en App Store Connect y Google Play (la app solo la ofrece en el anual). Pendiente también: medir la fluidez del vidrio en un iPhone real (iOS 15) y, si se pide, un build de TestFlight; el texto de las fichas de las tiendas (6 moods pasan a gratis) y las capturas se rehacen en el paso de marketing.
 

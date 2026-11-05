@@ -124,4 +124,43 @@ void main() {
       );
     });
   });
+
+  currentStreakAsOfTests();
+}
+
+void currentStreakAsOfTests() {
+  group('currentStreakAsOf', () {
+    final today = DateTime(2026, 11, 4);
+
+    test('counts from today when today has an entry', () {
+      final dates = [
+        DateTime(2026, 11, 2),
+        DateTime(2026, 11, 3),
+        DateTime(2026, 11, 4),
+      ];
+      expect(MoodStreakCalculator.currentStreakAsOf(dates, today), 3);
+    });
+
+    test('counts from yesterday while today has no entry yet', () {
+      final dates = [DateTime(2026, 11, 2), DateTime(2026, 11, 3)];
+      expect(MoodStreakCalculator.currentStreakAsOf(dates, today), 2);
+    });
+
+    test('is 0 when neither today nor yesterday has an entry', () {
+      final dates = [DateTime(2026, 11, 1), DateTime(2026, 11, 2)];
+      expect(MoodStreakCalculator.currentStreakAsOf(dates, today), 0);
+    });
+
+    test('crosses a month and a year boundary', () {
+      final dates = [
+        DateTime(2025, 12, 30),
+        DateTime(2025, 12, 31),
+        DateTime(2026, 1, 1),
+      ];
+      expect(
+        MoodStreakCalculator.currentStreakAsOf(dates, DateTime(2026, 1, 2)),
+        3,
+      );
+    });
+  });
 }

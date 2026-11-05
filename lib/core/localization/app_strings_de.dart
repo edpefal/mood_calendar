@@ -427,4 +427,83 @@ class AppStringsDe extends AppStrings {
   @override
   String trialTimelineCharge(String date, String price) =>
       '$date · Erste Abbuchung von $price';
+
+  @override
+  String get calendarViewYearTooltip => 'Jahr ansehen';
+  @override
+  String get chooseMonthYearLabel => 'Monat und Jahr wählen';
+  @override
+  String get previousYearTooltip => 'Vorheriges Jahr';
+  @override
+  String get nextYearTooltip => 'Nächstes Jahr';
+  @override
+  String get monthSoFarTitle => 'Dein Monat bis jetzt';
+  @override
+  String categoryShareLabel(String category, int percent) =>
+      '$category $percent %';
+  @override
+  String categoryDistributionSemantics(String shares) =>
+      'Stimmungskategorien in diesem Monat: $shares';
+  @override
+  String get currentStreakTitle => 'Aktuelle Serie';
+  @override
+  String streakDaysUnit(int days) => days == 1 ? 'Tag' : 'Tage';
+  @override
+  String currentStreakSemantics(int days) =>
+      "Aktuelle Serie: $days ${days == 1 ? 'Tag' : 'Tage'}";
+  @override
+  String dayDetailCategoryAndTime(String category, String time) =>
+      '$category · eingetragen um $time';
+  @override
+  String get dayDetailNoteTitle => 'Notiz';
+  @override
+  String dayDetailSemantics(String date) => 'Details für $date';
+
+  @override
+  String insightsMonthTitle(String monthName) => 'Zusammenfassung $monthName';
+  @override
+  String insightsEntriesCount(int count) =>
+      "$count ${count == 1 ? 'Eintrag' : 'Einträge'}";
+  @override
+  String get trendTitle => 'Verlauf';
+  @override
+  String trendRangeChip(int days) => '$days T';
+  @override
+  String trendRangeLabel(int days) => 'Letzte $days Tage';
+  @override
+  String trendChartSemantics(int days, int entries, String category) =>
+      'Stimmungsverlauf, letzte $days Tage, $entries Einträge, meist $category';
+  @override
+  String get insightsNotEnoughTitle => 'Noch nicht genug Daten';
+  @override
+  String get insightsNotEnoughBody =>
+      'Trage noch ein paar Tage ein, um das zu sehen.';
+  @override
+  String get weekdayTitle => 'Stimmung nach Wochentag';
+  @override
+  List<String> get weekdayLongNames => const [
+        'Montag',
+        'Dienstag',
+        'Mittwoch',
+        'Donnerstag',
+        'Freitag',
+        'Samstag',
+        'Sonntag'
+      ];
+  @override
+  String weekdayBarSemantics(String weekday, String category) =>
+      '$weekday: meist $category';
+  @override
+  String weekdayNoDataSemantics(String weekday) =>
+      '$weekday: zu wenige Einträge';
+  @override
+  String yearInPixelsTitle(int year) => 'Jahr in Pixeln · $year';
+  @override
+  String yearInPixelsSemantics(int year, int logged) =>
+      "Jahr in Pixeln $year: $logged ${logged == 1 ? 'Tag' : 'Tage'} eingetragen";
+  @override
+  String get seeWithPremium => 'Mit Premium ansehen';
+  @override
+  String lockedCardSemantics(String title) =>
+      '$title. Gesperrt. Mit Premium ansehen';
 }

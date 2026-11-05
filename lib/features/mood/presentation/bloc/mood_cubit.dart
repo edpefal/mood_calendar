@@ -15,13 +15,16 @@ class MoodCubit extends Cubit<MoodState> {
   final GetMoodsUseCase getMoods;
   final AppLogger logger;
   final AppTelemetry telemetry;
+  final DateTime Function() _now;
 
   MoodCubit({
     required this.saveMood,
     required this.getMoods,
     required this.logger,
     required this.telemetry,
-  }) : super(const MoodState.initial()) {
+    DateTime Function()? now,
+  })  : _now = now ?? DateTime.now,
+        super(const MoodState.initial()) {
     // Cargar los estados de ánimo inmediatamente al crear el cubit
     fetchAll();
   }
@@ -29,7 +32,8 @@ class MoodCubit extends Cubit<MoodState> {
   Future<void> save(MoodEntry entry) async {
     emit(const MoodState.loading());
     try {
-      await saveMood(entry);
+      await saveMood(
+          entry.loggedAt == null ? entry.copyWith(loggedAt: _now()) : entry);
       telemetry.trackEvent(
         AppTelemetryEvents.moodSaved,
         properties: {

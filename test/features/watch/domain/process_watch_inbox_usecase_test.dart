@@ -71,6 +71,19 @@ void main() {
     expect(saved.note, 'buen día');
   });
 
+  test('la hora de registro es la de la elección en el reloj', () async {
+    final repository = InMemoryMoodRepository();
+    final at = DateTime(2026, 11, 2, 8, 15).millisecondsSinceEpoch;
+    final channel = FakeWatchChannel(inbox: [_choice('a', 'calm', at: at)]);
+
+    await build(repository, channel)();
+
+    expect(
+      repository.entries.single.loggedAt,
+      DateTime.fromMillisecondsSinceEpoch(at),
+    );
+  });
+
   test('no guarda ni cuenta como aplicada una elección igual a la actual',
       () async {
     final repository = InMemoryMoodRepository([

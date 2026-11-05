@@ -37,8 +37,9 @@ Servicios sin Flutter, cada uno con tests: `CategoryDistribution` (porcentajes p
 - **Por qué los números 3/2/1**: el ADR 0003 pide un valor numérico solo para análisis y por categoría; mantenerlo dentro del servicio evita que otra pantalla lo reutilice como puntaje por mood.
 - **Alternativa descartada**: promediar `intensity`; prohibido por el ADR 0003.
 
-### 4. Un cubit de Insights alimentado por todas las entradas, no por mes
-`InsightsCubit` carga `getMoods()` una vez y se refresca como `CalendarCubit` (al guardar y al volver del reloj, vía `WatchSyncHost`). Guarda el rango elegido de la tendencia y el año de Year in Pixels. El calendario sigue con su cubit por mes; la racha actual del calendario sale del mismo servicio con todas las entradas, no del mes visible. El volumen es de a lo sumo unos cientos de entradas, así que no hace falta paginar ni cachear.
+### 4. Insights lee las entradas de `MoodCubit`; el rango y el año viven en la pantalla
+`MoodCubit` ya carga todas las entradas y se refresca al guardar y cuando `WatchSyncHost` aplica elecciones del reloj, así que Insights no necesita su propio cubit ni una segunda carga: escucha `MoodCubit` (como el Log y el calendario) y calcula con los servicios puros en cada cambio. El rango de la tendencia y el año de Year in Pixels son estado de la pantalla. La racha actual del calendario sale de las mismas entradas, no del mes visible. El volumen es de a lo sumo unos cientos de entradas, así que no hace falta paginar ni cachear.
+- **Alternativa descartada**: un `InsightsCubit` con su propia carga; duplicaba el refresco que ya resuelve `MoodCubit` y no aportaba estado que valga la pena probar aparte.
 
 ### 5. Bloqueo por candado difuminado con ilustración fija
 Una tarjeta Premium bloqueada muestra una ilustración estática (asset o `CustomPaint` con datos de muestra fijos) bajo un `ImageFiltered` y un botón "Ver con Premium". **Nunca** pasa los datos reales al widget bloqueado (spec: sin datos reales en la vista previa). La decisión de mostrar datos o candado sale de `PurchasesCubit.state.subscription`, igual que el desbloqueo de moods, para que quien deja de pagar vuelva a ver los candados sin tocar sus entradas. El blur es uno por tarjeta bloqueada (no por celda), en línea con la advertencia de rendimiento del vidrio del Bloque 1.
@@ -47,7 +48,7 @@ Una tarjeta Premium bloqueada muestra una ilustración estática (asset o `Custo
 ### 6. Gráficas con `fl_chart`; Year in Pixels con widgets
 La tendencia (`LineChart` con puntos coloreados por categoría y huecos en los días sin entrada) y las barras por día de la semana (`BarChart`) usan el paquete `fl_chart`. Year in Pixels es una cuadrícula de cuadros de color, que `fl_chart` no ofrece, y se construye con widgets (`GridView`/`CustomPaint`). Las tres llevan `Semantics` que resume la gráfica (spec: descripción accesible), porque `fl_chart` dibuja en un canvas sin árbol de accesibilidad, y los colores salen de `BrandPalette`, nunca de los valores por defecto del paquete.
 - **Por qué**: ejes, escalas, huecos en la serie y animación de entrada ya resueltos; menos código propio que mantener y probar.
-- **Costo asumido**: una dependencia nueva, solo Dart, sin plugins nativos ni acceso a red o a datos; no cambia App Privacy, Data safety ni la política. Se fija la versión en `pubspec.yaml` y se confirma que compila con Dart `>=3.6.0` y Flutter 3.32 (CI) y en iOS 15.
+- **Costo asumido**: una dependencia nueva, solo Dart, sin plugins nativos ni acceso a red o a datos; no cambia App Privacy, Data safety ni la política. La versión se fija en `1.0.0`: el CI usa Flutter 3.32.1, que fija `vector_math` 2.1.4; la `1.1.0` declara `^2.1.4` pero llama a `Matrix4.translateByDouble`/`scaleByDouble` (de `vector_math` 2.2.0) y falla al compilar, y desde la `1.1.1` el paquete pide `^2.2.0` (lo detectó el CI del PR del Bloque 2). Subirla exige subir antes el Flutter del CI.
 - **Alternativa descartada**: dibujar todo con `CustomPaint`; evitaba la dependencia, pero obligaba a escribir ejes, escalas y huecos a mano.
 
 ### 7. Detalle del día como hoja modal compartida

@@ -130,6 +130,84 @@ void main() {
     expect(moods.single.mood, 'assets/icon/angry.svg');
     expect(moodBox.keys.single, '2026-04-09');
   });
+
+  group('loggedAt', () {
+    const calm = 'assets/icon/calm.svg';
+    const sad = 'assets/icon/sad.svg';
+    final day = DateTime(2026, 11, 2);
+
+    MoodEntry entryAt(String mood, DateTime? loggedAt, {String? note}) =>
+        MoodEntry(
+          date: day,
+          mood: mood,
+          note: note,
+          intensity: 2,
+          loggedAt: loggedAt,
+        );
+
+    test('a new entry stores the time it arrives with', () async {
+      await repository.saveMood(entryAt(calm, DateTime(2026, 11, 2, 21, 2)));
+
+      final saved = (await repository.getMoods()).single;
+      expect(saved.loggedAt, DateTime(2026, 11, 2, 21, 2));
+    });
+
+    test('editing only the note keeps the original time', () async {
+      await repository.saveMood(entryAt(calm, DateTime(2026, 11, 2, 21, 2)));
+      await repository.saveMood(
+        entryAt(calm, DateTime(2026, 11, 2, 23, 40), note: 'later'),
+      );
+
+      final saved = (await repository.getMoods()).single;
+      expect(saved.note, 'later');
+      expect(saved.loggedAt, DateTime(2026, 11, 2, 21, 2));
+    });
+
+    test('changing the mood takes the new time', () async {
+      await repository.saveMood(entryAt(calm, DateTime(2026, 11, 2, 21, 2)));
+      await repository.saveMood(entryAt(sad, DateTime(2026, 11, 2, 23, 40)));
+
+      final saved = (await repository.getMoods()).single;
+      expect(saved.mood, sad);
+      expect(saved.loggedAt, DateTime(2026, 11, 2, 23, 40));
+    });
+
+    test('an entry saved before the field existed stays without a time',
+        () async {
+      await moodBox.put(
+        MoodStorageKeys.forDate(day),
+        MoodModel(date: day, mood: calm, intensity: 2),
+      );
+
+      await repository
+          .saveMood(entryAt(calm, DateTime(2026, 11, 3, 9), note: 'x'));
+
+      final saved = (await repository.getMoods()).single;
+      expect(saved.note, 'x');
+      expect(saved.loggedAt, isNull);
+    });
+
+    test('a box written with the previous schema still opens', () async {
+      Hive.registerAdapter(_PreviousSchemaMoodAdapter(), override: true);
+      final legacyBox = await Hive.openBox<MoodModel>('moods_previous');
+      await legacyBox.put(
+        '2026-11-01',
+        MoodModel(date: DateTime(2026, 11, 1), mood: calm, intensity: 2),
+      );
+      await legacyBox.close();
+
+      Hive.registerAdapter(MoodModelAdapter(), override: true);
+      final reopened = await Hive.openBox<MoodModel>('moods_previous');
+      final saved = await MoodRepositoryImpl(
+        reopened,
+        logger: const _TestAppLogger(),
+      ).getMoods();
+
+      expect(saved.single.mood, calm);
+      expect(saved.single.loggedAt, isNull);
+      await reopened.close();
+    });
+  });
 }
 
 class _TestAppLogger implements AppLogger {
@@ -150,4 +228,38 @@ class _TestAppLogger implements AppLogger {
     Object? error,
     StackTrace? stackTrace,
   }) {}
+}
+
+/// Writes entries with the four fields the model had before `loggedAt`.
+class _PreviousSchemaMoodAdapter extends TypeAdapter<MoodModel> {
+  @override
+  final int typeId = 0;
+
+  @override
+  MoodModel read(BinaryReader reader) {
+    final fields = <int, dynamic>{
+      for (var i = reader.readByte(); i > 0; i--)
+        reader.readByte(): reader.read(),
+    };
+    return MoodModel(
+      date: fields[0] as DateTime,
+      mood: fields[1] as String,
+      note: fields[2] as String?,
+      intensity: fields[3] as int,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, MoodModel obj) {
+    writer
+      ..writeByte(4)
+      ..writeByte(0)
+      ..write(obj.date)
+      ..writeByte(1)
+      ..write(obj.mood)
+      ..writeByte(2)
+      ..write(obj.note)
+      ..writeByte(3)
+      ..write(obj.intensity);
+  }
 }

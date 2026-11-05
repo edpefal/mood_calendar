@@ -41,6 +41,39 @@ void main() {
     await cubit.close();
   });
 
+  test('stamps the entry with the time it is saved and keeps it out of events',
+      () async {
+    final repository = _FakeMoodRepository();
+    final telemetry = _FakeAppTelemetry();
+    final cubit = MoodCubit(
+      saveMood: SaveMoodUseCase(repository),
+      getMoods: GetMoodsUseCase(repository),
+      logger: const _TestAppLogger(),
+      telemetry: telemetry,
+      now: () => DateTime(2026, 11, 2, 21, 2),
+    );
+
+    await cubit.save(
+      MoodEntry(
+        date: DateTime(2026, 11, 2),
+        mood: 'assets/icon/calm.svg',
+        intensity: 2,
+      ),
+    );
+
+    expect(repository._entries.single.loggedAt, DateTime(2026, 11, 2, 21, 2));
+    expect(
+      telemetry.events.single.properties.keys,
+      isNot(contains('loggedAt')),
+    );
+    expect(
+      telemetry.events.single.properties.values.map((v) => v.toString()),
+      isNot(contains(contains('21:02'))),
+    );
+
+    await cubit.close();
+  });
+
   test('records a traceable error when mood save fails', () async {
     final repository = _FakeMoodRepository(throwOnSave: true);
     final telemetry = _FakeAppTelemetry();

@@ -422,4 +422,82 @@ class AppStringsEn extends AppStrings {
   @override
   String trialTimelineCharge(String date, String price) =>
       '$date · First charge of $price';
+
+  @override
+  String get calendarViewYearTooltip => 'View year';
+  @override
+  String get chooseMonthYearLabel => 'Choose month and year';
+  @override
+  String get previousYearTooltip => 'Previous year';
+  @override
+  String get nextYearTooltip => 'Next year';
+  @override
+  String get monthSoFarTitle => 'Your month so far';
+  @override
+  String categoryShareLabel(String category, int percent) =>
+      '$category $percent%';
+  @override
+  String categoryDistributionSemantics(String shares) =>
+      'Mood categories this month: $shares';
+  @override
+  String get currentStreakTitle => 'Current streak';
+  @override
+  String streakDaysUnit(int days) => days == 1 ? 'day' : 'days';
+  @override
+  String currentStreakSemantics(int days) =>
+      "Current streak: $days ${days == 1 ? 'day' : 'days'}";
+  @override
+  String dayDetailCategoryAndTime(String category, String time) =>
+      '$category · logged at $time';
+  @override
+  String get dayDetailNoteTitle => 'Note';
+  @override
+  String dayDetailSemantics(String date) => 'Details for $date';
+
+  @override
+  String insightsMonthTitle(String monthName) => '$monthName summary';
+  @override
+  String insightsEntriesCount(int count) =>
+      "$count ${count == 1 ? 'entry' : 'entries'}";
+  @override
+  String get trendTitle => 'Trend';
+  @override
+  String trendRangeChip(int days) => '$days d';
+  @override
+  String trendRangeLabel(int days) => 'Last $days days';
+  @override
+  String trendChartSemantics(int days, int entries, String category) =>
+      'Mood trend, last $days days, $entries entries, mostly $category';
+  @override
+  String get insightsNotEnoughTitle => 'Not enough data yet';
+  @override
+  String get insightsNotEnoughBody => 'Log a few more days to see this.';
+  @override
+  String get weekdayTitle => 'Mood by day of the week';
+  @override
+  List<String> get weekdayLongNames => const [
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+        'Sunday'
+      ];
+  @override
+  String weekdayBarSemantics(String weekday, String category) =>
+      '$weekday: mostly $category';
+  @override
+  String weekdayNoDataSemantics(String weekday) =>
+      '$weekday: not enough entries';
+  @override
+  String yearInPixelsTitle(int year) => 'Year in Pixels · $year';
+  @override
+  String yearInPixelsSemantics(int year, int logged) =>
+      "Year in Pixels $year: $logged ${logged == 1 ? 'day' : 'days'} logged";
+  @override
+  String get seeWithPremium => 'See with Premium';
+  @override
+  String lockedCardSemantics(String title) =>
+      '$title. Locked. See with Premium';
 }

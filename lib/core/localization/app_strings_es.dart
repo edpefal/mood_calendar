@@ -425,4 +425,82 @@ class AppStringsEs extends AppStrings {
   @override
   String trialTimelineCharge(String date, String price) =>
       '$date · Primer cobro de $price';
+
+  @override
+  String get calendarViewYearTooltip => 'Ver año';
+  @override
+  String get chooseMonthYearLabel => 'Elegir mes y año';
+  @override
+  String get previousYearTooltip => 'Año anterior';
+  @override
+  String get nextYearTooltip => 'Año siguiente';
+  @override
+  String get monthSoFarTitle => 'Tu mes hasta ahora';
+  @override
+  String categoryShareLabel(String category, int percent) =>
+      '$category $percent%';
+  @override
+  String categoryDistributionSemantics(String shares) =>
+      'Categorías de ánimo este mes: $shares';
+  @override
+  String get currentStreakTitle => 'Racha actual';
+  @override
+  String streakDaysUnit(int days) => days == 1 ? 'día' : 'días';
+  @override
+  String currentStreakSemantics(int days) =>
+      "Racha actual: $days ${days == 1 ? 'día' : 'días'}";
+  @override
+  String dayDetailCategoryAndTime(String category, String time) =>
+      '$category · hora de registro $time';
+  @override
+  String get dayDetailNoteTitle => 'Nota';
+  @override
+  String dayDetailSemantics(String date) => 'Detalle del $date';
+
+  @override
+  String insightsMonthTitle(String monthName) =>
+      'Resumen de ${monthName.toLowerCase()}';
+  @override
+  String insightsEntriesCount(int count) =>
+      "$count ${count == 1 ? 'entrada' : 'entradas'}";
+  @override
+  String get trendTitle => 'Tendencia';
+  @override
+  String trendRangeChip(int days) => '$days d';
+  @override
+  String trendRangeLabel(int days) => 'Últimos $days días';
+  @override
+  String trendChartSemantics(int days, int entries, String category) =>
+      'Tendencia del ánimo, últimos $days días, $entries entradas, sobre todo $category';
+  @override
+  String get insightsNotEnoughTitle => 'Aún no hay suficientes datos';
+  @override
+  String get insightsNotEnoughBody => 'Registra unos días más para verlo.';
+  @override
+  String get weekdayTitle => 'Ánimo por día de la semana';
+  @override
+  List<String> get weekdayLongNames => const [
+        'lunes',
+        'martes',
+        'miércoles',
+        'jueves',
+        'viernes',
+        'sábado',
+        'domingo'
+      ];
+  @override
+  String weekdayBarSemantics(String weekday, String category) =>
+      '$weekday: sobre todo $category';
+  @override
+  String weekdayNoDataSemantics(String weekday) => '$weekday: pocas entradas';
+  @override
+  String yearInPixelsTitle(int year) => 'Año en píxeles · $year';
+  @override
+  String yearInPixelsSemantics(int year, int logged) =>
+      "Año en píxeles $year: $logged ${logged == 1 ? 'día registrado' : 'días registrados'}";
+  @override
+  String get seeWithPremium => 'Ver con Premium';
+  @override
+  String lockedCardSemantics(String title) =>
+      '$title. Bloqueado. Ver con Premium';
 }

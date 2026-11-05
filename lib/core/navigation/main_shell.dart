@@ -29,6 +29,9 @@ class MainShellState extends State<MainShell> {
   final Set<MainTab> _visited = {MainTab.log};
   DateTime _logDate = _dateOnly(DateTime.now());
   Key _logKey = UniqueKey();
+  bool _logStartsEditing = false;
+  Key _insightsKey = UniqueKey();
+  bool _insightsScrollsToYear = false;
 
   static DateTime _dateOnly(DateTime date) =>
       DateTime(date.year, date.month, date.day);
@@ -39,12 +42,25 @@ class MainShellState extends State<MainShell> {
   DateTime get logDate => _logDate;
 
   /// Activa el Log con [date]. Recrea el Log (y con él la selección y la nota
-  /// sin guardar), igual que cuando se abría una fecha nueva.
-  void showLog(DateTime date) {
+  /// sin guardar), igual que cuando se abría una fecha nueva. Con [edit] abre
+  /// la cuadrícula ya editando la entrada de esa fecha (el "Edit" del detalle
+  /// del día).
+  void showLog(DateTime date, {bool edit = false}) {
     setState(() {
       _logDate = _dateOnly(date);
       _logKey = UniqueKey();
+      _logStartsEditing = edit;
       _selectTab(MainTab.log);
+    });
+  }
+
+  /// Activa Insights y baja a la tarjeta Year in Pixels (el botón "ver año"
+  /// del calendario).
+  void showInsightsYear() {
+    setState(() {
+      _insightsKey = UniqueKey();
+      _insightsScrollsToYear = true;
+      _selectTab(MainTab.insights);
     });
   }
 
@@ -64,13 +80,22 @@ class MainShellState extends State<MainShell> {
     }
     switch (tab) {
       case MainTab.calendar:
-        return CalendarScreen(onDaySelected: showLog);
+        return CalendarScreen(
+          onDaySelected: showLog,
+          onEditEntry: (date) => showLog(date, edit: true),
+          onViewYear: showInsightsYear,
+        );
       case MainTab.insights:
-        return const InsightsScreen();
+        return InsightsScreen(
+          key: _insightsKey,
+          scrollToYear: _insightsScrollsToYear,
+          onEditEntry: (date) => showLog(date, edit: true),
+        );
       case MainTab.log:
         return LogScreen(
           key: _logKey,
           selectedDate: _logDate,
+          startEditing: _logStartsEditing,
           isActive: _tab == MainTab.log,
           onOpenSettings: showSettings,
           onRequestDate: showLog,

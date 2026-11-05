@@ -14,10 +14,12 @@ import '../../domain/repositories/mood_entitlements_repository.dart';
 part 'purchases_state.dart';
 
 /// Desde dónde se abrió la hoja de suscripción, para las analíticas (sin ids de
-/// moods): el toque en un mood bloqueado o la fila Premium de Ajustes.
+/// moods): el toque en un mood bloqueado, la fila Premium de Ajustes o una
+/// tarjeta bloqueada de Insights.
 enum PremiumSource {
   lockedMood('locked_mood'),
-  settings('settings');
+  settings('settings'),
+  insights('insights');
 
   const PremiumSource(this.analyticsValue);
   final String analyticsValue;

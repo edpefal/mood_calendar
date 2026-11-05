@@ -10,6 +10,10 @@ class MoodEntry with _$MoodEntry {
     required String mood,
     String? note,
     required int intensity,
+
+    /// When the entry was recorded (device-local time). Null for entries saved
+    /// before it existed; the repository keeps it while the mood is unchanged.
+    DateTime? loggedAt,
   }) = _MoodEntry;
 
   factory MoodEntry.fromJson(Map<String, dynamic> json) =>

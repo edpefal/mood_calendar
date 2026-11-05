@@ -18,6 +18,17 @@ class MoodStreakCalculator {
     return count;
   }
 
+  /// The streak that is still alive on [today]: it counts from today when
+  /// today has an entry, or from yesterday when it does not yet, so it does not
+  /// break before the day is over. 0 when neither day has an entry.
+  static int currentStreakAsOf(Iterable<DateTime> entryDates, DateTime today) {
+    final dates = entryDates.toList();
+    final day = DateTime(today.year, today.month, today.day);
+    final todayCount = currentStreak(dates, day);
+    if (todayCount > 0) return todayCount;
+    return currentStreak(dates, DateTime(day.year, day.month, day.day - 1));
+  }
+
   /// Computes the longest run of consecutive calendar days in [sortedDates].
   ///
   /// [sortedDates] must already be sorted ascending. Two dates are
