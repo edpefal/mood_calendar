@@ -7,7 +7,9 @@ emulator (the entrypoint wipes the app's local data) and keep it installed.
 usage: python3 tool/screenshots/capture_android.py <serial> <locale: en|es|de|fr|it>
 Writes build/screenshots/shots/android/<locale>/<picker|note|calendar|reminders>.png
 Buttons are found by position, like capture.py: `uiautomator dump` lists the clickable
-nodes and the four tabs of the bottom bar are the lowest row of four.
+nodes and the four tabs of the bottom bar are the lowest row of four
+([calendar, insights, log, settings]). The app opens on the Log in the "Saved" state
+(the seed has today's entry): Edit brings the grid back and the note pill sits above Save.
 The language is set per app with `cmd locale set-app-locales`. Put the status bar in demo mode
 first (clock 9:41, full battery, no notifications) with `adb shell am broadcast -a
 com.android.systemui.demo -e command ...`; the caret handle left in the note is painted over.
@@ -112,7 +114,7 @@ def rows(bs, tol=24):
 
 
 def tab_buttons():
-    """Bottom bar tabs, left to right: [mood picker, calendar, premium, settings]."""
+    """Bottom bar tabs, left to right: [calendar, insights, log, settings]."""
     groups = [g for g in rows(buttons()) if len(g) == 4]
     return sorted(groups[-1], key=lambda b: b[0]) if groups else []
 
@@ -122,22 +124,24 @@ def non_tab_rows():
     return rows([b for b in buttons() if tuple(b) not in tabs])
 
 
-def note_button():
+def edit_button():
+    """Edit on the Saved card: second row above the bar, after the bell."""
     for _ in range(6):
         groups = non_tab_rows()
-        if groups:
-            return max(groups[0], key=lambda b: b[0])
+        if len(groups) >= 2:
+            return groups[1][0]
         time.sleep(1)
-    raise RuntimeError('note button not found')
+    raise RuntimeError('edit button not found')
 
 
-def next_arrow():
+def note_pill():
+    """Note pill of the Log grid: the row just above Save (the last row)."""
     for _ in range(6):
         groups = non_tab_rows()
-        if len(groups) >= 5:  # arrows row is third from the bottom: [..., arrows, grid, save]
-            return max(groups[-3], key=lambda b: b[0])
+        if len(groups) >= 2:
+            return groups[-2][0]
         time.sleep(1)
-    raise RuntimeError('next arrow not found')
+    raise RuntimeError('note pill not found')
 
 
 def calendar_previous():
@@ -149,23 +153,20 @@ def calendar_previous():
     raise RuntimeError('calendar header buttons not found')
 
 
-NEXT_TAPS = 6
-
 launch()
-arrow = next_arrow()
-for _ in range(NEXT_TAPS):
-    tap_button(arrow)
+tap_button(edit_button())
 time.sleep(1)
 shot('picker')
 
 launch()
-tap_button(note_button())
+tap_button(edit_button())
+tap_button(note_pill())
 time.sleep(7)  # lets the caret handle fade out
 shot('note')
 clean_note(os.path.join(OUT, 'note.png'))
 
 launch()
-tap_button(tab_buttons()[1])  # calendar tab
+tap_button(tab_buttons()[0])  # calendar tab
 tap_button(calendar_previous())  # previous month is fully seeded
 time.sleep(1)
 shot('calendar')

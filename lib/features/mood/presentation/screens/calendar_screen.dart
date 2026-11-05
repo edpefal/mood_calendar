@@ -1,307 +1,165 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../core/localization/app_strings.dart';
-import '../../data/services/rating_prompt_service.dart';
+import '../../../../core/theme/brand_colors.dart';
+import '../../../../core/widgets/glass_card.dart';
+import '../../../../core/widgets/mesh_background.dart';
+import '../../../../core/widgets/phone_column.dart';
 import '../../domain/services/mood_definition_resolver.dart';
 import '../bloc/calendar_cubit.dart';
 import '../widgets/monthly_mood_summary_card.dart';
-import '../../../../core/theme/brand_colors.dart';
 
 class CalendarScreen extends StatefulWidget {
-  /// Día cuya entrada se acaba de guardar; se resalta con una animación.
-  final DateTime? recentlySavedDate;
-
-  /// Cambia con cada guardado exitoso, para que guardar dos veces el mismo día
-  /// también dispare el resaltado.
-  final int saveToken;
-
-  /// Si la pestaña del calendario es la visible. El pedido de calificación se
-  /// omite si el usuario ya cambió de pestaña.
-  final bool isActive;
-
-  /// Se llama con el día que el usuario toca.
+  /// Se llama con el día que el usuario toca (nunca uno futuro).
   final ValueChanged<DateTime> onDaySelected;
 
-  const CalendarScreen({
-    super.key,
-    required this.onDaySelected,
-    this.recentlySavedDate,
-    this.saveToken = 0,
-    this.isActive = true,
-  });
+  /// Hoy, inyectable para las pruebas.
+  final DateTime Function()? clock;
+
+  const CalendarScreen({super.key, required this.onDaySelected, this.clock});
 
   @override
   State<CalendarScreen> createState() => _CalendarScreenState();
 }
 
-class _CalendarScreenState extends State<CalendarScreen>
-    with SingleTickerProviderStateMixin {
+class _CalendarScreenState extends State<CalendarScreen> {
   late DateTime _focusedDay;
-  late AnimationController _animationController;
-  DateTime? _recentlySavedDate;
+
+  DateTime get _today => (widget.clock ?? DateTime.now)();
 
   @override
   void initState() {
     super.initState();
-    _focusedDay = DateTime.now();
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1200),
-    );
-    _recentlySavedDate = widget.recentlySavedDate;
-    if (_recentlySavedDate != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _startAnimation();
-        _requestRatingAfterSave();
-      });
-    }
-  }
-
-  @override
-  void didUpdateWidget(CalendarScreen oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.saveToken != oldWidget.saveToken &&
-        widget.recentlySavedDate != null) {
-      setState(() {
-        _recentlySavedDate = widget.recentlySavedDate;
-      });
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _startAnimation();
-        _requestRatingAfterSave();
-      });
-    }
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
-
-  void _startAnimation() {
-    if (!mounted) return;
-    _animationController.repeat(reverse: true);
-    Future.delayed(const Duration(seconds: 4), () {
-      if (mounted) {
-        _animationController.stop();
-        _animationController.reset();
-        setState(() {
-          _recentlySavedDate = null;
-        });
-      }
-    });
-  }
-
-  void _requestRatingAfterSave() {
-    if (!mounted) return;
-    final ratingPromptService = context.read<RatingPromptService>();
-    // Let the tab switch settle so the system dialog doesn't pop up
-    // mid-animation, and skip it if another tab or a modal was opened meanwhile.
-    Future.delayed(const Duration(milliseconds: 600), () {
-      if (!mounted ||
-          !widget.isActive ||
-          ModalRoute.of(context)?.isCurrent != true) {
-        return;
-      }
-      unawaited(ratingPromptService.maybeRequestAfterSave());
-    });
+    _focusedDay = _today;
   }
 
   @override
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: Text(
-          strings.calendarTitle,
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: brandInk,
-                fontWeight: FontWeight.bold,
-              ),
+    final palette = BrandPalette.of(context);
+
+    return MeshBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          title: Text(
+            strings.calendarTitle,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  color: palette.text,
+                  fontWeight: FontWeight.w500,
+                ),
+          ),
         ),
-      ),
-      body: SafeArea(
-        child: BlocBuilder<CalendarCubit, CalendarState>(
-          builder: (context, state) {
-            final now = _focusedDay;
-            final today = DateTime.now();
-            final canGoNext = now.year < today.year ||
-                (now.year == today.year && now.month < today.month);
-            final firstDayOfMonth = DateTime(now.year, now.month, 1);
-            final lastDayOfMonth = DateTime(now.year, now.month + 1, 0);
-            final daysInMonth = lastDayOfMonth.day;
-            // Sunday-indexed (0=Sunday..6=Saturday) to match the Sunday-first
-            // week header; DateTime.weekday is Monday-indexed (1=Monday..7=Sunday).
-            final firstWeekday = firstDayOfMonth.weekday % 7;
+        body: SafeArea(
+          child: BlocBuilder<CalendarCubit, CalendarState>(
+            builder: (context, state) {
+              final now = _focusedDay;
+              final today = _today;
+              final canGoNext = now.year < today.year ||
+                  (now.year == today.year && now.month < today.month);
+              final firstDayOfMonth = DateTime(now.year, now.month, 1);
+              final lastDayOfMonth = DateTime(now.year, now.month + 1, 0);
+              final daysInMonth = lastDayOfMonth.day;
+              // Sunday-indexed (0=Sunday..6=Saturday) to match the Sunday-first
+              // week header; DateTime.weekday is Monday-indexed (1=Monday..7=Sunday).
+              final firstWeekday = firstDayOfMonth.weekday % 7;
 
-            final entries = state.summary?.entries ?? [];
-            final moodMap = <String, String>{};
-            for (final mood in entries) {
-              moodMap[_dateKey(mood.date)] = mood.mood;
-            }
+              final entries = state.summary?.entries ?? [];
+              final moodMap = <String, String>{};
+              for (final mood in entries) {
+                moodMap[_dateKey(mood.date)] = mood.mood;
+              }
 
-            return Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const SizedBox(height: 8),
-                    Card(
-                      elevation: 2,
-                      clipBehavior: Clip.antiAlias,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            _CalendarHeader(
-                              month: now.month,
-                              year: now.year,
-                              onPreviousMonth: _onPreviousMonth,
-                              onNextMonth: canGoNext ? _onNextMonth : null,
-                            ),
-                            if (state.isLoading)
-                              const Padding(
-                                padding: EdgeInsets.only(top: 12),
-                                child: LinearProgressIndicator(minHeight: 3),
+              return PhoneColumn(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const SizedBox(height: 8),
+                        GlassCard(
+                          padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              _CalendarHeader(
+                                month: now.month,
+                                year: now.year,
+                                onPreviousMonth: _onPreviousMonth,
+                                onNextMonth: canGoNext ? _onNextMonth : null,
                               ),
-                            if (state.error != null) ...[
+                              if (state.isLoading)
+                                const Padding(
+                                  padding: EdgeInsets.only(top: 12),
+                                  child: LinearProgressIndicator(minHeight: 3),
+                                ),
+                              if (state.error != null) ...[
+                                const SizedBox(height: 12),
+                                _CalendarFeedbackBanner(
+                                  message: strings.loadingMonthError,
+                                  actionLabel: strings.retry,
+                                  onPressed: () {
+                                    context.read<CalendarCubit>().refresh();
+                                  },
+                                ),
+                              ],
                               const SizedBox(height: 12),
-                              _CalendarFeedbackBanner(
-                                message: strings.loadingMonthError,
-                                actionLabel: strings.retry,
-                                onPressed: () {
-                                  context.read<CalendarCubit>().refresh();
+                              _WeekDaysRow(),
+                              const SizedBox(height: 12),
+                              GridView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 7,
+                                  mainAxisSpacing: 8,
+                                  crossAxisSpacing: 8,
+                                  childAspectRatio: 1,
+                                ),
+                                itemCount: daysInMonth + firstWeekday,
+                                itemBuilder: (context, index) {
+                                  if (index < firstWeekday) {
+                                    return const SizedBox.shrink();
+                                  }
+                                  final day = index - firstWeekday + 1;
+                                  final date =
+                                      DateTime(now.year, now.month, day);
+                                  final isFutureDate = date.isAfter(
+                                    DateTime(
+                                        today.year, today.month, today.day),
+                                  );
+                                  final moodPath = moodMap[_dateKey(date)];
+                                  return _DayCell(
+                                    day: day,
+                                    date: date,
+                                    isFutureDate: isFutureDate,
+                                    moodPath: moodPath,
+                                    onTap: () => widget.onDaySelected(date),
+                                  );
                                 },
                               ),
                             ],
-                            const SizedBox(height: 12),
-                            _WeekDaysRow(),
-                            const SizedBox(height: 12),
-                            GridView.builder(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              gridDelegate:
-                                  const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 7,
-                                mainAxisSpacing: 8,
-                                crossAxisSpacing: 8,
-                                childAspectRatio: 1,
-                              ),
-                              itemCount: daysInMonth + firstWeekday,
-                              itemBuilder: (context, index) {
-                                if (index < firstWeekday) {
-                                  return const SizedBox.shrink();
-                                }
-                                final day = index - firstWeekday + 1;
-                                final date = DateTime(now.year, now.month, day);
-                                final isFutureDate = date.year > today.year ||
-                                    (date.year == today.year &&
-                                        date.month > today.month) ||
-                                    (date.year == today.year &&
-                                        date.month == today.month &&
-                                        date.day > today.day);
-                                final key = _dateKey(date);
-                                final moodPath = moodMap[key];
-                                final moodColor = moodPath != null
-                                    ? _colorForMoodPath(moodPath)
-                                    : null;
-                                final moodLabel = moodPath == null
-                                    ? null
-                                    : _moodLabelForPath(context, moodPath);
-                                final isRecentlySaved =
-                                    _recentlySavedDate != null &&
-                                        _dateKey(_recentlySavedDate!) == key;
-
-                                return Semantics(
-                                  button: !isFutureDate,
-                                  enabled: !isFutureDate,
-                                  label: strings.calendarDayLabel(
-                                    formattedDate: strings.formatFullDate(date),
-                                    moodLabel: moodLabel,
-                                    isFutureDate: isFutureDate,
-                                  ),
-                                  child: GestureDetector(
-                                    onTap: isFutureDate
-                                        ? null
-                                        : () => widget.onDaySelected(date),
-                                    child: Container(
-                                      constraints: const BoxConstraints(
-                                        minHeight: 44,
-                                        minWidth: 44,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: isFutureDate
-                                            ? Colors.grey[100]
-                                            : moodColor?.withValues(
-                                                    alpha: 0.15) ??
-                                                Colors.grey[200],
-                                        borderRadius: BorderRadius.circular(12),
-                                        border: Border.all(
-                                          color: isFutureDate
-                                              ? Colors.grey[200]!
-                                              : moodColor ?? Colors.grey[300]!,
-                                        ),
-                                      ),
-                                      child: Center(
-                                        child: FittedBox(
-                                          fit: BoxFit.scaleDown,
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Text(
-                                                '$day',
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: isFutureDate
-                                                      ? Colors.grey[500]
-                                                      : moodColor,
-                                                ),
-                                              ),
-                                              if (moodPath != null)
-                                                _AnimatedMoodIcon(
-                                                  animation:
-                                                      _animationController,
-                                                  isAnimated: isRecentlySaved,
-                                                  emojiPath: moodPath,
-                                                  semanticsLabel: moodLabel!,
-                                                ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          ],
+                          ),
                         ),
-                      ),
+                        const SizedBox(height: 20),
+                        MonthlyMoodSummaryCard(
+                          summary: state.summary,
+                          isLoading: state.isLoading,
+                          errorMessage: state.error == null
+                              ? null
+                              : strings.summaryLoadError,
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 28),
-                    MonthlyMoodSummaryCard(
-                      summary: state.summary,
-                      isLoading: state.isLoading,
-                      errorMessage:
-                          state.error == null ? null : strings.summaryLoadError,
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
       ),
     );
@@ -315,7 +173,7 @@ class _CalendarScreenState extends State<CalendarScreen>
   }
 
   void _onNextMonth() {
-    final today = DateTime.now();
+    final today = _today;
     final nextMonth = DateTime(_focusedDay.year, _focusedDay.month + 1, 1);
 
     if (nextMonth.year > today.year ||
@@ -330,14 +188,96 @@ class _CalendarScreenState extends State<CalendarScreen>
 
   static String _dateKey(DateTime date) =>
       '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+}
 
-  String _moodLabelForPath(BuildContext context, String path) {
-    return AppStrings.of(context)
-        .moodName(MoodDefinitionResolver.byAssetPath(path).id);
-  }
+class _DayCell extends StatelessWidget {
+  const _DayCell({
+    required this.day,
+    required this.date,
+    required this.isFutureDate,
+    required this.moodPath,
+    required this.onTap,
+  });
 
-  Color? _colorForMoodPath(String path) {
-    return MoodDefinitionResolver.colorForMoodPath(path);
+  final int day;
+  final DateTime date;
+  final bool isFutureDate;
+  final String? moodPath;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
+    final palette = BrandPalette.of(context);
+    final path = moodPath;
+    final tint = path == null
+        ? null
+        : MoodDefinitionResolver.tintForMoodPath(context, path);
+    final moodLabel = path == null
+        ? null
+        : strings.moodName(MoodDefinitionResolver.byAssetPath(path).id);
+
+    return Semantics(
+      button: !isFutureDate,
+      enabled: !isFutureDate,
+      label: strings.calendarDayLabel(
+        formattedDate: strings.formatFullDate(date),
+        moodLabel: moodLabel,
+        isFutureDate: isFutureDate,
+      ),
+      onTap: isFutureDate ? null : onTap,
+      excludeSemantics: true,
+      child: GestureDetector(
+        onTap: isFutureDate ? null : onTap,
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 44, minWidth: 44),
+          decoration: BoxDecoration(
+            color: isFutureDate
+                ? Colors.transparent
+                : tint?.fill ?? palette.text.withValues(alpha: 0.06),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isFutureDate
+                  ? palette.glassBorder
+                  : tint?.ring.withValues(alpha: 0.55) ?? Colors.transparent,
+            ),
+          ),
+          child: Center(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    '$day',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: isFutureDate
+                          ? palette.textSecondary.withValues(alpha: 0.6)
+                          : palette.text,
+                    ),
+                  ),
+                  if (path != null)
+                    SvgPicture.asset(
+                      path,
+                      height: 22,
+                      width: 22,
+                      fit: BoxFit.contain,
+                      semanticsLabel: moodLabel,
+                      errorBuilder: (context, error, stackTrace) => Icon(
+                        Icons.error_outline,
+                        size: 24,
+                        color: palette.danger,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -354,30 +294,27 @@ class _CalendarFeedbackBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = BrandPalette.of(context);
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF4E5),
+        color: palette.positive.fill,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFF2C46D)),
+        border: Border.all(color: palette.positive.ring),
       ),
       child: Row(
         children: [
-          const Icon(
-            Icons.info_outline,
-            color: Color(0xFF9A6700),
-          ),
+          Icon(Icons.info_outline, color: palette.positive.ring),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
               message,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: const Color(0xFF7A4D00),
-                  ),
+              style: Theme.of(context).textTheme.bodyMedium,
             ),
           ),
           TextButton(
             onPressed: onPressed,
+            style: TextButton.styleFrom(foregroundColor: palette.text),
             child: Text(actionLabel),
           ),
         ],
@@ -402,6 +339,7 @@ class _CalendarHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
+    final palette = BrandPalette.of(context);
     final months = [''] + strings.monthNames;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -409,10 +347,7 @@ class _CalendarHeader extends StatelessWidget {
         IconButton(
           iconSize: 36,
           tooltip: strings.previousMonthTooltip,
-          icon: const Icon(
-            Icons.chevron_left_rounded,
-            color: brandInk,
-          ),
+          icon: Icon(Icons.chevron_left_rounded, color: palette.text),
           onPressed: onPreviousMonth,
         ),
         Expanded(
@@ -421,8 +356,8 @@ class _CalendarHeader extends StatelessWidget {
             textAlign: TextAlign.center,
             overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: brandInk,
-                  fontWeight: FontWeight.w700,
+                  color: palette.text,
+                  fontWeight: FontWeight.w600,
                 ),
           ),
         ),
@@ -431,7 +366,9 @@ class _CalendarHeader extends StatelessWidget {
           tooltip: strings.nextMonthTooltip,
           icon: Icon(
             Icons.chevron_right_rounded,
-            color: onNextMonth == null ? Colors.grey[400] : brandInk,
+            color: onNextMonth == null
+                ? palette.textSecondary.withValues(alpha: 0.5)
+                : palette.text,
           ),
           onPressed: onNextMonth,
         ),
@@ -444,6 +381,7 @@ class _WeekDaysRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final days = AppStrings.of(context).weekdayInitials;
+    final palette = BrandPalette.of(context);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: days
@@ -452,65 +390,15 @@ class _WeekDaysRow extends StatelessWidget {
               child: Center(
                 child: Text(
                   day,
-                  style: Theme.of(context).textTheme.bodySmall,
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodySmall
+                      ?.copyWith(color: palette.textSecondary),
                 ),
               ),
             ),
           )
           .toList(),
-    );
-  }
-}
-
-class _AnimatedMoodIcon extends StatelessWidget {
-  final Animation<double> animation;
-  final bool isAnimated;
-  final String emojiPath;
-  final String semanticsLabel;
-
-  const _AnimatedMoodIcon({
-    required this.animation,
-    required this.isAnimated,
-    required this.emojiPath,
-    required this.semanticsLabel,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: animation,
-      builder: (context, child) {
-        final scale = isAnimated ? 1.0 + (animation.value * 0.9) : 1.0;
-        final rotation = isAnimated ? (animation.value * 0.2) : 0.0;
-
-        return Transform.scale(
-          scale: scale,
-          child: Transform.rotate(
-            angle: rotation,
-            child: SvgPicture.asset(
-              emojiPath,
-              height: 22,
-              width: 22,
-              fit: BoxFit.contain,
-              semanticsLabel: semanticsLabel,
-              placeholderBuilder: (context) => const SizedBox(
-                height: 22,
-                width: 22,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                ),
-              ),
-              errorBuilder: (context, error, stackTrace) {
-                return const Icon(
-                  Icons.error_outline,
-                  size: 24,
-                  color: Colors.red,
-                );
-              },
-            ),
-          ),
-        );
-      },
     );
   }
 }

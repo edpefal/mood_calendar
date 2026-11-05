@@ -237,7 +237,7 @@ void main() {
 
       expect(repository.isUnlocked('brave'), isTrue);
       expect(repository.isUnlocked('confident'), isTrue);
-      expect(repository.isUnlocked('anxious'), isFalse);
+      expect(repository.isUnlocked('romantic'), isFalse);
       expect(await repository.unlockedPremiumMoodIds().first,
           {'brave', 'confident'});
     });
@@ -249,14 +249,14 @@ void main() {
         _entitlement('premium'),
         _entitlement('mood_brave', productId: 'mood_brave_unlock'),
       ]));
-      expect(repository.isUnlocked('anxious'), isTrue);
+      expect(repository.isUnlocked('romantic'), isTrue);
 
       await deliver(
         _customer([_entitlement('mood_brave', productId: 'mood_brave_unlock')]),
       );
 
       expect(repository.isUnlocked('brave'), isTrue);
-      expect(repository.isUnlocked('anxious'), isFalse);
+      expect(repository.isUnlocked('romantic'), isFalse);
     });
 
     test('an unknown mood id is not blocked', () {
@@ -389,7 +389,7 @@ void main() {
       await repository.restorePurchases();
 
       expect(repository.isUnlocked('brave'), isTrue);
-      expect(repository.isUnlocked('anxious'), isFalse);
+      expect(repository.isUnlocked('romantic'), isFalse);
     });
   });
 }

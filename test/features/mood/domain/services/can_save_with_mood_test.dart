@@ -6,7 +6,7 @@ import 'package:mood_calendar/features/mood/domain/services/mood_definition_reso
 void main() {
   final happy = MoodDefinitionResolver.byId('happy');
   final brave = MoodDefinitionResolver.byId('brave');
-  final anxious = MoodDefinitionResolver.byId('anxious');
+  final romantic = MoodDefinitionResolver.byId('romantic');
 
   test('a base mood can always be saved', () {
     expect(happy.tier, MoodTier.base);
@@ -43,7 +43,7 @@ void main() {
       canSaveWithMood(
         mood: brave,
         isUnlocked: false,
-        savedMoodAssetPath: anxious.assetPath,
+        savedMoodAssetPath: romantic.assetPath,
       ),
       isFalse,
     );

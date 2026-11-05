@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+
 import '../theme/brand_colors.dart';
 
-/// Primary pill-shaped button with the app's brand gradient
-/// (`#00727D` → `#00838F`), used across screens as the standard
-/// primary action button.
+/// Primary pill-shaped button: an ink pill with white text, used across
+/// screens as the standard primary action. The name predates the visual
+/// system (it used to be a gradient) and is kept so call sites don't change.
 class GradientPillButton extends StatelessWidget {
   const GradientPillButton({
     super.key,
@@ -12,8 +13,8 @@ class GradientPillButton extends StatelessWidget {
     this.semanticsLabel,
     this.loading = false,
     this.enabled = true,
-    this.minHeight = 56,
-    this.fontSize = 18,
+    this.minHeight = 52,
+    this.fontSize = 17,
   });
 
   final String label;
@@ -26,7 +27,9 @@ class GradientPillButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = BrandPalette.of(context);
     final isEnabled = enabled && !loading && onPressed != null;
+    final foreground = isEnabled ? palette.onInk : palette.textSecondary;
 
     return AbsorbPointer(
       absorbing: !isEnabled,
@@ -37,36 +40,45 @@ class GradientPillButton extends StatelessWidget {
         child: ConstrainedBox(
           constraints: BoxConstraints(minHeight: minHeight),
           child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
             onTap: isEnabled ? onPressed : null,
             child: Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 12),
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                gradient: const LinearGradient(
-                  colors: [brandGradientStart, brandGradientEnd],
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                ),
+                borderRadius: BorderRadius.circular(999),
+                color: isEnabled ? palette.ink : palette.glassFill,
+                border:
+                    isEnabled ? null : Border.all(color: palette.glassBorder),
+                boxShadow: isEnabled
+                    ? [
+                        BoxShadow(
+                          color: palette.ink.withValues(alpha: 0.22),
+                          blurRadius: 24,
+                          offset: const Offset(0, 10),
+                        ),
+                      ]
+                    : null,
               ),
               child: Center(
                 child: loading
-                    ? const SizedBox(
+                    ? SizedBox(
                         height: 24,
                         width: 24,
                         child: CircularProgressIndicator(
                           strokeWidth: 2.5,
                           valueColor: AlwaysStoppedAnimation<Color>(
-                            Colors.white,
+                            palette.onInk,
                           ),
                         ),
                       )
                     : Text(
                         label,
+                        textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: Colors.white,
+                          color: foreground,
                           fontSize: fontSize,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
               ),

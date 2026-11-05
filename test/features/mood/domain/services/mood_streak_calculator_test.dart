@@ -50,4 +50,78 @@ void main() {
       expect(MoodStreakCalculator.bestStreak(dates), 3);
     });
   });
+
+  group('MoodStreakCalculator.currentStreak', () {
+    test('is 0 when the end date has no entry', () {
+      expect(
+        MoodStreakCalculator.currentStreak(
+          [DateTime(2026, 4, 9)],
+          DateTime(2026, 4, 10),
+        ),
+        0,
+      );
+    });
+
+    test('is 1 for a lone entry on the end date', () {
+      expect(
+        MoodStreakCalculator.currentStreak(
+          [DateTime(2026, 4, 10)],
+          DateTime(2026, 4, 10),
+        ),
+        1,
+      );
+    });
+
+    test('counts the run that ends on the end date', () {
+      final dates = [
+        DateTime(2026, 4, 5),
+        DateTime(2026, 4, 8),
+        DateTime(2026, 4, 9),
+        DateTime(2026, 4, 10),
+      ];
+      expect(
+          MoodStreakCalculator.currentStreak(dates, DateTime(2026, 4, 10)), 3);
+    });
+
+    test('ignores entries after the end date', () {
+      final dates = [
+        DateTime(2026, 4, 9),
+        DateTime(2026, 4, 10),
+        DateTime(2026, 4, 11),
+      ];
+      expect(
+          MoodStreakCalculator.currentStreak(dates, DateTime(2026, 4, 10)), 2);
+    });
+
+    test('crosses a month boundary', () {
+      final dates = [
+        DateTime(2026, 1, 31),
+        DateTime(2026, 2, 1),
+        DateTime(2026, 2, 2),
+      ];
+      expect(
+          MoodStreakCalculator.currentStreak(dates, DateTime(2026, 2, 2)), 3);
+    });
+
+    test('crosses a year boundary', () {
+      final dates = [
+        DateTime(2025, 12, 31),
+        DateTime(2026, 1, 1),
+      ];
+      expect(
+          MoodStreakCalculator.currentStreak(dates, DateTime(2026, 1, 1)), 2);
+    });
+
+    test('counts several entries on one day once and ignores the time', () {
+      final dates = [
+        DateTime(2026, 4, 9, 8),
+        DateTime(2026, 4, 10, 7),
+        DateTime(2026, 4, 10, 22),
+      ];
+      expect(
+        MoodStreakCalculator.currentStreak(dates, DateTime(2026, 4, 10, 12)),
+        2,
+      );
+    });
+  });
 }

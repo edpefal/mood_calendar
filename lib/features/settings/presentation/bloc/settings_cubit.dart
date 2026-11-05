@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/logging/app_logger.dart';
 import '../../../../core/settings/domain/entities/app_settings.dart';
+import '../../../../core/settings/domain/entities/app_theme_preference.dart';
 import '../../../../core/settings/domain/repositories/app_settings_repository.dart';
 import 'settings_state.dart';
 
@@ -17,6 +18,7 @@ class SettingsCubit extends Cubit<SettingsState> {
     required AppVersionLoader loadAppVersion,
     required AppLogger logger,
     Future<void> Function(bool enabled)? setUsageAnalyticsCollection,
+    void Function(AppThemePreference preference)? onThemeChanged,
   })  : _settingsRepository = settingsRepository,
         _scheduleReminder = scheduleReminder,
         _cancelReminder = cancelReminder,
@@ -24,6 +26,7 @@ class SettingsCubit extends Cubit<SettingsState> {
         _logger = logger,
         _setUsageAnalyticsCollection =
             setUsageAnalyticsCollection ?? ((_) async {}),
+        _onThemeChanged = onThemeChanged ?? ((_) {}),
         super(const SettingsState());
 
   final AppSettingsRepository _settingsRepository;
@@ -32,6 +35,10 @@ class SettingsCubit extends Cubit<SettingsState> {
   final AppVersionLoader _loadAppVersion;
   final AppLogger _logger;
   final Future<void> Function(bool enabled) _setUsageAnalyticsCollection;
+
+  /// Applies a theme to the running app (the root `ThemeCubit`). Called right
+  /// away on a change and again with the old value if saving it fails.
+  final void Function(AppThemePreference preference) _onThemeChanged;
 
   /// Last settings known to be saved; changes that fail revert to this.
   AppSettings _persisted = AppSettings.defaults;
@@ -70,6 +77,15 @@ class SettingsCubit extends Cubit<SettingsState> {
     emit(state.copyWith(usageAnalyticsEnabled: enabled));
     return _enqueue(
       (current) => current.copyWith(usageAnalyticsEnabled: enabled),
+      touchesReminder: false,
+    );
+  }
+
+  Future<void> setThemePreference(AppThemePreference preference) {
+    emit(state.copyWith(themePreference: preference));
+    _onThemeChanged(preference);
+    return _enqueue(
+      (current) => current.copyWith(themePreference: preference),
       touchesReminder: false,
     );
   }
@@ -129,6 +145,7 @@ class SettingsCubit extends Cubit<SettingsState> {
       );
       await _restore(previous);
       await _reapplyUsageAnalytics(previous);
+      _onThemeChanged(previous.themePreference);
       if (isClosed) return;
       emit(_stateFrom(previous).copyWith(
         isLoading: false,
@@ -160,6 +177,7 @@ class SettingsCubit extends Cubit<SettingsState> {
     return state.copyWith(
       remindersEnabled: settings.dailyReminderEnabled,
       usageAnalyticsEnabled: settings.usageAnalyticsEnabled,
+      themePreference: settings.themePreference,
       reminderTime: TimeOfDay(
         hour: settings.dailyReminderHour,
         minute: settings.dailyReminderMinute,

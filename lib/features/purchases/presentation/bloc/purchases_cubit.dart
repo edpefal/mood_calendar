@@ -13,11 +13,11 @@ import '../../domain/repositories/mood_entitlements_repository.dart';
 
 part 'purchases_state.dart';
 
-/// Desde dónde se abrió la pantalla Premium, para las analíticas (sin ids de
-/// moods): la pestaña o el toque en un mood bloqueado.
+/// Desde dónde se abrió la hoja de suscripción, para las analíticas (sin ids de
+/// moods): el toque en un mood bloqueado o la fila Premium de Ajustes.
 enum PremiumSource {
-  tab('tab'),
-  lockedMood('locked_mood');
+  lockedMood('locked_mood'),
+  settings('settings');
 
   const PremiumSource(this.analyticsValue);
   final String analyticsValue;
@@ -83,7 +83,7 @@ class PurchasesCubit extends Cubit<PurchasesState> {
     emit(state.copyWith(selectedPlan: plan));
   }
 
-  /// La pantalla Premium se abrió (pestaña u hoja). Sin ids de moods.
+  /// La hoja de suscripción se abrió. Sin ids de moods.
   void trackPremiumOpened(PremiumSource source) {
     telemetry?.trackEvent(
       AppTelemetryEvents.storeOpened,

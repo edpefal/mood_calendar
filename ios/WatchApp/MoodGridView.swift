@@ -38,8 +38,9 @@ struct MoodGridView: View {
 }
 
 struct MoodTile: View {
-  // Ocean Cyan brand end (#00838F), same as brandGradientEnd in the iPhone app.
-  static let accent = Color(red: 0x00 / 255, green: 0x83 / 255, blue: 0x8F / 255)
+  // Brand ink of the dark theme (#F4F3F7), same as `BrandPalette.dark.ink` in
+  // the iPhone app. The watch is always dark, so it uses the dark variant.
+  static let accent = Color(red: 0xF4 / 255, green: 0xF3 / 255, blue: 0xF7 / 255)
 
   let mood: WatchMood
   let isSelected: Bool

@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+import '../../../../core/theme/brand_colors.dart';
+import 'mood_category.dart';
 
 enum MoodTier { base, premium }
 
@@ -6,7 +7,10 @@ class MoodDefinition {
   final String id;
   final String label;
   final String assetPath;
-  final Color color;
+  final MoodCategory category;
+
+  /// Only for a mood whose tint is not its category's (today, `angry`).
+  final MoodTone? toneOverride;
   final int intensity;
   final MoodTier tier;
 
@@ -14,101 +18,69 @@ class MoodDefinition {
     required this.id,
     required this.label,
     required this.assetPath,
-    required this.color,
+    required this.category,
     required this.intensity,
     required this.tier,
+    this.toneOverride,
   });
+
+  /// Tint used to paint the mood: its category's, unless it overrides it.
+  MoodTone get tone => toneOverride ?? category.tone;
+
+  /// Score for the analyses; always the category's (ADR 0003).
+  MoodLevel get level => category.level;
 }
 
-const List<MoodDefinition> baseMoodDefinitions = [
+/// The whole catalog in the fixed on-screen order: categories as in
+/// [MoodCategory], and within each category the order listed here. The order
+/// never depends on usage, `unlocked` or `intensity`. A new mood must declare
+/// its category (the field is required).
+const List<MoodDefinition> allMoodDefinitions = [
   MoodDefinition(
     id: 'happy',
     label: 'Happy',
     assetPath: 'assets/icon/happy.svg',
-    color: Colors.green,
+    category: MoodCategory.positive,
     intensity: 1,
     tier: MoodTier.base,
   ),
   MoodDefinition(
-    id: 'calm',
-    label: 'Calm',
-    assetPath: 'assets/icon/calm.svg',
-    color: Colors.blue,
-    intensity: 2,
-    tier: MoodTier.base,
-  ),
-  MoodDefinition(
-    id: 'neutral',
-    label: 'Neutral',
-    assetPath: 'assets/icon/neutral.svg',
-    color: Colors.grey,
-    intensity: 3,
-    tier: MoodTier.base,
-  ),
-  MoodDefinition(
-    id: 'sad',
-    label: 'Sad',
-    assetPath: 'assets/icon/sad.svg',
-    color: Colors.orange,
-    intensity: 4,
-    tier: MoodTier.base,
-  ),
-  MoodDefinition(
-    id: 'angry',
-    label: 'Angry',
-    assetPath: 'assets/icon/angry.svg',
-    color: Colors.red,
-    intensity: 5,
-    tier: MoodTier.base,
-  ),
-];
-
-const List<MoodDefinition> premiumMoodDefinitions = [
-  MoodDefinition(
-    id: 'anxious',
-    label: 'Anxious',
-    assetPath: 'assets/icon/anxious.svg',
-    color: Colors.teal,
-    intensity: 6,
-    tier: MoodTier.premium,
-  ),
-  MoodDefinition(
-    id: 'brave',
-    label: 'Brave',
-    assetPath: 'assets/icon/brave.svg',
-    color: Colors.indigo,
-    intensity: 7,
+    id: 'laughing',
+    label: 'Laughing',
+    assetPath: 'assets/icon/laughing.svg',
+    category: MoodCategory.positive,
+    intensity: 13,
     tier: MoodTier.premium,
   ),
   MoodDefinition(
     id: 'confident',
     label: 'Confident',
     assetPath: 'assets/icon/confident.svg',
-    color: Colors.amber,
+    category: MoodCategory.positive,
     intensity: 8,
     tier: MoodTier.premium,
   ),
   MoodDefinition(
-    id: 'romantic',
-    label: 'Romantic',
-    assetPath: 'assets/icon/romantic.svg',
-    color: Colors.pink,
-    intensity: 9,
+    id: 'brave',
+    label: 'Brave',
+    assetPath: 'assets/icon/brave.svg',
+    category: MoodCategory.positive,
+    intensity: 7,
     tier: MoodTier.premium,
   ),
   MoodDefinition(
-    id: 'shy',
-    label: 'Shy',
-    assetPath: 'assets/icon/shy.svg',
-    color: Colors.brown,
-    intensity: 10,
-    tier: MoodTier.premium,
+    id: 'calm',
+    label: 'Calm',
+    assetPath: 'assets/icon/calm.svg',
+    category: MoodCategory.peaceful,
+    intensity: 2,
+    tier: MoodTier.base,
   ),
   MoodDefinition(
     id: 'affectionate',
     label: 'Affectionate',
     assetPath: 'assets/icon/affectionate.svg',
-    color: Colors.purple,
+    category: MoodCategory.peaceful,
     intensity: 11,
     tier: MoodTier.premium,
   ),
@@ -116,69 +88,128 @@ const List<MoodDefinition> premiumMoodDefinitions = [
     id: 'hugging',
     label: 'Hugging',
     assetPath: 'assets/icon/hugging.svg',
-    color: Colors.deepOrange,
+    category: MoodCategory.peaceful,
     intensity: 12,
     tier: MoodTier.premium,
   ),
   MoodDefinition(
-    id: 'laughing',
-    label: 'Laughing',
-    assetPath: 'assets/icon/laughing.svg',
-    color: Colors.cyan,
-    intensity: 13,
+    id: 'romantic',
+    label: 'Romantic',
+    assetPath: 'assets/icon/romantic.svg',
+    category: MoodCategory.peaceful,
+    intensity: 9,
     tier: MoodTier.premium,
+  ),
+  MoodDefinition(
+    id: 'neutral',
+    label: 'Neutral',
+    assetPath: 'assets/icon/neutral.svg',
+    category: MoodCategory.neutral,
+    intensity: 3,
+    tier: MoodTier.base,
   ),
   MoodDefinition(
     id: 'sleepy',
     label: 'Sleepy',
     assetPath: 'assets/icon/sleepy.svg',
-    color: Colors.deepPurple,
+    category: MoodCategory.neutral,
     intensity: 14,
+    tier: MoodTier.base,
+  ),
+  MoodDefinition(
+    id: 'shy',
+    label: 'Shy',
+    assetPath: 'assets/icon/shy.svg',
+    category: MoodCategory.neutral,
+    intensity: 10,
     tier: MoodTier.premium,
   ),
   MoodDefinition(
-    id: 'sick',
-    label: 'Sick',
-    assetPath: 'assets/icon/sick.svg',
-    color: Colors.lightGreen,
-    intensity: 15,
-    tier: MoodTier.premium,
+    id: 'sad',
+    label: 'Sad',
+    assetPath: 'assets/icon/sad.svg',
+    category: MoodCategory.hard,
+    intensity: 4,
+    tier: MoodTier.base,
   ),
   MoodDefinition(
-    id: 'hurt',
-    label: 'Hurt',
-    assetPath: 'assets/icon/hurt.svg',
-    color: Colors.blueGrey,
-    intensity: 16,
-    tier: MoodTier.premium,
+    id: 'angry',
+    label: 'Angry',
+    assetPath: 'assets/icon/angry.svg',
+    category: MoodCategory.hard,
+    toneOverride: MoodTone.angry,
+    intensity: 5,
+    tier: MoodTier.base,
   ),
   MoodDefinition(
-    id: 'crying',
-    label: 'Crying',
-    assetPath: 'assets/icon/crying.svg',
-    color: Colors.lightBlue,
-    intensity: 17,
-    tier: MoodTier.premium,
-  ),
-  MoodDefinition(
-    id: 'scared',
-    label: 'Scared',
-    assetPath: 'assets/icon/scared.svg',
-    color: Colors.purple,
-    intensity: 18,
-    tier: MoodTier.premium,
+    id: 'anxious',
+    label: 'Anxious',
+    assetPath: 'assets/icon/anxious.svg',
+    category: MoodCategory.hard,
+    intensity: 6,
+    tier: MoodTier.base,
   ),
   MoodDefinition(
     id: 'stressed',
     label: 'Stressed',
     assetPath: 'assets/icon/stressed.svg',
-    color: Colors.cyan,
+    category: MoodCategory.hard,
     intensity: 19,
+    tier: MoodTier.base,
+  ),
+  MoodDefinition(
+    id: 'scared',
+    label: 'Scared',
+    assetPath: 'assets/icon/scared.svg',
+    category: MoodCategory.hard,
+    intensity: 18,
+    tier: MoodTier.base,
+  ),
+  MoodDefinition(
+    id: 'crying',
+    label: 'Crying',
+    assetPath: 'assets/icon/crying.svg',
+    category: MoodCategory.hard,
+    intensity: 17,
+    tier: MoodTier.base,
+  ),
+  MoodDefinition(
+    id: 'sick',
+    label: 'Sick',
+    assetPath: 'assets/icon/sick.svg',
+    category: MoodCategory.hard,
+    intensity: 15,
+    tier: MoodTier.base,
+  ),
+  MoodDefinition(
+    id: 'hurt',
+    label: 'Hurt',
+    assetPath: 'assets/icon/hurt.svg',
+    category: MoodCategory.hard,
+    intensity: 16,
     tier: MoodTier.premium,
   ),
 ];
 
-const List<MoodDefinition> allMoodDefinitions = [
-  ...baseMoodDefinitions,
-  ...premiumMoodDefinitions,
-];
+/// The free moods, in catalog order.
+final List<MoodDefinition> baseMoodDefinitions = List.unmodifiable(
+  allMoodDefinitions.where((mood) => mood.tier == MoodTier.base),
+);
+
+/// The moods a subscription unlocks, in catalog order.
+final List<MoodDefinition> premiumMoodDefinitions = List.unmodifiable(
+  allMoodDefinitions.where((mood) => mood.tier == MoodTier.premium),
+);
+
+/// The catalog grouped by category, in category order.
+List<({MoodCategory category, List<MoodDefinition> moods})>
+    moodDefinitionsByCategory() => [
+          for (final category in MoodCategory.values)
+            (
+              category: category,
+              moods: [
+                for (final mood in allMoodDefinitions)
+                  if (mood.category == category) mood,
+              ],
+            ),
+        ];

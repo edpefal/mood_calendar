@@ -1,12 +1,11 @@
 import '../../../../core/localization/app_strings.dart';
 import '../../../mood/domain/entities/mood_definition.dart';
 import '../../../mood/domain/repositories/mood_repository.dart';
-import '../../../mood/domain/services/mood_picker_order.dart';
 import '../entities/watch_state.dart';
 import '../repositories/watch_channel.dart';
 
-/// Publica al reloj los moods desbloqueados (en el orden del selector), sus
-/// nombres localizados y el mood de hoy.
+/// Publica al reloj los moods desbloqueados (en el orden fijo por categoría del
+/// catálogo), sus nombres localizados y el mood de hoy.
 class PublishWatchStateUseCase {
   PublishWatchStateUseCase({
     required this.repository,
@@ -28,8 +27,7 @@ class PublishWatchStateUseCase {
     final entries = await repository.getMoods();
     final localized = strings();
 
-    final ordered = MoodPickerOrder.sort(entries, isUnlocked: isUnlocked)
-        .where((mood) => isUnlocked(mood.id));
+    final ordered = allMoodDefinitions.where((mood) => isUnlocked(mood.id));
 
     final now = _now();
     String? today;

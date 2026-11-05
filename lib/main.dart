@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -16,6 +15,7 @@ import 'core/notifications/local_notification_service.dart';
 import 'core/rating/review_requester.dart';
 import 'core/settings/data/datasources/app_settings_local_datasource.dart';
 import 'core/settings/data/datasources/rating_prompt_local_datasource.dart';
+import 'core/settings/domain/entities/app_theme_preference.dart';
 import 'core/settings/data/repositories/app_settings_repository_impl.dart';
 import 'core/settings/domain/repositories/app_settings_repository.dart';
 import 'core/telemetry/analytics_app_telemetry.dart';
@@ -26,6 +26,8 @@ import 'core/telemetry/app_telemetry_config.dart';
 import 'core/telemetry/crash_reporting_bootstrap.dart';
 import 'core/telemetry/crashlytics_app_telemetry.dart';
 import 'core/telemetry/logger_app_telemetry.dart';
+import 'core/theme/app_theme.dart';
+import 'core/theme/theme_cubit.dart';
 import 'features/mood/data/models/mood_model.dart';
 import 'features/mood/data/repositories/mood_repository_impl.dart';
 import 'features/mood/data/services/rating_prompt_service.dart';
@@ -50,13 +52,12 @@ import 'features/watch/domain/services/watch_sync_coordinator.dart';
 import 'features/watch/domain/usecases/process_watch_inbox_usecase.dart';
 import 'features/watch/domain/usecases/publish_watch_state_usecase.dart';
 import 'features/watch/presentation/watch_sync_host.dart';
-import 'core/theme/brand_colors.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 final mainShellKey = GlobalKey<MainShellState>();
 bool _isHandlingReminderTap = false;
 
-/// Abre el selector de moods de hoy cuando el usuario toca el recordatorio.
+/// Abre el Log con la fecha de hoy cuando el usuario toca el recordatorio.
 @visibleForTesting
 Future<void> handleReminderTap() {
   if (_isHandlingReminderTap) {
@@ -75,9 +76,9 @@ Future<void> handleReminderTap() {
       return;
     }
     // Cierra los modales abiertos (editor de nota, hojas de compra) antes de
-    // mostrar el selector de la fecha del recordatorio.
+    // mostrar el Log con la fecha del recordatorio.
     navigator.popUntil((route) => route.isFirst);
-    shell.showMoodPicker(targetDate);
+    shell.showLog(targetDate);
     _isHandlingReminderTap = false;
     if (!completer.isCompleted) {
       completer.complete();
@@ -116,8 +117,8 @@ void main() async {
   );
   // The preference is read and applied to the SDK before any telemetry is
   // composed, so nothing is sent while the user has opted out.
-  final usageAnalyticsEnabled =
-      (await appSettingsRepository.getSettings()).usageAnalyticsEnabled;
+  final savedSettings = await appSettingsRepository.getSettings();
+  final usageAnalyticsEnabled = savedSettings.usageAnalyticsEnabled;
   final analyticsReporter = await initializeAnalytics(
     logger: appLogger,
     usageAnalyticsEnabled: usageAnalyticsEnabled,
@@ -235,6 +236,9 @@ void main() async {
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
+            create: (context) => ThemeCubit(savedSettings.themePreference),
+          ),
+          BlocProvider(
             create: (context) => MoodCubit(
               saveMood: SaveMoodUseCase(repository),
               getMoods: GetMoodsUseCase(repository),
@@ -283,31 +287,22 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final baseTheme = ThemeData(
-      colorScheme: ColorScheme.fromSeed(seedColor: brandInk).copyWith(
-        surface: brandSurface,
-        surfaceContainerLow: brandSurfaceCard,
+    return BlocBuilder<ThemeCubit, AppThemePreference>(
+      builder: (context, _) => MaterialApp(
+        onGenerateTitle: (context) => AppStrings.of(context).appTitle,
+        navigatorKey: navigatorKey,
+        supportedLocales: AppStrings.supportedLocales,
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        theme: buildAppTheme(Brightness.light),
+        darkTheme: buildAppTheme(Brightness.dark),
+        themeMode: context.read<ThemeCubit>().themeMode,
+        home: MainShell(key: mainShellKey),
+        debugShowCheckedModeBanner: false,
       ),
-      useMaterial3: true,
-    );
-    final poppinsTextTheme = GoogleFonts.poppinsTextTheme(baseTheme.textTheme);
-
-    return MaterialApp(
-      onGenerateTitle: (context) => AppStrings.of(context).appTitle,
-      navigatorKey: navigatorKey,
-      supportedLocales: AppStrings.supportedLocales,
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      theme: baseTheme.copyWith(
-        textTheme: poppinsTextTheme,
-        primaryTextTheme: poppinsTextTheme,
-        colorScheme: baseTheme.colorScheme,
-      ),
-      home: MainShell(key: mainShellKey),
-      debugShowCheckedModeBanner: false,
     );
   }
 }

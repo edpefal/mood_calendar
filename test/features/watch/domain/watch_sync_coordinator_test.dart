@@ -104,9 +104,9 @@ void main() {
     final before = channel.published.length;
 
     unlocked
-      ..add({'anxious'})
-      ..add({'anxious', 'brave'})
-      ..add({'anxious', 'brave', 'shy'});
+      ..add({'romantic'})
+      ..add({'romantic', 'brave'})
+      ..add({'romantic', 'brave', 'shy'});
     await _settle();
 
     expect(channel.published.length, before + 1);
@@ -165,7 +165,7 @@ void main() {
     await _settle();
     final before = channel.published.length;
 
-    channel.deliver(_choice('locked-1', 'anxious'));
+    channel.deliver(_choice('locked-1', 'romantic'));
     await _settle();
 
     expect(repository.entries, isEmpty);
@@ -174,7 +174,7 @@ void main() {
     expect(channel.published.last.handledChoiceIds, ['locked-1']);
     expect(
       channel.published.last.moods.map((mood) => mood.id),
-      isNot(contains('anxious')),
+      isNot(contains('romantic')),
     );
   });
 
@@ -185,7 +185,7 @@ void main() {
     await _settle();
 
     for (var i = 0; i < 25; i++) {
-      channel.deliver(_choice('c$i', 'anxious'));
+      channel.deliver(_choice('c$i', 'romantic'));
       await _settle();
     }
 

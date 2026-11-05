@@ -305,4 +305,126 @@ class AppStringsDe extends AppStrings {
         'scared': 'Verängstigt',
         'stressed': 'Gestresst',
       };
+
+  @override
+  String get categoryPositive => 'Positiv';
+  @override
+  String get categoryPeaceful => 'Friedlich';
+  @override
+  String get categoryNeutral => 'Neutral';
+  @override
+  String get categoryHard => 'Schwer';
+  @override
+  String get notePromptPositive => 'Was hat deinen Tag gut gemacht?';
+  @override
+  String get notePromptNeutral => 'Etwas zum Erinnern';
+  @override
+  String get notePromptHard => 'Was bereitet dir Sorgen?';
+  @override
+  String get notePromptEmpty => 'Notiz hinzufügen (optional)';
+  @override
+  String get noteExistsSemantics => 'Notiz vorhanden';
+  @override
+  String get greetingMorning => 'Guten Morgen';
+  @override
+  String get greetingAfternoon => 'Guten Tag';
+  @override
+  String get greetingEvening => 'Guten Abend';
+  @override
+  String get remindersBellLabel => 'Erinnerungen';
+  @override
+  String get moodQuestionPast => 'Wie hast du dich an diesem Tag gefühlt?';
+  @override
+  String get savedLabel => 'Gespeichert';
+  @override
+  String savedStreak(int days) =>
+      days == 1 ? '1 Tag in Folge' : '$days Tage in Folge';
+  @override
+  String get todayYouFeel => 'Heute fühlst du dich';
+  @override
+  String get pastYouFelt => 'An diesem Tag hast du dich gefühlt';
+  @override
+  String get noNoteYet => 'Noch keine Notiz.';
+  @override
+  String get editEntryButton => 'Bearbeiten';
+  @override
+  String get forgotYesterdayPrefix => 'Gestern vergessen?';
+  @override
+  String get forgotYesterdayAction => 'Jetzt eintragen';
+  @override
+  String categorySectionSemantics(String category) => 'Stimmungen: $category';
+  @override
+  String moodCellSemantics(String mood, String category) => '$mood, $category';
+  @override
+  String lockedMoodSemantics(String mood, String category) =>
+      '$mood, $category, gesperrt, Premium';
+  @override
+  String get tabCalendar => 'Kalender';
+  @override
+  String get tabInsights => 'Insights';
+  @override
+  String get tabLog => 'Eintrag';
+  @override
+  String get tabSettings => 'Einstellungen';
+  @override
+  String get insightsEmptyTitle => 'Hier erscheinen deine Insights';
+  @override
+  String get insightsEmptyBody =>
+      'Trage ein paar Tage ein, und wir zeigen dir, wie es dir ging.';
+
+  @override
+  String get sectionPremium => 'Premium';
+  @override
+  String get sectionReminders => 'Erinnerungen';
+  @override
+  String get sectionPrivacyData => 'Datenschutz und Daten';
+  @override
+  String get sectionAppearance => 'Darstellung';
+  @override
+  String get sectionHelp => 'Hilfe';
+  @override
+  String get getPremiumTitle => 'Premium holen';
+  @override
+  String get getPremiumDetail =>
+      'Insights, geschützte Notizen und ausdrucksstarke Stimmungen';
+  @override
+  String get premiumActiveRowTitle => 'Premium · Aktiv';
+  @override
+  String get themeTitle => 'Design';
+  @override
+  String get themeSystem => 'System';
+  @override
+  String get themeLight => 'Hell';
+  @override
+  String get themeDark => 'Dunkel';
+  @override
+  String themeRowSemantics(String current) => 'Design, $current';
+  @override
+  String get sendFeedbackTitle => 'Feedback senden';
+  @override
+  String get sendFeedbackSemanticLabel => 'Feedback per E-Mail senden';
+  @override
+  String get termsTitle => 'Nutzungsbedingungen';
+  @override
+  String get termsSemanticLabel => 'Nutzungsbedingungen im Browser öffnen';
+  @override
+  String get restorePurchasesRowSemantics => 'Käufe wiederherstellen';
+
+  @override
+  String get paywallTitle => 'Verstehe, wie du dich fühlst';
+  @override
+  String get paywallBenefitInsights =>
+      'Insights und Year in Pixels mit 90- und 365-Tage-Trends';
+  @override
+  String get paywallBenefitNotes => 'Notizen mit Biometrie geschützt';
+  @override
+  String paywallBenefitMoods(String a, String b, String c) =>
+      'Ausdrucksstarke Stimmungen: $a, $b, $c und mehr';
+  @override
+  String get trialFreeLabel => '3 Tage gratis';
+  @override
+  String get trialTimelineToday => 'Heute · Voller Premium-Zugang';
+  @override
+  String trialTimelineCharge(String date, String price) =>
+      '$date · Erste Abbuchung von $price';
 }
