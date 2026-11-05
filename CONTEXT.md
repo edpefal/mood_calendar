@@ -32,6 +32,18 @@ _Avoid_: Selector, picker, carrusel (nombres del diseño anterior)
 Estado del Log tras un guardado exitoso (o al abrir una fecha que ya tiene Mood Entry): confirma con la racha actual y muestra la tarjeta del Mood, su Category y la nota, con un botón Edit. Guardar ya no cambia de pestaña.
 _Avoid_: Confirmación, éxito (como nombre del estado)
 
+**Logged time** (hora de registro):
+Instante en que se guardó una Mood Entry, solo en el dispositivo. Existe únicamente para entradas nuevas, se conserva al editar la nota y se reemplaza si cambia el Mood. Se muestra solo si cae el mismo día que la entrada: una entrada de ayer registrada hoy no tiene hora visible.
+_Avoid_: Fecha de la entrada (esa es el día al que pertenece), timestamp, hora del mood
+
+**Trend** (tendencia):
+Evolución del Level de las Mood Entry en un rango que termina hoy (7, 30, 90 o 365 días): un punto por día en los rangos cortos y por semana en los largos, con huecos donde no hay entradas. Nunca promedia `intensity`.
+_Avoid_: Puntaje, promedio de ánimo
+
+**Year in Pixels**:
+Cuadrícula de un año con un píxel por día, teñido con la Category de la entrada de ese día. Es una tarjeta de Insights solo para suscriptores.
+_Avoid_: Heatmap, mapa de calor
+
 **Subscription sheet** (hoja de suscripción):
 Hoja inferior que ofrece los tres planes. Solo se abre cuando el usuario la pide: al tocar un Mood premium bloqueado o la fila Premium de Settings. Reemplaza a la antigua pestaña Premium, que ya no existe.
 _Avoid_: Paywall, pantalla Premium, tienda
