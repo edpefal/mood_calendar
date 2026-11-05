@@ -1,11 +1,14 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../core/settings/domain/entities/app_theme_preference.dart';
+
 class SettingsState extends Equatable {
   const SettingsState({
     this.isLoading = true,
     this.remindersEnabled = false,
     this.usageAnalyticsEnabled = true,
+    this.themePreference = AppThemePreference.system,
     this.reminderTime = const TimeOfDay(hour: 18, minute: 0),
     this.appVersion = '',
     this.saveFailureCount = 0,
@@ -14,6 +17,7 @@ class SettingsState extends Equatable {
   final bool isLoading;
   final bool remindersEnabled;
   final bool usageAnalyticsEnabled;
+  final AppThemePreference themePreference;
   final TimeOfDay reminderTime;
   final String appVersion;
 
@@ -25,6 +29,7 @@ class SettingsState extends Equatable {
     bool? isLoading,
     bool? remindersEnabled,
     bool? usageAnalyticsEnabled,
+    AppThemePreference? themePreference,
     TimeOfDay? reminderTime,
     String? appVersion,
     int? saveFailureCount,
@@ -34,6 +39,7 @@ class SettingsState extends Equatable {
       remindersEnabled: remindersEnabled ?? this.remindersEnabled,
       usageAnalyticsEnabled:
           usageAnalyticsEnabled ?? this.usageAnalyticsEnabled,
+      themePreference: themePreference ?? this.themePreference,
       reminderTime: reminderTime ?? this.reminderTime,
       appVersion: appVersion ?? this.appVersion,
       saveFailureCount: saveFailureCount ?? this.saveFailureCount,
@@ -45,6 +51,7 @@ class SettingsState extends Equatable {
         isLoading,
         remindersEnabled,
         usageAnalyticsEnabled,
+        themePreference,
         reminderTime,
         appVersion,
         saveFailureCount,

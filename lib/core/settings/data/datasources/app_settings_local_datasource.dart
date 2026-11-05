@@ -1,6 +1,7 @@
 import 'package:hive/hive.dart';
 
 import '../../domain/entities/app_settings.dart';
+import '../../domain/entities/app_theme_preference.dart';
 
 class AppSettingsLocalDataSource {
   AppSettingsLocalDataSource(this._settingsBox);
@@ -10,6 +11,7 @@ class AppSettingsLocalDataSource {
   static const String _dailyReminderHourKey = 'daily_reminder_hour';
   static const String _dailyReminderMinuteKey = 'daily_reminder_minute';
   static const String _usageAnalyticsEnabledKey = 'usage_analytics_enabled';
+  static const String _themePreferenceKey = 'theme_preference';
 
   final Box<dynamic> _settingsBox;
 
@@ -32,11 +34,16 @@ class AppSettingsLocalDataSource {
       defaultValue: AppSettings.defaults.usageAnalyticsEnabled,
     ) as bool;
 
+    final themePreference = AppThemePreference.fromName(
+      _settingsBox.get(_themePreferenceKey),
+    );
+
     return AppSettings(
       dailyReminderEnabled: dailyReminderEnabled,
       dailyReminderHour: dailyReminderHour,
       dailyReminderMinute: dailyReminderMinute,
       usageAnalyticsEnabled: usageAnalyticsEnabled,
+      themePreference: themePreference,
     );
   }
 
@@ -57,5 +64,6 @@ class AppSettingsLocalDataSource {
       _usageAnalyticsEnabledKey,
       settings.usageAnalyticsEnabled,
     );
+    await _settingsBox.put(_themePreferenceKey, settings.themePreference.name);
   }
 }

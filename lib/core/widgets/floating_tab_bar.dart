@@ -1,23 +1,27 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
+
 import '../theme/brand_colors.dart';
 
-// Relleno y desenfoque bajos a propósito: el contenido que pasa por debajo del
-// bar debe seguir siendo reconocible (spec `bottom-navigation`).
-const double _blurSigma = 10;
-const double _fillAlpha = 0.40;
-const double _borderAlpha = 0.75;
-
 class FloatingTabItem {
-  const FloatingTabItem({required this.icon, required this.label});
+  const FloatingTabItem({
+    required this.icon,
+    required this.label,
+    this.highlighted = false,
+  });
 
   final IconData icon;
   final String label;
+
+  /// The central action tab: a round button over the brand gradient.
+  final bool highlighted;
 }
 
-/// Cápsula flotante y translúcida con pestañas de solo icono. La pestaña activa
-/// se marca con una píldora translúcida detrás de su icono.
+/// Floating capsule of ink with the tabs' icons and visible names. The active
+/// tab is drawn in full white and a heavier weight; the others are dimmed.
+/// A [FloatingTabItem.highlighted] tab (Log) is a round gradient button.
+///
+/// The bar is a solid fill, so it needs no separate fallback when the system
+/// asks to reduce transparency.
 class FloatingTabBar extends StatelessWidget {
   const FloatingTabBar({
     super.key,
@@ -26,10 +30,10 @@ class FloatingTabBar extends StatelessWidget {
     required this.onTap,
   });
 
-  static const double height = 64;
+  static const double height = 68;
   static const double bottomMargin = 12;
   static const double maxWidth = 420;
-  static const double _horizontalMargin = 24;
+  static const double _horizontalMargin = 20;
 
   /// Espacio vertical que las pantallas deben reservar para que el bar no
   /// tape su contenido (sin contar el inset del safe area).
@@ -42,6 +46,7 @@ class FloatingTabBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.paddingOf(context).bottom;
+    final palette = BrandPalette.of(context);
 
     return Align(
       alignment: Alignment.bottomCenter,
@@ -54,46 +59,34 @@ class FloatingTabBar extends StatelessWidget {
         ),
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: maxWidth),
-          child: DecoratedBox(
+          child: Container(
+            height: height,
+            padding: const EdgeInsets.symmetric(horizontal: 10),
             decoration: BoxDecoration(
+              color: palette.tabBar,
               borderRadius: BorderRadius.circular(height / 2),
+              border: Border.all(color: palette.tabBarBorder),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.12),
-                  blurRadius: 24,
-                  offset: const Offset(0, 8),
+                  color: palette.isDark
+                      ? palette.shadow
+                      : palette.tabBar.withValues(alpha: 0.28),
+                  blurRadius: 30,
+                  offset: const Offset(0, 14),
                 ),
               ],
             ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(height / 2),
-              child: BackdropFilter(
-                filter:
-                    ImageFilter.blur(sigmaX: _blurSigma, sigmaY: _blurSigma),
-                child: Container(
-                  height: height,
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: _fillAlpha),
-                    borderRadius: BorderRadius.circular(height / 2),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: _borderAlpha),
+            child: Row(
+              children: [
+                for (var i = 0; i < items.length; i++)
+                  Expanded(
+                    child: _TabButton(
+                      item: items[i],
+                      selected: i == currentIndex,
+                      onTap: () => onTap(i),
                     ),
                   ),
-                  child: Row(
-                    children: [
-                      for (var i = 0; i < items.length; i++)
-                        Expanded(
-                          child: _TabButton(
-                            item: items[i],
-                            selected: i == currentIndex,
-                            onTap: () => onTap(i),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              ),
+              ],
             ),
           ),
         ),
@@ -115,6 +108,21 @@ class _TabButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = BrandPalette.of(context);
+    final color = selected ? palette.onTabBar : palette.onTabBarMuted;
+    final label = Text(
+      item.label,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      textScaler: MediaQuery.textScalerOf(context).clamp(maxScaleFactor: 1.2),
+      style: TextStyle(
+        fontSize: 11,
+        height: 14 / 11,
+        fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+        color: color,
+      ),
+    );
+
     return Semantics(
       button: true,
       selected: selected,
@@ -126,19 +134,38 @@ class _TabButton extends StatelessWidget {
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: onTap,
-          child: Center(
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.easeOut,
-              width: 60,
-              height: 48,
-              decoration: BoxDecoration(
-                color: selected
-                    ? brandInk.withValues(alpha: 0.14)
-                    : Colors.transparent,
-                borderRadius: BorderRadius.circular(24),
-              ),
-              child: Icon(item.icon, color: brandInk, size: 26),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 56),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (item.highlighted)
+                  Container(
+                    width: 38,
+                    height: 38,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: palette.logLinearGradient,
+                      boxShadow: selected
+                          ? const [
+                              BoxShadow(
+                                color: Color(0xE6FFFFFF),
+                                spreadRadius: 3,
+                              ),
+                            ]
+                          : null,
+                    ),
+                    child: Icon(
+                      item.icon,
+                      size: 20,
+                      color: palette.onLogGradient,
+                    ),
+                  )
+                else
+                  Icon(item.icon, color: color, size: 22),
+                const SizedBox(height: 3),
+                label,
+              ],
             ),
           ),
         ),

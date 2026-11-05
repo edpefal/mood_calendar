@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mood_calendar/core/logging/app_logger.dart';
 import 'package:mood_calendar/core/settings/domain/entities/app_settings.dart';
+import 'package:mood_calendar/core/settings/domain/entities/app_theme_preference.dart';
 import 'package:mood_calendar/core/settings/domain/repositories/app_settings_repository.dart';
 import 'package:mood_calendar/features/settings/presentation/bloc/settings_cubit.dart';
 
@@ -131,6 +132,76 @@ void main() {
 
     expect(cubit.state.remindersEnabled, isFalse);
     expect(repository.saved.dailyReminderEnabled, isFalse);
+  });
+
+  group('theme', () {
+    late List<AppThemePreference> applied;
+
+    SettingsCubit buildThemedCubit() => SettingsCubit(
+          settingsRepository: repository,
+          scheduleReminder: () async => calls.add('schedule'),
+          cancelReminder: () async => calls.add('cancel'),
+          loadAppVersion: () async => '1.8.3 (28)',
+          logger: _SilentLogger(),
+          onThemeChanged: applied.add,
+        );
+
+    setUp(() => applied = []);
+
+    test('defaults to the system theme', () async {
+      final cubit = buildThemedCubit();
+      await cubit.load();
+
+      expect(cubit.state.themePreference, AppThemePreference.system);
+    });
+
+    test('load exposes the saved theme', () async {
+      repository.saved =
+          repository.saved.copyWith(themePreference: AppThemePreference.dark);
+      final cubit = buildThemedCubit();
+      await cubit.load();
+
+      expect(cubit.state.themePreference, AppThemePreference.dark);
+    });
+
+    test('choosing a theme applies it, saves it and keeps the reminder alone',
+        () async {
+      final cubit = buildThemedCubit();
+      await cubit.load();
+
+      await cubit.setThemePreference(AppThemePreference.dark);
+
+      expect(applied, [AppThemePreference.dark]);
+      expect(cubit.state.themePreference, AppThemePreference.dark);
+      expect(repository.saved.themePreference, AppThemePreference.dark);
+      expect(repository.saved.dailyReminderEnabled, isTrue);
+      expect(calls, isEmpty);
+    });
+
+    test('a failed save puts the previous theme back and reports it', () async {
+      final cubit = buildThemedCubit();
+      await cubit.load();
+      repository.failSaves = true;
+
+      await cubit.setThemePreference(AppThemePreference.dark);
+
+      expect(applied, [AppThemePreference.dark, AppThemePreference.system]);
+      expect(cubit.state.themePreference, AppThemePreference.system);
+      expect(repository.saved.themePreference, AppThemePreference.system);
+      expect(cubit.state.saveFailureCount, 1);
+    });
+
+    test('a theme change after another setting does not undo it', () async {
+      final cubit = buildThemedCubit();
+      await cubit.load();
+
+      final first = cubit.setThemePreference(AppThemePreference.light);
+      final second = cubit.setRemindersEnabled(false);
+      await Future.wait([first, second]);
+
+      expect(repository.saved.themePreference, AppThemePreference.light);
+      expect(repository.saved.dailyReminderEnabled, isFalse);
+    });
   });
 }
 

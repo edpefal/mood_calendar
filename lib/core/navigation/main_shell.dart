@@ -1,22 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../features/insights/presentation/screens/insights_screen.dart';
 import '../../features/mood/presentation/screens/calendar_screen.dart';
-import '../../features/mood/presentation/screens/mood_screen.dart';
-import '../../features/purchases/presentation/bloc/purchases_cubit.dart';
-import '../../features/purchases/presentation/screens/premium_screen.dart';
+import '../../features/mood/presentation/screens/log_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
 import '../localization/app_strings.dart';
 import '../widgets/floating_tab_bar.dart';
 
 /// Pestañas del bottom bar, en el orden en que se muestran.
-enum MainTab { moodPicker, calendar, premium, settings }
+enum MainTab { calendar, insights, log, settings }
 
 /// Raíz de la app: cuatro pestañas que conservan su estado y un bar flotante.
 ///
-/// Posee la pestaña activa y la fecha del selector de moods, de modo que
-/// guardar, tocar un día del calendario y abrir desde el recordatorio sean
-/// cambios de estado y no de rutas.
+/// Posee la pestaña activa y la fecha del Log, de modo que tocar un día del
+/// calendario, abrir desde el recordatorio y el atajo "¿Olvidaste ayer?" sean
+/// cambios de estado y no de rutas. La app abre en el Log con la fecha de hoy.
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
 
@@ -25,45 +23,37 @@ class MainShell extends StatefulWidget {
 }
 
 class MainShellState extends State<MainShell> {
-  MainTab _tab = MainTab.moodPicker;
+  MainTab _tab = MainTab.log;
   // Las pestañas se construyen la primera vez que se visitan y después se
   // conservan montadas.
-  final Set<MainTab> _visited = {MainTab.moodPicker};
-  DateTime _pickerDate = _dateOnly(DateTime.now());
-  Key _pickerKey = UniqueKey();
-  DateTime? _recentlySavedDate;
-  int _saveToken = 0;
+  final Set<MainTab> _visited = {MainTab.log};
+  DateTime _logDate = _dateOnly(DateTime.now());
+  Key _logKey = UniqueKey();
 
   static DateTime _dateOnly(DateTime date) =>
       DateTime(date.year, date.month, date.day);
 
   MainTab get currentTab => _tab;
 
-  /// Fecha que muestra el selector de moods.
-  DateTime get pickerDate => _pickerDate;
+  /// Fecha que muestra el Log.
+  DateTime get logDate => _logDate;
 
-  /// Activa el selector de moods con [date]. Recrea el selector (y con él el
-  /// orden del carrusel), igual que cuando se abría una fecha nueva.
-  void showMoodPicker(DateTime date) {
+  /// Activa el Log con [date]. Recrea el Log (y con él la selección y la nota
+  /// sin guardar), igual que cuando se abría una fecha nueva.
+  void showLog(DateTime date) {
     setState(() {
-      _pickerDate = _dateOnly(date);
-      _pickerKey = UniqueKey();
-      _selectTab(MainTab.moodPicker);
+      _logDate = _dateOnly(date);
+      _logKey = UniqueKey();
+      _selectTab(MainTab.log);
     });
   }
 
-  void _onMoodSaved(DateTime date) {
-    setState(() {
-      _recentlySavedDate = _dateOnly(date);
-      _saveToken++;
-      _selectTab(MainTab.calendar);
-    });
+  /// Activa la pestaña de Ajustes (la campana del Log).
+  void showSettings() {
+    setState(() => _selectTab(MainTab.settings));
   }
 
   void _selectTab(MainTab tab) {
-    if (tab == MainTab.premium && _tab != MainTab.premium) {
-      context.read<PurchasesCubit>().trackPremiumOpened(PremiumSource.tab);
-    }
     _tab = tab;
     _visited.add(tab);
   }
@@ -73,22 +63,18 @@ class MainShellState extends State<MainShell> {
       return const SizedBox.shrink();
     }
     switch (tab) {
-      case MainTab.moodPicker:
-        return MoodScreen(
-          key: _pickerKey,
-          selectedDate: _pickerDate,
-          isActive: _tab == MainTab.moodPicker,
-          onSaved: _onMoodSaved,
-        );
       case MainTab.calendar:
-        return CalendarScreen(
-          isActive: _tab == MainTab.calendar,
-          recentlySavedDate: _recentlySavedDate,
-          saveToken: _saveToken,
-          onDaySelected: showMoodPicker,
+        return CalendarScreen(onDaySelected: showLog);
+      case MainTab.insights:
+        return const InsightsScreen();
+      case MainTab.log:
+        return LogScreen(
+          key: _logKey,
+          selectedDate: _logDate,
+          isActive: _tab == MainTab.log,
+          onOpenSettings: showSettings,
+          onRequestDate: showLog,
         );
-      case MainTab.premium:
-        return PremiumScreen(isActive: _tab == MainTab.premium);
       case MainTab.settings:
         return SettingsScreen.forApp();
     }
@@ -126,20 +112,21 @@ class MainShellState extends State<MainShell> {
             onTap: (index) => setState(() => _selectTab(MainTab.values[index])),
             items: [
               FloatingTabItem(
-                icon: Icons.sentiment_satisfied_outlined,
-                label: strings.openMoodPickerTooltip,
+                icon: Icons.calendar_today_outlined,
+                label: strings.tabCalendar,
               ),
               FloatingTabItem(
-                icon: Icons.calendar_today,
-                label: strings.openCalendarTooltip,
+                icon: Icons.bar_chart_rounded,
+                label: strings.tabInsights,
               ),
               FloatingTabItem(
-                icon: Icons.diamond_outlined,
-                label: strings.openPremiumTooltip,
+                icon: Icons.add_rounded,
+                label: strings.tabLog,
+                highlighted: true,
               ),
               FloatingTabItem(
-                icon: Icons.settings_outlined,
-                label: strings.openSettingsTooltip,
+                icon: Icons.tune_rounded,
+                label: strings.tabSettings,
               ),
             ],
           ),

@@ -300,4 +300,126 @@ class AppStringsEn extends AppStrings {
         'scared': 'Scared',
         'stressed': 'Stressed',
       };
+
+  @override
+  String get categoryPositive => 'Positive';
+  @override
+  String get categoryPeaceful => 'Peaceful';
+  @override
+  String get categoryNeutral => 'Neutral';
+  @override
+  String get categoryHard => 'Hard';
+  @override
+  String get notePromptPositive => 'What made your day good?';
+  @override
+  String get notePromptNeutral => 'Something to remember';
+  @override
+  String get notePromptHard => 'What is worrying you?';
+  @override
+  String get notePromptEmpty => 'Add a note (optional)';
+  @override
+  String get noteExistsSemantics => 'Note added';
+  @override
+  String get greetingMorning => 'Good morning';
+  @override
+  String get greetingAfternoon => 'Good afternoon';
+  @override
+  String get greetingEvening => 'Good evening';
+  @override
+  String get remindersBellLabel => 'Reminders';
+  @override
+  String get moodQuestionPast => 'How did you feel this day?';
+  @override
+  String get savedLabel => 'Saved';
+  @override
+  String savedStreak(int days) =>
+      days == 1 ? '1 day in a row' : '$days days in a row';
+  @override
+  String get todayYouFeel => 'Today you feel';
+  @override
+  String get pastYouFelt => 'That day you felt';
+  @override
+  String get noNoteYet => 'No note yet.';
+  @override
+  String get editEntryButton => 'Edit';
+  @override
+  String get forgotYesterdayPrefix => 'Forgot yesterday?';
+  @override
+  String get forgotYesterdayAction => 'Log it';
+  @override
+  String categorySectionSemantics(String category) => '$category moods';
+  @override
+  String moodCellSemantics(String mood, String category) => '$mood, $category';
+  @override
+  String lockedMoodSemantics(String mood, String category) =>
+      '$mood, $category, locked, Premium';
+  @override
+  String get tabCalendar => 'Calendar';
+  @override
+  String get tabInsights => 'Insights';
+  @override
+  String get tabLog => 'Log';
+  @override
+  String get tabSettings => 'Settings';
+  @override
+  String get insightsEmptyTitle => 'Your insights will live here';
+  @override
+  String get insightsEmptyBody =>
+      'Log a few days and we will show you how you have been feeling.';
+
+  @override
+  String get sectionPremium => 'Premium';
+  @override
+  String get sectionReminders => 'Reminders';
+  @override
+  String get sectionPrivacyData => 'Privacy and data';
+  @override
+  String get sectionAppearance => 'Appearance';
+  @override
+  String get sectionHelp => 'Help';
+  @override
+  String get getPremiumTitle => 'Get Premium';
+  @override
+  String get getPremiumDetail =>
+      'Insights, protected notes and expressive moods';
+  @override
+  String get premiumActiveRowTitle => 'Premium · Active';
+  @override
+  String get themeTitle => 'Theme';
+  @override
+  String get themeSystem => 'System';
+  @override
+  String get themeLight => 'Light';
+  @override
+  String get themeDark => 'Dark';
+  @override
+  String themeRowSemantics(String current) => 'Theme, $current';
+  @override
+  String get sendFeedbackTitle => 'Send feedback';
+  @override
+  String get sendFeedbackSemanticLabel => 'Send feedback by email';
+  @override
+  String get termsTitle => 'Terms';
+  @override
+  String get termsSemanticLabel => 'Open the terms of use in the browser';
+  @override
+  String get restorePurchasesRowSemantics => 'Restore purchases';
+
+  @override
+  String get paywallTitle => 'Understand how you feel';
+  @override
+  String get paywallBenefitInsights =>
+      'Insights and Year in Pixels, with 90 and 365-day trends';
+  @override
+  String get paywallBenefitNotes => 'Notes protected with biometrics';
+  @override
+  String paywallBenefitMoods(String a, String b, String c) =>
+      'Expressive moods: $a, $b, $c and more';
+  @override
+  String get trialFreeLabel => '3 days free';
+  @override
+  String get trialTimelineToday => 'Today · Full Premium access';
+  @override
+  String trialTimelineCharge(String date, String price) =>
+      '$date · First charge of $price';
 }

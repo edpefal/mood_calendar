@@ -7,9 +7,11 @@ and have an idb companion connected to that simulator (see CLAUDE.md).
 usage: python3 tool/screenshots/capture.py <udid> <device: iphone|ipad> <locale: en|es|de|fr|it>
 Writes build/screenshots/shots/<device>/<locale>/<picker|note|calendar|reminders>.png
 Buttons are found by position (not label) so it works in every language.
-The note editor is opened with the pill in the picker header (top-right).
+The app opens on the Log, which shows today's entry (the seed has one) in the
+"Saved" state: the "picker" shot taps Edit to get the grid of moods by category,
+and the note editor is opened with the note pill above Save.
 The four tabs of the bottom bar are the bottom-most row of buttons:
-[mood picker, calendar, premium, settings].
+[calendar, insights, log, settings].
 """
 import json
 import os
@@ -88,26 +90,38 @@ def rows(bs):
 
 
 def tab_buttons():
-    """Bottom bar tabs, left to right: [mood picker, calendar, premium, settings]."""
+    """Bottom bar tabs, left to right: [calendar, insights, log, settings]."""
     groups = [g for g in rows(buttons()) if len(g) == 4]
     return sorted(groups[-1], key=lambda b: b[0]) if groups else []
 
 
-def note_button():
-    """Note pill in the picker header (top-right corner).
+def non_tab_rows():
+    tabs = {tuple(b) for b in tab_buttons()}
+    return rows([b for b in buttons() if tuple(b) not in tabs])
 
-    It is the topmost button of the picker once the bottom bar tabs are
-    excluded (the header sits above the carousel); on that row it is the
-    rightmost one.
+
+def edit_button():
+    """Edit button of the Saved card on the Log.
+
+    Rows of buttons above the bar, top to bottom: [bell], [Edit], and, when
+    yesterday has no entry, ["Forgot yesterday? Log it"]. Edit is the second.
     """
     for _ in range(6):
-        tabs = {tuple(b) for b in tab_buttons()}
-        rest = [b for b in buttons() if tuple(b) not in tabs]
-        groups = rows(rest)
-        if groups:
-            return max(groups[0], key=lambda b: b[0])
+        groups = non_tab_rows()
+        if len(groups) >= 2:
+            return groups[1][0]
         time.sleep(1)
-    raise RuntimeError('note button not found')
+    raise RuntimeError('edit button not found')
+
+
+def note_pill():
+    """Note pill of the Log grid: the row just above Save (the last row)."""
+    for _ in range(6):
+        groups = non_tab_rows()
+        if len(groups) >= 2:
+            return groups[-2][0]
+        time.sleep(1)
+    raise RuntimeError('note pill not found')
 
 
 def calendar_row_buttons():
@@ -128,40 +142,21 @@ def calendar_row_buttons():
 
 
 def open_calendar_previous_month():
-    tap_button(tab_buttons()[1])  # calendar tab
+    tap_button(tab_buttons()[0])  # calendar tab
     row = calendar_row_buttons()
     tap_button(row[0])  # previous month
 
 
-# 1) mood picker: advance with the "next" arrow to a colorful premium mood.
-# Buttons of the picker, top to bottom, once the bottom bar row is excluded:
-# [Note], [previous, next], [grid], [Save]. At the first mood "previous" is
-# disabled and absent from the accessibility tree, so the arrows row can have
-# a single button; "next" is always its rightmost one.
-NEXT_TAPS = 6
-
-
-def next_arrow():
-    for _ in range(6):
-        tabs = {tuple(b) for b in tab_buttons()}
-        rest = [b for b in buttons() if tuple(b) not in tabs]
-        groups = rows(rest)
-        if len(groups) >= 4:
-            return max(groups[1], key=lambda b: b[0])
-        time.sleep(1)
-    raise RuntimeError('next arrow not found')
-
-
+# 1) log grid: Edit on the Saved card brings back the moods by category.
 launch()
-arrow = next_arrow()
-for _ in range(NEXT_TAPS):
-    tap_button(arrow)
+tap_button(edit_button())
 time.sleep(1)
 shot('picker')
 
-# 2) note editor
+# 2) note editor, opened with the pill above Save
 launch()
-tap_button(note_button())
+tap_button(edit_button())
+tap_button(note_pill())
 time.sleep(1.5)
 shot('note')
 

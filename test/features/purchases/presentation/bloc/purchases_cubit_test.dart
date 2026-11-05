@@ -211,7 +211,7 @@ void main() {
       await Future<void>.delayed(Duration.zero);
 
       expect(cubit.isMoodUnlocked('brave'), isTrue);
-      expect(cubit.isMoodUnlocked('anxious'), isFalse);
+      expect(cubit.isMoodUnlocked('romantic'), isFalse);
     });
 
     test('restoring reports restored, not a purchase success', () async {
@@ -328,6 +328,13 @@ void main() {
       expect(telemetry.tracked.single.properties, isEmpty);
     });
 
+    test('the sheet sources are locked_mood and settings, with no tab', () {
+      expect(
+        PremiumSource.values.map((source) => source.analyticsValue),
+        ['locked_mood', 'settings'],
+      );
+    });
+
     test('opening Premium reports store_opened with where it came from', () {
       final telemetry = _RecordingTelemetry();
       final cubit = PurchasesCubit(
@@ -336,11 +343,11 @@ void main() {
       );
       addTearDown(cubit.close);
 
-      cubit.trackPremiumOpened(PremiumSource.tab);
+      cubit.trackPremiumOpened(PremiumSource.settings);
       cubit.trackPremiumOpened(PremiumSource.lockedMood);
 
       expect(telemetry.events, ['store_opened', 'store_opened']);
-      expect(telemetry.tracked[0].properties, {'source': 'tab'});
+      expect(telemetry.tracked[0].properties, {'source': 'settings'});
       expect(telemetry.tracked[1].properties, {'source': 'locked_mood'});
     });
   });

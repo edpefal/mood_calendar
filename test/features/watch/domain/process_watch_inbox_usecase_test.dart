@@ -114,7 +114,7 @@ void main() {
 
   test('ignora un mood premium bloqueado', () async {
     final repository = InMemoryMoodRepository();
-    final channel = FakeWatchChannel(inbox: [_choice('a', 'anxious')]);
+    final channel = FakeWatchChannel(inbox: [_choice('a', 'romantic')]);
 
     final result = await build(repository, channel)();
 
@@ -124,11 +124,11 @@ void main() {
 
   test('acepta un mood premium comprado', () async {
     final repository = InMemoryMoodRepository();
-    final channel = FakeWatchChannel(inbox: [_choice('a', 'anxious')]);
+    final channel = FakeWatchChannel(inbox: [_choice('a', 'romantic')]);
 
-    await build(repository, channel, unlockedPremium: {'anxious'})();
+    await build(repository, channel, unlockedPremium: {'romantic'})();
 
-    expect(repository.entries.single.mood, 'assets/icon/anxious.svg');
+    expect(repository.entries.single.mood, 'assets/icon/romantic.svg');
   });
 
   test('descarta fechas mal formadas, imposibles o futuras', () async {
@@ -171,7 +171,7 @@ void main() {
     final repository = InMemoryMoodRepository();
     final channel = FakeWatchChannel(inbox: [
       _choice('ok', 'calm'),
-      _choice('locked', 'anxious'),
+      _choice('locked', 'romantic'),
       _choice('unknown', 'nope'),
     ]);
 

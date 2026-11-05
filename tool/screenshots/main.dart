@@ -1,6 +1,7 @@
 // Screenshot-only entrypoint (not shipped): seeds sample data, unlocks every
 // premium mood and skips the notification permission flow so the app can be
-// captured in a clean, repeatable state.
+// captured in a clean, repeatable state. Today's entry is seeded, so the Log
+// opens in its "Saved" state; the capture scripts tap Edit to reach the grid.
 //
 //   flutter run -t tool/screenshots/main.dart -d <simulator>
 //
@@ -11,11 +12,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:mood_calendar/core/telemetry/analytics_reporter.dart';
 import 'package:mood_calendar/core/localization/app_strings.dart';
-import 'package:mood_calendar/core/theme/brand_colors.dart';
+import 'package:mood_calendar/core/theme/app_theme.dart';
+import 'package:mood_calendar/core/theme/theme_cubit.dart';
 import 'package:mood_calendar/core/logging/app_logger.dart';
 import 'package:mood_calendar/core/logging/logger_app_logger.dart';
 import 'package:mood_calendar/core/notifications/local_notification_service.dart';
@@ -237,6 +238,7 @@ Future<void> main() async {
               ),
             ),
           ),
+          BlocProvider(create: (context) => ThemeCubit()),
           BlocProvider(create: (context) => PurchasesCubit(entitlements)),
         ],
         child: const _ScreenshotApp(),
@@ -250,15 +252,6 @@ class _ScreenshotApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final baseTheme = ThemeData(
-      colorScheme: ColorScheme.fromSeed(seedColor: brandInk).copyWith(
-        surface: brandSurface,
-        surfaceContainerLow: brandSurfaceCard,
-      ),
-      useMaterial3: true,
-    );
-    final poppinsTextTheme = GoogleFonts.poppinsTextTheme(baseTheme.textTheme);
-
     return MaterialApp(
       supportedLocales: AppStrings.supportedLocales,
       localizationsDelegates: const [
@@ -266,10 +259,9 @@ class _ScreenshotApp extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      theme: baseTheme.copyWith(
-        textTheme: poppinsTextTheme,
-        primaryTextTheme: poppinsTextTheme,
-      ),
+      theme: buildAppTheme(Brightness.light),
+      darkTheme: buildAppTheme(Brightness.dark),
+      themeMode: ThemeMode.system,
       home: const MainShell(),
       debugShowCheckedModeBanner: false,
     );

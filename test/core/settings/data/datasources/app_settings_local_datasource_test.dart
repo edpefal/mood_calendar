@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:mood_calendar/core/settings/data/datasources/app_settings_local_datasource.dart';
 import 'package:mood_calendar/core/settings/domain/entities/app_settings.dart';
+import 'package:mood_calendar/core/settings/domain/entities/app_theme_preference.dart';
 
 void main() {
   late Directory tempDir;
@@ -31,6 +32,7 @@ void main() {
     expect(settings.dailyReminderHour, 18);
     expect(settings.dailyReminderMinute, 0);
     expect(settings.usageAnalyticsEnabled, isTrue);
+    expect(settings.themePreference, AppThemePreference.system);
   });
 
   test('persists and reloads typed settings values', () async {
@@ -61,5 +63,41 @@ void main() {
         await AppSettingsLocalDataSource(settingsBox).getSettings();
 
     expect(reloaded.usageAnalyticsEnabled, isFalse);
+  });
+
+  group('theme preference', () {
+    test('persists and reloads the chosen theme', () async {
+      await dataSource.saveSettings(
+        AppSettings.defaults.copyWith(themePreference: AppThemePreference.dark),
+      );
+
+      expect(
+        (await dataSource.getSettings()).themePreference,
+        AppThemePreference.dark,
+      );
+    });
+
+    test('keeps the other settings when only the theme changes', () async {
+      await dataSource.saveSettings(
+        AppSettings.defaults.copyWith(dailyReminderHour: 7),
+      );
+      final saved = await dataSource.getSettings();
+      await dataSource.saveSettings(
+        saved.copyWith(themePreference: AppThemePreference.light),
+      );
+
+      final reloaded = await dataSource.getSettings();
+      expect(reloaded.dailyReminderHour, 7);
+      expect(reloaded.themePreference, AppThemePreference.light);
+    });
+
+    test('falls back to system when the stored value is unknown', () async {
+      await settingsBox.put('theme_preference', 'sepia');
+
+      expect(
+        (await dataSource.getSettings()).themePreference,
+        AppThemePreference.system,
+      );
+    });
   });
 }

@@ -1,4 +1,7 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mood_calendar/core/theme/app_theme.dart';
+import 'package:mood_calendar/core/theme/brand_colors.dart';
 import 'package:mood_calendar/features/mood/domain/entities/mood_definition.dart';
 import 'package:mood_calendar/features/mood/domain/services/mood_definition_resolver.dart';
 
@@ -24,14 +27,60 @@ void main() {
       expect(intensity, 5);
     });
 
-    test('backgroundGradientForMood returns 2 distinct colors for every mood',
-        () {
-      for (final mood in allMoodDefinitions) {
-        final gradient = MoodDefinitionResolver.backgroundGradientForMood(mood);
+    for (final brightness in Brightness.values) {
+      testWidgets('tints follow the category in the ${brightness.name} theme',
+          (tester) async {
+        late BuildContext captured;
+        await tester.pumpWidget(MaterialApp(
+          theme: buildAppTheme(brightness),
+          home: Builder(builder: (context) {
+            captured = context;
+            return const SizedBox();
+          }),
+        ));
+        final palette = BrandPalette.of(captured);
 
-        expect(gradient.colors.length, 2);
-        expect(gradient.colors[0], isNot(equals(gradient.colors[1])));
-      }
-    });
+        MoodTint tintOf(String id) => MoodDefinitionResolver.tintFor(
+              captured,
+              MoodDefinitionResolver.byId(id),
+            );
+
+        expect(tintOf('calm'), palette.peaceful);
+        expect(tintOf('brave'), palette.positive);
+        expect(tintOf('shy'), palette.neutral);
+        expect(tintOf('sad'), palette.hard);
+        expect(tintOf('angry'), palette.angry);
+        expect(
+          MoodDefinitionResolver.tintForMoodPath(
+            captured,
+            'assets/icon/crying.svg',
+          ),
+          palette.hard,
+        );
+      });
+
+      testWidgets(
+          'backgroundGradientForMood returns 2 distinct colors for every '
+          'mood (${brightness.name})', (tester) async {
+        late BuildContext captured;
+        await tester.pumpWidget(MaterialApp(
+          theme: buildAppTheme(brightness),
+          home: Builder(builder: (context) {
+            captured = context;
+            return const SizedBox();
+          }),
+        ));
+
+        for (final mood in allMoodDefinitions) {
+          final gradient = MoodDefinitionResolver.backgroundGradientForMood(
+            captured,
+            mood,
+          );
+
+          expect(gradient.colors.length, 2);
+          expect(gradient.colors[0], isNot(equals(gradient.colors[1])));
+        }
+      });
+    }
   });
 }

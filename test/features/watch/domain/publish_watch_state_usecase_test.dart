@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mood_calendar/core/localization/app_strings_en.dart';
 import 'package:mood_calendar/core/localization/app_strings_es.dart';
+import 'package:mood_calendar/features/mood/domain/entities/mood_definition.dart';
 import 'package:mood_calendar/features/mood/domain/entities/mood_entry.dart';
 import 'package:mood_calendar/features/watch/domain/usecases/publish_watch_state_usecase.dart';
 
@@ -15,7 +16,7 @@ MoodEntry _entry(DateTime date, String id, int intensity) => MoodEntry(
 
 void main() {
   final now = DateTime(2026, 11, 2, 9);
-  const base = {'happy', 'calm', 'neutral', 'sad', 'angry'};
+  final base = baseMoodDefinitions.map((mood) => mood.id).toSet();
 
   PublishWatchStateUseCase build(
     List<MoodEntry> entries,
@@ -31,17 +32,54 @@ void main() {
         now: () => now,
       );
 
-  test('publica solo los moods desbloqueados, sin los premium bloqueados',
-      () async {
+  test('publica los 11 moods gratis en el orden fijo por categoría', () async {
     final channel = FakeWatchChannel();
 
-    await build([], channel, premium: {'anxious'})();
+    await build([], channel)();
 
     final ids = channel.published.single.moods.map((m) => m.id).toList();
-    expect(ids, ['happy', 'calm', 'neutral', 'sad', 'angry', 'anxious']);
+    expect(ids, [
+      'happy',
+      'calm',
+      'neutral',
+      'sleepy',
+      'sad',
+      'angry',
+      'anxious',
+      'stressed',
+      'scared',
+      'crying',
+      'sick',
+    ]);
   });
 
-  test('sigue el orden de uso del selector del iPhone', () async {
+  test(
+      'añade los premium desbloqueados en su lugar de la categoría, sin los '
+      'bloqueados', () async {
+    final channel = FakeWatchChannel();
+
+    await build([], channel, premium: {'brave', 'shy'})();
+
+    final ids = channel.published.single.moods.map((m) => m.id).toList();
+    expect(ids, [
+      'happy',
+      'brave',
+      'calm',
+      'neutral',
+      'sleepy',
+      'shy',
+      'sad',
+      'angry',
+      'anxious',
+      'stressed',
+      'scared',
+      'crying',
+      'sick',
+    ]);
+    expect(ids, isNot(contains('laughing')));
+  });
+
+  test('el orden no sigue la frecuencia de uso', () async {
     final channel = FakeWatchChannel();
     final entries = [
       _entry(DateTime(2026, 10, 30), 'sad', 4),
@@ -52,7 +90,9 @@ void main() {
     await build(entries, channel)();
 
     final ids = channel.published.single.moods.map((m) => m.id).toList();
-    expect(ids.take(2), ['sad', 'angry']);
+    expect(ids.first, 'happy');
+    expect(ids.indexOf('sad'), lessThan(ids.indexOf('angry')));
+    expect(ids.indexOf('calm'), lessThan(ids.indexOf('sad')));
   });
 
   test('los nombres salen en el idioma de la app', () async {
@@ -82,7 +122,7 @@ void main() {
     final map = channel.published.single.toMap();
     expect(map['version'], 1);
     expect(map.keys, containsAll(['version', 'locale', 'today', 'moods']));
-    expect((map['moods']! as List).first, {'id': 'calm', 'name': 'Calm'});
+    expect((map['moods']! as List).first, {'id': 'happy', 'name': 'Happy'});
   });
 
   test('publica los ids de las elecciones procesadas y, por defecto, ninguno',

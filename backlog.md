@@ -5,7 +5,7 @@ Backlog activo del proyecto, actualizado contra el estado actual del repo.
 ## Completado recientemente
 
 - La UI ya no accede directo a Hive.
-  `MoodScreen` y `CalendarScreen` dependen de cubits, repositorios y servicios.
+  `LogScreen` y `CalendarScreen` dependen de cubits, repositorios y servicios.
 
 - Se eliminó el código residual del template de Flutter.
   `MyHomePage` y el test de contador ya no forman parte de la app.
@@ -21,11 +21,11 @@ Backlog activo del proyecto, actualizado contra el estado actual del repo.
 - Ya existe una capa de settings.
   La configuración de recordatorios vive en `core/settings/`.
 
-- Los recordatorios diarios se configuran desde la pantalla de Settings (engrane en la pantalla principal), con autoguardado; también están ahí calificar la app, la política de privacidad y la versión.
+- Los recordatorios diarios se configuran desde la pestaña Settings, con autoguardado; también están ahí calificar la app, la política de privacidad y la versión.
 
 - El historial se exporta a JSON versionado (`formatVersion: 1`, sin `intensity`) y se comparte con la hoja del sistema desde Settings > Tus datos.
 
-- La app ya incorpora moods adicionales en el selector principal.
+- La app ya incorpora moods adicionales en el selector principal (desde el Bloque 1, en la cuadrícula del Log por categorías).
 
 - Ficha de App Store localizada a es/de/fr/it, subtitle y keywords nuevos, categoría primaria Lifestyle, aviso para calificar la app (versión 1.8.3) y script/hook que obligan a pasar por `scripts/build_ios_release.sh` al generar builds de iOS.
 
@@ -35,7 +35,7 @@ Backlog activo del proyecto, actualizado contra el estado actual del repo.
 
 - Los nombres de los moods se muestran en el idioma del dispositivo (`AppStrings.moodName`).
 
-- Compras y moods: catálogo de 19 moods (14 premium) con Packs, Tienda con reintento del catálogo, y compras en iOS y Android con RevenueCat.
+- Compras y moods: catálogo de 19 moods (en el Bloque 1: 11 gratis y 8 premium) con Packs heredados, Tienda con reintento del catálogo, y compras en iOS y Android con RevenueCat.
 
 - Android publicado en Google Play junto al mismo identificador de iOS, con capturas, gráfico de funciones y notas generados desde `tool/screenshots/`.
 
@@ -48,6 +48,9 @@ Backlog activo del proyecto, actualizado contra el estado actual del repo.
 - README y `CLAUDE.md` actualizados con el estado real del proyecto (2026-10-24); todos los cambios de OpenSpec están archivados.
 
 ## Alta prioridad
+
+- Cerrar el rediseño (Bloques 2 y 3) antes de publicar el Bloque 1.
+  El Bloque 1 (sistema visual, Log por categorías, 4 pestañas, paywall como hoja y Ajustes) está implementado en `feat/redesign-block-1`, pero **no puede publicarse solo**: el paywall anuncia notas protegidas con biometría (Bloque 3) y Insights es un estado vacío (Bloque 2). Requisito previo a publicar, que hay que pedir aparte porque toca las tiendas: quitar la prueba gratis del plan mensual y del semanal en App Store Connect y Google Play (la app solo la ofrece en el anual). Pendiente también: medir la fluidez del vidrio en un iPhone real (iOS 15) y, si se pide, un build de TestFlight; el texto de las fichas de las tiendas (6 moods pasan a gratis) y las capturas se rehacen en el paso de marketing.
 
 - Siguiente change visual y publicación de la versión con la nueva marca (1.10.1 o posterior).
   El recolor Ocean Cyan está en `main` y el build 1.10.1 (42) está en TestFlight desde el 2026-11-04, probado por el usuario. No se publica todavía: se agruparán más cambios visuales en un change nuevo y entonces se sube la versión a Play, se recapturan las capturas de tienda en los 5 idiomas (`capture.py`, `capture_android.py`, `compose.py`, `header.py`), se suben el ícono, las capturas y los gráficos a App Store Connect y Play, y se envía a revisión. Pendiente también de ese cierre: revisar el modo oscuro y los 390 pt del sitio, y el arranque con el ícono nuevo en Android.

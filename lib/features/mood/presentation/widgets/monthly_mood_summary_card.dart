@@ -5,6 +5,7 @@ import '../../../../core/localization/app_strings.dart';
 import '../../domain/entities/monthly_mood_summary.dart';
 import '../../domain/services/mood_definition_resolver.dart';
 import '../../../../core/theme/brand_colors.dart';
+import '../../../../core/widgets/glass_card.dart';
 
 class MonthlyMoodSummaryCard extends StatelessWidget {
   final MonthlyMoodSummary? summary;
@@ -49,10 +50,9 @@ class MonthlyMoodSummaryCard extends StatelessWidget {
     final mostCommonMood = MoodDefinitionResolver.byAssetPath(
       mostCommonMoodPath,
     );
-    final moodGradient = MoodDefinitionResolver.backgroundGradientForMood(
-      mostCommonMood,
-    );
-    final moodTextColor = (mostCommonMood.color as MaterialColor).shade700;
+    final palette = BrandPalette.of(context);
+    final moodTint = MoodDefinitionResolver.tintFor(context, mostCommonMood);
+    final moodTextColor = palette.text;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -62,8 +62,7 @@ class MonthlyMoodSummaryCard extends StatelessWidget {
           semanticsLabel: strings.monthlyAverageSemantics(
             _moodLabelFromPath(context, mostCommonMoodPath),
           ),
-          gradient: moodGradient,
-          textColor: moodTextColor,
+          fill: moodTint.fill,
           child: Row(
             children: [
               SvgPicture.asset(
@@ -93,21 +92,18 @@ class MonthlyMoodSummaryCard extends StatelessWidget {
         _StatCard(
           title: strings.bestStreak,
           semanticsLabel: strings.bestStreakSemantics(summaryData.bestStreak),
-          highlight: true,
           child: Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.local_fire_department_rounded,
                 size: 32,
-                color: Colors.white,
+                color: palette.text,
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   strings.streakText(summaryData.bestStreak),
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Colors.white,
-                      ),
+                  style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ),
             ],
@@ -131,59 +127,36 @@ class MonthlyMoodSummaryCard extends StatelessWidget {
 class _StatCard extends StatelessWidget {
   final String title;
   final Widget child;
-  final bool highlight;
   final String? semanticsLabel;
-  final Gradient? gradient;
-  final Color? textColor;
+
+  /// Tint behind the card (the most common mood's category); glass if null.
+  final Color? fill;
 
   const _StatCard({
     required this.title,
     required this.child,
-    this.highlight = false,
     this.semanticsLabel,
-    this.gradient,
-    this.textColor,
+    this.fill,
   });
 
   @override
   Widget build(BuildContext context) {
-    final borderRadius = BorderRadius.circular(16);
-    final effectiveGradient = gradient ??
-        (highlight
-            ? const LinearGradient(
-                colors: [brandGradientStart, brandGradientEnd],
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-              )
-            : null);
-    final effectiveTextColor = textColor ?? (highlight ? Colors.white : null);
-    final titleStyle = Theme.of(context).textTheme.titleSmall?.copyWith(
-          fontWeight: FontWeight.bold,
-          color: effectiveTextColor,
-        );
-
     return Semantics(
       label: semanticsLabel,
-      child: Card(
-        elevation: 2,
-        clipBehavior: Clip.antiAlias,
-        color: effectiveGradient != null ? Colors.transparent : null,
-        shape: RoundedRectangleBorder(borderRadius: borderRadius),
-        child: Container(
-          decoration: effectiveGradient != null
-              ? BoxDecoration(gradient: effectiveGradient)
-              : null,
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: titleStyle),
-                const SizedBox(height: 8),
-                child,
-              ],
+      child: GlassCard(
+        fill: fill,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
             ),
-          ),
+            const SizedBox(height: 8),
+            child,
+          ],
         ),
       ),
     );
@@ -201,24 +174,19 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 0,
-      color: brandInk.withValues(alpha: 0.10),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Icon(icon, color: brandInk),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                message,
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
+    final palette = BrandPalette.of(context);
+    return GlassCard(
+      child: Row(
+        children: [
+          Icon(icon, color: palette.text),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              message,
+              style: Theme.of(context).textTheme.bodyMedium,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
