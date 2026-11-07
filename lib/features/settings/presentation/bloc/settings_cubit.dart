@@ -19,6 +19,8 @@ class SettingsCubit extends Cubit<SettingsState> {
     required AppLogger logger,
     Future<void> Function(bool enabled)? setUsageAnalyticsCollection,
     void Function(AppThemePreference preference)? onThemeChanged,
+    Future<bool> Function()? requestNotificationPermission,
+    void Function(bool enabled)? onNoteLockChanged,
   })  : _settingsRepository = settingsRepository,
         _scheduleReminder = scheduleReminder,
         _cancelReminder = cancelReminder,
@@ -27,6 +29,9 @@ class SettingsCubit extends Cubit<SettingsState> {
         _setUsageAnalyticsCollection =
             setUsageAnalyticsCollection ?? ((_) async {}),
         _onThemeChanged = onThemeChanged ?? ((_) {}),
+        _requestNotificationPermission =
+            requestNotificationPermission ?? (() async => true),
+        _onNoteLockChanged = onNoteLockChanged ?? ((_) {}),
         super(const SettingsState());
 
   final AppSettingsRepository _settingsRepository;
@@ -39,6 +44,15 @@ class SettingsCubit extends Cubit<SettingsState> {
   /// Applies a theme to the running app (the root `ThemeCubit`). Called right
   /// away on a change and again with the old value if saving it fails.
   final void Function(AppThemePreference preference) _onThemeChanged;
+
+  /// Asks the OS for the notification permission when the reminder is turned
+  /// on; false means the user refused it.
+  final Future<bool> Function() _requestNotificationPermission;
+
+  /// Tells the root `NoteLockCubit` the saved value, again with the old one if
+  /// saving fails. The lock itself is decided there (Premium, authentication);
+  /// this cubit only persists it so no other write overwrites it.
+  final void Function(bool enabled) _onNoteLockChanged;
 
   /// Last settings known to be saved; changes that fail revert to this.
   AppSettings _persisted = AppSettings.defaults;
@@ -70,7 +84,19 @@ class SettingsCubit extends Cubit<SettingsState> {
   Future<void> setRemindersEnabled(bool enabled) {
     emit(state.copyWith(remindersEnabled: enabled));
     return _enqueue(
-        (current) => current.copyWith(dailyReminderEnabled: enabled));
+      (current) => current.copyWith(dailyReminderEnabled: enabled),
+      // Turning it on needs the OS permission; it is asked inside the queue so
+      // quick consecutive changes still run in order.
+      needsNotificationPermission: enabled,
+    );
+  }
+
+  Future<void> setNoteLockEnabled(bool enabled) {
+    emit(state.copyWith(noteLockEnabled: enabled));
+    return _enqueue(
+      (current) => current.copyWith(noteLockEnabled: enabled),
+      touchesReminder: false,
+    );
   }
 
   Future<void> setUsageAnalyticsEnabled(bool enabled) {
@@ -103,8 +129,11 @@ class SettingsCubit extends Cubit<SettingsState> {
   Future<void> _enqueue(
     AppSettings Function(AppSettings) change, {
     bool touchesReminder = true,
+    bool needsNotificationPermission = false,
   }) {
-    final run = _queue.then((_) => _apply(change, touchesReminder));
+    final run = _queue.then(
+      (_) => _apply(change, touchesReminder, needsNotificationPermission),
+    );
     _queue = run;
     return run;
   }
@@ -112,12 +141,23 @@ class SettingsCubit extends Cubit<SettingsState> {
   Future<void> _apply(
     AppSettings Function(AppSettings) change,
     bool touchesReminder,
+    bool needsNotificationPermission,
   ) async {
     // Applied to the latest saved values, not to those at the time of the
     // tap, so a queued change never undoes an earlier one.
     final previous = _persisted;
     final next = change(previous);
     try {
+      if (needsNotificationPermission &&
+          !await _requestNotificationPermission()) {
+        if (isClosed) return;
+        emit(_stateFrom(previous).copyWith(
+          isLoading: false,
+          appVersion: state.appVersion,
+          notificationDeniedCount: state.notificationDeniedCount + 1,
+        ));
+        return;
+      }
       await _settingsRepository.saveSettings(next);
       _persisted = next;
       if (touchesReminder) {
@@ -146,6 +186,7 @@ class SettingsCubit extends Cubit<SettingsState> {
       await _restore(previous);
       await _reapplyUsageAnalytics(previous);
       _onThemeChanged(previous.themePreference);
+      _onNoteLockChanged(previous.noteLockEnabled);
       if (isClosed) return;
       emit(_stateFrom(previous).copyWith(
         isLoading: false,
@@ -178,6 +219,7 @@ class SettingsCubit extends Cubit<SettingsState> {
       remindersEnabled: settings.dailyReminderEnabled,
       usageAnalyticsEnabled: settings.usageAnalyticsEnabled,
       themePreference: settings.themePreference,
+      noteLockEnabled: settings.noteLockEnabled,
       reminderTime: TimeOfDay(
         hour: settings.dailyReminderHour,
         minute: settings.dailyReminderMinute,

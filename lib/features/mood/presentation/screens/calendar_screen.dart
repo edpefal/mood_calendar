@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../core/localization/app_strings.dart';
 import '../../../../core/theme/brand_colors.dart';
+import '../../../../core/widgets/dashed_border_painter.dart';
 import '../../../../core/widgets/glass_card.dart';
 import '../../../../core/widgets/mesh_background.dart';
 import '../../../../core/widgets/phone_column.dart';
@@ -336,7 +337,7 @@ class _DayCell extends StatelessWidget {
         onTap: isFutureDate ? null : onTap,
         child: CustomPaint(
           foregroundPainter: path == null && !isFutureDate
-              ? _DashedBorderPainter(color: palette.textSecondary)
+              ? DashedBorderPainter(color: palette.textSecondary)
               : null,
           child: Container(
             constraints: const BoxConstraints(minHeight: 44, minWidth: 44),
@@ -395,37 +396,6 @@ class _DayCell extends StatelessWidget {
       ),
     );
   }
-}
-
-/// Dashed rounded outline for a past day with no entry.
-class _DashedBorderPainter extends CustomPainter {
-  const _DashedBorderPainter({required this.color});
-
-  final Color color;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5;
-    final path = Path()
-      ..addRRect(
-        RRect.fromRectAndRadius(
-          (Offset.zero & size).deflate(0.75),
-          const Radius.circular(12),
-        ),
-      );
-    for (final metric in path.computeMetrics()) {
-      for (var d = 0.0; d < metric.length; d += 7) {
-        canvas.drawPath(metric.extractPath(d, d + 3.5), paint);
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(_DashedBorderPainter oldDelegate) =>
-      oldDelegate.color != color;
 }
 
 class _CalendarFeedbackBanner extends StatelessWidget {

@@ -175,3 +175,20 @@ Quien se suscribe desde la 1.10.0 no ve sus moods desbloqueados en un dispositiv
 
 ### Precio frente a las compras sueltas
 Un mensual de $2.99 supera el coste de comprar todo suelto (≈ $8 con los Packs) en pocos meses. Sin compras reales hasta octubre de 2026 no hay compradores con los que comparar; los precios viven en las tiendas y se pueden cambiar sin tocar la app.
+
+## Bloqueo de notas (Bloque 3 del rediseño)
+
+Riesgos aceptados del change `redesign-block-3-onboarding-note-lock`.
+
+### Las notas no están cifradas en reposo
+El bloqueo es una barrera de la interfaz: el texto de las notas sigue guardado sin cifrar en la caja de Hive y entra en las copias de seguridad del dispositivo. Quien tenga acceso al sistema de archivos (por ejemplo, un dispositivo con jailbreak o una copia sin cifrar) puede leerlas. La app nunca dice que las notas estén "cifradas". Cifrar la caja de notas queda como mejora futura (`backlog.md`).
+
+### Sin código en el dispositivo el bloqueo no se aplica
+Si con el bloqueo activo el dispositivo deja de tener biometría y código, las notas se muestran en vez de quedar ilegibles. Quien quita el código del dispositivo ya entrega el teléfono desbloqueado; perder las notas por una configuración del teléfono sería peor.
+
+### El bloqueo sobrevive al vencimiento de la suscripción
+Activarlo exige Premium, pero un bloqueo activo sigue aplicándose y se puede apagar sin suscripción. Se acepta: el usuario nunca pierde acceso a su propio texto, y lo único que está en juego es volver a encenderlo.
+
+### El texto sigue en la vista previa del selector de apps
+No hay "privacy screen" ni `FLAG_SECURE`: la miniatura de la app en el selector de apps puede mostrar el texto de una nota que estaba a la vista. Queda fuera de este change.
+

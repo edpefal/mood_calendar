@@ -13,6 +13,10 @@ class AppTelemetryEvents {
   static const purchaseCancelled = 'purchase_cancelled';
   static const purchaseFailed = 'purchase_failed';
   static const purchasesRestored = 'purchases_restored';
+  static const onboardingCompleted = 'onboarding_completed';
+  static const onboardingSkipped = 'onboarding_skipped';
+  static const noteLockEnabled = 'note_lock_enabled';
+  static const noteLockDisabled = 'note_lock_disabled';
 
   /// Lista cerrada de eventos que pueden salir del dispositivo hacia
   /// Analytics. Cualquier otro (p. ej. `mood_history_exported`) solo va al log.
@@ -29,8 +33,17 @@ class AppTelemetryEvents {
     purchaseCancelled,
     purchaseFailed,
     purchasesRestored,
+    onboardingCompleted,
+    onboardingSkipped,
+    noteLockEnabled,
+    noteLockDisabled,
   };
 
   /// Únicos parámetros que se reenvían a Analytics.
-  static const analyticsParameterAllowlist = {'has_note', 'source', 'plan'};
+  static const analyticsParameterAllowlist = {
+    'has_note',
+    'source',
+    'plan',
+    'step'
+  };
 }

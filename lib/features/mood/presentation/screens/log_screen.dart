@@ -11,6 +11,9 @@ import '../../../../core/widgets/glass_card.dart';
 import '../../../../core/widgets/gradient_pill_button.dart';
 import '../../../../core/widgets/mesh_background.dart';
 import '../../../../core/widgets/phone_column.dart';
+import '../../../note_lock/presentation/bloc/note_lock_cubit.dart';
+import '../../../note_lock/presentation/bloc/note_lock_state.dart';
+import '../../../note_lock/presentation/widgets/note_text.dart';
 import '../../../purchases/presentation/bloc/purchases_cubit.dart';
 import '../../../purchases/presentation/widgets/premium_sheet.dart';
 import '../../data/services/rating_prompt_service.dart';
@@ -213,12 +216,28 @@ class _LogScreenState extends State<LogScreen> {
     setState(() => _selected = mood);
   }
 
-  void _openNoteEditor() {
-    showNoteEditorSheet(
+  /// The saved note is still what the field shows and the note lock hides it:
+  /// the pill and the editor must not reveal it until the session is unlocked.
+  /// A note being typed (different from the saved one) is the user's own draft.
+  bool _noteIsConcealed(NoteLockState lock) {
+    final saved = _entry?.note?.trim() ?? '';
+    return lock.conceals &&
+        saved.isNotEmpty &&
+        _noteController.text.trim() == saved;
+  }
+
+  Future<void> _openNoteEditor() async {
+    final lockCubit = context.read<NoteLockCubit>();
+    if (_noteIsConcealed(lockCubit.state)) {
+      final reason = AppStrings.of(context).noteLockReasonUnlock;
+      if (!await lockCubit.unlock(reason) || !mounted) return;
+    }
+    if (!mounted) return;
+    unawaited(showNoteEditorSheet(
       context,
       controller: _noteController,
       mood: _selected,
-    );
+    ));
   }
 
   void _save() {
@@ -453,17 +472,24 @@ class _LogScreenState extends State<LogScreen> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        AnimatedBuilder(
-          animation: _noteController,
-          builder: (context, _) {
-            final note = _noteController.text.trim();
-            return _NotePill(
-              text:
-                  note.isEmpty ? _notePrompt(strings) : note.split('\n').first,
-              hasNote: note.isNotEmpty,
-              onTap: _openNoteEditor,
-            );
-          },
+        BlocBuilder<NoteLockCubit, NoteLockState>(
+          builder: (context, lock) => AnimatedBuilder(
+            animation: _noteController,
+            builder: (context, _) {
+              final note = _noteController.text.trim();
+              final concealed = _noteIsConcealed(lock);
+              return _NotePill(
+                text: concealed
+                    ? strings.noteLockedLabel
+                    : note.isEmpty
+                        ? _notePrompt(strings)
+                        : note.split('\n').first,
+                hasNote: note.isNotEmpty,
+                concealed: concealed,
+                onTap: () => unawaited(_openNoteEditor()),
+              );
+            },
+          ),
         ),
         const SizedBox(height: 12),
         Center(
@@ -597,14 +623,24 @@ class _LogScreenState extends State<LogScreen> {
                 ],
               ),
               const SizedBox(height: 14),
-              Text(
-                note.isEmpty ? strings.noNoteYet : note,
-                style: TextStyle(
-                  fontSize: 15,
-                  height: 22 / 15,
-                  color: note.isEmpty ? palette.textSecondary : palette.text,
+              if (note.isEmpty)
+                Text(
+                  strings.noNoteYet,
+                  style: TextStyle(
+                    fontSize: 15,
+                    height: 22 / 15,
+                    color: palette.textSecondary,
+                  ),
+                )
+              else
+                NoteText(
+                  note,
+                  style: TextStyle(
+                    fontSize: 15,
+                    height: 22 / 15,
+                    color: palette.text,
+                  ),
                 ),
-              ),
               const SizedBox(height: 14),
               Align(
                 alignment: Alignment.centerLeft,
@@ -696,10 +732,14 @@ class _NotePill extends StatelessWidget {
     required this.text,
     required this.hasNote,
     required this.onTap,
+    this.concealed = false,
   });
 
   final String text;
   final bool hasNote;
+
+  /// The note is there but the note lock is hiding it.
+  final bool concealed;
   final VoidCallback onTap;
 
   @override
@@ -709,7 +749,11 @@ class _NotePill extends StatelessWidget {
 
     return Semantics(
       button: true,
-      label: hasNote ? '$text. ${strings.noteExistsSemantics}' : text,
+      label: concealed
+          ? strings.noteLockedSemantics
+          : hasNote
+              ? '$text. ${strings.noteExistsSemantics}'
+              : text,
       onTap: onTap,
       excludeSemantics: true,
       child: GestureDetector(
@@ -723,7 +767,7 @@ class _NotePill extends StatelessWidget {
             child: Row(
               children: [
                 Icon(
-                  Icons.edit_outlined,
+                  concealed ? Icons.lock_outline_rounded : Icons.edit_outlined,
                   size: 18,
                   color: palette.textSecondary,
                 ),
@@ -735,7 +779,9 @@ class _NotePill extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 15,
-                      color: hasNote ? palette.text : palette.textSecondary,
+                      color: hasNote && !concealed
+                          ? palette.text
+                          : palette.textSecondary,
                     ),
                   ),
                 ),

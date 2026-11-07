@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../core/localization/app_strings.dart';
 import '../../../../core/theme/brand_colors.dart';
 import '../../../../core/widgets/gradient_pill_button.dart';
+import '../../../note_lock/presentation/widgets/note_text.dart';
 import '../../domain/entities/mood_entry.dart';
 import '../../domain/services/logged_time.dart';
 import '../../domain/services/mood_definition_resolver.dart';
@@ -151,13 +152,20 @@ class DayDetailSheet extends StatelessWidget {
                     ),
               ),
               const SizedBox(height: 6),
-              Text(
-                note.isEmpty ? strings.noNoteYet : note,
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color:
-                          note.isEmpty ? palette.textSecondary : palette.text,
-                    ),
-              ),
+              if (note.isEmpty)
+                Text(
+                  strings.noNoteYet,
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: palette.textSecondary,
+                      ),
+                )
+              else
+                NoteText(
+                  note,
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: palette.text,
+                      ),
+                ),
               const SizedBox(height: 20),
               GradientPillButton(
                 label: strings.editEntryButton,

@@ -19,7 +19,8 @@ part 'purchases_state.dart';
 enum PremiumSource {
   lockedMood('locked_mood'),
   settings('settings'),
-  insights('insights');
+  insights('insights'),
+  onboarding('onboarding');
 
   const PremiumSource(this.analyticsValue);
   final String analyticsValue;

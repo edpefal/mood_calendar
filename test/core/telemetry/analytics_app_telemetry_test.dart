@@ -90,6 +90,38 @@ void main() {
     expect(reporter.events[1].parameters, {'source': 'locked_mood'});
   });
 
+  test('the onboarding and note lock events are forwarded without entry data',
+      () {
+    telemetry.trackEvent(
+      AppTelemetryEvents.onboardingSkipped,
+      properties: {'step': 2, 'mood': 'calm', 'note': 'secret'},
+    );
+    telemetry.trackEvent(AppTelemetryEvents.onboardingCompleted);
+    telemetry.trackEvent(
+      AppTelemetryEvents.noteLockEnabled,
+      properties: {'note': 'secret'},
+    );
+    telemetry.trackEvent(AppTelemetryEvents.noteLockDisabled);
+    telemetry.trackEvent(
+      AppTelemetryEvents.storeOpened,
+      properties: {'source': 'onboarding'},
+    );
+
+    expect(
+      reporter.events.map((e) => e.name),
+      [
+        'onboarding_skipped',
+        'onboarding_completed',
+        'note_lock_enabled',
+        'note_lock_disabled',
+        'store_opened',
+      ],
+    );
+    expect(reporter.events[0].parameters, {'step': 2});
+    expect(reporter.events[2].parameters, isEmpty);
+    expect(reporter.events[4].parameters, {'source': 'onboarding'});
+  });
+
   test('a purchase event never carries a mood or a pack id', () {
     telemetry.trackEvent(
       AppTelemetryEvents.purchaseCompleted,

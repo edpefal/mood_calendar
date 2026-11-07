@@ -19,6 +19,8 @@ import '../../../../core/widgets/mesh_background.dart';
 import '../../../../core/widgets/phone_column.dart';
 import '../../../mood/data/services/rating_prompt_service.dart';
 import '../../../mood/domain/usecases/export_mood_history_usecase.dart';
+import '../../../note_lock/presentation/bloc/note_lock_cubit.dart';
+import '../../../note_lock/presentation/bloc/note_lock_state.dart';
 import '../../../purchases/domain/entities/subscription_plan.dart';
 import '../../../purchases/domain/entities/subscription_status.dart';
 import '../../../purchases/presentation/bloc/purchases_cubit.dart';
@@ -68,6 +70,7 @@ class SettingsScreen extends StatelessWidget {
       builder: (context) {
         final notificationService = context.read<LocalNotificationService>();
         final themeCubit = context.read<ThemeCubit>();
+        final noteLockCubit = context.read<NoteLockCubit>();
         return BlocProvider(
           create: (context) => SettingsCubit(
             settingsRepository: context.read<AppSettingsRepository>(),
@@ -78,6 +81,9 @@ class SettingsScreen extends StatelessWidget {
             setUsageAnalyticsCollection:
                 context.read<AnalyticsReporter>().setCollectionEnabled,
             onThemeChanged: themeCubit.apply,
+            requestNotificationPermission:
+                notificationService.requestPermission,
+            onNoteLockChanged: noteLockCubit.setEnabled,
           )..load(),
           child: const SettingsScreen(),
         );
@@ -150,6 +156,16 @@ class SettingsScreen extends StatelessWidget {
                 );
               },
             ),
+            BlocListener<SettingsCubit, SettingsState>(
+              listenWhen: (previous, current) =>
+                  previous.notificationDeniedCount !=
+                  current.notificationDeniedCount,
+              listener: (context, state) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(strings.reminderPermissionDenied)),
+                );
+              },
+            ),
             BlocListener<PurchasesCubit, PurchasesState>(
               listenWhen: (previous, current) =>
                   previous.actionStatus != current.actionStatus,
@@ -204,6 +220,7 @@ class SettingsScreen extends StatelessWidget {
                         title: strings.sectionPrivacyData,
                         children: [
                           _ExportHistoryRow(shareFile: _shareFile),
+                          const _NoteLockRow(),
                           _SettingsRow(
                             icon: Icons.analytics_outlined,
                             tone: MoodTone.neutral,
@@ -526,9 +543,13 @@ class _SettingsRow extends StatelessWidget {
     this.semanticLabel,
     this.enabled = true,
     this.busy = false,
+    this.badge,
   });
 
   final IconData icon;
+
+  /// A small pill before the control, e.g. "Pro".
+  final String? badge;
   final MoodTone tone;
   final String title;
   final String? detail;
@@ -597,6 +618,25 @@ class _SettingsRow extends StatelessWidget {
               style: TextStyle(
                 fontSize: 15,
                 color: palette.textSecondary,
+              ),
+            ),
+          ],
+          if (badge != null) ...[
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: palette.ink,
+                borderRadius: BorderRadius.circular(999),
+              ),
+              child: Text(
+                badge!,
+                style: TextStyle(
+                  fontSize: 11,
+                  height: 14 / 11,
+                  fontWeight: FontWeight.w600,
+                  color: palette.onInk,
+                ),
               ),
             ),
           ],
@@ -675,6 +715,12 @@ class _ExportHistoryRowState extends State<_ExportHistoryRow> {
     final exportHistory = context.read<ExportMoodHistoryUseCase>();
     final messenger = ScaffoldMessenger.of(context);
     final anchor = _anchorRect();
+    // The file carries the notes' text: with the note lock on, prove who is
+    // asking first. Cancelling just leaves the row available.
+    final unlocked = await context
+        .read<NoteLockCubit>()
+        .unlock(strings.noteLockReasonExport);
+    if (!unlocked || !mounted) return;
     setState(() => _isExporting = true);
     try {
       final result = await exportHistory();
@@ -708,6 +754,64 @@ class _ExportHistoryRowState extends State<_ExportHistoryRow> {
       enabled: !_isExporting,
       busy: _isExporting,
       onTap: () => unawaited(_export()),
+    );
+  }
+}
+
+/// "Lock notes" in Privacy and data: needs Premium to turn on, authentication
+/// to turn on or off (see the `note-lock` spec).
+class _NoteLockRow extends StatelessWidget {
+  const _NoteLockRow();
+
+  Future<void> _change(BuildContext context, bool enable) async {
+    final strings = AppStrings.of(context);
+    final lock = context.read<NoteLockCubit>();
+    final settings = context.read<SettingsCubit>();
+    final messenger = ScaffoldMessenger.of(context);
+    final reason =
+        enable ? strings.noteLockReasonEnable : strings.noteLockReasonDisable;
+
+    final result = await lock.requestChange(enable: enable, reason: reason);
+    switch (result) {
+      case NoteLockChange.enabled:
+      case NoteLockChange.disabled:
+        unawaited(settings.setNoteLockEnabled(enable));
+      case NoteLockChange.needsPremium:
+        if (context.mounted) {
+          unawaited(
+            showPremiumSheet(context, source: PremiumSource.settings),
+          );
+        }
+      case NoteLockChange.unavailable:
+        messenger.showSnackBar(
+          SnackBar(content: Text(strings.noteLockNeedsPasscodeMessage)),
+        );
+      case NoteLockChange.cancelled:
+        break;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
+    return BlocBuilder<PurchasesCubit, PurchasesState>(
+      buildWhen: (previous, current) =>
+          previous.subscription != current.subscription,
+      builder: (context, purchases) =>
+          BlocBuilder<NoteLockCubit, NoteLockState>(
+        builder: (context, lock) => _SettingsRow(
+          icon: Icons.lock_outline_rounded,
+          tone: MoodTone.hard,
+          title: strings.noteLockTitle,
+          detail: lock.enabledButUnenforceable
+              ? strings.noteLockNeedsPasscodeSubtitle
+              : strings.noteLockSubtitle,
+          badge:
+              purchases.subscription.isActive ? null : strings.noteLockProBadge,
+          toggled: lock.enabled,
+          onToggle: (value) => unawaited(_change(context, value)),
+        ),
+      ),
     );
   }
 }
