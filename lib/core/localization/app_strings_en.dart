@@ -500,4 +500,84 @@ class AppStringsEn extends AppStrings {
   @override
   String lockedCardSemantics(String title) =>
       '$title. Locked. See with Premium';
+
+  @override
+  String get onboardingSkip => 'Skip';
+  @override
+  String onboardingStepLabel(int step) => "Step $step of 4";
+  @override
+  String get onboardingWelcomeTitle => 'Track how you feel in 5 seconds a day';
+  @override
+  String get onboardingWelcomeBody =>
+      'One tap a day, and over time you will see what makes you feel better.';
+  @override
+  String get onboardingGetStarted => 'Get started';
+  @override
+  String get onboardingTimeTitle => 'When do you want to check in?';
+  @override
+  String get onboardingTimeBody =>
+      'Most people do it at night, as the day winds down.';
+  @override
+  String get onboardingMorning => 'Morning';
+  @override
+  String get onboardingAfternoon => 'Afternoon';
+  @override
+  String get onboardingNight => 'Night';
+  @override
+  String onboardingTimeSuggestionSemantics(String name, String time) =>
+      "$name, $time";
+  @override
+  String onboardingTimePickerSemantics(String time) => "Reminder time: $time";
+  @override
+  String get onboardingReminderTitle => 'One reminder a day, that’s it';
+  @override
+  String get onboardingReminderBody =>
+      'Tap the notification to log your mood in seconds.';
+  @override
+  String get onboardingTurnOnReminder => 'Turn on reminder';
+  @override
+  String get onboardingNotNow => 'Not now';
+  @override
+  String get onboardingLogTitle => 'How are you feeling right now?';
+  @override
+  String get onboardingLogBody =>
+      'Pick the closest one. You can change it later.';
+  @override
+  String get onboardingSaveFirstDay => 'Save my first day';
+  @override
+  String get onboardingDayOneTitle => 'Day 1 of your calendar';
+  @override
+  String onboardingDayOneToday(String mood) => "Today: $mood";
+  @override
+  String get onboardingCalendarPreviewSemantics =>
+      'Preview of a calendar filled with moods';
+  @override
+  String get reminderPermissionDenied =>
+      'Notifications are off for Mood Calendar. Turn them on in your device settings to get the reminder.';
+  @override
+  String get noteLockTitle => 'Lock notes';
+  @override
+  String get noteLockSubtitle => 'Biometrics or device passcode';
+  @override
+  String get noteLockNeedsPasscodeSubtitle =>
+      'Set a passcode on your device to use the lock';
+  @override
+  String get noteLockNeedsPasscodeMessage =>
+      'Set a passcode or biometrics on your device first to lock your notes.';
+  @override
+  String get noteLockProBadge => 'Pro';
+  @override
+  String get noteLockedLabel => 'Note locked';
+  @override
+  String get noteLockedUnlockAction => 'Unlock';
+  @override
+  String get noteLockedSemantics => 'Note locked. Double tap to unlock';
+  @override
+  String get noteLockReasonUnlock => 'Unlock your notes';
+  @override
+  String get noteLockReasonEnable => 'Turn on the notes lock';
+  @override
+  String get noteLockReasonDisable => 'Turn off the notes lock';
+  @override
+  String get noteLockReasonExport => 'Unlock your notes to export your history';
 }

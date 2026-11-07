@@ -33,6 +33,7 @@ void main() {
     expect(settings.dailyReminderMinute, 0);
     expect(settings.usageAnalyticsEnabled, isTrue);
     expect(settings.themePreference, AppThemePreference.system);
+    expect(settings.noteLockEnabled, isFalse);
   });
 
   test('persists and reloads typed settings values', () async {
@@ -98,6 +99,32 @@ void main() {
         (await dataSource.getSettings()).themePreference,
         AppThemePreference.system,
       );
+    });
+  });
+
+  group('note lock', () {
+    test('is off for a box saved before the key existed', () async {
+      await settingsBox.put('daily_reminder_hour', 7);
+
+      expect((await dataSource.getSettings()).noteLockEnabled, isFalse);
+    });
+
+    test('persists across reopens and keeps the other settings', () async {
+      await dataSource.saveSettings(
+        AppSettings.defaults.copyWith(dailyReminderHour: 7),
+      );
+      final saved = await dataSource.getSettings();
+      await dataSource.saveSettings(saved.copyWith(noteLockEnabled: true));
+      await settingsBox.close();
+      settingsBox = await Hive.openBox<dynamic>(
+        AppSettingsLocalDataSource.boxName,
+      );
+
+      final reloaded =
+          await AppSettingsLocalDataSource(settingsBox).getSettings();
+
+      expect(reloaded.noteLockEnabled, isTrue);
+      expect(reloaded.dailyReminderHour, 7);
     });
   });
 }

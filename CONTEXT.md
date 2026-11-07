@@ -45,8 +45,20 @@ Cuadrícula de un año con un píxel por día, teñido con la Category de la ent
 _Avoid_: Heatmap, mapa de calor
 
 **Subscription sheet** (hoja de suscripción):
-Hoja inferior que ofrece los tres planes. Solo se abre cuando el usuario la pide: al tocar un Mood premium bloqueado o la fila Premium de Settings. Reemplaza a la antigua pestaña Premium, que ya no existe.
+Hoja inferior que ofrece los tres planes. Solo se abre cuando el usuario la pide (un Mood premium bloqueado, la fila Premium o el bloqueo de notas en Settings, una tarjeta bloqueada de Insights) o, una sola vez, al terminar el **Onboarding**. Reemplaza a la antigua pestaña Premium, que ya no existe.
 _Avoid_: Paywall, pantalla Premium, tienda
+
+**Onboarding**:
+Recorrido de cuatro pasos (bienvenida, hora del recordatorio, permiso de notificaciones y primer registro) que solo ve quien instala la app sin ninguna Mood Entry. Es donde se pide por primera vez el permiso de notificaciones; termina en la **Subscription sheet**, ofrecida una sola vez. Quien actualiza con historial nunca lo ve.
+_Avoid_: Tutorial, walkthrough, tour
+
+**Note lock** (bloqueo de notas):
+Función Premium que oculta el texto de las notas ("Note locked") hasta que el usuario se autentica con la biometría o el código del dispositivo. Protege solo el texto: el mood, la fecha y las rachas siguen visibles. Es una barrera de la interfaz, **no cifrado**: el texto sigue guardado en el dispositivo. Un bloqueo ya activo se sigue aplicando si la suscripción vence.
+_Avoid_: Cifrado, encriptación, candado de la app
+
+**Unlocked session** (sesión desbloqueada):
+El periodo en que, con el **Note lock** activo, el usuario ya se autenticó y las notas se ven. Vive en memoria, no se guarda y termina al enviar la app a segundo plano. No confundir con **Unlocked** (acceso a un Mood premium).
+_Avoid_: Sesión iniciada, login
 
 **Unlocked**:
 Estado por usuario: si ese usuario tiene acceso para usar un Mood concreto. Todo Mood `base` está unlocked trivialmente para cualquiera; un Mood `premium` está unlocked solo si el usuario tiene una **Subscription** activa o si compró ese Mood en una versión anterior (directo o vía Pack).

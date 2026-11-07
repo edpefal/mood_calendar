@@ -9,15 +9,18 @@ class SettingsState extends Equatable {
     this.remindersEnabled = false,
     this.usageAnalyticsEnabled = true,
     this.themePreference = AppThemePreference.system,
+    this.noteLockEnabled = false,
     this.reminderTime = const TimeOfDay(hour: 18, minute: 0),
     this.appVersion = '',
     this.saveFailureCount = 0,
+    this.notificationDeniedCount = 0,
   });
 
   final bool isLoading;
   final bool remindersEnabled;
   final bool usageAnalyticsEnabled;
   final AppThemePreference themePreference;
+  final bool noteLockEnabled;
   final TimeOfDay reminderTime;
   final String appVersion;
 
@@ -25,14 +28,20 @@ class SettingsState extends Equatable {
   /// to every failure (including consecutive ones) with a listener.
   final int saveFailureCount;
 
+  /// Incremented each time turning the reminder on was refused by the OS
+  /// notification permission, so the UI can explain it.
+  final int notificationDeniedCount;
+
   SettingsState copyWith({
     bool? isLoading,
     bool? remindersEnabled,
     bool? usageAnalyticsEnabled,
     AppThemePreference? themePreference,
+    bool? noteLockEnabled,
     TimeOfDay? reminderTime,
     String? appVersion,
     int? saveFailureCount,
+    int? notificationDeniedCount,
   }) {
     return SettingsState(
       isLoading: isLoading ?? this.isLoading,
@@ -40,9 +49,12 @@ class SettingsState extends Equatable {
       usageAnalyticsEnabled:
           usageAnalyticsEnabled ?? this.usageAnalyticsEnabled,
       themePreference: themePreference ?? this.themePreference,
+      noteLockEnabled: noteLockEnabled ?? this.noteLockEnabled,
       reminderTime: reminderTime ?? this.reminderTime,
       appVersion: appVersion ?? this.appVersion,
       saveFailureCount: saveFailureCount ?? this.saveFailureCount,
+      notificationDeniedCount:
+          notificationDeniedCount ?? this.notificationDeniedCount,
     );
   }
 
@@ -52,8 +64,10 @@ class SettingsState extends Equatable {
         remindersEnabled,
         usageAnalyticsEnabled,
         themePreference,
+        noteLockEnabled,
         reminderTime,
         appVersion,
         saveFailureCount,
+        notificationDeniedCount,
       ];
 }

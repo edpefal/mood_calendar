@@ -30,13 +30,29 @@ class MoodCategoryGrid extends StatelessWidget {
     required this.selectedId,
     required this.isLocked,
     required this.onMoodTap,
+    this.onlyTier,
   });
+
+  /// Shows only the moods of this tier (the onboarding offers the base ones,
+  /// with nothing to unlock yet). All of them when null.
+  final MoodTier? onlyTier;
 
   final String? selectedId;
   final bool Function(MoodDefinition mood) isLocked;
   final ValueChanged<MoodDefinition> onMoodTap;
 
   static const double _spacing = 6;
+
+  List<({MoodCategory category, List<MoodDefinition> moods})> _groups() => [
+        for (final group in moodDefinitionsByCategory())
+          (
+            category: group.category,
+            moods: [
+              for (final mood in group.moods)
+                if (onlyTier == null || mood.tier == onlyTier) mood,
+            ],
+          ),
+      ].where((group) => group.moods.isNotEmpty).toList();
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +65,7 @@ class MoodCategoryGrid extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        for (final group in moodDefinitionsByCategory()) ...[
+        for (final group in _groups()) ...[
           Semantics(
             header: true,
             label: strings.categorySectionSemantics(

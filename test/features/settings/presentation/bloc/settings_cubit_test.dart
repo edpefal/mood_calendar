@@ -203,6 +203,108 @@ void main() {
       expect(repository.saved.dailyReminderEnabled, isFalse);
     });
   });
+
+  group('notification permission', () {
+    SettingsCubit buildPermissionCubit(Future<bool> Function() request) =>
+        SettingsCubit(
+          settingsRepository: repository,
+          scheduleReminder: () async => calls.add('schedule'),
+          cancelReminder: () async => calls.add('cancel'),
+          loadAppVersion: () async => '1.8.3 (28)',
+          logger: _SilentLogger(),
+          requestNotificationPermission: request,
+        );
+
+    setUp(() {
+      repository.saved = repository.saved.copyWith(dailyReminderEnabled: false);
+    });
+
+    test('turning the reminder on asks for the permission first', () async {
+      var asked = 0;
+      final cubit = buildPermissionCubit(() async {
+        asked++;
+        return true;
+      });
+      await cubit.load();
+
+      await cubit.setRemindersEnabled(true);
+
+      expect(asked, 1);
+      expect(repository.saved.dailyReminderEnabled, isTrue);
+      expect(calls, ['schedule']);
+    });
+
+    test('a refused permission turns the switch back off and says so',
+        () async {
+      final cubit = buildPermissionCubit(() async => false);
+      await cubit.load();
+
+      await cubit.setRemindersEnabled(true);
+
+      expect(cubit.state.remindersEnabled, isFalse);
+      expect(cubit.state.notificationDeniedCount, 1);
+      expect(repository.saved.dailyReminderEnabled, isFalse);
+      expect(calls, isEmpty);
+    });
+
+    test('turning the reminder off never asks for the permission', () async {
+      repository.saved = repository.saved.copyWith(dailyReminderEnabled: true);
+      var asked = 0;
+      final cubit = buildPermissionCubit(() async {
+        asked++;
+        return true;
+      });
+      await cubit.load();
+
+      await cubit.setRemindersEnabled(false);
+
+      expect(asked, 0);
+      expect(calls, ['cancel']);
+    });
+  });
+
+  group('note lock', () {
+    test('is saved without touching the reminder', () async {
+      final cubit = buildCubit();
+      await cubit.load();
+
+      await cubit.setNoteLockEnabled(true);
+
+      expect(cubit.state.noteLockEnabled, isTrue);
+      expect(repository.saved.noteLockEnabled, isTrue);
+      expect(calls, isEmpty);
+    });
+
+    test('a failed save reverts it and tells the lock to go back', () async {
+      final changes = <bool>[];
+      final cubit = SettingsCubit(
+        settingsRepository: repository,
+        scheduleReminder: () async {},
+        cancelReminder: () async {},
+        loadAppVersion: () async => '1.8.3 (28)',
+        logger: _SilentLogger(),
+        onNoteLockChanged: changes.add,
+      );
+      await cubit.load();
+      repository.failSaves = true;
+
+      await cubit.setNoteLockEnabled(true);
+
+      expect(cubit.state.noteLockEnabled, isFalse);
+      expect(changes, [false]);
+      expect(cubit.state.saveFailureCount, 1);
+    });
+
+    test('a later write of another setting keeps the lock', () async {
+      final cubit = buildCubit();
+      await cubit.load();
+
+      await cubit.setNoteLockEnabled(true);
+      await cubit.setUsageAnalyticsEnabled(false);
+
+      expect(repository.saved.noteLockEnabled, isTrue);
+    });
+  });
 }
 
 class _FakeSettingsRepository implements AppSettingsRepository {

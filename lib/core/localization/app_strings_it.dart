@@ -510,4 +510,88 @@ class AppStringsIt extends AppStrings {
   @override
   String lockedCardSemantics(String title) =>
       '$title. Bloccato. Vedi con Premium';
+
+  @override
+  String get onboardingSkip => 'Salta';
+  @override
+  String onboardingStepLabel(int step) => "Passaggio $step di 4";
+  @override
+  String get onboardingWelcomeTitle =>
+      'Registra come ti senti in 5 secondi al giorno';
+  @override
+  String get onboardingWelcomeBody =>
+      'Un tocco al giorno e col tempo vedrai cosa ti fa stare meglio.';
+  @override
+  String get onboardingGetStarted => 'Inizia';
+  @override
+  String get onboardingTimeTitle => 'Quando vuoi registrarti?';
+  @override
+  String get onboardingTimeBody =>
+      'La maggior parte lo fa la sera, quando la giornata finisce.';
+  @override
+  String get onboardingMorning => 'Mattina';
+  @override
+  String get onboardingAfternoon => 'Pomeriggio';
+  @override
+  String get onboardingNight => 'Sera';
+  @override
+  String onboardingTimeSuggestionSemantics(String name, String time) =>
+      "$name, $time";
+  @override
+  String onboardingTimePickerSemantics(String time) =>
+      "Orario del promemoria: $time";
+  @override
+  String get onboardingReminderTitle => 'Un promemoria al giorno, e basta';
+  @override
+  String get onboardingReminderBody =>
+      'Tocca la notifica per registrare il tuo umore in pochi secondi.';
+  @override
+  String get onboardingTurnOnReminder => 'Attiva il promemoria';
+  @override
+  String get onboardingNotNow => 'Non ora';
+  @override
+  String get onboardingLogTitle => 'Come ti senti adesso?';
+  @override
+  String get onboardingLogBody =>
+      'Scegli quello più vicino. Potrai cambiarlo dopo.';
+  @override
+  String get onboardingSaveFirstDay => 'Salva il mio primo giorno';
+  @override
+  String get onboardingDayOneTitle => 'Giorno 1 del tuo calendario';
+  @override
+  String onboardingDayOneToday(String mood) => "Oggi: $mood";
+  @override
+  String get onboardingCalendarPreviewSemantics =>
+      'Anteprima di un calendario pieno di stati d’animo';
+  @override
+  String get reminderPermissionDenied =>
+      'Le notifiche sono disattivate per Mood Calendar. Attivale nelle impostazioni del dispositivo per ricevere il promemoria.';
+  @override
+  String get noteLockTitle => 'Blocca le note';
+  @override
+  String get noteLockSubtitle => 'Biometria o codice del dispositivo';
+  @override
+  String get noteLockNeedsPasscodeSubtitle =>
+      'Imposta un codice sul dispositivo per usare il blocco';
+  @override
+  String get noteLockNeedsPasscodeMessage =>
+      'Imposta prima un codice o la biometria sul dispositivo per bloccare le note.';
+  @override
+  String get noteLockProBadge => 'Pro';
+  @override
+  String get noteLockedLabel => 'Nota bloccata';
+  @override
+  String get noteLockedUnlockAction => 'Sblocca';
+  @override
+  String get noteLockedSemantics =>
+      'Nota bloccata. Tocca due volte per sbloccare';
+  @override
+  String get noteLockReasonUnlock => 'Sblocca le tue note';
+  @override
+  String get noteLockReasonEnable => 'Attiva il blocco delle note';
+  @override
+  String get noteLockReasonDisable => 'Disattiva il blocco delle note';
+  @override
+  String get noteLockReasonExport =>
+      'Sblocca le note per esportare la cronologia';
 }

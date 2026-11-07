@@ -10,6 +10,7 @@ import 'package:path_provider/path_provider.dart';
 import 'core/localization/app_strings.dart';
 import 'core/logging/app_logger.dart';
 import 'core/logging/logger_app_logger.dart';
+import 'core/navigation/app_root.dart';
 import 'core/navigation/main_shell.dart';
 import 'core/notifications/local_notification_service.dart';
 import 'core/rating/review_requester.dart';
@@ -29,6 +30,12 @@ import 'core/telemetry/logger_app_telemetry.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_cubit.dart';
 import 'features/mood/data/models/mood_model.dart';
+import 'features/note_lock/data/local_auth_note_lock_authenticator.dart';
+import 'features/note_lock/presentation/bloc/note_lock_cubit.dart';
+import 'features/note_lock/presentation/widgets/note_lock_host.dart';
+import 'features/onboarding/data/onboarding_state_data_source.dart';
+import 'features/onboarding/domain/onboarding_gate.dart';
+import 'features/onboarding/presentation/screens/onboarding_flow.dart';
 import 'features/mood/data/repositories/mood_repository_impl.dart';
 import 'features/mood/data/services/rating_prompt_service.dart';
 import 'features/mood/data/services/json_mood_history_exporter.dart';
@@ -146,6 +153,15 @@ void main() async {
     );
   }
   final repository = MoodRepositoryImpl(moodBox, logger: appLogger);
+  // Decided once, here, from the boxes already open: a brand-new install
+  // (nothing finished, no entries) opens on the onboarding, which asks for the
+  // notification permission itself.
+  final onboardingState = OnboardingStateDataSource(settingsBox);
+  final onboardingGate = OnboardingGate(
+    isCompleted: () => onboardingState.isCompleted,
+    hasEntries: () => moodBox.isNotEmpty,
+  );
+  final onboardingPending = onboardingGate.shouldShow;
   final notificationService = LocalNotificationService(
     onReminderTap: handleReminderTap,
     appSettingsRepository: appSettingsRepository,
@@ -217,6 +233,7 @@ void main() async {
       providers: [
         RepositoryProvider<WatchSyncCoordinator>.value(value: watchSync),
         RepositoryProvider<AppLogger>.value(value: appLogger),
+        RepositoryProvider<AppTelemetry>.value(value: telemetry),
         RepositoryProvider<AnalyticsReporter>.value(
           value: analyticsReporter ?? const NoopAnalyticsReporter(),
         ),
@@ -260,8 +277,21 @@ void main() async {
               telemetry: telemetry,
             ),
           ),
+          BlocProvider(
+            create: (context) => NoteLockCubit(
+              authenticator: LocalAuthNoteLockAuthenticator(),
+              telemetry: telemetry,
+              enabled: savedSettings.noteLockEnabled,
+              isSubscribed: () =>
+                  context.read<PurchasesCubit>().state.subscription.isActive,
+            ),
+          ),
         ],
-        child: isIos ? const WatchSyncHost(child: MyApp()) : const MyApp(),
+        child: NoteLockHost(
+          child: isIos
+              ? WatchSyncHost(child: _app(onboardingGate, onboardingState))
+              : _app(onboardingGate, onboardingState),
+        ),
       ),
     ),
   );
@@ -270,9 +300,15 @@ void main() async {
   // notification-permission dialog, which never resolves until the user
   // interacts with it. Awaiting it before runApp() left the app stuck on
   // the launch screen until that dialog was dismissed (see proposal.md).
+  // On a brand-new install the dialog waits for step 3 of the onboarding and
+  // nothing is scheduled until the user chooses a time there.
   unawaited(
-    notificationService.initialize().then((launchedFromReminder) async {
-      await notificationService.scheduleDailyReminder();
+    notificationService
+        .initialize(requestPermission: !onboardingPending)
+        .then((launchedFromReminder) async {
+      if (!onboardingPending) {
+        await notificationService.scheduleDailyReminder();
+      }
       if (launchedFromReminder) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           unawaited(handleReminderTap());
@@ -282,8 +318,19 @@ void main() async {
   );
 }
 
+MyApp _app(OnboardingGate gate, OnboardingStateDataSource state) =>
+    MyApp(onboardingGate: gate, markOnboardingCompleted: state.markCompleted);
+
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({
+    super.key,
+    this.onboardingGate = const OnboardingGate.skipped(),
+    this.markOnboardingCompleted,
+  });
+
+  /// Whether the app opens on the onboarding; tests keep the default (never).
+  final OnboardingGate onboardingGate;
+  final Future<void> Function()? markOnboardingCompleted;
 
   @override
   Widget build(BuildContext context) {
@@ -300,7 +347,14 @@ class MyApp extends StatelessWidget {
         theme: buildAppTheme(Brightness.light),
         darkTheme: buildAppTheme(Brightness.dark),
         themeMode: context.read<ThemeCubit>().themeMode,
-        home: MainShell(key: mainShellKey),
+        home: AppRoot(
+          gate: onboardingGate,
+          shell: MainShell(key: mainShellKey),
+          onboardingBuilder: (onFinished) => OnboardingFlow.forApp(
+            onFinished: onFinished,
+            markCompleted: markOnboardingCompleted ?? () async {},
+          ),
+        ),
         debugShowCheckedModeBanner: false,
       ),
     );

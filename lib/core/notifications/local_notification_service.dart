@@ -41,9 +41,14 @@ class LocalNotificationService {
   @visibleForTesting
   AppStrings get strings => AppStrings.forLocale(_localeResolver());
 
-  Future<bool> initialize() async {
+  /// [requestPermission] is false on a brand-new install: the onboarding asks
+  /// for the notification permission itself (step 3), in context, instead of
+  /// the OS dialog appearing at launch.
+  Future<bool> initialize({bool requestPermission = true}) async {
     await _configureTimeZones();
-    await _requestPermissions();
+    if (requestPermission) {
+      await this.requestPermission();
+    }
 
     const androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -134,7 +139,11 @@ class LocalNotificationService {
         android: androidDetails,
         iOS: darwinDetails,
       ),
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      // Inexact on purpose: the daily reminder does not need to fire on the
+      // minute, and exact alarms need SCHEDULE_EXACT_ALARM (Android 12+),
+      // which the app does not declare; asking for it throws
+      // `exact_alarms_not_permitted` and the reminder is never scheduled.
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.wallClockTime,
       matchDateTimeComponents: DateTimeComponents.time,
@@ -182,19 +191,25 @@ class LocalNotificationService {
     _timeZoneInitialized = true;
   }
 
-  Future<void> _requestPermissions() async {
+  /// Asks the OS for permission to show notifications and reports whether it
+  /// ended up granted. Safe to call again: once the user has decided, the OS
+  /// shows no dialog and just returns the current answer.
+  Future<bool> requestPermission() async {
+    var granted = true;
     if (Platform.isIOS || Platform.isMacOS) {
-      await _plugin
+      final result = await _plugin
           .resolvePlatformSpecificImplementation<
               IOSFlutterLocalNotificationsPlugin>()
           ?.requestPermissions(alert: true, badge: false, sound: true);
+      granted = result == true;
     }
 
     if (Platform.isAndroid) {
       final androidPlugin = _plugin.resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>();
-      final granted = await androidPlugin?.requestNotificationsPermission();
-      if (granted != null && !granted) {
+      final result = await androidPlugin?.requestNotificationsPermission();
+      granted = result == true;
+      if (result != null && !result) {
         _telemetry.recordError(
           'notification_permission_denied',
           reason: 'android_runtime_permission',
@@ -204,6 +219,7 @@ class LocalNotificationService {
         }
       }
     }
+    return granted;
   }
 
   Future<String?> _tryGetLocalTimeZone() async {

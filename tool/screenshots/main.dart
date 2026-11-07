@@ -40,6 +40,9 @@ import 'package:mood_calendar/features/mood/domain/usecases/save_mood_usecase.da
 import 'package:mood_calendar/features/mood/presentation/bloc/calendar_cubit.dart';
 import 'package:mood_calendar/features/mood/presentation/bloc/mood_cubit.dart';
 import 'package:mood_calendar/core/navigation/main_shell.dart';
+import 'package:mood_calendar/features/note_lock/data/local_auth_note_lock_authenticator.dart';
+import 'package:mood_calendar/features/note_lock/presentation/bloc/note_lock_cubit.dart';
+import 'package:mood_calendar/features/note_lock/presentation/widgets/note_lock_host.dart';
 import 'package:mood_calendar/features/purchases/data/datasources/revenue_cat_datasource.dart';
 import 'package:mood_calendar/features/purchases/data/repositories/mood_entitlements_repository_impl.dart';
 import 'package:mood_calendar/features/purchases/domain/entities/subscription_plan.dart';
@@ -240,8 +243,16 @@ Future<void> main() async {
           ),
           BlocProvider(create: (context) => ThemeCubit()),
           BlocProvider(create: (context) => PurchasesCubit(entitlements)),
+          // The lock stays off in the store screenshots.
+          BlocProvider(
+            create: (context) => NoteLockCubit(
+              authenticator: LocalAuthNoteLockAuthenticator(),
+              telemetry: telemetry,
+              isSubscribed: () => true,
+            ),
+          ),
         ],
-        child: const _ScreenshotApp(),
+        child: const NoteLockHost(child: _ScreenshotApp()),
       ),
     ),
   );

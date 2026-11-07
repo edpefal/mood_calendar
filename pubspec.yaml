@@ -57,10 +57,19 @@ dependencies:
   firebase_crashlytics: ^5.4.0
   firebase_analytics: ^12.0.0
   fl_chart: 1.0.0
+  local_auth: ^2.3.0
 
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
+
+# CI runs Flutter 3.32.1 (Dart 3.8). The newest local_auth_* releases that
+# local_auth 2.3.0 accepts need Dart 3.9+, so they are pinned to the last ones
+# that resolve there. Lift these when CI moves to Flutter 3.35 or later.
+dependency_overrides:
+  local_auth_android: 1.0.52
+  local_auth_darwin: 1.6.0
+  flutter_plugin_android_lifecycle: 2.0.31
 
 dev_dependencies:
   flutter_test:

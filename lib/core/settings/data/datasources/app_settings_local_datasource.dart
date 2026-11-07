@@ -12,6 +12,7 @@ class AppSettingsLocalDataSource {
   static const String _dailyReminderMinuteKey = 'daily_reminder_minute';
   static const String _usageAnalyticsEnabledKey = 'usage_analytics_enabled';
   static const String _themePreferenceKey = 'theme_preference';
+  static const String _noteLockEnabledKey = 'note_lock_enabled';
 
   final Box<dynamic> _settingsBox;
 
@@ -38,12 +39,18 @@ class AppSettingsLocalDataSource {
       _settingsBox.get(_themePreferenceKey),
     );
 
+    final noteLockEnabled = _settingsBox.get(
+      _noteLockEnabledKey,
+      defaultValue: AppSettings.defaults.noteLockEnabled,
+    ) as bool;
+
     return AppSettings(
       dailyReminderEnabled: dailyReminderEnabled,
       dailyReminderHour: dailyReminderHour,
       dailyReminderMinute: dailyReminderMinute,
       usageAnalyticsEnabled: usageAnalyticsEnabled,
       themePreference: themePreference,
+      noteLockEnabled: noteLockEnabled,
     );
   }
 
@@ -65,5 +72,6 @@ class AppSettingsLocalDataSource {
       settings.usageAnalyticsEnabled,
     );
     await _settingsBox.put(_themePreferenceKey, settings.themePreference.name);
+    await _settingsBox.put(_noteLockEnabledKey, settings.noteLockEnabled);
   }
 }

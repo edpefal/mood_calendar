@@ -71,6 +71,9 @@ class FakeMoodEntitlementsRepository implements MoodEntitlementsRepository {
   final Set<String> _unlockedMoodIds;
   SubscriptionStatus _subscription;
 
+  /// The subscription the fake reports right now.
+  SubscriptionStatus get currentSubscription => _subscription;
+
   /// Moods que `restorePurchases` desbloquea, como una restauración real.
   final Set<String> _restorableMoodIds;
   final _controller = StreamController<Set<String>>.broadcast();

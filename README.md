@@ -14,7 +14,8 @@ Mood Calendar es una app Flutter para registrar el estado de ánimo de cada día
 - **Exportar el historial** en JSON y compartirlo con la hoja del sistema.
 - **Calificar la app** de forma automática (en hitos de uso) y manual desde Ajustes.
 - **Apple Watch** (solo iOS): elegir el mood de hoy desde el reloj con un toque; el iPhone sigue siendo la única fuente de verdad.
-- Cuatro pestañas en un bottom bar flotante: Calendar, Insights (provisional), Log y Settings. La oferta Premium es una hoja que se abre desde un mood bloqueado o desde Ajustes.
+- **Onboarding** de cuatro pasos en la primera ejecución (hora del recordatorio, permiso de notificaciones y primer registro) y **bloqueo de notas** Premium con Face ID, huella o el código del dispositivo.
+- Cuatro pestañas en un bottom bar flotante: Calendar, Insights, Log y Settings. La oferta Premium es una hoja que se abre desde un mood bloqueado o desde Ajustes.
 - Tema Sistema, Claro u Oscuro.
 - Sistema visual de tinta `#1D1D22`, fondo de malla pastel y tarjetas de vidrio, con paleta clara y oscura definida una sola vez en `lib/core/theme/brand_colors.dart`.
 

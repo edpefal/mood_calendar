@@ -15,6 +15,7 @@ import 'package:mood_calendar/features/mood/data/services/rating_prompt_service.
 import 'package:mood_calendar/features/mood/domain/entities/mood_history_export_result.dart';
 import 'package:mood_calendar/features/mood/domain/services/mood_history_exporter.dart';
 import 'package:mood_calendar/features/mood/domain/usecases/export_mood_history_usecase.dart';
+import 'package:mood_calendar/features/note_lock/presentation/bloc/note_lock_cubit.dart';
 import 'package:mood_calendar/features/purchases/domain/entities/subscription_plan.dart';
 import 'package:mood_calendar/features/purchases/domain/entities/subscription_status.dart';
 import 'package:mood_calendar/features/purchases/presentation/bloc/purchases_cubit.dart';
@@ -24,6 +25,7 @@ import 'package:mood_calendar/features/settings/presentation/screens/settings_sc
 import '../../../../support/app_harness.dart';
 import '../../../../support/fake_analytics_reporter.dart';
 import '../../../../support/fake_mood_entitlements_repository.dart';
+import '../../../../support/fake_note_lock_authenticator.dart';
 
 void main() {
   late _FakeSettingsRepository repository;
@@ -37,6 +39,9 @@ void main() {
   late ThemeCubit themeCubit;
   late FakeMoodEntitlementsRepository entitlements;
   late RecordingTelemetry telemetry;
+  late FakeNoteLockAuthenticator authenticator;
+  late NoteLockCubit noteLockCubit;
+  late bool notificationPermission;
 
   Future<void> pumpScreen(
     WidgetTester tester, {
@@ -60,6 +65,7 @@ void main() {
         child: MultiBlocProvider(
           providers: [
             BlocProvider.value(value: themeCubit),
+            BlocProvider.value(value: noteLockCubit),
             BlocProvider(
               lazy: false,
               create: (_) => PurchasesCubit(entitlements, telemetry: telemetry),
@@ -73,6 +79,9 @@ void main() {
                 logger: const _SilentLogger(),
                 setUsageAnalyticsCollection: analytics.setCollectionEnabled,
                 onThemeChanged: themeCubit.apply,
+                requestNotificationPermission: () async =>
+                    notificationPermission,
+                onNoteLockChanged: noteLockCubit.setEnabled,
               )..load(),
             ),
           ],
@@ -117,13 +126,23 @@ void main() {
     themeCubit = ThemeCubit();
     entitlements = FakeMoodEntitlementsRepository();
     telemetry = RecordingTelemetry();
+    authenticator = FakeNoteLockAuthenticator();
+    notificationPermission = true;
+    noteLockCubit = NoteLockCubit(
+      authenticator: authenticator,
+      telemetry: telemetry,
+      isSubscribed: () => entitlements.currentSubscription.isActive,
+    );
     openUrl = (url) async {
       openedUrls.add(url);
       return true;
     };
   });
 
-  tearDown(() => themeCubit.close());
+  tearDown(() async {
+    await themeCubit.close();
+    await noteLockCubit.close();
+  });
 
   /// The switch of the row titled [title].
   Finder switchOf(String title) => find.descendant(
@@ -648,6 +667,224 @@ void main() {
         expect(find.text(entry.value), findsOneWidget);
       });
     }
+  });
+
+  group('notification permission', () {
+    testWidgets('turning the reminder on asks first and keeps it on',
+        (tester) async {
+      repository.saved = repository.saved.copyWith(dailyReminderEnabled: false);
+      await pumpScreen(tester);
+
+      await tester.tap(switchOf('Enable daily reminders'));
+      await tester.pumpAndSettle();
+
+      expect(isOn(tester, 'Enable daily reminders'), isTrue);
+      expect(repository.saved.dailyReminderEnabled, isTrue);
+      expect(notificationCalls, ['schedule']);
+    });
+
+    testWidgets('a refused permission turns it back off and explains',
+        (tester) async {
+      notificationPermission = false;
+      repository.saved = repository.saved.copyWith(dailyReminderEnabled: false);
+      await pumpScreen(tester);
+
+      await tester.tap(switchOf('Enable daily reminders'));
+      await tester.pumpAndSettle();
+
+      expect(isOn(tester, 'Enable daily reminders'), isFalse);
+      expect(repository.saved.dailyReminderEnabled, isFalse);
+      expect(notificationCalls, isEmpty);
+      expect(find.textContaining('Notifications are off'), findsOneWidget);
+    });
+  });
+
+  group('note lock', () {
+    final subscriber = FakeMoodEntitlementsRepository(
+      subscription: const SubscriptionStatus(
+        isActive: true,
+        plan: SubscriptionPlanType.monthly,
+      ),
+    );
+
+    testWidgets('sits in Privacy and data with the Pro badge for a free user',
+        (tester) async {
+      await pumpScreen(tester);
+
+      expect(find.text('Lock notes'), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find
+              .ancestor(
+                  of: find.text('Lock notes'), matching: find.byType(InkWell))
+              .first,
+          matching: find.text('Pro'),
+        ),
+        findsOneWidget,
+      );
+      expect(isOn(tester, 'Lock notes'), isFalse);
+    });
+
+    testWidgets('a subscriber has no Pro badge', (tester) async {
+      entitlements = subscriber;
+      await pumpScreen(tester);
+
+      expect(find.text('Pro'), findsNothing);
+    });
+
+    testWidgets(
+        'without a subscription the switch opens the sheet and stays '
+        'off', (tester) async {
+      await pumpScreen(tester);
+
+      await tester.tap(switchOf('Lock notes'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Understand how you feel'), findsOneWidget);
+      expect(isOn(tester, 'Lock notes'), isFalse);
+      expect(repository.saved.noteLockEnabled, isFalse);
+      expect(authenticator.reasons, isEmpty);
+    });
+
+    testWidgets('a subscriber who authenticates turns it on and it is saved',
+        (tester) async {
+      entitlements = subscriber;
+      await pumpScreen(tester);
+
+      await tester.tap(switchOf('Lock notes'));
+      await tester.pumpAndSettle();
+
+      expect(isOn(tester, 'Lock notes'), isTrue);
+      expect(repository.saved.noteLockEnabled, isTrue);
+      expect(noteLockCubit.state.enabled, isTrue);
+      expect(
+          telemetry.events.map((e) => e.name), contains('note_lock_enabled'));
+    });
+
+    testWidgets('cancelling the authentication leaves it off', (tester) async {
+      entitlements = subscriber;
+      authenticator.succeeds = false;
+      await pumpScreen(tester);
+
+      await tester.tap(switchOf('Lock notes'));
+      await tester.pumpAndSettle();
+
+      expect(isOn(tester, 'Lock notes'), isFalse);
+      expect(repository.saved.noteLockEnabled, isFalse);
+      expect(find.byType(SnackBar), findsNothing);
+    });
+
+    testWidgets('a device without a passcode explains instead of enabling',
+        (tester) async {
+      entitlements = subscriber;
+      authenticator.available = false;
+      await pumpScreen(tester);
+
+      await tester.tap(switchOf('Lock notes'));
+      await tester.pumpAndSettle();
+
+      expect(isOn(tester, 'Lock notes'), isFalse);
+      expect(
+          find.textContaining('Set a passcode or biometrics'), findsOneWidget);
+    });
+
+    testWidgets('a lapsed subscription still lets the user turn it off',
+        (tester) async {
+      repository.saved = repository.saved.copyWith(noteLockEnabled: true);
+      noteLockCubit
+        ..setEnabled(true)
+        ..lock(); // as after a launch with the lock on
+      await pumpScreen(tester);
+      expect(isOn(tester, 'Lock notes'), isTrue);
+
+      await tester.tap(switchOf('Lock notes'));
+      await tester.pumpAndSettle();
+
+      expect(isOn(tester, 'Lock notes'), isFalse);
+      expect(repository.saved.noteLockEnabled, isFalse);
+      expect(authenticator.reasons, ['Turn off the notes lock']);
+    });
+
+    testWidgets('an active lock the device cannot enforce says so',
+        (tester) async {
+      repository.saved = repository.saved.copyWith(noteLockEnabled: true);
+      noteLockCubit
+        ..setEnabled(true)
+        ..lock(); // as after a launch with the lock on
+      authenticator.available = false;
+      await noteLockCubit.refreshAvailability();
+      await pumpScreen(tester);
+
+      expect(
+        find.text('Set a passcode on your device to use the lock'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('a failed save puts the lock back off', (tester) async {
+      entitlements = subscriber;
+      await pumpScreen(tester);
+      repository.failSaves = true;
+
+      await tester.tap(switchOf('Lock notes'));
+      await tester.pumpAndSettle();
+
+      expect(isOn(tester, 'Lock notes'), isFalse);
+      expect(noteLockCubit.state.enabled, isFalse);
+    });
+
+    testWidgets('shows the row in Spanish', (tester) async {
+      await pumpScreen(tester, locale: const Locale('es'));
+
+      expect(find.text('Bloquear notas'), findsOneWidget);
+    });
+  });
+
+  group('export with the note lock', () {
+    setUp(() {
+      repository.saved = repository.saved.copyWith(noteLockEnabled: true);
+      noteLockCubit
+        ..setEnabled(true)
+        ..lock(); // as after a launch with the lock on
+    });
+
+    testWidgets('asks to unlock first and exports on success', (tester) async {
+      await pumpScreen(tester);
+
+      await tester.tap(find.text('Export history'));
+      await tester.pumpAndSettle();
+
+      expect(
+          authenticator.reasons, ['Unlock your notes to export your history']);
+      expect(exporter.calls, 1);
+      expect(sharedFiles, hasLength(1));
+    });
+
+    testWidgets('cancelling generates nothing and leaves the row usable',
+        (tester) async {
+      authenticator.succeeds = false;
+      await pumpScreen(tester);
+
+      await tester.tap(find.text('Export history'));
+      await tester.pumpAndSettle();
+
+      expect(exporter.calls, 0);
+      expect(sharedFiles, isEmpty);
+      expect(find.byType(SnackBar), findsNothing);
+      expect(find.text('Export history'), findsOneWidget);
+    });
+
+    testWidgets('an unlocked session does not ask again', (tester) async {
+      await pumpScreen(tester);
+      await noteLockCubit.unlock('r');
+      authenticator.reasons.clear();
+
+      await tester.tap(find.text('Export history'));
+      await tester.pumpAndSettle();
+
+      expect(authenticator.reasons, isEmpty);
+      expect(exporter.calls, 1);
+    });
   });
 
   group('export history', () {

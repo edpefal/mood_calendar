@@ -7,6 +7,7 @@ class AppSettings {
     required this.dailyReminderMinute,
     this.usageAnalyticsEnabled = true,
     this.themePreference = AppThemePreference.system,
+    this.noteLockEnabled = false,
   });
 
   final bool dailyReminderEnabled;
@@ -18,6 +19,10 @@ class AppSettings {
 
   /// Tema elegido en Settings (Sistema por defecto).
   final AppThemePreference themePreference;
+
+  /// Si el texto de las notas pide autenticación del dispositivo (Premium).
+  /// Sobrevive a un vencimiento de la suscripción: ver `note-lock`.
+  final bool noteLockEnabled;
 
   static const defaults = AppSettings(
     dailyReminderEnabled: true,
@@ -31,6 +36,7 @@ class AppSettings {
     int? dailyReminderMinute,
     bool? usageAnalyticsEnabled,
     AppThemePreference? themePreference,
+    bool? noteLockEnabled,
   }) {
     return AppSettings(
       dailyReminderEnabled: dailyReminderEnabled ?? this.dailyReminderEnabled,
@@ -39,6 +45,7 @@ class AppSettings {
       usageAnalyticsEnabled:
           usageAnalyticsEnabled ?? this.usageAnalyticsEnabled,
       themePreference: themePreference ?? this.themePreference,
+      noteLockEnabled: noteLockEnabled ?? this.noteLockEnabled,
     );
   }
 }

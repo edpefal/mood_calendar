@@ -14,6 +14,14 @@
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>es</string>
+		<string>de</string>
+		<string>fr</string>
+		<string>it</string>
+	</array>
 	<key>CFBundleName</key>
 	<string>mood_calendar</string>
 	<key>CFBundlePackageType</key>
@@ -34,6 +42,8 @@
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Mood Calendar uses Face ID to unlock your locked notes.</string>
 	<key>NSUserNotificationUsageDescription</key>
 	<string>We use notifications to remind you to record your daily mood.</string>
 	<key>UIApplicationSceneManifest</key>

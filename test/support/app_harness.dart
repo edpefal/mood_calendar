@@ -18,9 +18,11 @@ import 'package:mood_calendar/features/mood/domain/usecases/get_moods_usecase.da
 import 'package:mood_calendar/features/mood/domain/usecases/save_mood_usecase.dart';
 import 'package:mood_calendar/features/mood/presentation/bloc/calendar_cubit.dart';
 import 'package:mood_calendar/features/mood/presentation/bloc/mood_cubit.dart';
+import 'package:mood_calendar/features/note_lock/presentation/bloc/note_lock_cubit.dart';
 import 'package:mood_calendar/features/purchases/presentation/bloc/purchases_cubit.dart';
 
 import 'fake_mood_entitlements_repository.dart';
+import 'fake_note_lock_authenticator.dart';
 import 'in_memory_mood_repository.dart';
 
 class TestAppLogger implements AppLogger {
@@ -114,6 +116,7 @@ Widget buildTestProviders({
   FakeRatingPromptService? ratingPromptService,
   FakeSettingsRepository? settingsRepository,
   ThemeCubit? themeCubit,
+  NoteLockCubit? noteLockCubit,
   AppTelemetry telemetry = const _SilentTelemetry(),
   DateTime? calendarMonth,
 }) {
@@ -142,6 +145,15 @@ Widget buildTestProviders({
     child: MultiBlocProvider(
       providers: [
         BlocProvider(create: (_) => themeCubit ?? ThemeCubit()),
+        BlocProvider(
+          create: (_) =>
+              noteLockCubit ??
+              NoteLockCubit(
+                authenticator: FakeNoteLockAuthenticator(),
+                telemetry: const _SilentTelemetry(),
+                isSubscribed: () => false,
+              ),
+        ),
         BlocProvider(
           create: (_) => MoodCubit(
             saveMood: SaveMoodUseCase(repository),
@@ -180,6 +192,7 @@ Widget buildTestApp({
   FakeRatingPromptService? ratingPromptService,
   FakeSettingsRepository? settingsRepository,
   ThemeCubit? themeCubit,
+  NoteLockCubit? noteLockCubit,
   AppTelemetry telemetry = const _SilentTelemetry(),
   Locale locale = const Locale('en'),
   ThemeMode themeMode = ThemeMode.light,
@@ -191,6 +204,7 @@ Widget buildTestApp({
     ratingPromptService: ratingPromptService,
     settingsRepository: settingsRepository,
     themeCubit: themeCubit,
+    noteLockCubit: noteLockCubit,
     telemetry: telemetry,
     calendarMonth: calendarMonth,
     child: MaterialApp(
