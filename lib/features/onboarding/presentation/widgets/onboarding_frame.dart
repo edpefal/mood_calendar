@@ -163,12 +163,18 @@ class OnboardingTitleCard extends StatelessWidget {
         children: [
           Semantics(
             header: true,
-            child: Text(
-              title,
-              style: const TextStyle(
-                fontSize: 32,
-                height: 40 / 32,
-                fontWeight: FontWeight.w600,
+            // The title is already 32 pt: at the largest accessibility sizes it
+            // would outgrow the card and break in the middle of a word, so only
+            // its scaling is capped (the rest of the text keeps the full scale).
+            child: MediaQuery.withClampedTextScaling(
+              maxScaleFactor: 1.7,
+              child: Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 32,
+                  height: 40 / 32,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ),
@@ -209,12 +215,18 @@ class OnboardingTextButton extends StatelessWidget {
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: onPressed,
-        child: SizedBox(
-          height: 48,
+        // A minimum, not a fixed height, so large system text is not clipped.
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 48),
           child: Center(
-            child: Text(
-              label,
-              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Text(
+                label,
+                textAlign: TextAlign.center,
+                style:
+                    const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+              ),
             ),
           ),
         ),

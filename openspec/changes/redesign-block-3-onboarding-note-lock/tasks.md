@@ -34,7 +34,7 @@
 ## 5. Textos y accesibilidad
 
 - [x] 5.1 Añadir los strings del onboarding, el bloqueo (fila, detalle, marcador, acción, mensajes y motivo del diálogo del sistema) y el permiso a `app_strings.dart` y a los cinco idiomas, con las `Semantics`
-- [ ] 5.2 Revisar texto grande (1.2× y 2×) en los cuatro pasos, modo claro y oscuro e iPad con `PhoneColumn` _(hecho: iPhone 16e en claro y en inglés, y un test a 2× del paso 1; falta oscuro, iPad, otros idiomas y 2× en los pasos 2 a 4)_
+- [x] 5.2 Revisar texto grande (1.2× y 2×) en los cuatro pasos, modo claro y oscuro e iPad con `PhoneColumn` _(2026-11-09, simulador: iPhone 16e en alemán y oscuro (los 4 pasos), en inglés al tamaño máximo de accesibilidad, y iPad Pro 13" (onboarding, confirmación, hoja de suscripción, Log y edición). Hallazgos corregidos: a ese tamaño los títulos se partían a mitad de palabra (ahora el título escala hasta 1,7×) y "Not now" se recortaba (alto mínimo en vez de fijo). El contenido se desplaza y los botones principales siguen alcanzables)_
 
 ## 6. Verificación
 
