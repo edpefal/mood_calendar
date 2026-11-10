@@ -84,6 +84,10 @@ Un bloqueo ya activo SHALL seguir aplicándose aunque la suscripción haya venci
 - **WHEN** el usuario apaga el bloqueo y cancela la autenticación
 - **THEN** el bloqueo sigue activo
 
+#### Scenario: Apagar con la sesión ya desbloqueada
+- **WHEN** el usuario ya leyó sus notas en esta sesión y apaga el bloqueo
+- **THEN** la app pide la autenticación igualmente y solo lo apaga si tiene éxito
+
 #### Scenario: Reactivar sin suscripción
 - **WHEN** un usuario sin suscripción toca el interruptor apagado
 - **THEN** se abre la hoja de suscripción
