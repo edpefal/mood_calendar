@@ -91,10 +91,33 @@ void main() {
       expect(cubit.state.enabled, isTrue);
     });
 
-    test('an unlocked session does not ask again', () async {
+    test('asks even when the session is already unlocked', () async {
       final cubit = build(enabled: true);
       await cubit.unlock('r');
       authenticator.reasons.clear();
+
+      final result = await cubit.requestChange(enable: false, reason: 'r');
+
+      expect(result, NoteLockChange.disabled);
+      expect(authenticator.reasons, ['r']);
+    });
+
+    test('an unlocked session whose authentication is cancelled keeps the lock',
+        () async {
+      final cubit = build(enabled: true);
+      await cubit.unlock('r');
+      authenticator.succeeds = false;
+
+      final result = await cubit.requestChange(enable: false, reason: 'r');
+
+      expect(result, NoteLockChange.cancelled);
+      expect(cubit.state.enabled, isTrue);
+    });
+
+    test('a device that can no longer authenticate still lets it be turned off',
+        () async {
+      final cubit = build(enabled: true);
+      authenticator.available = false;
 
       final result = await cubit.requestChange(enable: false, reason: 'r');
 

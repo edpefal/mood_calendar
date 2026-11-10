@@ -69,6 +69,6 @@
 
 - [x] 9.1 `flutter analyze` y `flutter test` en verde
 - [x] 9.2 Revisar en un simulador de iPhone y de iPad, en claro y oscuro, en inglés y alemán, con texto al 200 % y con reducir transparencia
-- [ ] 9.3 Medir la fluidez del vidrio en un iPhone real o en el simulador más lento disponible
+- [x] 9.3 Medir la fluidez del vidrio en un iPhone real o en el simulador más lento disponible _(2026-11-09: probado en un iPhone real con el build de TestFlight del Bloque 3; la fluidez del vidrio es correcta)_
 - [x] 9.4 Actualizar `CLAUDE.md` (estado actual, sistema de diseño, moods 11/8, flujo de Premium, pestañas), `README.md` y `backlog.md` (quitar la prueba del mensual y el semanal en las tiendas, requisito previo a publicar; el bloque no se publica solo)
 - [x] 9.5 Un build de TestFlight del Bloque 1 solo si el usuario lo pide; no publicar versión ni recapturar capturas

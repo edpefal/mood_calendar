@@ -805,6 +805,23 @@ void main() {
       expect(authenticator.reasons, ['Turn off the notes lock']);
     });
 
+    testWidgets('turning it off asks again even with the session unlocked',
+        (tester) async {
+      repository.saved = repository.saved.copyWith(noteLockEnabled: true);
+      noteLockCubit
+        ..setEnabled(true)
+        ..lock();
+      await noteLockCubit.unlock('r');
+      authenticator.reasons.clear();
+      await pumpScreen(tester);
+
+      await tester.tap(switchOf('Lock notes'));
+      await tester.pumpAndSettle();
+
+      expect(authenticator.reasons, ['Turn off the notes lock']);
+      expect(isOn(tester, 'Lock notes'), isFalse);
+    });
+
     testWidgets('an active lock the device cannot enforce says so',
         (tester) async {
       repository.saved = repository.saved.copyWith(noteLockEnabled: true);

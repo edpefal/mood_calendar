@@ -90,8 +90,10 @@ class NoteLockCubit extends Cubit<NoteLockState> {
         return NoteLockChange.unavailable;
       }
     } else if (await _authenticator.isAvailable()) {
-      // Turning it off needs proof, unless the device can no longer ask.
-      if (!state.unlocked && !await _authenticator.authenticate(reason)) {
+      // Turning it off always needs proof, even with the session already
+      // unlocked: someone holding the unlocked phone must not be able to drop
+      // the lock. Only a device that can no longer ask lets it go.
+      if (!await _authenticator.authenticate(reason)) {
         return NoteLockChange.cancelled;
       }
     }
