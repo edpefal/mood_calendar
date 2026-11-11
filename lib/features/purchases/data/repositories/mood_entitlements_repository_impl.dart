@@ -202,7 +202,24 @@ class MoodEntitlementsRepositoryImpl implements MoodEntitlementsRepository {
       final customerInfo = await datasource.purchasePackage(package);
       _applyCustomerInfo(customerInfo);
     } on PlatformException catch (e) {
+      if (PurchasesErrorHelper.getErrorCode(e) ==
+          PurchasesErrorCode.productAlreadyPurchasedError) {
+        await _recoverExistingSubscription();
+        return;
+      }
       throw _mapPlatformException(e);
+    }
+  }
+
+  /// La tienda dice que este Apple ID o cuenta de Google ya tiene la
+  /// suscripción, pero este dispositivo todavía no (reinstalación, otro
+  /// teléfono): se restaura en vez de mostrar un error. Si tras restaurar no
+  /// hay suscripción activa (p. ej. venció o es de otro plan), se informa que el
+  /// producto no está disponible.
+  Future<void> _recoverExistingSubscription() async {
+    await restorePurchases();
+    if (!_subscriptionStatus.isActive) {
+      throw const PurchaseException(PurchaseFailureReason.productUnavailable);
     }
   }
 
