@@ -380,6 +380,42 @@ void main() {
       );
     });
 
+    test(
+        'already subscribed in the store restores the subscription instead of failing',
+        () async {
+      datasource.purchaseError = PlatformException(
+        code: PurchasesErrorCode.productAlreadyPurchasedError.index.toString(),
+      );
+      datasource.restoreResult = _customer([
+        _entitlement('premium', productId: 'premium_weekly'),
+      ]);
+
+      await repository.purchasePlan(SubscriptionPlanType.weekly);
+
+      expect(repository.isUnlocked('brave'), isTrue);
+      final status = await repository.subscriptionStatus().first;
+      expect(status.isActive, isTrue);
+      expect(status.plan, SubscriptionPlanType.weekly);
+    });
+
+    test('already subscribed but nothing active after restoring is unavailable',
+        () async {
+      datasource.purchaseError = PlatformException(
+        code: PurchasesErrorCode.productAlreadyPurchasedError.index.toString(),
+      );
+      datasource.restoreResult = _customer([]);
+
+      expect(
+        () => repository.purchasePlan(SubscriptionPlanType.weekly),
+        throwsA(isA<PurchaseException>().having(
+          (e) => e.reason,
+          'reason',
+          PurchaseFailureReason.productUnavailable,
+        )),
+      );
+      expect(repository.isUnlocked('brave'), isFalse);
+    });
+
     test('restoring recovers the subscription and the legacy purchases',
         () async {
       datasource.restoreResult = _customer([
