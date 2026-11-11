@@ -152,14 +152,14 @@ Un usuario que compró un Mood premium o un Pack en una versión anterior SHALL 
 - **THEN** sus Moods heredados vuelven a estar `unlocked`
 
 ### Requirement: La suscripción solo se ofrece a petición del usuario
-La hoja de suscripción SHALL mostrarse únicamente cuando el usuario la pide: al tocar un Mood premium bloqueado, al tocar "Get Premium" en Ajustes o al tocar una tarjeta o un rango bloqueado de Insights ("Ver con Premium"). La app NO SHALL mostrarla al abrirse, después de guardar un Mood ni interrumpiendo el registro diario, NO SHALL mostrarla a un suscriptor y NO SHALL mostrar contadores ni avisos de presión sobre la oferta.
+La hoja de suscripción SHALL mostrarse únicamente cuando el usuario la pide: al tocar un Mood premium bloqueado, al tocar "Get Premium" en Ajustes, al tocar el interruptor del bloqueo de notas sin suscripción, al tocar una tarjeta o un rango bloqueado de Insights ("Ver con Premium") o, **una sola vez**, al terminar el onboarding. La app NO SHALL mostrarla al abrirse, después de guardar un Mood fuera del onboarding ni interrumpiendo el registro diario, NO SHALL mostrarla a un suscriptor y NO SHALL mostrar contadores ni avisos de presión sobre la oferta.
 
 #### Scenario: Abrir la app
-- **WHEN** el usuario abre la app, con o sin suscripción
+- **WHEN** el usuario abre la app, con o sin suscripción, habiendo terminado el onboarding
 - **THEN** se muestra el Log y no aparece la hoja de suscripción
 
 #### Scenario: Guardar un mood base
-- **WHEN** el usuario guarda un Mood base
+- **WHEN** el usuario guarda un Mood base desde el Log
 - **THEN** el Log muestra el estado "Saved" sin ofrecer la suscripción
 
 #### Scenario: Tocar un mood bloqueado
@@ -168,6 +168,10 @@ La hoja de suscripción SHALL mostrarse únicamente cuando el usuario la pide: a
 
 #### Scenario: Fila de Ajustes
 - **WHEN** el usuario sin suscripción toca "Get Premium" en Ajustes
+- **THEN** se abre la hoja de suscripción
+
+#### Scenario: Interruptor del bloqueo de notas
+- **WHEN** el usuario sin suscripción toca el interruptor del bloqueo de notas en Ajustes
 - **THEN** se abre la hoja de suscripción
 
 #### Scenario: Tarjeta bloqueada de Insights
@@ -181,6 +185,18 @@ La hoja de suscripción SHALL mostrarse únicamente cuando el usuario la pide: a
 #### Scenario: Suscriptor en Insights
 - **WHEN** un suscriptor abre Insights
 - **THEN** no ve candados ni acciones de suscripción
+
+#### Scenario: Fin del onboarding
+- **WHEN** un usuario sin suscripción toca "Continue" en la confirmación del primer registro del onboarding
+- **THEN** se abre la hoja de suscripción una sola vez y, al cerrarla, el usuario queda en el Log
+
+#### Scenario: Suscriptor al terminar el onboarding
+- **WHEN** un suscriptor termina el onboarding
+- **THEN** la hoja de suscripción no se abre
+
+#### Scenario: Omitir el onboarding
+- **WHEN** el usuario omite el onboarding en el paso 1
+- **THEN** la hoja de suscripción no se abre
 
 ### Requirement: Privacidad de la suscripción
 La suscripción NO SHALL añadir recolección de datos: RevenueCat, Apple y Google ya reciben el identificador anónimo de la instalación y el historial de compras, y nada de las entradas (mood, nota, fecha, intensidad) SHALL salir del dispositivo.
