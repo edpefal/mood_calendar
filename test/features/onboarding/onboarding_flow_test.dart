@@ -276,4 +276,28 @@ void main() {
     expect(rect.bottom, lessThanOrEqualTo(844));
     expect(rect.top, greaterThanOrEqualTo(0));
   });
+
+  testWidgets('large system text stacks the time suggestions at full width',
+      (tester) async {
+    await pumpFlow(tester, textScale: 2);
+    await tapText(tester, strings.onboardingGetStarted);
+
+    final morning = tester.getRect(find.text('Morning'));
+    final afternoon = tester.getRect(find.text('Afternoon'));
+    final night = tester.getRect(find.text('Night'));
+    expect(afternoon.top, greaterThan(morning.bottom));
+    expect(night.top, greaterThan(afternoon.bottom));
+    expect(afternoon.center.dx, closeTo(morning.center.dx, 0.5));
+  });
+
+  testWidgets('regular text keeps the time suggestions side by side',
+      (tester) async {
+    await pumpFlow(tester);
+    await tapText(tester, strings.onboardingGetStarted);
+
+    final morning = tester.getRect(find.text('Morning'));
+    final afternoon = tester.getRect(find.text('Afternoon'));
+    expect(afternoon.left, greaterThan(morning.right));
+    expect(afternoon.top, morning.top);
+  });
 }
