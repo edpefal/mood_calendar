@@ -3,7 +3,6 @@
 ## Purpose
 
 Define cuándo y cómo la app le pide al usuario que califique Mood Calendar en el App Store: un pedido automático en momentos de éxito, con límites estrictos para no molestar, y una entrada manual siempre disponible.
-
 ## Requirements
 ### Requirement: Pedido automático de calificación por hitos de entradas
 La app SHALL solicitar el diálogo nativo de calificación del sistema tras un guardado exitoso de una Mood Entry, en función de la cantidad total de días con una Mood Entry guardada:
@@ -37,7 +36,7 @@ La app NO SHALL hacer más de 2 intentos automáticos en toda la vida de la inst
 - **THEN** la app no solicita el diálogo de calificación
 
 ### Requirement: El pedido nunca interrumpe ni sigue a una falla
-La app NO SHALL solicitar el diálogo de calificación si el guardado de la Mood Entry falló, ni mientras el editor de nota esté abierto. Cuando corresponda solicitarlo, la app SHALL hacerlo una vez que el usuario haya llegado a la pestaña del calendario tras guardar.
+La app NO SHALL solicitar el diálogo de calificación si el guardado de la Mood Entry falló, ni mientras el editor de nota o la hoja de suscripción estén abiertos. Cuando corresponda solicitarlo, la app SHALL hacerlo una vez que el Log muestre el estado "Saved" tras guardar.
 
 #### Scenario: Falla el guardado
 - **WHEN** el guardado de la Mood Entry falla aunque el total de entradas alcance un hito
@@ -48,8 +47,12 @@ La app NO SHALL solicitar el diálogo de calificación si el guardado de la Mood
 - **THEN** la app no solicita el diálogo de calificación
 
 #### Scenario: Guardado exitoso que cumple el hito
-- **WHEN** el usuario guarda con éxito una Mood Entry que cumple las condiciones de un intento y la app cambia a la pestaña del calendario
-- **THEN** el diálogo de calificación se solicita en el calendario, no sobre otra pantalla ni sobre el editor de nota
+- **WHEN** el usuario guarda con éxito una Mood Entry que cumple las condiciones de un intento y el Log pasa al estado "Saved"
+- **THEN** el diálogo de calificación se solicita sobre el Log en estado "Saved", no sobre otra pantalla ni sobre el editor de nota
+
+#### Scenario: El usuario sale antes de ver el estado Saved
+- **WHEN** el guardado fue exitoso pero el usuario cambia de pestaña antes de que el Log muestre "Saved"
+- **THEN** la app no solicita el diálogo en esa pestaña y no registra el intento
 
 ### Requirement: El estado de los intentos persiste entre sesiones
 La app SHALL conservar localmente la cantidad de intentos automáticos realizados y la fecha del último, de modo que sobrevivan al cierre y reapertura de la app.
@@ -90,3 +93,4 @@ La app SHALL registrar un evento de telemetría cuando solicita automáticamente
 #### Scenario: Uso de la entrada manual
 - **WHEN** el usuario toca la fila manual de calificar en Settings
 - **THEN** se registra el evento de entrada manual
+

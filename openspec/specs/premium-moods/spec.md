@@ -29,77 +29,6 @@ El sistema SHALL determinar el estado `unlocked` de cada Mood premium por usuari
 - **WHEN** el usuario no tiene suscripción activa ni compró un Mood o Pack en una versión anterior
 - **THEN** todos los Moods premium se reportan como no `unlocked`
 
-### Requirement: Selección bloqueada en el carrusel diario
-El carrusel de selección diaria SHALL mostrar todos los Moods del catálogo (base y premium), marcando visualmente los Moods premium no `unlocked`. Al intentar seleccionar un Mood no `unlocked` para registrar o editar la entrada del día, el sistema SHALL impedir guardar esa entrada y SHALL abrir la hoja de suscripción en su lugar. La única excepción es una fecha que ya tiene una Mood Entry con ese mismo Mood: en ese caso el sistema SHALL permitir guardar los cambios de la nota sin pedir suscripción, siempre que el Mood de la entrada no cambie.
-
-El carrusel SHALL ordenar sus Moods en dos grupos consecutivos: primero los Moods `unlocked`, ordenados por cantidad de Mood Entry guardadas con ese Mood (todo el historial) de mayor a menor; después los Moods no `unlocked`, en el orden del catálogo. Entre Moods `unlocked` con la misma cantidad de Mood Entry, el sistema SHALL conservar el orden del catálogo. El orden SHALL NOT depender de `intensity`.
-
-El sistema SHALL calcular este orden al abrir el selector y cada vez que el usuario regresa a la pestaña del selector desde otra pestaña, de modo que refleje las suscripciones, las restauraciones y las entradas guardadas desde la última vez. Al recalcularlo, el sistema SHALL conservar la fecha del selector, el Mood seleccionado (aunque cambie de posición) y la nota sin guardar. El sistema SHALL NOT modificar el orden mientras el selector permanece visible.
-
-#### Scenario: Usuario toca un Mood bloqueado
-- **WHEN** el usuario toca el Mood premium no `unlocked` que está seleccionado en el carrusel
-- **THEN** el sistema no permite seleccionarlo para guardar la entrada del día y abre la hoja de suscripción
-
-#### Scenario: Usuario selecciona un Mood desbloqueado
-- **WHEN** el usuario toca un Mood `base` o un Mood premium ya `unlocked`
-- **THEN** el sistema permite seleccionarlo normalmente para registrar o editar la entrada del día
-
-#### Scenario: Guardar con un Mood bloqueado distinto
-- **WHEN** el usuario tiene seleccionado un Mood premium no `unlocked` que es distinto del Mood de la entrada de esa fecha (o la fecha no tiene entrada) y toca Guardar
-- **THEN** no se guarda nada y se abre la hoja de suscripción
-
-#### Scenario: Editar la nota con el mismo Mood caducado
-- **WHEN** la fecha ya tiene una Mood Entry con un Mood premium que ya no está `unlocked`, el usuario cambia solo la nota y toca Guardar
-- **THEN** la nota se guarda, el Mood de la entrada no cambia y no se abre la hoja de suscripción
-
-#### Scenario: Cambiar a otro Mood premium bloqueado
-- **WHEN** la fecha tiene una entrada con un Mood premium caducado y el usuario selecciona otro Mood premium bloqueado y toca Guardar
-- **THEN** no se guarda nada y se abre la hoja de suscripción
-
-#### Scenario: Primer uso sin historial
-- **WHEN** el usuario abre la pantalla de selección sin ninguna Mood Entry guardada
-- **THEN** el carrusel muestra los Moods en el orden del catálogo, con los premium no `unlocked` al final
-
-#### Scenario: Moods desbloqueados ordenados por frecuencia
-- **WHEN** el usuario tiene 3 Mood Entry con `calm`, 1 con `happy` y ninguna con los demás Moods `base`
-- **THEN** el carrusel muestra primero `calm`, luego `happy`, luego los demás Moods `base` en el orden del catálogo
-
-#### Scenario: Empate de frecuencia
-- **WHEN** dos Moods `unlocked` tienen la misma cantidad de Mood Entry
-- **THEN** el que aparece antes en el catálogo se muestra primero
-
-#### Scenario: Mood premium desbloqueado entra al grupo ordenado
-- **WHEN** el usuario tiene una suscripción activa y Mood Entry con un Mood premium
-- **THEN** ese Mood se ordena por su frecuencia junto con los demás Moods `unlocked`, y no al final con los bloqueados
-
-#### Scenario: Moods bloqueados al final
-- **WHEN** el usuario tiene Moods premium no `unlocked`
-- **THEN** se muestran después de todos los Moods `unlocked`, en el orden del catálogo, sin importar si tienen Mood Entry históricas
-
-#### Scenario: Mood preseleccionado en una fecha sin entrada
-- **WHEN** el usuario abre una fecha sin Mood Entry
-- **THEN** el Mood seleccionado inicialmente es el primero del carrusel ordenado
-
-#### Scenario: Fecha con entrada existente
-- **WHEN** el usuario abre una fecha que ya tiene una Mood Entry
-- **THEN** el carrusel se posiciona en el Mood de esa entrada, esté en la posición que esté
-
-#### Scenario: El orden no cambia con el selector visible
-- **WHEN** el selector está visible y cambia el historial o el estado `unlocked` de un Mood, por ejemplo al completar una suscripción iniciada desde un Mood bloqueado
-- **THEN** el orden del carrusel no cambia hasta que el usuario sale de la pestaña del selector y regresa
-
-#### Scenario: Suscribirse en Premium reordena al volver
-- **WHEN** el usuario se suscribe en la pestaña Premium y regresa a la pestaña del selector
-- **THEN** los Moods premium aparecen entre los Moods `unlocked`, antes de los bloqueados, ordenados por frecuencia
-
-#### Scenario: Restaurar compras reordena al volver
-- **WHEN** el usuario restaura sus compras en la pestaña Premium y regresa a la pestaña del selector
-- **THEN** los Moods restaurados aparecen entre los Moods `unlocked`, antes de los bloqueados
-
-#### Scenario: Reordenar conserva la selección sin guardar
-- **WHEN** el usuario tiene un Mood seleccionado y una nota sin guardar, cambia de pestaña, se suscribe y regresa al selector
-- **THEN** el Mood seleccionado, la fecha y la nota siguen iguales, y el carrusel está posicionado en ese Mood en su nueva posición
-
 ### Requirement: El desbloqueo no reescribe el historial
 Un cambio en el estado `unlocked` de un Mood (incluida su pérdida, por ejemplo tras vencer una suscripción, un fallo de pago o un reembolso) SHALL afectar únicamente la capacidad de crear o editar entradas nuevas con ese Mood. El sistema SHALL NOT ocultar, modificar ni invalidar entradas (Mood Entry) ya guardadas con ese Mood.
 
@@ -112,116 +41,44 @@ Un cambio en el estado `unlocked` de un Mood (incluida su pérdida, por ejemplo 
 - **THEN** las entradas con Moods premium se muestran igual, y el mood más frecuente y la mejor racha las siguen contando
 
 ### Requirement: El selector soporta texto grande del sistema
-La pantalla del selector de moods SHALL mostrarse sin desbordes visuales con cualquier tamaño de texto que permita el sistema, hasta el 200 %, en pantallas desde 390 pt de ancho. Cuando el contenido no quepa en la altura disponible, la pantalla SHALL poder desplazarse en vertical de modo que el encabezado, el botón de nota, el carrusel y el botón Guardar sean alcanzables. Con tamaños de texto normales la disposición SHALL ser la misma que antes: encabezado arriba, carrusel centrado y botón Guardar abajo, sin desplazamiento.
+La pantalla del Log SHALL mostrarse sin desbordes visuales con cualquier tamaño de texto que permita el sistema, hasta el 200 %, en pantallas desde 390 pt de ancho. Cuando el contenido no quepa en la altura disponible, la pantalla SHALL poder desplazarse en vertical de modo que el encabezado, la cuadrícula de moods, la píldora de nota y el botón Guardar sean alcanzables. Con tamaños de texto normales la cuadrícula SHALL tener 4 columnas y con texto grande 2.
 
 #### Scenario: Texto al 200 % en iPhone de 390 pt
-- **WHEN** el texto del sistema está al 200 % en una pantalla de 390×844 pt y el usuario abre el selector
+- **WHEN** el texto del sistema está al 200 % en una pantalla de 390×844 pt y el usuario abre el Log
 - **THEN** no hay desbordes y el usuario puede desplazarse hasta el botón Guardar
 
 #### Scenario: Texto al 200 % con idioma de etiquetas largas
 - **WHEN** el idioma es alemán, la fecha es larga y el texto está al 200 %
-- **THEN** el encabezado, el botón de nota y el carrusel se muestran completos, sin recortes ni desbordes
+- **THEN** el encabezado, los títulos de categoría y la cuadrícula se muestran completos, sin recortes ni desbordes
 
 #### Scenario: Tamaño de texto normal
 - **WHEN** el texto del sistema está al 100 %
-- **THEN** el selector no se desplaza y mantiene la disposición habitual
+- **THEN** la cuadrícula tiene 4 columnas y el botón Guardar queda abajo
 
 #### Scenario: Teclado del editor de nota abierto
 - **WHEN** el editor de nota está abierto con el teclado visible
-- **THEN** el selector detrás no desborda
+- **THEN** el Log detrás no desborda
 
-### Requirement: Indicador de posición del carrusel
-El selector SHALL indicar la posición del Mood visible con un contador "N / M" (N = posición 1-based, M = total de Moods del carrusel) en lugar de un punto por Mood. El indicador SHALL ocupar el mismo espacio sin importar el total y SHALL NOT desbordar con cualquier cantidad de Moods en pantallas desde 390 pt de ancho. El contador SHALL excluirse del árbol de accesibilidad como elemento aparte, porque la posición ya se anuncia en la etiqueta del carrusel.
+### Requirement: Catálogo de 19 moods con 11 base y 8 premium
+El catálogo SHALL tener 19 Moods: 11 con tier `base` (`happy`, `calm`, `neutral`, `sleepy`, `sad`, `angry`, `anxious`, `stressed`, `scared`, `crying`, `sick`) y 8 con tier `premium` (`laughing`, `confident`, `brave`, `affectionate`, `hugging`, `romantic`, `shy`, `hurt`). Cada uno SHALL tener un ícono propio y un nombre localizado en inglés, español, alemán, francés e italiano. Los ids SHALL NOT cambiar, porque son el identificador estable de las Mood Entry guardadas y de la exportación. Los Moods `sleepy`, `anxious`, `stressed`, `scared`, `crying` y `sick`, que eran premium en versiones anteriores, SHALL pasar a `base` sin afectar a ningún usuario existente.
 
-#### Scenario: Contador con muchos moods
-- **WHEN** el catálogo tiene 15 Moods y el carrusel muestra el tercero
-- **THEN** el indicador muestra "3 / 15" y no hay desbordes
-
-#### Scenario: El contador sigue al carrusel
-- **WHEN** el usuario desliza al siguiente Mood
-- **THEN** el contador avanza una posición
-
-### Requirement: El carrusel indica que se puede deslizar
-El carrusel SHALL mostrar parte de los Moods vecinos al seleccionado (anterior y siguiente), más pequeños y atenuados, para que sea evidente que hay más opciones a los lados. Junto al contador SHALL haber un botón "anterior" y otro "siguiente", con etiqueta de accesibilidad, que mueven el carrusel un Mood; el de "anterior" SHALL estar deshabilitado en el primer Mood y el de "siguiente" en el último. En pantallas anchas (iPad) el ancho de cada página SHALL limitarse para que los vecinos queden cerca del seleccionado y no pegados a los bordes de la pantalla. Solo el Mood seleccionado SHALL mostrar su nombre.
-
-Tocar un Mood vecino SHALL centrarlo sin abrir la suscripción, aunque esté bloqueado. Tocar el Mood seleccionado, si está bloqueado, SHALL abrir la hoja de suscripción.
-
-#### Scenario: Se ven los vecinos
-- **WHEN** el selector está en el segundo Mood
-- **THEN** se ven, más pequeños y atenuados, el primero a la izquierda y el tercero a la derecha, sin sus nombres
-
-#### Scenario: Pantalla ancha
-- **WHEN** el selector se muestra en una pantalla de 1032 pt de ancho
-- **THEN** cada página mide 240 pt como máximo y los Moods vecinos se ven cerca del seleccionado
-
-#### Scenario: Girar la pantalla
-- **WHEN** el usuario gira el dispositivo con el tercer Mood seleccionado
-- **THEN** el ancho de página se ajusta al nuevo ancho y el tercer Mood sigue seleccionado
-
-#### Scenario: Flechas
-- **WHEN** el usuario toca el botón "siguiente"
-- **THEN** el carrusel avanza un Mood y el contador aumenta en uno
-
-#### Scenario: Flechas en los extremos
-- **WHEN** el carrusel está en el primer Mood
-- **THEN** el botón "anterior" está deshabilitado
-
-#### Scenario: Tocar un vecino bloqueado
-- **WHEN** el usuario toca un Mood premium bloqueado que es vecino del seleccionado
-- **THEN** el carrusel lo centra y no se abre la hoja de suscripción
-
-#### Scenario: Tocar el seleccionado bloqueado
-- **WHEN** el Mood premium bloqueado ya está seleccionado y el usuario lo toca
-- **THEN** se abre la hoja de suscripción
-
-### Requirement: Selección rápida desde la hoja de todos los moods
-El selector SHALL ofrecer un botón, con etiqueta de accesibilidad, que abre una hoja inferior con todos los Moods del carrusel en una cuadrícula. La hoja SHALL usar exactamente el orden vigente del carrusel (Moods `unlocked` primero, bloqueados al final) y SHALL NOT recalcularlo. Debe marcar el Mood actualmente seleccionado y mostrar los bloqueados atenuados con candado.
-
-Al tocar un Mood `unlocked`, la hoja SHALL cerrarse y el carrusel SHALL posicionarse en ese Mood, quedando seleccionado; la fecha, la nota sin guardar y el resto del estado del selector SHALL conservarse. Al tocar un Mood no `unlocked`, el sistema SHALL abrir la hoja de suscripción sin cambiar el Mood seleccionado.
-
-#### Scenario: Abrir la hoja
-- **WHEN** el usuario toca el botón de la cuadrícula
-- **THEN** se muestra una hoja con todos los Moods en el mismo orden que el carrusel y el Mood actual marcado
-
-#### Scenario: Saltar a un mood lejano
-- **WHEN** el usuario toca en la hoja un Mood `unlocked` que está en la posición 12 del carrusel
-- **THEN** la hoja se cierra, el carrusel muestra ese Mood, el contador indica "12 / M" y el Mood queda seleccionado para guardar
-
-#### Scenario: El estado del selector se conserva
-- **WHEN** el usuario tiene una nota sin guardar y salta a otro Mood desde la hoja
-- **THEN** la nota sin guardar y la fecha siguen igual
-
-#### Scenario: Mood bloqueado en la hoja
-- **WHEN** el usuario toca en la hoja un Mood premium no `unlocked`
-- **THEN** se abre la hoja de suscripción y el Mood seleccionado no cambia
-
-#### Scenario: La hoja respeta el orden congelado
-- **WHEN** el historial o el estado `unlocked` cambian mientras el selector está visible
-- **THEN** la hoja muestra el mismo orden que el carrusel, sin reordenarse
-
-#### Scenario: Texto grande del sistema
-- **WHEN** el texto del sistema está al 200 % y el usuario abre la hoja
-- **THEN** los nombres de los Moods se muestran sin desbordes y la hoja puede desplazarse para alcanzar todos
-
-### Requirement: Moods premium de la primera ola de packs
-El catálogo SHALL incluir, además de los moods existentes, 9 Moods premium con ids estables: `affectionate`, `hugging`, `laughing`, `sleepy`, `sick`, `hurt`, `crying`, `scared` y `stressed`. Los 9 SHALL tener tier `premium`, un ícono propio, un nombre localizado en inglés, español, alemán, francés e italiano, y SHALL ordenarse en el catálogo después de los moods premium existentes, agrupados por Pack (Afecto, Cuerpo, Intenso) en el orden en que se listan aquí. El catálogo resultante SHALL tener 5 Moods `base` y 14 `premium`. Los ids SHALL NOT cambiar una vez publicados, porque son el identificador estable de las Mood Entry guardadas y de la exportación.
-
-#### Scenario: El catálogo incluye los moods nuevos
+#### Scenario: Conteo del catálogo
 - **WHEN** se consulta el catálogo completo de moods
-- **THEN** contiene 19 Moods, de los cuales 5 son `base` y 14 son `premium`, y los 9 nuevos son `premium`
+- **THEN** contiene 19 Moods, 11 `base` y 8 `premium`
 
-#### Scenario: Cada mood nuevo tiene nombre en todos los idiomas
+#### Scenario: Mood que pasa a gratis
+- **WHEN** un usuario sin suscripción abre el Log
+- **THEN** `anxious`, `crying` y `sick` están disponibles sin candado
+
+#### Scenario: Usuario que compró un mood que ahora es gratis
+- **WHEN** un usuario compró `sleepy` en una versión anterior y actualiza
+- **THEN** `sleepy` sigue disponible, sus entradas no cambian y la compra heredada se conserva
+
+#### Scenario: Entradas existentes
+- **WHEN** un usuario con entradas guardadas con `crying` actualiza a esta versión
+- **THEN** esas entradas se muestran igual en el calendario y se exportan con `crying`
+
+#### Scenario: Nombres en todos los idiomas
 - **WHEN** el idioma del dispositivo es cualquiera de los 5 soportados
-- **THEN** cada uno de los 9 moods nuevos muestra su nombre localizado y no cae al id ni a otro idioma
+- **THEN** los 19 Moods muestran su nombre localizado y no caen al id ni a otro idioma
 
-#### Scenario: Los moods nuevos aparecen bloqueados sin compra
-- **WHEN** un usuario sin compras abre el selector
-- **THEN** los 9 moods nuevos aparecen después de los moods `unlocked`, marcados como no `unlocked`, en el orden del catálogo
-
-#### Scenario: Un usuario existente conserva sus datos
-- **WHEN** un usuario con Mood Entry previas actualiza a la versión que incluye los moods nuevos
-- **THEN** sus entradas y sus moods `unlocked` no cambian
-
-#### Scenario: Los moods nuevos se exportan con su id
-- **WHEN** el usuario exporta su historial y tiene una entrada con `sleepy`
-- **THEN** el JSON contiene `sleepy` como `mood`, no la ruta del asset ni `intensity`
