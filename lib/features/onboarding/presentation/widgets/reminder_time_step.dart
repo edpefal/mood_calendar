@@ -46,6 +46,49 @@ class _ReminderTimeStepState extends State<ReminderTimeStep> {
     }
   }
 
+  /// Three pills side by side only while the names fit: with large system
+  /// text each one is a third of the width and its name ("Afternoon") is cut,
+  /// so they stack at full width instead.
+  Widget _suggestionPills(
+    BuildContext context,
+    AppStrings strings,
+    OnboardingState state,
+  ) {
+    final stacked = MediaQuery.textScalerOf(context).scale(14) / 14 > 1.3;
+    final pills = [
+      for (final suggestion in ReminderSuggestion.values)
+        _SuggestionPill(
+          name: _suggestionName(strings, suggestion),
+          time: TimeOfDay(hour: suggestion.hour, minute: suggestion.minute)
+              .format(context),
+          selected: state.suggestion == suggestion,
+          onTap: () {
+            setState(() => _wheelEpoch++);
+            widget.onSuggestion(suggestion);
+          },
+        ),
+    ];
+    if (stacked) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (final pill in pills) ...[
+            if (pill != pills.first) const SizedBox(height: 8),
+            pill,
+          ],
+        ],
+      );
+    }
+    return Row(
+      children: [
+        for (final pill in pills) ...[
+          if (pill != pills.first) const SizedBox(width: 8),
+          Expanded(child: pill),
+        ],
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
@@ -64,28 +107,7 @@ class _ReminderTimeStepState extends State<ReminderTimeStep> {
             body: strings.onboardingTimeBody,
           ),
           const SizedBox(height: 16),
-          Row(
-            children: [
-              for (final suggestion in ReminderSuggestion.values) ...[
-                if (suggestion != ReminderSuggestion.values.first)
-                  const SizedBox(width: 8),
-                Expanded(
-                  child: _SuggestionPill(
-                    name: _suggestionName(strings, suggestion),
-                    time: TimeOfDay(
-                      hour: suggestion.hour,
-                      minute: suggestion.minute,
-                    ).format(context),
-                    selected: state.suggestion == suggestion,
-                    onTap: () {
-                      setState(() => _wheelEpoch++);
-                      widget.onSuggestion(suggestion);
-                    },
-                  ),
-                ),
-              ],
-            ],
-          ),
+          _suggestionPills(context, strings, state),
           const SizedBox(height: 16),
           Semantics(
             label: strings
@@ -154,7 +176,7 @@ class _SuggestionPill extends StatelessWidget {
         onTap: onTap,
         child: Container(
           constraints: const BoxConstraints(minHeight: 64),
-          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(999),
             color: selected ? palette.ink : palette.glassFill,
