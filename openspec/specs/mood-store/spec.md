@@ -3,19 +3,8 @@
 ## Purpose
 Da a los usuarios la pestaña Premium donde descubrir el catálogo de moods premium (con los desbloqueados marcados), y restaurar compras previas. Los planes de suscripción y su compra se especifican en `premium-subscription`.
 ## Requirements
-### Requirement: Escaparate de moods premium en la pantalla Premium
-La pantalla Premium SHALL mostrar los Moods premium del catálogo como escaparate, con su nombre localizado, e indicar cuáles están `unlocked` para el usuario. Los planes de suscripción y su compra se especifican en `premium-subscription`. La pantalla NO SHALL mostrar precios por Mood ni Packs.
-
-#### Scenario: Usuario abre la pestaña Premium
-- **WHEN** el usuario abre la pestaña Premium sin suscripción activa
-- **THEN** ve el escaparate de los Moods premium y los planes de suscripción con el precio de la tienda
-
-#### Scenario: Mood desbloqueado por una compra heredada
-- **WHEN** el usuario compró el Mood `brave` en una versión anterior y abre la pestaña Premium
-- **THEN** `brave` aparece marcado como desbloqueado en el escaparate
-
 ### Requirement: Restaurar compras
-La pantalla Premium SHALL ofrecer una acción de restaurar compras que recupere el estado `unlocked` de la suscripción activa y de los Moods comprados individualmente o en Pack en versiones anteriores, con la cuenta de la tienda de la plataforma. La acción SHALL estar disponible con y sin suscripción activa.
+La hoja de suscripción y Ajustes SHALL ofrecer una acción de restaurar compras que recupere el estado `unlocked` de la suscripción activa y de los Moods comprados individualmente o en Pack en versiones anteriores, con la cuenta de la tienda de la plataforma. La acción SHALL estar disponible con y sin suscripción activa.
 
 #### Scenario: Restaurar en un dispositivo nuevo
 - **WHEN** el usuario, en un dispositivo nuevo o tras reinstalar la app, ejecuta "Restaurar compras" con la misma cuenta de la tienda usada para suscribirse
@@ -29,27 +18,20 @@ La pantalla Premium SHALL ofrecer una acción de restaurar compras que recupere 
 - **WHEN** el usuario ejecuta "Restaurar compras" y su cuenta no tiene suscripción ni compras anteriores
 - **THEN** la app termina la acción sin cambiar el estado de ningún Mood y sin mostrar un error
 
-### Requirement: Nombres de Mood localizados en la tienda
-La pantalla Premium SHALL mostrar los nombres de los Moods premium en el idioma activo del dispositivo, con fallback a inglés. Los textos de los planes y la información legal SHALL seguir la misma regla de idioma.
+#### Scenario: Desde Ajustes
+- **WHEN** el usuario toca "Restaurar compras" en la sección Premium de Ajustes
+- **THEN** se ejecuta la misma restauración que en la hoja y el Log refleja los Moods recuperados al volver
 
-#### Scenario: Pantalla Premium en alemán
-- **WHEN** el dispositivo está en alemán y se abre la pestaña Premium
-- **THEN** el escaparate muestra los nombres de los Moods en alemán (por ejemplo "Mutig" para `brave`) y los textos de los planes en alemán
+### Requirement: Nombres de Mood localizados en la tienda
+La hoja de suscripción SHALL mostrar el nombre del Mood bloqueado que la abrió en el idioma activo del dispositivo, con fallback a inglés. Los textos de los planes y la información legal SHALL seguir la misma regla de idioma.
+
+#### Scenario: Hoja en alemán
+- **WHEN** el dispositivo está en alemán y se abre la hoja desde `brave`
+- **THEN** la cápsula muestra "Mutig" y los textos de los planes están en alemán
 
 #### Scenario: Idioma no soportado
 - **WHEN** el dispositivo está en un idioma que la app no soporta
 - **THEN** los nombres y los textos aparecen en inglés
-
-### Requirement: Premium es una pestaña del bottom bar
-La pantalla Premium SHALL abrirse desde la tercera pestaña del bottom bar, con el nombre "Premium" y su icono. La pantalla principal NO SHALL mostrar un icono de tienda en su header, y la pantalla Premium NO SHALL mostrar un botón de regresar. La hoja de suscripción que se abre al tocar un Mood bloqueado SHALL cubrir el bottom bar mientras esté abierta.
-
-#### Scenario: Abrir Premium
-- **WHEN** el usuario toca la pestaña Premium
-- **THEN** se muestra la pantalla Premium
-
-#### Scenario: Hoja de suscripción
-- **WHEN** el usuario toca un Mood bloqueado en el selector y se abre la hoja de suscripción
-- **THEN** el bottom bar queda cubierto por la hoja hasta que se cierra
 
 ### Requirement: El control de reintento es accesible
 El control para reintentar la carga de los planes SHALL tener una etiqueta de accesibilidad y SHALL mostrarse en el idioma del dispositivo.
@@ -59,24 +41,25 @@ El control para reintentar la carga de los planes SHALL tener una etiqueta de ac
 - **THEN** el control de reintentar aparece con su texto en ese idioma y con etiqueta de accesibilidad
 
 ### Requirement: Recuperación cuando los planes no cargan
-Si los planes de suscripción de la pantalla Premium no se pueden cargar, la pantalla SHALL mostrar un mensaje de error junto con un control para reintentar, y NO SHALL quedarse en ese estado sin una forma de recuperarse. Al activar el control, la pantalla SHALL mostrar un estado de carga y volver a pedir los planes. Al volver a la pestaña Premium con los planes en error, la app SHALL reintentar la carga una vez por visita. Un reintento fallido SHALL volver a mostrar el error con el control disponible.
+Si los planes de suscripción de la hoja no se pueden cargar, la hoja SHALL mostrar un mensaje de error junto con un control para reintentar, y NO SHALL quedarse en ese estado sin una forma de recuperarse. Al activar el control, la hoja SHALL mostrar un estado de carga y volver a pedir los planes. Al abrir la hoja con los planes en error, la app SHALL reintentar la carga una vez por apertura. Un reintento fallido SHALL volver a mostrar el error con el control disponible.
 
 #### Scenario: Reintento manual exitoso
 - **WHEN** los planes no cargaron y el usuario toca el control de reintentar y la carga ahora tiene éxito
-- **THEN** la pantalla muestra los planes en lugar del error
+- **THEN** la hoja muestra los planes en lugar del error
 
 #### Scenario: Reintento manual fallido
 - **WHEN** los planes no cargaron y el usuario toca el control de reintentar y la carga vuelve a fallar
-- **THEN** la pantalla muestra otra vez el mensaje de error con el control para reintentar
+- **THEN** la hoja muestra otra vez el mensaje de error con el control para reintentar
 
 #### Scenario: Estado de carga durante el reintento
 - **WHEN** el usuario toca el control de reintentar
-- **THEN** la pantalla muestra un estado de carga hasta que el reintento termina
+- **THEN** la hoja muestra un estado de carga hasta que el reintento termina
 
-#### Scenario: Reintento automático al volver a la pestaña
-- **WHEN** los planes están en error y el usuario cambia a otra pestaña y regresa a Premium
+#### Scenario: Reintento automático al abrir la hoja
+- **WHEN** los planes están en error y el usuario cierra la hoja y la vuelve a abrir
 - **THEN** la app reintenta cargar los planes sin que el usuario toque nada
 
 #### Scenario: Sin recarga si los planes ya cargaron
-- **WHEN** los planes ya se cargaron y el usuario cambia a otra pestaña y regresa a Premium
-- **THEN** la pantalla conserva los planes y no los vuelve a pedir
+- **WHEN** los planes ya se cargaron y el usuario cierra la hoja y la vuelve a abrir
+- **THEN** la hoja conserva los planes y no los vuelve a pedir
+

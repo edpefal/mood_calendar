@@ -11,6 +11,10 @@ El sistema SHALL ofrecer una superficie de edición expandida (bottom sheet) par
 - **WHEN** el usuario abre el sheet con `calm` seleccionado
 - **THEN** el sheet muestra el ícono y el nombre de `calm` junto al botón "Done"
 
+#### Scenario: Edición en vivo
+- **WHEN** el usuario escribe dentro del sheet
+- **THEN** el texto se refleja inmediatamente en el mismo dato que se guardará al guardar el registro desde el Log
+
 #### Scenario: Cerrar con Done
 - **WHEN** el usuario toca "Done"
 - **THEN** el sheet se cierra y el texto escrito se conserva en el Log sin guardar el mood

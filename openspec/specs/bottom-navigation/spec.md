@@ -4,15 +4,19 @@
 Define el bottom bar flotante que da acceso permanente al selector de moods, al calendario, a la tienda y a los ajustes, y cómo se comporta (apariencia, estado de las pestañas y cambios automáticos de pestaña).
 ## Requirements
 ### Requirement: Cuatro pestañas en un bottom bar
-La app SHALL mostrar un bottom bar con cuatro pestañas, de izquierda a derecha: selector de moods, calendario, Premium y ajustes. Los iconos SHALL ser de estilo outlined en el color de marca de la app; el de moods SHALL ser una carita sonriente de contorno, no un emoji SVG; el de Premium SHALL ser una estrella o un diamante de contorno. Las pestañas de calendario y ajustes SHALL usar los mismos iconos que tenían como botones del header. Los botones de calendario y ajustes y cualquier acceso a la tienda SHALL dejar de mostrarse en el header del selector.
+La app SHALL mostrar un bottom bar con cuatro pestañas, de izquierda a derecha: Calendar, Insights, Log y Settings. Los iconos de Calendar, Insights y Settings SHALL ser de contorno; el de Log SHALL ser un botón circular central con un signo "+" sobre el degradado de marca, más destacado que los demás. Todas las pestañas SHALL tener un nombre visible debajo de su icono. Los accesos a Premium, calendario y ajustes SHALL dejar de mostrarse como botones del header del Log, salvo la campana que lleva a Ajustes.
 
 #### Scenario: Orden y contenido
 - **WHEN** la app muestra su pantalla principal
-- **THEN** el bottom bar muestra, de izquierda a derecha, moods, calendario, Premium y ajustes
+- **THEN** el bottom bar muestra, de izquierda a derecha, Calendar, Insights, Log y Settings
 
-#### Scenario: El header del selector ya no tiene esos botones
-- **WHEN** el usuario está en la pestaña del selector de moods
-- **THEN** el header no muestra botones de Premium, calendario ni ajustes
+#### Scenario: Log destacado
+- **WHEN** el bottom bar se muestra en cualquier pestaña
+- **THEN** la pestaña Log aparece como un botón circular con "+" más grande que los demás iconos
+
+#### Scenario: No hay pestaña Premium
+- **WHEN** el usuario mira el bottom bar
+- **THEN** no hay ninguna pestaña de Premium ni de tienda
 
 #### Scenario: Cambiar de pestaña
 - **WHEN** el usuario toca una pestaña distinta de la activa
@@ -20,93 +24,55 @@ La app SHALL mostrar un bottom bar con cuatro pestañas, de izquierda a derecha:
 
 #### Scenario: Nombre de la pestaña en cada idioma
 - **WHEN** el dispositivo está en inglés, español, alemán, francés o italiano
-- **THEN** la pestaña Premium muestra su nombre en ese idioma y tiene etiqueta de accesibilidad
-
-#### Scenario: Íconos en el color de marca
-- **WHEN** el bottom bar se muestra en cualquier pestaña
-- **THEN** los iconos de las cuatro pestañas usan el mismo color de marca que los títulos y los botones principales de la app, y ese color no es el de ningún mood base
-
-### Requirement: Apariencia del bar como cápsula translúcida flotante
-El bar SHALL mostrarse como una cápsula flotante con bordes totalmente redondeados, separada de los bordes laterales e inferior de la pantalla, con fondo translúcido y un desenfoque suave del contenido que pasa por debajo. El contenido situado detrás del bar SHALL seguir siendo reconocible a través de él (sus formas y colores se distinguen, aunque suavizados), sin comprometer la legibilidad de los iconos de las pestañas. La pestaña activa SHALL distinguirse con una píldora translúcida detrás de su icono. En pantallas anchas el bar SHALL tener un ancho máximo de entre 400 y 440 pt y quedar centrado horizontalmente.
-
-#### Scenario: Contenido reconocible bajo el bar
-- **WHEN** una pantalla de pestaña tiene contenido (por ejemplo un botón con borde o una tarjeta) desplazado por debajo del bar
-- **THEN** ese contenido se distingue a través de la cápsula, suavizado pero no oculto por un relleno casi opaco
-
-#### Scenario: Iconos legibles
-- **WHEN** el bar está sobre contenido de cualquier color o texto
-- **THEN** los iconos de las cuatro pestañas y la pestaña activa se siguen distinguiendo con claridad
-
-#### Scenario: Pestaña activa marcada
-- **WHEN** una pestaña está activa
-- **THEN** su icono aparece sobre una píldora translúcida y las otras pestañas no la tienen
-
-#### Scenario: iPad
-- **WHEN** la app corre en una pantalla más ancha que el ancho máximo del bar
-- **THEN** el bar mantiene su ancho máximo y se centra en la parte baja de la pantalla
-
-#### Scenario: El contenido no queda tapado
-- **WHEN** una pantalla de pestaña tiene contenido en su parte baja (botón de guardar del selector, lista de Tienda o de Ajustes)
-- **THEN** ese contenido puede desplazarse o colocarse de modo que ningún control quede cubierto por el bar
+- **THEN** las cuatro pestañas muestran su nombre en ese idioma y tienen etiqueta de accesibilidad
 
 ### Requirement: Las pestañas conservan su estado
-Cambiar de pestaña NO SHALL reiniciar el contenido de las demás. En particular, la fecha del selector de moods SHALL conservarse al ir a otra pestaña y volver, y solo SHALL cambiar cuando el usuario toca un día del calendario. Al iniciar la app el selector SHALL mostrar hoy.
+Cambiar de pestaña NO SHALL reiniciar el contenido de las demás. En particular, la fecha del Log SHALL conservarse al ir a otra pestaña y volver, y solo SHALL cambiar cuando el usuario toca un día del calendario o el atajo del día anterior. Al iniciar la app la pestaña activa SHALL ser Log con la fecha de hoy.
 
-#### Scenario: Volver a la pestaña del selector
-- **WHEN** el usuario está en el selector de la fecha F, va a Ajustes y toca la pestaña del selector
-- **THEN** el selector sigue mostrando la fecha F
+#### Scenario: Volver a la pestaña Log
+- **WHEN** el usuario está en el Log de la fecha F, va a Ajustes y toca la pestaña Log
+- **THEN** el Log sigue mostrando la fecha F
 
 #### Scenario: Tocar un día del calendario
-- **WHEN** el usuario toca un día D en la pestaña del calendario
-- **THEN** la app cambia a la pestaña del selector con la fecha D
+- **WHEN** el usuario toca un día D en la pestaña Calendar
+- **THEN** la app cambia a la pestaña Log con la fecha D
 
 #### Scenario: Arranque
 - **WHEN** la app se inicia
-- **THEN** la pestaña activa es el selector de moods con la fecha de hoy
+- **THEN** la pestaña activa es Log con la fecha de hoy
 
 ### Requirement: Los modales cubren el bar
-El bar SHALL estar visible en las cuatro pestañas. Mientras haya un modal abierto sobre ellas (el editor de nota o una hoja de compra), el bar SHALL quedar cubierto por el modal y su barrera, sin poder recibir toques, y SHALL volver a estar disponible al cerrar el modal.
+El bar SHALL estar visible en las cuatro pestañas. Mientras haya un modal abierto sobre ellas (el editor de nota o la hoja de suscripción), el bar SHALL quedar cubierto por el modal y su barrera, sin poder recibir toques, y SHALL volver a estar disponible al cerrar el modal.
 
-#### Scenario: Visible en el selector
-- **WHEN** el usuario está en el selector de moods sin ningún modal abierto
+#### Scenario: Visible en el Log
+- **WHEN** el usuario está en el Log sin ningún modal abierto
 - **THEN** el bar está visible y sus pestañas reciben toques
 
-#### Scenario: Cubierto por una hoja de compra
-- **WHEN** el usuario abre la hoja de compra de un mood o de un Pack
+#### Scenario: Cubierto por la hoja de suscripción
+- **WHEN** el usuario abre la hoja de suscripción
 - **THEN** el bar no recibe toques ni aparece como control disponible, y vuelve a estarlo al cerrar la hoja
 
-### Requirement: Guardar cambia a la pestaña del calendario
-Tras guardar con éxito una Mood Entry, la app SHALL cambiar a la pestaña del calendario y resaltar el día guardado. Si el guardado falla, la app SHALL permanecer en la pestaña del selector.
-
-#### Scenario: Guardado exitoso
-- **WHEN** el usuario guarda una Mood Entry con éxito desde el selector
-- **THEN** la pestaña activa pasa a ser el calendario, con el día guardado resaltado
-
-#### Scenario: Guardado fallido
-- **WHEN** el guardado de la Mood Entry falla
-- **THEN** la app sigue en la pestaña del selector
-
 ### Requirement: El recordatorio abre el selector de la fecha del recordatorio
-Al tocar la notificación del recordatorio diario, la app SHALL cerrar cualquier modal abierto, activar la pestaña del selector de moods y mostrar la fecha del recordatorio, estuviera la app cerrada o abierta en otra pestaña.
+Al tocar la notificación del recordatorio diario, la app SHALL cerrar cualquier modal abierto, activar la pestaña Log y mostrar la fecha del recordatorio, estuviera la app cerrada o abierta en otra pestaña.
 
 #### Scenario: App abierta en otra pestaña
 - **WHEN** el usuario está en la pestaña de Ajustes y toca la notificación del recordatorio
-- **THEN** la app activa la pestaña del selector con la fecha del recordatorio
+- **THEN** la app activa la pestaña Log con la fecha del recordatorio
 
 #### Scenario: App abierta con un modal
-- **WHEN** hay una hoja de compra abierta y el usuario toca la notificación del recordatorio
-- **THEN** la hoja se cierra y la app muestra el selector con la fecha del recordatorio
+- **WHEN** hay la hoja de suscripción abierta y el usuario toca la notificación del recordatorio
+- **THEN** la hoja se cierra y la app muestra el Log con la fecha del recordatorio
 
 ### Requirement: Pantallas de pestaña con título y sin flecha de regresar
-Calendario, Tienda y Ajustes SHALL mostrar su título en bold y color de marca, y NO SHALL mostrar un botón de regresar en su header. El título del calendario SHALL ser "Calendario" (o su traducción) en todos los idiomas soportados.
+Calendar, Insights y Settings SHALL mostrar su título en peso medio y color de tinta, y NO SHALL mostrar un botón de regresar en su encabezado. El título del calendario SHALL ser "Calendario" (o su traducción) en todos los idiomas soportados.
 
-#### Scenario: Header de Ajustes
+#### Scenario: Encabezado de Ajustes
 - **WHEN** el usuario está en la pestaña de Ajustes
-- **THEN** el header muestra el título de Ajustes y ninguna flecha de regresar
+- **THEN** el encabezado muestra el título de Ajustes y ninguna flecha de regresar
 
-#### Scenario: Header del calendario
+#### Scenario: Encabezado del calendario
 - **WHEN** el usuario está en la pestaña del calendario
-- **THEN** el header muestra el título "Calendario" en el idioma del dispositivo y ninguna flecha de regresar
+- **THEN** el encabezado muestra el título "Calendario" en el idioma del dispositivo y ninguna flecha de regresar
 
 ### Requirement: Pestañas localizadas y accesibles
 Cada pestaña SHALL tener una etiqueta de `Semantics` y un tooltip localizados en todos los idiomas soportados (inglés, español, alemán, francés e italiano), y SHALL indicar a las tecnologías de asistencia si está seleccionada.
@@ -118,3 +84,30 @@ Cada pestaña SHALL tener una etiqueta de `Semantics` y un tooltip localizados e
 #### Scenario: Estado seleccionado
 - **WHEN** una pestaña está activa
 - **THEN** su `Semantics` la marca como seleccionada
+
+### Requirement: Insights provisional hasta el siguiente bloque
+La pestaña Insights SHALL mostrar, mientras no exista su contenido, una pantalla con el título "Insights" y un estado vacío que invita a registrar días, sin gráficas ni datos inventados y sin acceso a la hoja de suscripción.
+
+#### Scenario: Abrir Insights
+- **WHEN** el usuario toca la pestaña Insights
+- **THEN** ve el título "Insights" y un estado vacío localizado, sin gráficas
+
+### Requirement: Apariencia del bar como cápsula oscura flotante
+El bar SHALL mostrarse como una cápsula flotante de tinta oscura con bordes totalmente redondeados y una sombra suave, separada de los bordes laterales e inferior de la pantalla. La pestaña activa SHALL distinguirse con su ícono y nombre en blanco y en peso mayor; las inactivas, en blanco atenuado con contraste de al menos 4.5:1. En pantallas anchas el bar SHALL tener un ancho máximo de entre 400 y 440 pt y quedar centrado horizontalmente. Con el tema oscuro el bar SHALL conservar su contraste sobre el fondo oscuro.
+
+#### Scenario: Pestaña activa marcada
+- **WHEN** una pestaña está activa
+- **THEN** su ícono y nombre aparecen en blanco y en peso mayor, y los de las otras pestañas atenuados
+
+#### Scenario: iPad
+- **WHEN** la app corre en una pantalla más ancha que el ancho máximo del bar
+- **THEN** el bar mantiene su ancho máximo y se centra en la parte baja de la pantalla
+
+#### Scenario: El contenido no queda tapado
+- **WHEN** una pantalla de pestaña tiene contenido en su parte baja (botón de guardar del Log, lista de Ajustes)
+- **THEN** ese contenido puede desplazarse o colocarse de modo que ningún control quede cubierto por el bar
+
+#### Scenario: Tema oscuro
+- **WHEN** el tema es Oscuro
+- **THEN** el bar se distingue del fondo y sus íconos siguen con contraste de al menos 4.5:1
+
