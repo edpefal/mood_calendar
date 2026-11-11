@@ -49,7 +49,7 @@
 ## 7. Verificación y cierre
 
 - [x] 7.1 `flutter analyze` y `flutter test` en verde
-- [ ] 7.2 Revisar en simulador de iPhone y de iPad, en claro y oscuro, en inglés y alemán, con texto al 200 %, con datos de un año completo y con una caja con entradas antiguas sin hora
+- [x] 7.2 Revisar en simulador de iPhone y de iPad, en claro y oscuro, en inglés y alemán, con texto al 200 %, con datos de un año completo y con una caja con entradas antiguas sin hora _(2026-11-10: cerrada por decisión del usuario sin una revisión dedicada; el iPhone se revisó antes en claro y oscuro, en inglés y alemán y con texto grande, y el calendario y Insights se usaron en un iPhone real con TestFlight. No se revisaron el iPad, el año completo de datos ni las entradas antiguas sin hora)_
 - [x] 7.3 Medir la fluidez de Insights (varias tarjetas con blur y gráficas) en un iPhone real o en el simulador más lento disponible _(2026-11-09: probado en un iPhone real con el build de TestFlight del Bloque 3; Insights fluye bien)_
 - [x] 7.4 Actualizar `CLAUDE.md` (estado, Insights, calendario, hora de registro), `CONTEXT.md` (Hora de registro, Tendencia, Year in Pixels) y `backlog.md` (palabras frecuentes e imagen del mes)
 - [x] 7.5 Un build de TestFlight solo si el usuario lo pide; no publicar versión ni recapturar capturas
