@@ -8,6 +8,7 @@
 // Pass --dart-define=REVENUECAT_IOS_API_KEY=<key> to use the real store
 // catalog instead of the all-unlocked fake (needed for the store screenshot).
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -40,7 +41,7 @@ import 'package:mood_calendar/features/mood/domain/usecases/save_mood_usecase.da
 import 'package:mood_calendar/features/mood/presentation/bloc/calendar_cubit.dart';
 import 'package:mood_calendar/features/mood/presentation/bloc/mood_cubit.dart';
 import 'package:mood_calendar/core/navigation/main_shell.dart';
-import 'package:mood_calendar/features/note_lock/data/local_auth_note_lock_authenticator.dart';
+import 'package:mood_calendar/features/note_lock/domain/note_lock_authenticator.dart';
 import 'package:mood_calendar/features/note_lock/presentation/bloc/note_lock_cubit.dart';
 import 'package:mood_calendar/features/note_lock/presentation/widgets/note_lock_host.dart';
 import 'package:mood_calendar/features/purchases/data/datasources/revenue_cat_datasource.dart';
@@ -71,6 +72,34 @@ const Map<String, String> _todayNote = {
       'Un caffè con Ana e una lunga passeggiata lungo il fiume. Una giornata davvero bella.',
 };
 
+/// Day 15 of the previous month: the entry the calendar capture opens to show
+/// the day detail (mood, time logged and note).
+const int _detailDay = 15;
+
+const Map<String, String> _detailNote = {
+  'en': 'Finally finished the project I kept postponing. Proud of myself.',
+  'es': 'Por fin terminé el proyecto que venía posponiendo. Orgulloso de mí.',
+  'de':
+      'Endlich das Projekt abgeschlossen, das ich ständig aufgeschoben habe. Stolz auf mich.',
+  'fr':
+      'J’ai enfin terminé le projet que je repoussais sans cesse. Fier de moi.',
+  'it': 'Ho finalmente finito il progetto che rimandavo da tempo. Fiero di me.',
+};
+
+/// Launch with `SIMCTL_CHILD_SCREENSHOT_LOCK=1 xcrun simctl launch ...` to
+/// capture the note lock on: the lock is enabled and the session starts locked.
+final bool _noteLockOn = Platform.environment['SCREENSHOT_LOCK'] == '1';
+
+/// A device that always has a passcode and always accepts it, so the lock can
+/// be shown without the system prompt.
+class _ScreenshotAuthenticator implements NoteLockAuthenticator {
+  @override
+  Future<bool> isAvailable() async => true;
+
+  @override
+  Future<bool> authenticate(String reason) async => true;
+}
+
 class _AllUnlockedEntitlementsRepository implements MoodEntitlementsRepository {
   const _AllUnlockedEntitlementsRepository();
 
@@ -84,7 +113,12 @@ class _AllUnlockedEntitlementsRepository implements MoodEntitlementsRepository {
 
   @override
   Stream<SubscriptionStatus> subscriptionStatus() async* {
-    yield SubscriptionStatus.inactive;
+    // Active, so Insights and the other Premium features are not blurred.
+    yield SubscriptionStatus(
+      isActive: true,
+      plan: SubscriptionPlanType.annual,
+      expiresAt: DateTime.now().add(const Duration(days: 300)),
+    );
   }
 
   @override
@@ -109,7 +143,8 @@ Future<void> _seed(Box<MoodModel> moodBox, Box<dynamic> settingsBox) async {
   String keyFor(DateTime date) =>
       '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
 
-  Future<void> put(DateTime date, String moodId, {String? note}) {
+  Future<void> put(DateTime date, String moodId,
+      {String? note, DateTime? loggedAt}) {
     final definition = allMoodDefinitions.firstWhere((m) => m.id == moodId);
     return moodBox.put(
       keyFor(date),
@@ -118,6 +153,7 @@ Future<void> _seed(Box<MoodModel> moodBox, Box<dynamic> settingsBox) async {
         mood: definition.assetPath,
         note: note,
         intensity: definition.intensity,
+        loggedAt: loggedAt,
       ),
     );
   }
@@ -126,7 +162,17 @@ Future<void> _seed(Box<MoodModel> moodBox, Box<dynamic> settingsBox) async {
   for (var i = 0; i < _previousMonthMoods.length; i++) {
     final moodId = _previousMonthMoods[i];
     if (moodId == null) continue;
-    await put(DateTime(previousMonth.year, previousMonth.month, i + 1), moodId);
+    final day = i + 1;
+    await put(
+      DateTime(previousMonth.year, previousMonth.month, day),
+      moodId,
+      note: day == _detailDay
+          ? (_detailNote[languageCode] ?? _detailNote['en'])
+          : null,
+      loggedAt: day == _detailDay
+          ? DateTime(previousMonth.year, previousMonth.month, day, 21, 12)
+          : null,
+    );
   }
 
   const thisMonthMoods = ['happy', 'calm', 'confident', 'happy', 'calm'];
@@ -142,6 +188,7 @@ Future<void> _seed(Box<MoodModel> moodBox, Box<dynamic> settingsBox) async {
 
   // Reminder shown as enabled at 8 PM, and the rating prompt already spent so
   // the system dialog never covers a screenshot.
+  await settingsBox.put('note_lock_enabled', _noteLockOn);
   await settingsBox.put('daily_reminder_enabled', true);
   await settingsBox.put('daily_reminder_hour', 20);
   await settingsBox.put('daily_reminder_minute', 0);
@@ -243,13 +290,14 @@ Future<void> main() async {
           ),
           BlocProvider(create: (context) => ThemeCubit()),
           BlocProvider(create: (context) => PurchasesCubit(entitlements)),
-          // The lock stays off in the store screenshots.
+          // The lock is off unless the capture asks for it (see _noteLockOn).
           BlocProvider(
             create: (context) => NoteLockCubit(
-              authenticator: LocalAuthNoteLockAuthenticator(),
+              authenticator: _ScreenshotAuthenticator(),
               telemetry: telemetry,
               isSubscribed: () => true,
-            ),
+              enabled: _noteLockOn,
+            )..refreshAvailability(),
           ),
         ],
         child: const NoteLockHost(child: _ScreenshotApp()),

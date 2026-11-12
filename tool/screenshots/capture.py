@@ -5,11 +5,13 @@ Run the app first with `flutter run -t tool/screenshots/main.dart -d <udid>`
 and have an idb companion connected to that simulator (see CLAUDE.md).
 
 usage: python3 tool/screenshots/capture.py <udid> <device: iphone|ipad> <locale: en|es|de|fr|it>
-Writes build/screenshots/shots/<device>/<locale>/<picker|note|calendar|reminders>.png
+Writes build/screenshots/shots/<device>/<locale>/<picker|calendar|day|insights|locked|reminders>.png
 Buttons are found by position (not label) so it works in every language.
 The app opens on the Log, which shows today's entry (the seed has one) in the
-"Saved" state: the "picker" shot taps Edit to get the grid of moods by category,
-and the note editor is opened with the note pill above Save.
+"Saved" state: the "picker" shot taps Edit to get the grid of moods by category.
+"day" opens the detail of day 15 of the previous month (the seed gives it a note
+and a time), "insights" is the Insights tab and "locked" is the Log with the note
+lock on (the app is launched with SIMCTL_CHILD_SCREENSHOT_LOCK=1).
 The four tabs of the bottom bar are the bottom-most row of buttons:
 [calendar, insights, log, settings].
 """
@@ -31,11 +33,15 @@ def sh(*args):
     return subprocess.run(args, capture_output=True, text=True).stdout
 
 
-def launch():
+def launch(lock=False):
     sh('xcrun', 'simctl', 'terminate', UDID, BUNDLE)
     time.sleep(1)
-    sh('xcrun', 'simctl', 'launch', UDID, BUNDLE,
-       '-AppleLanguages', f'({LOCALE})', '-AppleLocale', APPLE_LOCALE)
+    env = dict(os.environ)
+    if lock:
+        env['SIMCTL_CHILD_SCREENSHOT_LOCK'] = '1'
+    subprocess.run(['xcrun', 'simctl', 'launch', UDID, BUNDLE,
+                    '-AppleLanguages', f'({LOCALE})', '-AppleLocale', APPLE_LOCALE],
+                   capture_output=True, text=True, env=env)
     time.sleep(5)
     for _ in range(20):  # wait until the bottom bar is on screen
         if len(tab_buttons()) >= 4:
@@ -125,18 +131,18 @@ def note_pill():
 
 
 def calendar_row_buttons():
-    """Calendar card header, left to right: [previous, next].
+    """Calendar card header, left to right: [previous, month title, next].
 
-    It is the topmost row of buttons once the bottom bar row is excluded (the
-    day cells sit below it). The current month has no enabled "next", so the
-    caller only needs the leftmost one.
+    It is the row that holds the wide "choose month and year" button: "view
+    year" sits in a row above it and the day cells below. The current month has
+    no enabled "next", so the caller only needs the leftmost one.
     """
     for _ in range(6):  # the tab switch may still be animating
         tabs = {tuple(b) for b in tab_buttons()}
-        rest = [b for b in buttons() if tuple(b) not in tabs]
-        groups = rows(rest)
-        if groups:
-            return sorted(groups[0], key=lambda b: b[0])
+        groups = rows([b for b in buttons() if tuple(b) not in tabs])
+        for g in groups:
+            if any(b[2] > 150 for b in g):
+                return sorted(g, key=lambda b: b[0])
         time.sleep(1)
     raise RuntimeError('calendar header buttons not found')
 
@@ -147,26 +153,62 @@ def open_calendar_previous_month():
     tap_button(row[0])  # previous month
 
 
+DETAIL_DAY = 15  # keep in sync with _detailDay in tool/screenshots/main.dart
+
+
+def day_cell(day):
+    """Calendar cell of `day` in the visible (previous) month, as a button tuple.
+
+    idb returns a truncated list for the day cells, so the position is computed
+    from the first cell of the grid, which is always the 1st of the month: the
+    grid has 7 columns, starts on Sunday and has an 8 pt gap between cells.
+    """
+    import datetime
+    today = datetime.date.today()
+    first = (today.replace(day=1) - datetime.timedelta(days=1)).replace(day=1)
+    first_weekday = first.weekday() % 7  # DateTime.weekday % 7 in the app: Sunday = 0
+    for _ in range(6):
+        tabs = {tuple(b) for b in tab_buttons()}
+        groups = rows([b for b in buttons() if tuple(b) not in tabs])
+        header = next((i for i, g in enumerate(groups) if any(b[2] > 150 for b in g)), None)
+        if header is not None and len(groups) > header + 1:
+            x, y, w, h, _label = sorted(groups[header + 1], key=lambda b: b[0])[0]
+            index = first_weekday + day - 1
+            col, row = index % 7, index // 7
+            return (x + (col - first_weekday) * (w + 8), y + row * (h + 8), w, h, '')
+        time.sleep(1)
+    raise RuntimeError('calendar day cell not found')
+
+
 # 1) log grid: Edit on the Saved card brings back the moods by category.
 launch()
 tap_button(edit_button())
 time.sleep(1)
 shot('picker')
 
-# 2) note editor, opened with the pill above Save
-launch()
-tap_button(edit_button())
-tap_button(note_pill())
-time.sleep(1.5)
-shot('note')
-
-# 3) calendar + summary (previous month is fully seeded)
+# 2) calendar + summary (previous month is fully seeded)
 launch()
 open_calendar_previous_month()
 time.sleep(1)
 shot('calendar')
 
-# 4) settings screen (reminders)
+# 3) day detail: tap a day with an entry (it has a note and the time it was logged)
+tap_button(day_cell(DETAIL_DAY))
+time.sleep(1.5)
+shot('day')
+
+# 4) insights
+launch()
+tap_button(tab_buttons()[1])  # insights tab
+time.sleep(2)
+shot('insights')
+
+# 5) the Log with the note lock on: today's note shows "Note locked"
+launch(lock=True)
+time.sleep(1)
+shot('locked')
+
+# 6) settings screen (reminders)
 launch()
 tap_button(tab_buttons()[3])  # settings tab
 time.sleep(1.5)
