@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'brand_colors.dart';
@@ -53,6 +54,12 @@ ThemeData buildAppTheme(Brightness brightness) {
       foregroundColor: palette.text,
       elevation: 0,
       scrolledUnderElevation: 0,
+      // The AppBar is transparent over the mesh background and Flutter picks
+      // the status bar icons from that colour's luminance (ignoring its
+      // alpha), so without this a light theme got white icons on pastel.
+      systemOverlayStyle: brightness == Brightness.dark
+          ? SystemUiOverlayStyle.light
+          : SystemUiOverlayStyle.dark,
       titleTextStyle: textTheme.titleLarge?.copyWith(
         color: palette.text,
         fontWeight: FontWeight.w500,
