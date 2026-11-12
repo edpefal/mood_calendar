@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-12T20:44:13+00:00",
+  "generatedAt": "2026-11-12T21:08:38+00:00",
   "title": "Design System: Mood Calendar (sitio web)",
   "extensions": {
     "colorMeta": {
@@ -408,6 +408,186 @@
           "#F8C6C4",
           "#FFE4E1"
         ]
+      },
+      "hero-start-to": {
+        "role": "secondary",
+        "displayName": "Lavanda de Inicio",
+        "canonical": "oklch(92% 0.042 296)",
+        "tonalRamp": [
+          "#0D0818",
+          "#282335",
+          "#464155",
+          "#676278",
+          "#8B859C",
+          "#AFAAC2",
+          "#D6D0E9",
+          "#F3EEFF"
+        ]
+      },
+      "hero-start-from": {
+        "role": "secondary",
+        "displayName": "Menta de Inicio",
+        "canonical": "oklch(96% 0.023 169)",
+        "tonalRamp": [
+          "#040E0A",
+          "#1E2925",
+          "#3C4843",
+          "#5C6A64",
+          "#7F8D87",
+          "#A4B2AC",
+          "#C9D8D2",
+          "#E7F6F0"
+        ]
+      },
+      "cell-positive-fill": {
+        "role": "secondary",
+        "displayName": "Celda Positive",
+        "canonical": "oklch(96% 0.050 90)",
+        "tonalRamp": [
+          "#120A00",
+          "#2E250D",
+          "#4D442C",
+          "#6F654C",
+          "#93886E",
+          "#B8AD91",
+          "#DED4B7",
+          "#FCF1D4"
+        ]
+      },
+      "cell-positive-ring": {
+        "role": "secondary",
+        "displayName": "Aro Positive",
+        "canonical": "oklch(55% 0.117 73)",
+        "tonalRamp": [
+          "#200000",
+          "#401B00",
+          "#623B00",
+          "#865D1F",
+          "#AB8045",
+          "#D2A569",
+          "#FACB8F",
+          "#FFE9AB"
+        ]
+      },
+      "cell-peaceful-fill": {
+        "role": "secondary",
+        "displayName": "Celda Peaceful",
+        "canonical": "oklch(94% 0.036 168)",
+        "tonalRamp": [
+          "#010F09",
+          "#182B24",
+          "#364A42",
+          "#576C63",
+          "#798F86",
+          "#9DB4AA",
+          "#C3DBD0",
+          "#E0F8EE"
+        ]
+      },
+      "cell-peaceful-ring": {
+        "role": "secondary",
+        "displayName": "Aro Peaceful",
+        "canonical": "oklch(53% 0.105 163)",
+        "tonalRamp": [
+          "#001402",
+          "#00321A",
+          "#005338",
+          "#307558",
+          "#55997B",
+          "#7ABF9F",
+          "#A0E6C5",
+          "#BEFFE2"
+        ]
+      },
+      "cell-neutral-fill": {
+        "role": "secondary",
+        "displayName": "Celda Neutral",
+        "canonical": "oklch(94% 0.016 298)",
+        "tonalRamp": [
+          "#0C0A10",
+          "#27252C",
+          "#46444B",
+          "#67656D",
+          "#8A8890",
+          "#AFACB5",
+          "#D5D3DC",
+          "#F2F0FA"
+        ]
+      },
+      "cell-neutral-ring": {
+        "role": "secondary",
+        "displayName": "Aro Neutral",
+        "canonical": "oklch(48% 0.064 292)",
+        "tonalRamp": [
+          "#0C061E",
+          "#27213D",
+          "#45405E",
+          "#666181",
+          "#8984A6",
+          "#AEA9CC",
+          "#D4CFF4",
+          "#F2ECFF"
+        ]
+      },
+      "cell-hard-fill": {
+        "role": "secondary",
+        "displayName": "Celda Hard",
+        "canonical": "oklch(92% 0.041 292)",
+        "tonalRamp": [
+          "#0B0818",
+          "#272435",
+          "#454255",
+          "#666378",
+          "#89869C",
+          "#AEABC1",
+          "#D4D1E9",
+          "#F2EEFF"
+        ]
+      },
+      "cell-hard-ring": {
+        "role": "secondary",
+        "displayName": "Aro Hard",
+        "canonical": "oklch(50% 0.204 281)",
+        "tonalRamp": [
+          "#12004C",
+          "#230072",
+          "#3C2F98",
+          "#5954C0",
+          "#7A79E8",
+          "#9D9FFF",
+          "#C2C6FF",
+          "#DFE4FF"
+        ]
+      },
+      "cell-angry-fill": {
+        "role": "secondary",
+        "displayName": "Celda Angry",
+        "canonical": "oklch(93% 0.031 23)",
+        "tonalRamp": [
+          "#140707",
+          "#322221",
+          "#52403F",
+          "#74615F",
+          "#988482",
+          "#BDA8A7",
+          "#E4CECD",
+          "#FFECEA"
+        ]
+      },
+      "cell-angry-ring": {
+        "role": "secondary",
+        "displayName": "Aro Angry",
+        "canonical": "oklch(55% 0.174 27)",
+        "tonalRamp": [
+          "#320000",
+          "#580000",
+          "#7F1717",
+          "#A73F38",
+          "#D0645A",
+          "#F9897E",
+          "#FFAFA3",
+          "#FFCDBF"
+        ]
       }
     },
     "typographyMeta": {
@@ -429,7 +609,7 @@
       },
       "label": {
         "displayName": "Label",
-        "purpose": "Nombre del mood y contador."
+        "purpose": "Nombre del mood en cada celda (500) y de la categoría (600)."
       }
     },
     "shadows": [
@@ -443,7 +623,7 @@
       {
         "name": "ease-out-expo",
         "value": "cubic-bezier(.16, 1, .3, 1)",
-        "purpose": "Cambio de carita y de pastel; 0.6 s en la carita, 0.7 s en el fondo. Se anula con prefers-reduced-motion."
+        "purpose": "Cambio del tinte del héroe (0.7 s con @property) y borde de la celda (0.3 s); escala de la carita elegida 0.5 s. Se anula con prefers-reduced-motion."
       }
     ],
     "breakpoints": [
@@ -455,26 +635,12 @@
   },
   "components": [
     {
-      "name": "Picker Nav",
-      "kind": "nav",
-      "refersTo": "picker-nav-button",
-      "description": "Botones ‹ › y contador del selector de caritas.",
-      "html": "<div class=\"ds-nav\"><button class=\"ds-nav-btn\" aria-label=\"Previous\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M15 5l-7 7 7 7\"/></svg></button><span class=\"ds-nav-count\">2 / 5</span><button class=\"ds-nav-btn\" aria-label=\"Next\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M9 5l7 7-7 7\"/></svg></button></div>",
-      "css": ".ds-nav{display:flex;align-items:center;justify-content:center;gap:6px;padding:16px;background:linear-gradient(135deg,#E5F8F0,#9FD2BE);color:#1D1D22;font:600 1.0625rem Poppins,system-ui,sans-serif;font-variant-numeric:tabular-nums}.ds-nav-btn{width:48px;height:48px;border:0;border-radius:50%;background:transparent;color:inherit;display:grid;place-items:center;cursor:pointer}.ds-nav-btn:hover{background:rgba(255,255,255,.55)}.ds-nav-btn:focus-visible{outline:3px solid #7C5CFF;outline-offset:3px}.ds-nav-btn svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}.ds-nav-count{min-width:3.6em;text-align:center}"
-    },
-    {
-      "name": "Mood Face (current)",
+      "name": "Mood Cell",
       "kind": "custom",
-      "description": "Carita seleccionada: escala completa y opacidad 1, sobre el pastel de su mood.",
-      "html": "<div class=\"ds-face-stage\"><svg class=\"ds-face\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" viewBox=\"0 0 512 512\" ><circle style=\"fill:#FFE17D;\" cx=\"256\" cy=\"256\" r=\"256\"/><path style=\"fill:#FFD164;\" d=\"M293.161,474.839c-141.385,0-256-114.615-256-256c0-61.227,21.521-117.411,57.376-161.463 C36.863,104.316,0,175.842,0,256c0,141.385,114.615,256,256,256c80.159,0,151.685-36.864,198.626-94.538 C410.573,453.317,354.389,474.839,293.161,474.839z\"/><path style=\"fill:#9C6846;\" d=\"M256,305.305c-49.323,0-96.405-5.727-139.598-16.079c-5.595-1.341-10.417,4.504-8.691,10.596 c19.92,70.324,78.718,121.34,148.29,121.34s128.369-51.016,148.29-121.34c1.726-6.092-3.096-11.937-8.691-10.596 C352.405,299.578,305.323,305.305,256,305.305z\"/><g><path style=\"fill:#7D5046;\" d=\"M395.599,289.226c-43.194,10.352-90.275,16.079-139.599,16.079s-96.405-5.726-139.598-16.079 c-5.595-1.341-10.417,4.504-8.691,10.596c5.214,18.408,13.148,35.443,23.186,50.637c41.04,7.796,82.792,12.085,125.121,12.085 c42.315,0,84.051-4.286,125.079-12.076c10.041-15.196,17.978-32.233,23.193-50.645 C406.015,293.729,401.194,287.885,395.599,289.226z\"/><path style=\"fill:#7D5046;\" d=\"M169.29,231.642L169.29,231.642c-11.402,0-20.645-9.243-20.645-20.645v-33.449 c0-11.402,9.243-20.645,20.645-20.645l0,0c11.402,0,20.645,9.243,20.645,20.645v33.449 C189.935,222.399,180.692,231.642,169.29,231.642z\"/></g><path style=\"fill:#9C6846;\" d=\"M169.29,156.903c-1.414,0-2.794,0.145-4.129,0.416v45.419c0,6.841,5.546,12.387,12.387,12.387 s12.387-5.546,12.387-12.387v-25.191C189.935,166.146,180.693,156.903,169.29,156.903z\"/><path style=\"fill:#7D5046;\" d=\"M342.71,231.642L342.71,231.642c-11.402,0-20.645-9.243-20.645-20.645v-33.449 c0-11.402,9.243-20.645,20.645-20.645l0,0c11.402,0,20.645,9.243,20.645,20.645v33.449 C363.355,222.399,354.112,231.642,342.71,231.642z\"/><path style=\"fill:#9C6846;\" d=\"M342.71,156.903c-1.414,0-2.794,0.145-4.129,0.416v45.419c0,6.841,5.546,12.387,12.387,12.387 s12.387-5.546,12.387-12.387v-25.191C363.355,166.146,354.112,156.903,342.71,156.903z\"/><path style=\"fill:#FFFFFF;\" d=\"M367.048,317.428c4.464-7.649,8.199-15.845,11.331-24.377 c-38.384,7.921-79.532,12.253-122.379,12.253c-42.873,0-84.044-4.336-122.448-12.267c3.148,8.573,6.944,16.784,11.438,24.465 c5.195,8.88,13.99,14.56,23.558,15.724c28.649,3.485,57.847,5.354,87.452,5.354c29.599,0,58.79-1.868,87.433-5.352 C353.033,332.061,361.845,326.344,367.048,317.428z\"/><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g></svg></div>",
-      "css": ".ds-face-stage{display:grid;place-items:center;padding:24px;background:linear-gradient(135deg,#FFF6DE,#E1C78F)}.ds-face{width:160px;height:160px}"
-    },
-    {
-      "name": "Mood Face (neighbor)",
-      "kind": "custom",
-      "description": "Carita vecina: 40% de escala y 50% de opacidad.",
-      "html": "<div class=\"ds-face-stage\"><svg class=\"ds-face\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" viewBox=\"0 0 512 512\" ><circle style=\"fill:#FFE17D;\" cx=\"256\" cy=\"256\" r=\"256\"/><path style=\"fill:#FFD164;\" d=\"M293.161,474.839c-141.385,0-256-114.615-256-256c0-61.227,21.521-117.411,57.376-161.463 C36.863,104.316,0,175.842,0,256c0,141.385,114.615,256,256,256c80.159,0,151.685-36.864,198.626-94.538 C410.573,453.317,354.389,474.839,293.161,474.839z\"/><path style=\"fill:#9C6846;\" d=\"M256,305.305c-49.323,0-96.405-5.727-139.598-16.079c-5.595-1.341-10.417,4.504-8.691,10.596 c19.92,70.324,78.718,121.34,148.29,121.34s128.369-51.016,148.29-121.34c1.726-6.092-3.096-11.937-8.691-10.596 C352.405,299.578,305.323,305.305,256,305.305z\"/><g><path style=\"fill:#7D5046;\" d=\"M395.599,289.226c-43.194,10.352-90.275,16.079-139.599,16.079s-96.405-5.726-139.598-16.079 c-5.595-1.341-10.417,4.504-8.691,10.596c5.214,18.408,13.148,35.443,23.186,50.637c41.04,7.796,82.792,12.085,125.121,12.085 c42.315,0,84.051-4.286,125.079-12.076c10.041-15.196,17.978-32.233,23.193-50.645 C406.015,293.729,401.194,287.885,395.599,289.226z\"/><path style=\"fill:#7D5046;\" d=\"M169.29,231.642L169.29,231.642c-11.402,0-20.645-9.243-20.645-20.645v-33.449 c0-11.402,9.243-20.645,20.645-20.645l0,0c11.402,0,20.645,9.243,20.645,20.645v33.449 C189.935,222.399,180.692,231.642,169.29,231.642z\"/></g><path style=\"fill:#9C6846;\" d=\"M169.29,156.903c-1.414,0-2.794,0.145-4.129,0.416v45.419c0,6.841,5.546,12.387,12.387,12.387 s12.387-5.546,12.387-12.387v-25.191C189.935,166.146,180.693,156.903,169.29,156.903z\"/><path style=\"fill:#7D5046;\" d=\"M342.71,231.642L342.71,231.642c-11.402,0-20.645-9.243-20.645-20.645v-33.449 c0-11.402,9.243-20.645,20.645-20.645l0,0c11.402,0,20.645,9.243,20.645,20.645v33.449 C363.355,222.399,354.112,231.642,342.71,231.642z\"/><path style=\"fill:#9C6846;\" d=\"M342.71,156.903c-1.414,0-2.794,0.145-4.129,0.416v45.419c0,6.841,5.546,12.387,12.387,12.387 s12.387-5.546,12.387-12.387v-25.191C363.355,166.146,354.112,156.903,342.71,156.903z\"/><path style=\"fill:#FFFFFF;\" d=\"M367.048,317.428c4.464-7.649,8.199-15.845,11.331-24.377 c-38.384,7.921-79.532,12.253-122.379,12.253c-42.873,0-84.044-4.336-122.448-12.267c3.148,8.573,6.944,16.784,11.438,24.465 c5.195,8.88,13.99,14.56,23.558,15.724c28.649,3.485,57.847,5.354,87.452,5.354c29.599,0,58.79-1.868,87.433-5.352 C353.033,332.061,361.845,326.344,367.048,317.428z\"/><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g></svg></div>",
-      "css": ".ds-face-stage{display:grid;place-items:center;padding:24px;background:linear-gradient(135deg,#FFF6DE,#E1C78F)}.ds-face{width:160px;height:160px;transform:scale(.4);opacity:.5}"
+      "refersTo": "mood-cell",
+      "description": "Celda de la cuadrícula de moods: radio nativo, carita de 44 px y nombre; relleno y aro de su categoría. Se muestra en reposo y elegida.",
+      "html": "<div class=\"ds-cells\"><label class=\"ds-cell\"><svg class=\"ds-cell-face\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" viewBox=\"0 0 512 512\" ><circle style=\"fill:#FFE17D;\" cx=\"256\" cy=\"256\" r=\"256\"/><path style=\"fill:#FFD164;\" d=\"M293.161,474.839c-141.385,0-256-114.615-256-256c0-61.227,21.521-117.411,57.376-161.463 C36.863,104.316,0,175.842,0,256c0,141.385,114.615,256,256,256c80.159,0,151.685-36.864,198.626-94.538 C410.573,453.317,354.389,474.839,293.161,474.839z\"/><path style=\"fill:#9C6846;\" d=\"M256,305.305c-49.323,0-96.405-5.727-139.598-16.079c-5.595-1.341-10.417,4.504-8.691,10.596 c19.92,70.324,78.718,121.34,148.29,121.34s128.369-51.016,148.29-121.34c1.726-6.092-3.096-11.937-8.691-10.596 C352.405,299.578,305.323,305.305,256,305.305z\"/><g><path style=\"fill:#7D5046;\" d=\"M395.599,289.226c-43.194,10.352-90.275,16.079-139.599,16.079s-96.405-5.726-139.598-16.079 c-5.595-1.341-10.417,4.504-8.691,10.596c5.214,18.408,13.148,35.443,23.186,50.637c41.04,7.796,82.792,12.085,125.121,12.085 c42.315,0,84.051-4.286,125.079-12.076c10.041-15.196,17.978-32.233,23.193-50.645 C406.015,293.729,401.194,287.885,395.599,289.226z\"/><path style=\"fill:#7D5046;\" d=\"M169.29,231.642L169.29,231.642c-11.402,0-20.645-9.243-20.645-20.645v-33.449 c0-11.402,9.243-20.645,20.645-20.645l0,0c11.402,0,20.645,9.243,20.645,20.645v33.449 C189.935,222.399,180.692,231.642,169.29,231.642z\"/></g><path style=\"fill:#9C6846;\" d=\"M169.29,156.903c-1.414,0-2.794,0.145-4.129,0.416v45.419c0,6.841,5.546,12.387,12.387,12.387 s12.387-5.546,12.387-12.387v-25.191C189.935,166.146,180.693,156.903,169.29,156.903z\"/><path style=\"fill:#7D5046;\" d=\"M342.71,231.642L342.71,231.642c-11.402,0-20.645-9.243-20.645-20.645v-33.449 c0-11.402,9.243-20.645,20.645-20.645l0,0c11.402,0,20.645,9.243,20.645,20.645v33.449 C363.355,222.399,354.112,231.642,342.71,231.642z\"/><path style=\"fill:#9C6846;\" d=\"M342.71,156.903c-1.414,0-2.794,0.145-4.129,0.416v45.419c0,6.841,5.546,12.387,12.387,12.387 s12.387-5.546,12.387-12.387v-25.191C363.355,166.146,354.112,156.903,342.71,156.903z\"/><path style=\"fill:#FFFFFF;\" d=\"M367.048,317.428c4.464-7.649,8.199-15.845,11.331-24.377 c-38.384,7.921-79.532,12.253-122.379,12.253c-42.873,0-84.044-4.336-122.448-12.267c3.148,8.573,6.944,16.784,11.438,24.465 c5.195,8.88,13.99,14.56,23.558,15.724c28.649,3.485,57.847,5.354,87.452,5.354c29.599,0,58.79-1.868,87.433-5.352 C353.033,332.061,361.845,326.344,367.048,317.428z\"/><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g></svg><span>Happy</span></label><label class=\"ds-cell on\"><svg class=\"ds-cell-face\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" viewBox=\"0 0 512 512\" ><circle style=\"fill:#FFE17D;\" cx=\"256\" cy=\"256\" r=\"256\"/><path style=\"fill:#FFD164;\" d=\"M293.161,474.839c-141.385,0-256-114.615-256-256c0-61.227,21.521-117.411,57.376-161.463 C36.863,104.316,0,175.842,0,256c0,141.385,114.615,256,256,256c80.159,0,151.685-36.864,198.626-94.538 C410.573,453.317,354.389,474.839,293.161,474.839z\"/><path style=\"fill:#9C6846;\" d=\"M256,305.305c-49.323,0-96.405-5.727-139.598-16.079c-5.595-1.341-10.417,4.504-8.691,10.596 c19.92,70.324,78.718,121.34,148.29,121.34s128.369-51.016,148.29-121.34c1.726-6.092-3.096-11.937-8.691-10.596 C352.405,299.578,305.323,305.305,256,305.305z\"/><g><path style=\"fill:#7D5046;\" d=\"M395.599,289.226c-43.194,10.352-90.275,16.079-139.599,16.079s-96.405-5.726-139.598-16.079 c-5.595-1.341-10.417,4.504-8.691,10.596c5.214,18.408,13.148,35.443,23.186,50.637c41.04,7.796,82.792,12.085,125.121,12.085 c42.315,0,84.051-4.286,125.079-12.076c10.041-15.196,17.978-32.233,23.193-50.645 C406.015,293.729,401.194,287.885,395.599,289.226z\"/><path style=\"fill:#7D5046;\" d=\"M169.29,231.642L169.29,231.642c-11.402,0-20.645-9.243-20.645-20.645v-33.449 c0-11.402,9.243-20.645,20.645-20.645l0,0c11.402,0,20.645,9.243,20.645,20.645v33.449 C189.935,222.399,180.692,231.642,169.29,231.642z\"/></g><path style=\"fill:#9C6846;\" d=\"M169.29,156.903c-1.414,0-2.794,0.145-4.129,0.416v45.419c0,6.841,5.546,12.387,12.387,12.387 s12.387-5.546,12.387-12.387v-25.191C189.935,166.146,180.693,156.903,169.29,156.903z\"/><path style=\"fill:#7D5046;\" d=\"M342.71,231.642L342.71,231.642c-11.402,0-20.645-9.243-20.645-20.645v-33.449 c0-11.402,9.243-20.645,20.645-20.645l0,0c11.402,0,20.645,9.243,20.645,20.645v33.449 C363.355,222.399,354.112,231.642,342.71,231.642z\"/><path style=\"fill:#9C6846;\" d=\"M342.71,156.903c-1.414,0-2.794,0.145-4.129,0.416v45.419c0,6.841,5.546,12.387,12.387,12.387 s12.387-5.546,12.387-12.387v-25.191C363.355,166.146,354.112,156.903,342.71,156.903z\"/><path style=\"fill:#FFFFFF;\" d=\"M367.048,317.428c4.464-7.649,8.199-15.845,11.331-24.377 c-38.384,7.921-79.532,12.253-122.379,12.253c-42.873,0-84.044-4.336-122.448-12.267c3.148,8.573,6.944,16.784,11.438,24.465 c5.195,8.88,13.99,14.56,23.558,15.724c28.649,3.485,57.847,5.354,87.452,5.354c29.599,0,58.79-1.868,87.433-5.352 C353.033,332.061,361.845,326.344,367.048,317.428z\"/><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g></svg><span>Happy</span></label></div>",
+      "css": ".ds-cells{display:grid;grid-template-columns:repeat(2,96px);gap:6px;padding:16px;justify-content:center;background:linear-gradient(135deg,#FFF6DE,#E1C78F)}.ds-cell{display:grid;justify-items:center;align-content:center;gap:3px;min-height:70px;padding:6px 2px 5px;border-radius:16px;background:#FFF1CC;border:1px solid rgba(29,29,34,.07);color:#1D1D22;font:500 .75rem/1.1 Poppins,system-ui,sans-serif}.ds-cell-face{width:44px;height:44px}.ds-cell.on{border-color:#9A6500;outline:2px solid #9A6500;outline-offset:-3px}.ds-cell.on .ds-cell-face{transform:scale(1.12)}"
     },
     {
       "name": "Phone Frame",
@@ -503,12 +669,12 @@
   ],
   "narrative": {
     "northStar": "El selector de bolsillo",
-    "overview": "La web se comporta como la app: una carita grande al centro, un tinte pastel de su categoría que cambia con ella y todo lo demás en calma. Tono tranquilo y confiable; las caritas llevan toda la expresividad y el resto es tipografía, espacio y tinta.",
+    "overview": "La web es el Log de la app hecho página: una cuadrícula con todos los moods agrupados por categoría y un tinte que sigue lo que eliges, con todo lo demás en calma. Tono tranquilo y confiable; las caritas llevan la expresividad y el resto es tipografía, espacio y tinta.",
     "keyCharacteristics": [
-      "Móvil primero: titular, carita, selector y badges en 390 pt.",
+      "Móvil primero: titular, cuadrícula completa de 19 moods y badges en 390x844.",
       "Dos voces de color: el tinte de categoría del mood en el héroe y la tinta con filete del Log en la privacidad, nunca en la misma superficie.",
       "Planos y suaves: solo el teléfono lleva sombra.",
-      "Funciona sin JavaScript y sin movimiento.",
+      "Funciona sin JavaScript: la cuadrícula es de radios nativos y el script solo tiñe el héroe; sin movimiento si el sistema lo pide.",
       "Sin recursos de terceros."
     ],
     "rules": [
@@ -519,7 +685,7 @@
       },
       {
         "name": "The Mood Owns The Hero Rule",
-        "body": "El fondo del héroe es siempre el degradado del tinte de categoría del mood seleccionado; no se fija tinta ni otro color encima.",
+        "body": "El fondo del héroe es el degradado del tinte de categoría del mood elegido (menta a lavanda antes de elegir).",
         "section": "colors"
       },
       {
@@ -539,8 +705,8 @@
       }
     ],
     "dos": [
-      "Do dejar que el mood seleccionado tiña todo el héroe con el tinte de su categoría en la app.",
-      "Do mantener la primera pantalla de 390 pt con titular, carita, selector y los dos badges.",
+      "Do dejar que el mood elegido tiña todo el héroe con el tinte de su categoría en la app.",
+      "Do mantener la primera pantalla de 390x844 con titular, la cuadrícula completa y los dos badges.",
       "Do usar Poppins autoalojada y nada que cargue desde otro dominio.",
       "Do mantener un contraste mínimo de 4.5:1 en texto de cuerpo y 3:1 en grande.",
       "Do mantener la edición en inglés y en español a la vez."

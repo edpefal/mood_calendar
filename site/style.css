@@ -1,8 +1,8 @@
 @font-face{font-family:Poppins;font-style:normal;font-weight:500;font-display:swap;src:url(/fonts/poppins-500.woff2) format("woff2")}
 @font-face{font-family:Poppins;font-style:normal;font-weight:600;font-display:swap;src:url(/fonts/poppins-600.woff2) format("woff2")}
 @font-face{font-family:Poppins;font-style:normal;font-weight:700;font-display:swap;src:url(/fonts/poppins-700.woff2) format("woff2")}
-@property --c1{syntax:"<color>";inherits:true;initial-value:#FFF6DE}
-@property --c2{syntax:"<color>";inherits:true;initial-value:#E1C78F}
+@property --c1{syntax:"<color>";inherits:true;initial-value:#E5F8F0}
+@property --c2{syntax:"<color>";inherits:true;initial-value:#E7E0FF}
 
 :root{
   --ink:#1D1D22;--ink-soft:#3A3A48;--ring:#7C5CFF;--heading:#1D1D22;--bezel:#17171B;--private:#1D1D22;
@@ -39,31 +39,34 @@ header.top nav a{font-weight:500;color:var(--muted);padding:0 4px}
 .stores img{display:block;height:48px;width:auto;max-width:none}
 .stores .gp img{height:64px;margin:-8px -6px}
 
-/* hero: the page behaves like the app's mood picker */
-.picker{--c1:#FFF6DE;--c2:#E1C78F;
+/* hero: the page behaves like the app's Log: a grid of moods by category; picking one tints the page */
+.picker{--c1:#E5F8F0;--c2:#E7E0FF;
   background:linear-gradient(135deg,var(--c1),var(--c2));color:var(--ink);
-  text-align:center;padding:76px 0 36px;overflow:hidden;
+  text-align:center;padding:56px 0 24px;overflow:hidden;
   transition:--c1 .7s var(--ease),--c2 .7s var(--ease)}
 .picker h1{margin:8px 24px 10px;font-size:clamp(2.1rem,8.4vw,3.6rem);font-weight:700;color:var(--ink)}
 .picker h1 span{display:block}
 .picker .lede{max-width:30ch;margin:0 auto;font-size:1.0625rem;line-height:1.5;color:var(--ink-soft)}
-.faces{--face:clamp(168px,56vw,232px);--slide:calc(var(--face)*.8);
-  position:relative;display:flex;list-style:none;margin:14px 0 0;padding:0 calc(50% - var(--slide)/2);
-  overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain}
-.faces::-webkit-scrollbar{display:none}
-.faces li{flex:0 0 var(--slide);scroll-snap-align:center;display:grid;place-items:center;height:calc(var(--face) + 24px)}
-.faces img{display:block;width:var(--face);height:var(--face);transform:scale(.62);transition:transform .6s var(--ease),opacity .6s var(--ease)}
-.faces.live img{transform:scale(.4);opacity:.5}
-.faces.live li[aria-current=true] img{transform:none;opacity:1}
-.faces.live li{cursor:pointer}
-.picker .name{margin:2px 0 0;min-height:1.7em;font-weight:600;font-size:1.0625rem}
-.picker .nav{display:none;align-items:center;justify-content:center;gap:6px;margin:4px 0 22px;color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
-.picker .nav.live{display:flex}
-.picker .nav button{width:48px;height:48px;border:0;border-radius:50%;background:transparent;color:inherit;display:grid;place-items:center;cursor:pointer}
-.picker .nav button:hover{background:rgba(255,255,255,.55)}
-.picker .nav svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
-.picker .nav span{min-width:3.6em}
-.picker .stores{margin-top:6px}
+.moods{display:grid;gap:8px;max-width:560px;margin:14px auto 0;padding:0 16px;text-align:left}
+.cat{--fill:#ECE9F5;--ring:#5F5880;min-width:0}
+.cat[data-tone=positive]{--fill:#FFF1CC;--ring:#9A6500}
+.cat[data-tone=peaceful]{--fill:#D7F5E8;--ring:#1C7F5B}
+.cat[data-tone=neutral]{--fill:#ECE9F5;--ring:#5F5880}
+.cat[data-tone=hard]{--fill:#E5E1FF;--ring:#5646D1}
+.cat .cell[data-tone=angry]{--fill:#FDE1DF;--ring:#C23A35}
+.cat-name{margin:0 0 4px 2px;font-size:.75rem;font-weight:600;line-height:1.2;color:var(--ink-soft)}
+.cells{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.cell{position:relative;display:grid;justify-items:center;align-content:center;gap:3px;min-height:70px;padding:6px 2px 5px;
+  border-radius:16px;background:var(--fill);border:1px solid rgba(29,29,34,.07);color:var(--ink);cursor:pointer;
+  transition:border-color .3s var(--ease)}
+.cell img{display:block;width:44px;height:44px;transition:transform .5s var(--ease)}
+.cell span{font-size:.75rem;font-weight:500;line-height:1.1;text-align:center;overflow-wrap:break-word}
+.cell input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}
+.cell:hover{border-color:rgba(29,29,34,.22)}
+.cell.on{border-color:var(--ring);outline:2px solid var(--ring);outline-offset:-3px}
+.cell.on img{transform:scale(1.12)}
+.cell:has(input:focus-visible){outline:3px solid var(--ring);outline-offset:2px}
+.picker .stores{margin-top:14px}
 
 /* sections under the fold */
 section.block{max-width:1040px;margin:0 auto;padding:72px 20px 24px}
@@ -103,12 +106,17 @@ footer a{color:var(--muted);margin-right:16px;display:inline-flex;align-items:ce
 
 @media (min-width:900px){
   .picker{padding:96px 0 56px}
-  .faces{--face:240px}
+  .moods{max-width:640px;gap:14px}
+  .cells{gap:10px}
+  .cell{min-height:96px;gap:6px;padding:8px 4px 6px}
+  .cell img{width:56px;height:56px}
+  .cell span{font-size:.8125rem}
   .month{grid-template-columns:1fr 1fr;align-items:end;text-align:left;gap:56px}
   .month .copy{justify-self:end;padding-bottom:64px}
   .month .copy p{margin-inline:0}
   .month .phone{justify-self:start}
 }
 @media (prefers-reduced-motion:reduce){
-  .picker,.faces img{transition:none}
+  .picker,.cell,.cell img{transition:none}
+  .cell.on img{transform:none}
 }
