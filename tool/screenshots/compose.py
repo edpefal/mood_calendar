@@ -94,6 +94,16 @@ else:
              panel_w=1560)
 
 
+# The app is a 520 pt column centered on the iPad, so half of the capture is
+# empty margin: zoom in so the column fills the frame (the sides are cropped).
+ZOOM = {'ipad': 1.5}.get(DEVICE, 1.0)
+
+
+# Px of the capture hidden above the frame, per slide: the day detail sheet sits
+# at the bottom of the iPad screen and the zoom would otherwise cut it off.
+SHIFT = {'ipad': {'03_day': 800}}.get(DEVICE, {})
+
+
 def head_size(text):
     for limit, size in L['head_sizes']:
         if len(text) <= limit:
@@ -173,7 +183,7 @@ def page(slide_id, screen, bg, dark, locale):
     top = L['top']
     head_top = L['head_top']
 
-    body = phone_html(shot, top)
+    body = phone_html(shot, top, shift=SHIFT.get(slide_id, 0), zoom=ZOOM)
 
     sub_html = ''
     if sub:
