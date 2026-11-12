@@ -3,9 +3,7 @@
 ## Purpose
 
 Permite al usuario sacar su historial de Mood Entries de la app como un archivo JSON portable, compartiéndolo con la hoja del sistema desde Settings, para que conserve o respalde sus datos.
-
 ## Requirements
-
 ### Requirement: Entrada para exportar el historial en Settings
 Settings SHALL incluir una sección "Tus datos" con una fila "Exportar historial". Al tocarla, la app SHALL generar el archivo de exportación y abrir la hoja de compartir del sistema con ese archivo.
 
@@ -87,3 +85,23 @@ La app SHALL registrar un evento de telemetría cuando la exportación termina c
 #### Scenario: Exportación fallida
 - **WHEN** la generación del archivo falla
 - **THEN** se registra un error trazable de exportación
+
+### Requirement: Exportar con el bloqueo de notas activo exige autenticarse
+Con el bloqueo de notas activo, "Exportar historial" SHALL pedir la autenticación del dispositivo antes de generar el archivo, porque el archivo incluye el texto de las notas. Si el usuario ya está desbloqueado en la sesión, NO SHALL pedirla de nuevo. Si cancela o falla, la app NO SHALL generar el archivo ni abrir la hoja de compartir y SHALL dejar la fila disponible sin mostrar un error.
+
+#### Scenario: Exportar con el bloqueo activo
+- **WHEN** el bloqueo está activo, la sesión está bloqueada y el usuario toca "Exportar historial"
+- **THEN** la app pide la autenticación y, solo si tiene éxito, genera el archivo y abre la hoja de compartir
+
+#### Scenario: Autenticación cancelada
+- **WHEN** el usuario cancela la autenticación al exportar
+- **THEN** no se genera el archivo, no se abre la hoja de compartir y la fila vuelve a estar disponible
+
+#### Scenario: Sesión desbloqueada
+- **WHEN** el bloqueo está activo y el usuario ya se autenticó en esta sesión
+- **THEN** exportar no pide una nueva autenticación
+
+#### Scenario: Bloqueo apagado
+- **WHEN** el bloqueo está apagado
+- **THEN** exportar funciona como antes, sin autenticación
+
