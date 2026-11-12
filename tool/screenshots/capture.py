@@ -33,15 +33,24 @@ def sh(*args):
     return subprocess.run(args, capture_output=True, text=True).stdout
 
 
+def set_lock_marker(on):
+    """Documents/screenshot_lock in the app container makes main.dart start with the note lock on."""
+    container = sh('xcrun', 'simctl', 'get_app_container', UDID, BUNDLE, 'data').strip()
+    docs = os.path.join(container, 'Documents')
+    os.makedirs(docs, exist_ok=True)
+    marker = os.path.join(docs, 'screenshot_lock')
+    if on:
+        open(marker, 'w').close()
+    elif os.path.exists(marker):
+        os.remove(marker)
+
+
 def launch(lock=False):
     sh('xcrun', 'simctl', 'terminate', UDID, BUNDLE)
     time.sleep(1)
-    env = dict(os.environ)
-    if lock:
-        env['SIMCTL_CHILD_SCREENSHOT_LOCK'] = '1'
-    subprocess.run(['xcrun', 'simctl', 'launch', UDID, BUNDLE,
-                    '-AppleLanguages', f'({LOCALE})', '-AppleLocale', APPLE_LOCALE],
-                   capture_output=True, text=True, env=env)
+    set_lock_marker(lock)
+    sh('xcrun', 'simctl', 'launch', UDID, BUNDLE,
+       '-AppleLanguages', f'({LOCALE})', '-AppleLocale', APPLE_LOCALE)
     time.sleep(5)
     for _ in range(20):  # wait until the bottom bar is on screen
         if len(tab_buttons()) >= 4:
@@ -201,6 +210,12 @@ shot('day')
 launch()
 tap_button(tab_buttons()[1])  # insights tab
 time.sleep(2)
+# 7 days has too little data in the seed ("Not enough data yet"): pick 30 days,
+# the second pill of the trend range row (the only other row of four buttons).
+ranges = [g for g in non_tab_rows() if len(g) == 4]
+if ranges:
+    tap_button(sorted(ranges[0], key=lambda b: b[0])[1])
+    time.sleep(1.5)
 shot('insights')
 
 # 5) the Log with the note lock on: today's note shows "Note locked"

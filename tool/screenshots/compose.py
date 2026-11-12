@@ -25,56 +25,57 @@ LOCALES = sys.argv[2:] or ['en', 'es', 'de', 'fr', 'it']
 
 CANVAS = {'iphone': (1320, 2868), 'ipad': (2064, 2752), 'android': (1080, 1920)}[DEVICE]
 
-# (screen file, background gradient, dark text?)
+# (slide id, capture file, background gradient, dark text?)
+# Pastel gradients from the app's mesh background; headlines in the app's ink.
 SLIDES = [
-    ('01_calendar', 'calendar', ('#D6F0F2', '#EEF9F9'), True),
-    ('02_moods', 'picker', ('#FFE1EC', '#FFC9DC'), True),
-    ('03_summary', 'calendar', ('#DDF5E4', '#C4EBD0'), True),
-    ('04_notes', 'note', ('#FFF0D3', '#FFDDA8'), True),
-    ('05_reminders', 'reminders', ('#DDF1F7', '#C6E6F0'), True),
-    ('06_privacy', 'calendar', ('#00727D', '#00838F'), False),
+    ('01_log', 'picker', ('#FFE9C9', '#FFD7E8'), True),
+    ('02_calendar', 'calendar', ('#D8F3E6', '#E9E4FF'), True),
+    ('03_day', 'day', ('#E7E0FF', '#D6EBFF'), True),
+    ('04_insights', 'insights', ('#D6EBFF', '#E9E0FF'), True),
+    ('05_notes', 'locked', ('#FFDDEB', '#E4DAFF'), True),
+    ('06_reminders', 'reminders', ('#D9F5E8', '#FFF0D2'), True),
 ]
 
 TEXT = {
     'en': {
-        '01_calendar': 'Your mood, in full color',
-        '02_moods': 'A mood for every feeling',
-        '03_summary': 'See your month and best streak',
-        '04_notes': 'Add a note to any day',
-        '05_reminders': 'A gentle daily reminder',
-        '06_privacy': ('Private, on your device', 'Your moods are stored only on your device.'),
+        '01_log': 'Name how you feel',
+        '02_calendar': 'See your month in color',
+        '03_day': 'Remember how each day felt',
+        '04_insights': 'Understand your patterns',
+        '05_notes': 'Keep your notes private',
+        '06_reminders': 'A gentle daily reminder',
     },
     'es': {
-        '01_calendar': 'Tu ánimo, a todo color',
-        '02_moods': 'Un mood para cada emoción',
-        '03_summary': 'Tu mes y tu mejor racha',
-        '04_notes': 'Añade una nota a cada día',
-        '05_reminders': 'Un recordatorio diario y amable',
-        '06_privacy': ('Privado y en tu dispositivo', 'Tus moods se guardan solo en tu dispositivo.'),
+        '01_log': 'Ponle nombre a lo que sientes',
+        '02_calendar': 'Tu mes, a todo color',
+        '03_day': 'Recuerda cómo fue cada día',
+        '04_insights': 'Entiende tus patrones',
+        '05_notes': 'Mantén tus notas privadas',
+        '06_reminders': 'Un recordatorio diario y amable',
     },
     'de': {
-        '01_calendar': 'Deine Stimmung in allen Farben',
-        '02_moods': 'Eine Stimmung für jedes Gefühl',
-        '03_summary': 'Dein Monat und deine beste Serie',
-        '04_notes': 'Eine Notiz zu jedem Tag',
-        '05_reminders': 'Eine sanfte tägliche Erinnerung',
-        '06_privacy': ('Privat, auf deinem Gerät', 'Deine Stimmungen bleiben nur auf deinem Gerät.'),
+        '01_log': 'Benenne, wie du dich fühlst',
+        '02_calendar': 'Dein Monat in Farbe',
+        '03_day': 'Erinnere dich an jeden Tag',
+        '04_insights': 'Verstehe deine Muster',
+        '05_notes': 'Halte deine Notizen privat',
+        '06_reminders': 'Eine sanfte tägliche Erinnerung',
     },
     'fr': {
-        '01_calendar': 'Votre humeur en couleurs',
-        '02_moods': 'Une humeur pour chaque émotion',
-        '03_summary': 'Votre mois et votre meilleure série',
-        '04_notes': 'Une note pour chaque jour',
-        '05_reminders': 'Un rappel quotidien en douceur',
-        '06_privacy': ('Privé, sur votre appareil', 'Vos humeurs restent uniquement sur votre appareil.'),
+        '01_log': 'Mettez des mots sur vos émotions',
+        '02_calendar': 'Votre mois en couleurs',
+        '03_day': 'Souvenez-vous de chaque jour',
+        '04_insights': 'Comprenez vos habitudes',
+        '05_notes': 'Gardez vos notes privées',
+        '06_reminders': 'Un rappel quotidien en douceur',
     },
     'it': {
-        '01_calendar': 'Il tuo umore a colori',
-        '02_moods': 'Uno stato d’animo per ogni emozione',
-        '03_summary': 'Il tuo mese e la tua serie migliore',
-        '04_notes': 'Una nota per ogni giorno',
-        '05_reminders': 'Un promemoria quotidiano gentile',
-        '06_privacy': ('Privato, sul tuo dispositivo', 'I tuoi stati d’animo restano solo sul tuo dispositivo.'),
+        '01_log': 'Dai un nome a ciò che senti',
+        '02_calendar': 'Il tuo mese a colori',
+        '03_day': 'Ricorda com’è andato ogni giorno',
+        '04_insights': 'Scopri i tuoi andamenti',
+        '05_notes': 'Tieni private le tue note',
+        '06_reminders': 'Un promemoria quotidiano gentile',
     },
 }
 
@@ -165,43 +166,14 @@ def page(slide_id, screen, bg, dark, locale):
     sub = None
     if isinstance(text, tuple):
         text, sub = text
-    color = '#00363C' if dark else '#FFFFFF'
+    color = '#1D1D22' if dark else '#FFFFFF'
     size = head_size(text)
     shot = os.path.join(BUILD, 'shots', DEVICE, locale, screen + '.png')
     body = ''
     top = L['top']
     head_top = L['head_top']
 
-    if slide_id == '03_summary':
-        (x0, y0, x1, y1), bg_px = find_cards(shot)
-        im_w = Image.open(shot).width
-        cy0 = find_calendar_top(shot)
-        cw, ch = im_w, y1 - cy0
-        pw = {'iphone': 1180, 'android': 940}.get(DEVICE, 1640)
-        scale = pw / cw
-        panel_h = round(ch * scale)
-        rgb = '#%02x%02x%02x' % bg_px
-        panel_top = top + {'iphone': 60, 'android': 40}.get(DEVICE, 30)
-        body = f'''
-        <div style="position:absolute;left:{(W - pw) // 2}px;top:{panel_top}px;width:{pw}px;height:{panel_h}px;
-             border-radius:72px;overflow:hidden;background:{rgb};
-             box-shadow:0 60px 140px rgba(20,90,50,.32);">
-          <div style="width:{pw}px;height:{panel_h}px;background:url(file://{shot}) no-repeat;
-               background-size:{pw}px auto;background-position:0 -{round(cy0 * scale)}px;"></div>
-        </div>'''
-    elif slide_id == '06_privacy':
-        head_top = {'android': 330}.get(DEVICE, 380)
-        top = {'iphone': 1180, 'android': 1000}.get(DEVICE, 1000)
-        lock = f'''
-        <svg style="position:absolute;left:{W // 2 - 90}px;top:{ {'iphone': 150, 'android': 120}.get(DEVICE, 110) }px"
-             width="180" height="180" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7"
-             stroke-linecap="round" stroke-linejoin="round">
-          <rect x="4.5" y="10.5" width="15" height="10" rx="2.5" fill="rgba(255,255,255,.18)"/>
-          <path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.5" r="1.3" fill="#fff"/>
-        </svg>'''
-        body = lock + phone_html(shot, top)
-    else:
-        body = phone_html(shot, top)
+    body = phone_html(shot, top)
 
     sub_html = ''
     if sub:

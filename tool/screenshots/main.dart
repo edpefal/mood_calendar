@@ -86,9 +86,11 @@ const Map<String, String> _detailNote = {
   'it': 'Ho finalmente finito il progetto che rimandavo da tempo. Fiero di me.',
 };
 
-/// Launch with `SIMCTL_CHILD_SCREENSHOT_LOCK=1 xcrun simctl launch ...` to
-/// capture the note lock on: the lock is enabled and the session starts locked.
-final bool _noteLockOn = Platform.environment['SCREENSHOT_LOCK'] == '1';
+/// The capture script creates `screenshot_lock` next to the Hive files (the
+/// app's Documents folder) to capture the note lock on: the lock is enabled and
+/// the session starts locked. Neither a launch environment variable nor `HOME`
+/// reached the app in the simulator, so the marker is looked up from the box.
+bool _noteLockOn = false;
 
 /// A device that always has a passcode and always accepts it, so the lock can
 /// be shown without the system prompt.
@@ -207,6 +209,8 @@ Future<void> main() async {
   final moodBox = await Hive.openBox<MoodModel>('moods');
   final settingsBox =
       await Hive.openBox<dynamic>(AppSettingsLocalDataSource.boxName);
+  _noteLockOn = File('${File(settingsBox.path!).parent.path}/screenshot_lock')
+      .existsSync();
   await _seed(moodBox, settingsBox);
 
   final appLogger = LoggerAppLogger();
