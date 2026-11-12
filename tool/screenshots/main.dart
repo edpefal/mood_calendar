@@ -78,12 +78,13 @@ const int _detailDay = 15;
 
 const Map<String, String> _detailNote = {
   'en': 'Finally finished the project I kept postponing. Proud of myself.',
-  'es': 'Por fin terminé el proyecto que venía posponiendo. Orgulloso de mí.',
+  'es': 'Por fin terminé el proyecto que venía posponiendo. ¡Qué satisfacción!',
   'de':
       'Endlich das Projekt abgeschlossen, das ich ständig aufgeschoben habe. Stolz auf mich.',
   'fr':
-      'J’ai enfin terminé le projet que je repoussais sans cesse. Fier de moi.',
-  'it': 'Ho finalmente finito il progetto che rimandavo da tempo. Fiero di me.',
+      'J’ai enfin terminé le projet que je repoussais sans cesse. Quelle fierté !',
+  'it':
+      'Ho finalmente finito il progetto che rimandavo da tempo. Che soddisfazione!',
 };
 
 /// The capture script creates `screenshot_lock` next to the Hive files (the

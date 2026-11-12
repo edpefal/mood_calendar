@@ -105,8 +105,17 @@ def rows(bs):
 
 
 def tab_buttons():
-    """Bottom bar tabs, left to right: [calendar, insights, log, settings]."""
-    groups = [g for g in rows(buttons()) if len(g) == 4]
+    """Bottom bar tabs, left to right: [calendar, insights, log, settings].
+
+    Only a row of four buttons in the lower fifth of the screen counts: on
+    Insights idb's list is cut off by the Year in Pixels cells and the bar can
+    be missing, and the trend range pills (also four buttons) must not pass for it.
+    """
+    els = elements()
+    height = next((e['frame']['height'] for e in els if e.get('type') == 'Application'), 0)
+    bs = [(e['frame']['x'], e['frame']['y'], e['frame']['width'], e['frame']['height'],
+           e.get('AXLabel') or '') for e in els if e.get('type') == 'Button']
+    groups = [g for g in rows(bs) if len(g) == 4 and g[0][1] > height * 0.8]
     return sorted(groups[-1], key=lambda b: b[0]) if groups else []
 
 
@@ -212,10 +221,16 @@ tap_button(tab_buttons()[1])  # insights tab
 time.sleep(2)
 # 7 days has too little data in the seed ("Not enough data yet"): pick 30 days,
 # the second pill of the trend range row (the only other row of four buttons).
-ranges = [g for g in non_tab_rows() if len(g) == 4]
-if ranges:
-    tap_button(sorted(ranges[0], key=lambda b: b[0])[1])
-    time.sleep(1.5)
+ranges = []
+for _ in range(8):  # idb's list can come back incomplete right after the tab switch
+    ranges = [g for g in non_tab_rows() if len(g) == 4]
+    if ranges:
+        break
+    time.sleep(1)
+if not ranges:
+    raise RuntimeError('trend range pills not found')
+tap_button(sorted(ranges[0], key=lambda b: b[0])[1])
+time.sleep(1.5)
 shot('insights')
 
 # 5) the Log with the note lock on: today's note shows "Note locked"
