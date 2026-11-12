@@ -38,14 +38,14 @@ def render(loc):
     @font-face{{font-family:P;font-weight:700;src:url(file://{HERE}/fonts/poppins-700.woff2)}}
     @font-face{{font-family:P;font-weight:500;src:url(file://{HERE}/fonts/poppins-500.woff2)}}
     html,body{{margin:0;width:{W}px;height:{H}px;overflow:hidden}}
-    body{{background:linear-gradient(135deg,#00525A,#00727D);font-family:P;color:#fff;
+    body{{background:radial-gradient(60% 70% at 12% 15%,#CFF1E1 0%,transparent 70%),radial-gradient(55% 65% at 88% 12%,#E3DAFF 0%,transparent 70%),radial-gradient(60% 70% at 85% 90%,#FFD3E6 0%,transparent 70%),radial-gradient(55% 65% at 10% 88%,#FFE6C2 0%,transparent 70%),#F4F2FA;font-family:P;color:#1D1D22;
      display:flex;flex-direction:column;align-items:center;justify-content:center;gap:90px}}
     .top{{display:flex;align-items:center;gap:150px}}
-    .top img{{width:640px;height:640px;border-radius:144px;box-shadow:0 40px 120px #0004}}
+    .top img{{width:640px;height:640px;border-radius:144px;box-shadow:0 40px 120px rgba(124,92,255,.35)}}
     h1{{font-size:300px;margin:0;line-height:1}}
-    p{{font-size:120px;font-weight:500;margin:30px 0 0;opacity:.95}}
+    p{{font-size:120px;font-weight:500;margin:30px 0 0;opacity:.7}}
     .row{{display:flex;gap:70px}}
-    .row img{{width:290px;height:290px;background:#fff;border-radius:50%;padding:30px;box-sizing:border-box;box-shadow:0 20px 60px #0003}}
+    .row img{{width:290px;height:290px;background:#fff;border-radius:50%;padding:30px;box-sizing:border-box;box-shadow:0 20px 60px rgba(29,29,34,.12)}}
     </style><body>
     <div class="top"><img src="file://{icon}"><div><h1>Mood Calendar</h1><p>{TAGLINE[loc]}</p></div></div>
     <div class="row">{faces}</div></body>'''
@@ -68,14 +68,14 @@ def render_play(loc):
     @font-face{{font-family:P;font-weight:700;src:url(file://{HERE}/fonts/poppins-700.woff2)}}
     @font-face{{font-family:P;font-weight:500;src:url(file://{HERE}/fonts/poppins-500.woff2)}}
     html,body{{margin:0;width:{pw}px;height:{ph}px;overflow:hidden}}
-    body{{background:linear-gradient(135deg,#00525A,#00727D);font-family:P;color:#fff;
+    body{{background:radial-gradient(60% 70% at 12% 15%,#CFF1E1 0%,transparent 70%),radial-gradient(55% 65% at 88% 12%,#E3DAFF 0%,transparent 70%),radial-gradient(60% 70% at 85% 90%,#FFD3E6 0%,transparent 70%),radial-gradient(55% 65% at 10% 88%,#FFE6C2 0%,transparent 70%),#F4F2FA;font-family:P;color:#1D1D22;
      display:flex;flex-direction:column;align-items:center;justify-content:center;gap:70px}}
     .top{{display:flex;align-items:center;gap:90px}}
-    .top img{{width:300px;height:300px;border-radius:68px;box-shadow:0 20px 60px #0004}}
+    .top img{{width:300px;height:300px;border-radius:68px;box-shadow:0 20px 60px rgba(124,92,255,.35)}}
     h1{{font-size:140px;margin:0;line-height:1}}
-    p{{font-size:58px;font-weight:500;margin:14px 0 0;opacity:.95}}
+    p{{font-size:58px;font-weight:500;margin:14px 0 0;opacity:.7}}
     .row{{display:flex;gap:34px}}
-    .row img{{width:140px;height:140px;background:#fff;border-radius:50%;padding:15px;box-sizing:border-box;box-shadow:0 10px 30px #0003}}
+    .row img{{width:140px;height:140px;background:#fff;border-radius:50%;padding:15px;box-sizing:border-box;box-shadow:0 10px 30px rgba(29,29,34,.12)}}
     </style><body>
     <div class="top"><img src="file://{icon}"><div><h1>Mood Calendar</h1><p>{TAGLINE[loc]}</p></div></div>
     <div class="row">{faces}</div></body>'''

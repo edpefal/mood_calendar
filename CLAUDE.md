@@ -353,7 +353,7 @@ python3 tool/screenshots/header.py [en es de fr it]   # -> aso/header/<locale>/h
 
 - Una sola imagen **16:9 de 5244×2950, PNG sin alfa** sirve para los dos slots. Specs de Apple: Header 21:9 (3840×1646), Search Results 3:2 (1920×1280 a 3840×2560); videos opcionales de 5–30 s.
 - Apple recorta la imagen según el slot, así que el contenido debe quedar dentro de los 4425×2247 px centrales (cubre ambos recortes). Si se cambia el layout, mantenerlo ahí.
-- Muestra ícono (`AppIcon 1024`), nombre, lema y una fila de caritas de `assets/icon/` (sin `brave.svg`, que es muy pesado). Los lemas por idioma están en el diccionario `TAGLINE` del script.
+- Muestra ícono (`AppIcon 1024`), nombre, lema y una fila de caritas de `assets/icon/` (sin `brave.svg`, que es muy pesado), sobre la malla pastel de la app y con el texto en tinta `#1D1D22` (regenerado con el ícono nuevo el 2026-11-12; el gráfico de funciones de Play usa el mismo diseño). Los lemas por idioma están en el diccionario `TAGLINE` del script.
 - Se sube a mano, un archivo por idioma, con el selector de idioma de la esquina: la misma imagen en **Header** y en **Search Results**, y revisar con **Preview**.
 
 ### Capturas y gráfico de funciones de Google Play
