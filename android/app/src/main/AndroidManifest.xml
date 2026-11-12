@@ -11,7 +11,10 @@
     <uses-permission android:name="android.permission.ACCESS_ADSERVICES_AD_ID" tools:node="remove"/>
     <uses-permission android:name="android.permission.ACCESS_ADSERVICES_ATTRIBUTION" tools:node="remove"/>
     
+    <!-- Backups are on on purpose (decided 2026-11-12): Android restores the app's data after a
+         reinstall or on a new phone. The privacy policy says so; see docs/risks.md. -->
     <application
+        android:allowBackup="true"
         android:label="Mood Calendar"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"

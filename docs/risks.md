@@ -183,6 +183,9 @@ Riesgos aceptados del change `redesign-block-3-onboarding-note-lock`.
 ### Las notas no están cifradas en reposo
 El bloqueo es una barrera de la interfaz: el texto de las notas sigue guardado sin cifrar en la caja de Hive y entra en las copias de seguridad del dispositivo. Quien tenga acceso al sistema de archivos (por ejemplo, un dispositivo con jailbreak o una copia sin cifrar) puede leerlas. La app nunca dice que las notas estén "cifradas". Cifrar la caja de notas queda como mejora futura (`backlog.md`).
 
+### El respaldo del dispositivo restaura los datos (decidido el 2026-11-12)
+El manifiesto de Android declara `allowBackup="true"` a propósito: al reinstalar o en un teléfono nuevo, la copia de Google restaura las cajas de Hive (entradas, notas, ajustes, bloqueo de notas activo y que el onboarding ya se hizo), y en iOS pasa lo mismo con la copia de iCloud. Se acepta porque quien cambia de teléfono espera recuperar su diario y la app no tiene importación de su JSON. Lo que implica: las notas, sin cifrar, entran en el respaldo de la cuenta de Apple o de Google del usuario (no las recibimos nosotros), y borrar la app no borra esa copia. La política de privacidad (`site/privacy/` y `site/es/privacy/`) lo dice. Para repetir el onboarding en pruebas hay que borrar los datos de la app. Excluir las notas no es posible sin perder también las entradas: viven en la misma caja.
+
 ### Sin código en el dispositivo el bloqueo no se aplica
 Si con el bloqueo activo el dispositivo deja de tener biometría y código, las notas se muestran en vez de quedar ilegibles. Quien quita el código del dispositivo ya entrega el teléfono desbloqueado; perder las notas por una configuración del teléfono sería peor.
 
