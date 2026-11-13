@@ -137,12 +137,13 @@ def edit_button():
 
 
 def calendar_header():
-    """Calendar card header, left to right: [previous, month title, next]: the row with the wide button."""
+    """Calendar card header row. Android only exposes the arrow buttons as clickable, so the
+    leftmost one is "previous month"; rows of buttons from the top: ["view year"], header, cells.
+    """
     for _ in range(6):
-        tabs = {tuple(b) for b in tab_buttons()}
-        for g in rows([b for b in buttons() if tuple(b) not in tabs]):
-            if any(b[2] > 400 for b in g):
-                return sorted(g, key=lambda b: b[0])
+        groups = non_tab_rows()
+        if len(groups) >= 3:
+            return sorted(groups[1], key=lambda b: b[0])
         time.sleep(1)
     raise RuntimeError('calendar header buttons not found')
 
@@ -163,9 +164,8 @@ def day_cell(day):
     for _ in range(6):
         tabs = {tuple(b) for b in tab_buttons()}
         groups = rows([b for b in buttons() if tuple(b) not in tabs])
-        header = next((i for i, g in enumerate(groups) if any(b[2] > 400 for b in g)), None)
-        if header is not None and len(groups) > header + 1:
-            x, y, w, h = sorted(groups[header + 1], key=lambda b: b[0])[0]
+        if len(groups) >= 3:
+            x, y, w, h = sorted(groups[2], key=lambda b: b[0])[0]
             index = first_weekday + day - 1
             col, row = index % 7, index // 7
             return (x + (col - first_weekday) * (w + gap), y + row * (h + gap), w, h)
