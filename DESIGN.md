@@ -1,6 +1,6 @@
 ---
 name: Mood Calendar (sitio web)
-description: El Log de la app hecho web: una cuadrícula de moods por categoría, un tinte que sigue lo que eliges, calma y privacidad.
+description: El Log de la app hecho web: una cuadrícula de moods gratis, un tinte que sigue lo que eliges, calma y privacidad.
 colors:
   ink: "#1D1D22"
   ink-soft: "#3A3A48"
@@ -94,8 +94,8 @@ components:
     backgroundColor: "{colors.cell-positive-fill}"
     textColor: "{colors.ink}"
     rounded: "{rounded.cell}"
-    padding: "6px 2px 5px"
-    height: "70px"
+    padding: "8px 2px 6px"
+    height: "84px"
   phone-frame:
     backgroundColor: "{colors.bezel}"
     rounded: "{rounded.phone}"
@@ -112,12 +112,12 @@ components:
 
 **Creative North Star: "El selector de bolsillo"**
 
-La web es el Log de la app hecho página: una cuadrícula con todos los moods agrupados por categoría y un tinte que sigue lo que eliges, con todo lo demás en calma. El sitio no explica la app, la deja usar: lo primero que ve una persona es el mismo gesto de elegir cómo se siente, con el color propio de cada categoría. Alrededor, la página guarda silencio: aire, un solo mensaje por bloque y una sola pieza de tinta (el bloque de privacidad, con un filete del degradado del Log) para cerrar.
+La web es el Log de la app hecho página: una cuadrícula con los diez moods gratis y un tinte que sigue lo que eliges, con todo lo demás en calma. El sitio no explica la app, la deja usar: lo primero que ve una persona es el mismo gesto de elegir cómo se siente, con el color de su categoría en la app. La web enseña solo las caritas de los moods gratis, así que no insinúa que todo el catálogo lo sea, y diez llenan justo una rejilla de 5x2. Alrededor, la página guarda silencio: aire, un solo mensaje por bloque y una sola pieza de tinta (el bloque de privacidad, con un filete del degradado del Log) para cerrar.
 
 El tono es tranquilo y confiable. Tranquilo, porque casi nada se mueve (solo el tinte del héroe y la carita elegida, y sin movimiento si el sistema lo pide). Confiable, porque la privacidad se dice sin adornos ni promesas vagas, sobre tinta sólida. Las caritas llevan toda la expresividad; el resto es tipografía, espacio y planos de color.
 
 **Key Characteristics:**
-- Móvil primero: la primera pantalla de 390x844 contiene el titular, la cuadrícula completa de 19 moods y los dos badges.
+- Móvil primero: la primera pantalla de 390x844 contiene el titular, la cuadrícula completa de 10 moods (5x2) y los dos badges, también en español.
 - Color de dos fuentes: los tintes de categoría de cada mood (los de la app) y la tinta del cierre con su filete del Log, nunca mezclados en la misma superficie.
 - Planos y suaves: superficies planas; solo el teléfono lleva sombra.
 - Funciona sin JavaScript y sin movimiento; la cuadrícula es una rejilla estática de radios nativos (teclado y lectores de pantalla intactos) y el script solo tiñe el héroe y marca la celda elegida.
@@ -133,10 +133,10 @@ Una paleta de tinta y pastel, como la app: tinte de categoría en el héroe y ti
 - **Anillo Violeta** (#7C5CFF): anillo de foco en claro (#A396FF en oscuro) y selección de texto (#DCD3FF, con tinta encima).
 
 ### Secondary
-- **Tintes de categoría**: cada mood base va de un tono muy claro a uno medio, los tintes de categoría de la app. Feliz, categoría Positive (#FFF6DE → #E1C78F); Tranquilo, Peaceful (#E5F8F0 → #9FD2BE); Neutral (#F3F1F8 → #C2BED2); Triste, Hard (#EEECFF → #BAB2F1); Enojado, el rojo de angry (#FEECEA → #EBAFAC). Cada par es el degradado del héroe al elegir un mood, en diagonal de 135deg. Antes de elegir, el héroe va de menta (#E5F8F0) a lavanda (#E7E0FF). La tinta mide al menos 8.5:1 sobre todos y la tinta suave al menos 5.7:1.
+- **Tintes de categoría**: cada mood base va de un tono muy claro a uno medio, los tintes de categoría de la app. Feliz, categoría Positive (#FFF6DE → #E1C78F); Tranquilo, Peaceful (#E5F8F0 → #9FD2BE); Neutral (#F3F1F8 → #C2BED2); Triste, Hard (#EEECFF → #BAB2F1); Enojado, el rojo de angry (#FEECEA → #EBAFAC). Cada par (`data-c1`/`data-c2` en la celda) es el degradado del héroe al elegir un mood, en diagonal de 135deg. Antes de elegir, el héroe va de menta (#E5F8F0) a lavanda (#E7E0FF). La tinta mide al menos 8.5:1 sobre todos y la tinta suave al menos 5.7:1.
 - **Filete del Log** (#B9A6FF → #F7B2D9 → #FFD3B6): el degradado del botón Log de la app, solo como filete de 4 px en el borde superior del bloque de privacidad.
 
-- **Celdas de la cuadrícula**: relleno y aro por categoría. Positive #FFF1CC / #9A6500; Peaceful #D7F5E8 / #1C7F5B; Neutral #ECE9F5 / #5F5880; Hard #E5E1FF / #5646D1; la celda angry se sale de Hard con su rojo #FDE1DF / #C23A35. Son los mismos en claro y oscuro.
+- **Celdas de la cuadrícula**: relleno y aro por categoría, declarados en `.cell[data-tone=...]`; la categoría solo se comunica con el color, la página no escribe su nombre. Positive #FFF1CC / #9A6500; Peaceful #D7F5E8 / #1C7F5B; Neutral #ECE9F5 / #5F5880; Hard #E5E1FF / #5646D1; la celda angry se sale de Hard con su rojo #FDE1DF / #C23A35. Son los mismos en claro y oscuro.
 
 ### Neutral
 - **Tinta Suave** (#3A3A48): línea de apoyo bajo el titular, sobre el tinte.
@@ -156,7 +156,7 @@ Una paleta de tinta y pastel, como la app: tinte de categoría en el héroe y ti
 
 **Display Font:** Poppins 700 (con respaldo del sistema)
 **Body Font:** Poppins 500 (con respaldo del sistema)
-**Label/Mono Font:** Poppins 500 (celdas) y 600 (categorías); no hay mono.
+**Label/Mono Font:** Poppins 500 (celdas); no hay mono.
 
 **Character:** La misma Poppins redondeada de la app y de las tiendas, con pesos altos y apretados para los titulares y un cuerpo cómodo y pausado. Al compartir fuente con la app, el salto de la tienda a la web no cambia de voz.
 
@@ -165,7 +165,7 @@ Una paleta de tinta y pastel, como la app: tinte de categoría en el héroe y ti
 - **Headline** (700, clamp(1.7rem, 6vw, 2.6rem), 1.15): títulos de sección; sobre privacidad sube a clamp(1.9rem, 7vw, 3.2rem).
 - **Title** (600, 1.1875rem, 1.55): los encabezados de cada punto de privacidad.
 - **Body** (500, 1rem a 1.0625rem, 1.65): párrafos, con medida máxima de 52ch.
-- **Label** (500, 0.75rem, 1.1; 0.8125rem desde 900 px): el nombre del mood en cada celda. El nombre de categoría va en 600, 0.75rem, en Tinta Suave.
+- **Label** (500, 0.75rem, 1.1; 0.8125rem desde 900 px): el nombre del mood en cada celda.
 
 ### Named Rules
 **The Two Weights Rule.** Los titulares son 700 y todo lo demás 500 o 600. No se añade otro peso ni cursiva.
@@ -174,7 +174,7 @@ Una paleta de tinta y pastel, como la app: tinte de categoría en el héroe y ti
 
 ## Layout
 
-Una sola columna centrada, a ancho completo en móvil y con un contenedor de 1040 px en escritorio (960 px en las páginas de lectura, 720 px para el artículo). La página se ordena de arriba abajo: héroe con el titular, la cuadrícula de moods (máx. 560 px, 640 px desde 900 px; cuatro columnas por categoría, en el orden de la app) y los badges, todo en la primera pantalla de 390x844; después un bloque con la captura del calendario, un bloque de privacidad a todo el ancho y una descarga final.
+Una sola columna centrada, a ancho completo en móvil y con un contenedor de 1040 px en escritorio (960 px en las páginas de lectura, 720 px para el artículo). La página se ordena de arriba abajo: héroe con el titular, la cuadrícula de moods (máx. 560 px, 640 px desde 900 px; 5 columnas por 2 filas, sin nombres de categoría) y los badges, todo en la primera pantalla de 390x844; después un bloque con la captura del calendario, un bloque de privacidad a todo el ancho y una descarga final.
 
 El ritmo vertical es generoso: 72 px sobre cada sección y 20 px de margen lateral en móvil. A partir de 900 px el bloque del calendario pasa a dos columnas (texto a la izquierda, teléfono a la derecha) y el héroe gana aire. La cabecera es transparente y va sobre el héroe en la home; en las demás páginas es una barra normal.
 
@@ -195,11 +195,12 @@ Formas redondas y sin esquinas duras. Los controles circulares son de 48 px (50%
 ## Components
 
 ### Cuadrícula de moods
-- **Estructura:** `div.moods` con una `div.cat` por categoría en el orden de la app: Positive (happy, laughing, confident, brave), Peaceful (calm, affectionate, hugging, romantic), Neutral (neutral, sleepy, shy) y Hard (sad, angry, anxious, stressed, scared, crying, sick, hurt). Cada una lleva su nombre (12 px, 600, Tinta Suave) y una rejilla de 4 columnas con separación de 6 px (10 px desde 900 px).
-- **Celda:** un `label` con un radio nativo invisible, la carita de 44 px (56 px desde 900 px) y el nombre en 12 px y peso 500; alto mínimo de 70 px (96 px desde 900 px), radio de 16 px, relleno de la categoría y borde de tinta al 7%. La celda angry usa su propio rojo. La carita de brave es `brave.webp` (192 px); las demás son SVG.
-- **Elegida:** contorno de 2 px en el aro de su categoría, borde en ese color y carita a escala 1.12. El foco de teclado usa `:has(input:focus-visible)` con contorno de 3 px.
-- **Héroe:** al elegir, `--c1` y `--c2` toman el par de la celda o de su categoría y el cambio dura 0.7 s con `@property`; se anula con movimiento reducido.
+- **Estructura:** `div.moods > div.cells`, una rejilla plana de 10 moods gratis en 5 columnas y 2 filas, en este orden: happy, calm, neutral, sleepy, sad / angry, anxious, stressed, scared, crying. Separación de 6 px (10 px desde 900 px). No hay nombres de categoría: el color la comunica. Cada celda lleva su categoría en `data-tone` (positive, peaceful, neutral, hard o angry) y su par de degradado en `data-c1`/`data-c2`.
+- **Celda:** un `label` con un radio nativo invisible, la carita SVG de 44 px (56 px desde 900 px) y el nombre en 12 px y peso 500 (13 px desde 900 px); alto mínimo de 84 px (112 px desde 900 px), radio de 16 px, relleno de su tono y borde de tinta al 7%. Angry usa su propio rojo.
+- **Elegida:** contorno de 2 px en el aro de su tono, borde en ese color y carita a escala 1.12. El foco de teclado usa `:has(input:focus-visible)` con contorno de 3 px.
+- **Héroe:** al elegir, `--c1` y `--c2` toman el par de la celda y el cambio dura 0.7 s con `@property`; se anula con movimiento reducido.
 - **Sin JavaScript:** una rejilla estática de radios nativos; el script solo tiñe el héroe y pone `.on`.
+- **Solo moods gratis:** la web no muestra moods premium ni menciona la suscripción en el héroe; las demás caritas ya no están en `img/moods`.
 
 ### Teléfono
 - Marco de 10 px en Bisel del Teléfono, corte inferior sin borde y la captura limpia del calendario rediseñado de la app; ancho máximo de 300 px y alto de 480 px.
@@ -217,13 +218,14 @@ Formas redondas y sin esquinas duras. Los controles circulares son de 48 px (50%
 
 ### Do:
 - **Do** dejar que el mood seleccionado tiña todo el héroe con el tinte de su categoría en la app.
-- **Do** mantener la primera pantalla de 390x844 con titular, la cuadrícula completa y los dos badges, sin hacer scroll.
+- **Do** mantener la primera pantalla de 390x844 con titular, la cuadrícula completa de 10 moods y los dos badges, sin hacer scroll.
 - **Do** usar Poppins autoalojada y nada que cargue desde otro dominio.
 - **Do** mantener un contraste mínimo de 4.5:1 en texto de cuerpo y 3:1 en grande, en claro y en oscuro.
 - **Do** mantener la edición en inglés y en español a la vez, con el mismo marcado.
 
 ### Don't:
 - **Don't** mezclar un tinte de mood con la tinta del bloque de privacidad en la misma superficie.
+- **Don't** mostrar moods premium ni mencionar la suscripción en el héroe: la cuadrícula solo lleva los 10 moods gratis.
 - **Don't** usar el degradado del Log como texto ni como franja lateral: solo es el filete de 4 px del bloque de privacidad.
 - **Don't** poner sombra a nada que no sea el teléfono, ni sombras de color.
 - **Don't** usar texto con degradado, ni tarjetas idénticas de ícono más título como estructura de página.
