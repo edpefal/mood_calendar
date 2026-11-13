@@ -14,7 +14,7 @@ Llegan a moodcalendar.app desde cuentas de redes sociales y desde las fichas de 
 
 ## Product Purpose
 
-Mood Calendar es una app para registrar el estado de ánimo diario con un mood, una nota opcional y un recordatorio, y para ver el mes completo en un calendario de colores, con el mood más frecuente y la mejor racha. Está publicada en iOS y Android (`com.artlab.moodcalendar`).
+Mood Calendar es una app para registrar el estado de ánimo diario con un mood, una nota opcional y un recordatorio, y para ver el mes completo en un calendario de colores, con el mood más frecuente, las rachas y un apartado de Insights. Está publicada en iOS y Android (`com.artlab.moodcalendar`).
 
 El éxito del sitio es que quien llega entienda en segundos qué es, que es gratis para descargar y que es privada, y que descargue la app desde la tienda que le corresponde.
 
@@ -28,8 +28,8 @@ La app se descarga desde las tiendas. La web (`site/`) es un sitio estático bil
 
 ## Capabilities and Constraints
 
-- Moods: 5 base gratis (`happy`, `calm`, `neutral`, `sad`, `angry`) y 14 premium que se desbloquean con una suscripción opcional (semanal, mensual o anual, con 3 días de prueba); quien compró moods o Packs en versiones anteriores los conserva. La web comunica "gratis para descargar y usar" y no afirma que todos los moods sean gratis. Por decisión del producto no menciona precios, la suscripción ni la tienda de moods; los Términos de uso y la política de privacidad sí describen la suscripción.
-- Funciones: elegir mood con nota opcional, calendario mensual a color, mood más frecuente y mejor racha, recordatorio diario, exportar el historial en JSON.
+- Moods: 19 en total, 11 base gratis y 8 premium que se desbloquean con una suscripción opcional (semanal, mensual o anual; la prueba de 3 días es solo del plan anual); quien compró moods o Packs en versiones anteriores los conserva. El héroe de la web muestra una cuadrícula de 10 moods gratuitos (con el tinte de su categoría en la app), como el Log, y no muestra los premium ni menciona la suscripción. La web comunica "gratis para descargar y usar" y no afirma que todos los moods sean gratis. Por decisión del producto no menciona precios, la suscripción ni la tienda de moods; los Términos de uso y la política de privacidad sí describen la suscripción.
+- Funciones: elegir mood con nota opcional, calendario mensual a color con el detalle de cada día, mood más frecuente y rachas, Insights (tendencia, mood por día de la semana y Year in Pixels; los rangos largos son Premium), bloqueo de notas con Face ID, huella o código del dispositivo (Premium; es una barrera de la interfaz, no cifrado), recordatorio diario con un inicio guiado, Apple Watch y exportar el historial en JSON.
 - Analíticas anónimas de uso (con interruptor en Ajustes) y reporte de fallos; nada de las entradas sale del dispositivo. Todo lo que la web diga sobre privacidad debe coincidir con la política (`site/privacy/`) y con las declaraciones de las tiendas.
 - La web no carga fuentes, scripts ni analíticas de terceros. Se edita siempre en inglés y en español, con el mismo contenido y estructura.
 - El contenido legal (política, términos, soporte) no cambia de texto ni de URL por motivos de diseño.
@@ -39,7 +39,7 @@ La app se descarga desde las tiendas. La web (`site/`) es un sitio estático bil
 ## Brand Commitments
 
 - Nombre: Mood Calendar. Ícono y lema de las tiendas en `AppIcon 1024` y `aso/header/`.
-- Color de marca: Ocean Cyan `#00727D` a `#00838F` (degradado). El ícono usa `#00838F` con la carita blanca; el launch screen es blanco con el ícono centrado.
+- Color de marca: tinta `#1D1D22`, fondo de malla pastel (menta, lavanda, rosa y melocotón) y el degradado del botón Log (`#B9A6FF → #F7B2D9 → #FFD3B6`). El ícono es la carita blanca sobre un degradado diagonal `#7C5CFF → #E0509F → #FF8A5B`; el launch screen es blanco con el ícono centrado. Ocean Cyan fue la marca hasta el 2026-11-12.
 - Tipografía de la app y de las tiendas: Poppins (licencia OFL, ya en `tool/screenshots/fonts/`).
 - Las caritas de `assets/icon/` y los pasteles por mood son parte de la identidad. `brave.svg` pesa 1 MB y no se usa en la web.
 

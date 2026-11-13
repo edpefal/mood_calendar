@@ -1,202 +1,592 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-24T21:28:08+00:00",
+  "generatedAt": "2026-11-13T05:19:25+00:00",
   "title": "Design System: Mood Calendar (sitio web)",
   "extensions": {
     "colorMeta": {
-      "brand": {
-        "role": "primary",
-        "displayName": "Cian de Marca",
-        "canonical": "oklch(48% 0.198 288)",
-        "tonalRamp": [
-          "#130042",
-          "#2A0070",
-          "#4616A1",
-          "#6241C8",
-          "#8166EF",
-          "#A28BFF",
-          "#C5B5FF",
-          "#EADFFF"
-        ]
-      },
-      "brand-signal": {
-        "role": "primary",
-        "displayName": "Cian Señal",
-        "canonical": "oklch(60% 0.224 280)",
-        "tonalRamp": [
-          "#11004C",
-          "#23007D",
-          "#390AB2",
-          "#523FDA",
-          "#6F66FF",
-          "#8E8CFF",
-          "#B2B7FF",
-          "#D9E2FF"
-        ]
-      },
-      "brand-deep": {
-        "role": "primary",
-        "displayName": "Cian Profundo",
-        "canonical": "oklch(37% 0.171 284)",
-        "tonalRamp": [
-          "#0E003B",
-          "#230667",
-          "#3D2896",
-          "#594CBD",
-          "#786FE3",
-          "#9993FF",
-          "#BDBBFF",
-          "#E3E4FF"
-        ]
-      },
       "ink": {
         "role": "neutral",
-        "displayName": "Tinta de Noche Suave",
-        "canonical": "oklch(23% 0.062 294)",
+        "displayName": "Tinta Violeta",
+        "canonical": "oklch(23% 0.010 286)",
         "tonalRamp": [
-          "#0C071C",
-          "#261F3C",
-          "#443B60",
-          "#635B81",
-          "#847CA4",
-          "#A69EC9",
-          "#CAC3E9",
-          "#EFE9FF"
+          "#0B0B0E",
+          "#26262A",
+          "#444449",
+          "#65656A",
+          "#88888E",
+          "#ADADB3",
+          "#D3D4D9",
+          "#F1F1F7"
+        ]
+      },
+      "ink-soft": {
+        "role": "neutral",
+        "displayName": "Tinta Suave",
+        "canonical": "oklch(35% 0.024 285)",
+        "tonalRamp": [
+          "#0A0A13",
+          "#252530",
+          "#44444F",
+          "#656571",
+          "#888895",
+          "#ACACBA",
+          "#D2D3E1",
+          "#F0F0FF"
         ]
       },
       "paper": {
         "role": "neutral",
-        "displayName": "Papel Hielo",
-        "canonical": "oklch(98% 0.009 299)",
+        "displayName": "Papel Perla",
+        "canonical": "oklch(98% 0.004 286)",
         "tonalRamp": [
-          "#0B0B0E",
-          "#252429",
-          "#434146",
-          "#626066",
-          "#838187",
-          "#A6A4AA",
-          "#CAC8CE",
-          "#EFEDF2"
+          "#0B0B0C",
+          "#262628",
+          "#454547",
+          "#666668",
+          "#89898B",
+          "#AEAEB0",
+          "#D4D4D6",
+          "#F1F1F4"
         ]
       },
       "muted": {
         "role": "neutral",
-        "displayName": "Gris Cian",
-        "canonical": "oklch(44% 0.056 293)",
+        "displayName": "Gris Pizarra",
+        "canonical": "oklch(47% 0.026 280)",
         "tonalRamp": [
-          "#0C071A",
-          "#26203A",
-          "#433C5D",
-          "#625B7E",
-          "#837CA1",
-          "#A69FC5",
-          "#CAC4E6",
-          "#EFEAFF"
+          "#090A14",
+          "#242531",
+          "#424450",
+          "#636572",
+          "#868896",
+          "#ABADBB",
+          "#D1D3E2",
+          "#EFF1FF"
         ]
       },
       "line": {
         "role": "neutral",
-        "displayName": "Línea Cian",
-        "canonical": "oklch(92% 0.027 297)",
+        "displayName": "Línea Bruma",
+        "canonical": "oklch(92% 0.011 292)",
         "tonalRamp": [
-          "#0C0912",
-          "#26232F",
-          "#433F4F",
-          "#635E6F",
-          "#847F91",
-          "#A7A2B4",
-          "#CAC6D7",
-          "#F0ECFB"
+          "#0B0B0F",
+          "#26262A",
+          "#454449",
+          "#66656B",
+          "#89888E",
+          "#AEADB3",
+          "#D4D3DA",
+          "#F2F1F7"
         ]
       },
-      "night": {
+      "card": {
         "role": "neutral",
-        "displayName": "Noche Cian",
-        "canonical": "oklch(19% 0.028 293)",
+        "displayName": "Tarjeta Blanca",
+        "canonical": "oklch(100% 0.000 90)",
         "tonalRamp": [
-          "#0B0913",
-          "#252330",
-          "#423F50",
-          "#625E70",
-          "#837F92",
-          "#A5A2B6",
-          "#C9C7D8",
-          "#EFECFB"
+          "#0B0B0B",
+          "#262626",
+          "#454545",
+          "#666666",
+          "#898989",
+          "#AEAEAE",
+          "#D4D4D4",
+          "#F2F2F2"
+        ]
+      },
+      "link": {
+        "role": "primary",
+        "displayName": "Enlace Índigo",
+        "canonical": "oklch(50% 0.204 281)",
+        "tonalRamp": [
+          "#12004C",
+          "#230072",
+          "#3C2F98",
+          "#5954C0",
+          "#7A79E8",
+          "#9D9FFF",
+          "#C2C6FF",
+          "#DFE4FF"
+        ]
+      },
+      "ring": {
+        "role": "primary",
+        "displayName": "Anillo Violeta",
+        "canonical": "oklch(60% 0.230 286)",
+        "tonalRamp": [
+          "#180053",
+          "#2B0079",
+          "#4424A0",
+          "#624CC8",
+          "#8372F1",
+          "#A798FF",
+          "#CCBFFF",
+          "#E9DDFF"
+        ]
+      },
+      "selection": {
+        "role": "secondary",
+        "displayName": "Selección Lila",
+        "canonical": "oklch(89% 0.061 295)",
+        "tonalRamp": [
+          "#0D061D",
+          "#28213C",
+          "#46405D",
+          "#676180",
+          "#8B84A4",
+          "#AFA8CA",
+          "#D6CFF2",
+          "#F3ECFF"
         ]
       },
       "bezel": {
         "role": "neutral",
         "displayName": "Bisel del Teléfono",
-        "canonical": "oklch(20% 0.058 291)",
+        "canonical": "oklch(21% 0.008 286)",
         "tonalRamp": [
-          "#0C071B",
-          "#25203B",
-          "#423C5E",
-          "#615C80",
-          "#827DA3",
-          "#A59FC7",
-          "#C9C4E8",
-          "#EEEAFF"
+          "#0B0B0E",
+          "#262629",
+          "#454548",
+          "#66666A",
+          "#89898D",
+          "#ADADB2",
+          "#D4D4D8",
+          "#F1F1F6"
+        ]
+      },
+      "night": {
+        "role": "neutral",
+        "displayName": "Noche Grafito",
+        "canonical": "oklch(18% 0.006 286)",
+        "tonalRamp": [
+          "#0B0B0D",
+          "#262629",
+          "#454548",
+          "#666669",
+          "#89898C",
+          "#ADADB1",
+          "#D4D4D7",
+          "#F1F1F5"
+        ]
+      },
+      "night-card": {
+        "role": "neutral",
+        "displayName": "Tarjeta Grafito",
+        "canonical": "oklch(23% 0.010 286)",
+        "tonalRamp": [
+          "#0B0B0E",
+          "#26262A",
+          "#444449",
+          "#65656A",
+          "#88888E",
+          "#ADADB3",
+          "#D3D4D9",
+          "#F1F1F7"
+        ]
+      },
+      "night-text": {
+        "role": "neutral",
+        "displayName": "Texto de Noche",
+        "canonical": "oklch(97% 0.005 298)",
+        "tonalRamp": [
+          "#0B0B0D",
+          "#272628",
+          "#454447",
+          "#666568",
+          "#89898B",
+          "#AEADB0",
+          "#D4D4D7",
+          "#F2F1F4"
+        ]
+      },
+      "night-muted": {
+        "role": "neutral",
+        "displayName": "Apoyo de Noche",
+        "canonical": "oklch(78% 0.018 279)",
+        "tonalRamp": [
+          "#0A0B11",
+          "#25262E",
+          "#43444D",
+          "#64656F",
+          "#878892",
+          "#ACADB7",
+          "#D2D3DE",
+          "#EFF1FC"
+        ]
+      },
+      "night-heading": {
+        "role": "neutral",
+        "displayName": "Titular de Noche",
+        "canonical": "oklch(92% 0.041 292)",
+        "tonalRamp": [
+          "#0B0818",
+          "#272435",
+          "#454255",
+          "#666378",
+          "#89869C",
+          "#AEABC1",
+          "#D4D1E9",
+          "#F2EEFF"
+        ]
+      },
+      "night-link": {
+        "role": "primary",
+        "displayName": "Enlace y Anillo de Noche",
+        "canonical": "oklch(73% 0.150 288)",
+        "tonalRamp": [
+          "#100039",
+          "#27145C",
+          "#443680",
+          "#6459A6",
+          "#867CCD",
+          "#AAA1F5",
+          "#D0C8FF",
+          "#EDE6FF"
+        ]
+      },
+      "night-line": {
+        "role": "neutral",
+        "displayName": "Línea de Noche",
+        "canonical": "oklch(29% 0.016 285)",
+        "tonalRamp": [
+          "#0A0A11",
+          "#26262D",
+          "#44444C",
+          "#65656D",
+          "#888891",
+          "#ADADB6",
+          "#D3D3DD",
+          "#F1F1FB"
+        ]
+      },
+      "private-night": {
+        "role": "neutral",
+        "displayName": "Privacidad de Noche",
+        "canonical": "oklch(27% 0.011 286)",
+        "tonalRamp": [
+          "#0B0B0F",
+          "#26262B",
+          "#44444A",
+          "#65656B",
+          "#88888E",
+          "#ADADB3",
+          "#D3D3DA",
+          "#F1F1F8"
+        ]
+      },
+      "private-muted": {
+        "role": "neutral",
+        "displayName": "Apoyo sobre Tinta",
+        "canonical": "oklch(86% 0.015 286)",
+        "tonalRamp": [
+          "#0B0A10",
+          "#26262C",
+          "#44444B",
+          "#65656D",
+          "#888890",
+          "#ADADB5",
+          "#D3D3DC",
+          "#F1F1FA"
+        ]
+      },
+      "log-from": {
+        "role": "secondary",
+        "displayName": "Filete Lavanda",
+        "canonical": "oklch(78% 0.126 293)",
+        "tonalRamp": [
+          "#100030",
+          "#2A1852",
+          "#483875",
+          "#695A9A",
+          "#8B7DC1",
+          "#B0A2E8",
+          "#D6C8FF",
+          "#F4E6FF"
+        ]
+      },
+      "log-mid": {
+        "role": "secondary",
+        "displayName": "Filete Rosa",
+        "canonical": "oklch(84% 0.094 344)",
+        "tonalRamp": [
+          "#1E0012",
+          "#3E142F",
+          "#61334F",
+          "#855470",
+          "#AA7794",
+          "#D19BB9",
+          "#F9C1E0",
+          "#FFDEFE"
+        ]
+      },
+      "log-to": {
+        "role": "secondary",
+        "displayName": "Filete Durazno",
+        "canonical": "oklch(90% 0.063 55)",
+        "tonalRamp": [
+          "#1A0400",
+          "#391F0C",
+          "#5A3E2A",
+          "#7D5F4A",
+          "#A2826C",
+          "#C8A690",
+          "#EFCCB5",
+          "#FFEAD2"
         ]
       },
       "happy-to": {
         "role": "secondary",
-        "displayName": "Pastel Feliz",
-        "canonical": "oklch(83% 0.083 146)",
+        "displayName": "Tinte Positive (Feliz)",
+        "canonical": "oklch(84% 0.078 86)",
         "tonalRamp": [
-          "#001100",
-          "#072E0D",
-          "#214D26",
-          "#416E44",
-          "#619064",
-          "#84B386",
-          "#ACD6AE",
-          "#D6FAD7"
+          "#170700",
+          "#342300",
+          "#544219",
+          "#76643B",
+          "#9A875D",
+          "#C0AC80",
+          "#E7D2A6",
+          "#FFF0C2"
         ]
       },
       "calm-to": {
         "role": "secondary",
-        "displayName": "Pastel Tranquilo",
-        "canonical": "oklch(82% 0.090 244)",
+        "displayName": "Tinte Peaceful (Tranquilo)",
+        "canonical": "oklch(82% 0.060 169)",
         "tonalRamp": [
-          "#000B24",
-          "#002747",
-          "#06466D",
-          "#2E6690",
-          "#5088B4",
-          "#73ACD9",
-          "#9ED0F8",
-          "#CAF4FF"
+          "#001108",
+          "#072E22",
+          "#294D40",
+          "#4A6F61",
+          "#6D9384",
+          "#91B8A9",
+          "#B6DFCF",
+          "#D3FDEC"
+        ]
+      },
+      "neutral-to": {
+        "role": "secondary",
+        "displayName": "Tinte Neutral",
+        "canonical": "oklch(81% 0.028 295)",
+        "tonalRamp": [
+          "#0C0914",
+          "#272430",
+          "#464350",
+          "#676472",
+          "#8A8796",
+          "#AFABBB",
+          "#D5D2E2",
+          "#F2EFFF"
         ]
       },
       "sad-to": {
         "role": "secondary",
-        "displayName": "Pastel Triste",
-        "canonical": "oklch(87% 0.110 76)",
+        "displayName": "Tinte Hard (Triste)",
+        "canonical": "oklch(79% 0.089 290)",
         "tonalRamp": [
-          "#1C0300",
-          "#3E1B00",
-          "#623700",
-          "#845700",
-          "#A77829",
-          "#CC9B50",
-          "#ECC182",
-          "#FFE8B3"
+          "#0D0326",
+          "#271F46",
+          "#453E68",
+          "#655F8C",
+          "#8882B2",
+          "#ADA7D9",
+          "#D3CDFF",
+          "#F0EBFF"
         ]
       },
       "angry-to": {
         "role": "secondary",
-        "displayName": "Pastel Enojado",
-        "canonical": "oklch(77% 0.102 20)",
+        "displayName": "Tinte Rojo (Enojado)",
+        "canonical": "oklch(81% 0.071 22)",
         "tonalRamp": [
-          "#220001",
-          "#470C12",
-          "#6E262B",
-          "#924749",
-          "#B86869",
-          "#DE8B8B",
-          "#FDB3B2",
-          "#FFDCDA"
+          "#1E0102",
+          "#3E1A1A",
+          "#603837",
+          "#845957",
+          "#A97C7A",
+          "#D0A09E",
+          "#F8C6C4",
+          "#FFE4E1"
+        ]
+      },
+      "hero-start-to": {
+        "role": "secondary",
+        "displayName": "Lavanda de Inicio",
+        "canonical": "oklch(92% 0.042 296)",
+        "tonalRamp": [
+          "#0D0818",
+          "#282335",
+          "#464155",
+          "#676278",
+          "#8B859C",
+          "#AFAAC2",
+          "#D6D0E9",
+          "#F3EEFF"
+        ]
+      },
+      "hero-start-from": {
+        "role": "secondary",
+        "displayName": "Menta de Inicio",
+        "canonical": "oklch(96% 0.023 169)",
+        "tonalRamp": [
+          "#040E0A",
+          "#1E2925",
+          "#3C4843",
+          "#5C6A64",
+          "#7F8D87",
+          "#A4B2AC",
+          "#C9D8D2",
+          "#E7F6F0"
+        ]
+      },
+      "cell-positive-fill": {
+        "role": "secondary",
+        "displayName": "Celda Positive",
+        "canonical": "oklch(96% 0.050 90)",
+        "tonalRamp": [
+          "#120A00",
+          "#2E250D",
+          "#4D442C",
+          "#6F654C",
+          "#93886E",
+          "#B8AD91",
+          "#DED4B7",
+          "#FCF1D4"
+        ]
+      },
+      "cell-positive-ring": {
+        "role": "secondary",
+        "displayName": "Aro Positive",
+        "canonical": "oklch(55% 0.117 73)",
+        "tonalRamp": [
+          "#200000",
+          "#401B00",
+          "#623B00",
+          "#865D1F",
+          "#AB8045",
+          "#D2A569",
+          "#FACB8F",
+          "#FFE9AB"
+        ]
+      },
+      "cell-peaceful-fill": {
+        "role": "secondary",
+        "displayName": "Celda Peaceful",
+        "canonical": "oklch(94% 0.036 168)",
+        "tonalRamp": [
+          "#010F09",
+          "#182B24",
+          "#364A42",
+          "#576C63",
+          "#798F86",
+          "#9DB4AA",
+          "#C3DBD0",
+          "#E0F8EE"
+        ]
+      },
+      "cell-peaceful-ring": {
+        "role": "secondary",
+        "displayName": "Aro Peaceful",
+        "canonical": "oklch(53% 0.105 163)",
+        "tonalRamp": [
+          "#001402",
+          "#00321A",
+          "#005338",
+          "#307558",
+          "#55997B",
+          "#7ABF9F",
+          "#A0E6C5",
+          "#BEFFE2"
+        ]
+      },
+      "cell-neutral-fill": {
+        "role": "secondary",
+        "displayName": "Celda Neutral",
+        "canonical": "oklch(94% 0.016 298)",
+        "tonalRamp": [
+          "#0C0A10",
+          "#27252C",
+          "#46444B",
+          "#67656D",
+          "#8A8890",
+          "#AFACB5",
+          "#D5D3DC",
+          "#F2F0FA"
+        ]
+      },
+      "cell-neutral-ring": {
+        "role": "secondary",
+        "displayName": "Aro Neutral",
+        "canonical": "oklch(48% 0.064 292)",
+        "tonalRamp": [
+          "#0C061E",
+          "#27213D",
+          "#45405E",
+          "#666181",
+          "#8984A6",
+          "#AEA9CC",
+          "#D4CFF4",
+          "#F2ECFF"
+        ]
+      },
+      "cell-hard-fill": {
+        "role": "secondary",
+        "displayName": "Celda Hard",
+        "canonical": "oklch(92% 0.041 292)",
+        "tonalRamp": [
+          "#0B0818",
+          "#272435",
+          "#454255",
+          "#666378",
+          "#89869C",
+          "#AEABC1",
+          "#D4D1E9",
+          "#F2EEFF"
+        ]
+      },
+      "cell-hard-ring": {
+        "role": "secondary",
+        "displayName": "Aro Hard",
+        "canonical": "oklch(50% 0.204 281)",
+        "tonalRamp": [
+          "#12004C",
+          "#230072",
+          "#3C2F98",
+          "#5954C0",
+          "#7A79E8",
+          "#9D9FFF",
+          "#C2C6FF",
+          "#DFE4FF"
+        ]
+      },
+      "cell-angry-fill": {
+        "role": "secondary",
+        "displayName": "Celda Angry",
+        "canonical": "oklch(93% 0.031 23)",
+        "tonalRamp": [
+          "#140707",
+          "#322221",
+          "#52403F",
+          "#74615F",
+          "#988482",
+          "#BDA8A7",
+          "#E4CECD",
+          "#FFECEA"
+        ]
+      },
+      "cell-angry-ring": {
+        "role": "secondary",
+        "displayName": "Aro Angry",
+        "canonical": "oklch(55% 0.174 27)",
+        "tonalRamp": [
+          "#320000",
+          "#580000",
+          "#7F1717",
+          "#A73F38",
+          "#D0645A",
+          "#F9897E",
+          "#FFAFA3",
+          "#FFCDBF"
         ]
       }
     },
@@ -219,7 +609,7 @@
       },
       "label": {
         "displayName": "Label",
-        "purpose": "Nombre del mood y contador."
+        "purpose": "Nombre del mood en cada celda (500)."
       }
     },
     "shadows": [
@@ -233,7 +623,7 @@
       {
         "name": "ease-out-expo",
         "value": "cubic-bezier(.16, 1, .3, 1)",
-        "purpose": "Cambio de carita y de pastel; 0.6 s en la carita, 0.7 s en el fondo. Se anula con prefers-reduced-motion."
+        "purpose": "Cambio del tinte del héroe (0.7 s con @property) y borde de la celda (0.3 s); escala de la carita elegida 0.5 s. Se anula con prefers-reduced-motion."
       }
     ],
     "breakpoints": [
@@ -245,26 +635,12 @@
   },
   "components": [
     {
-      "name": "Picker Nav",
-      "kind": "nav",
-      "refersTo": "picker-nav-button",
-      "description": "Botones ‹ › y contador del selector de caritas.",
-      "html": "<div class=\"ds-nav\"><button class=\"ds-nav-btn\" aria-label=\"Previous\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M15 5l-7 7 7 7\"/></svg></button><span class=\"ds-nav-count\">2 / 5</span><button class=\"ds-nav-btn\" aria-label=\"Next\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M9 5l7 7-7 7\"/></svg></button></div>",
-      "css": ".ds-nav{display:flex;align-items:center;justify-content:center;gap:6px;padding:16px;background:linear-gradient(135deg,#E3F2FD,#90CAF9);color:#004A52;font:600 1.0625rem Poppins,system-ui,sans-serif;font-variant-numeric:tabular-nums}.ds-nav-btn{width:48px;height:48px;border:0;border-radius:50%;background:transparent;color:inherit;display:grid;place-items:center;cursor:pointer}.ds-nav-btn:hover{background:rgba(255,255,255,.55)}.ds-nav-btn:focus-visible{outline:3px solid #00838F;outline-offset:3px}.ds-nav-btn svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}.ds-nav-count{min-width:3.6em;text-align:center}"
-    },
-    {
-      "name": "Mood Face (current)",
+      "name": "Mood Cell",
       "kind": "custom",
-      "description": "Carita seleccionada: escala completa y opacidad 1, sobre el pastel de su mood.",
-      "html": "<div class=\"ds-face-stage\"><svg class=\"ds-face\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" viewBox=\"0 0 512 512\" ><circle style=\"fill:#FFE17D;\" cx=\"256\" cy=\"256\" r=\"256\"/><path style=\"fill:#FFD164;\" d=\"M293.161,474.839c-141.385,0-256-114.615-256-256c0-61.227,21.521-117.411,57.376-161.463 C36.863,104.316,0,175.842,0,256c0,141.385,114.615,256,256,256c80.159,0,151.685-36.864,198.626-94.538 C410.573,453.317,354.389,474.839,293.161,474.839z\"/><path style=\"fill:#9C6846;\" d=\"M256,305.305c-49.323,0-96.405-5.727-139.598-16.079c-5.595-1.341-10.417,4.504-8.691,10.596 c19.92,70.324,78.718,121.34,148.29,121.34s128.369-51.016,148.29-121.34c1.726-6.092-3.096-11.937-8.691-10.596 C352.405,299.578,305.323,305.305,256,305.305z\"/><g><path style=\"fill:#7D5046;\" d=\"M395.599,289.226c-43.194,10.352-90.275,16.079-139.599,16.079s-96.405-5.726-139.598-16.079 c-5.595-1.341-10.417,4.504-8.691,10.596c5.214,18.408,13.148,35.443,23.186,50.637c41.04,7.796,82.792,12.085,125.121,12.085 c42.315,0,84.051-4.286,125.079-12.076c10.041-15.196,17.978-32.233,23.193-50.645 C406.015,293.729,401.194,287.885,395.599,289.226z\"/><path style=\"fill:#7D5046;\" d=\"M169.29,231.642L169.29,231.642c-11.402,0-20.645-9.243-20.645-20.645v-33.449 c0-11.402,9.243-20.645,20.645-20.645l0,0c11.402,0,20.645,9.243,20.645,20.645v33.449 C189.935,222.399,180.692,231.642,169.29,231.642z\"/></g><path style=\"fill:#9C6846;\" d=\"M169.29,156.903c-1.414,0-2.794,0.145-4.129,0.416v45.419c0,6.841,5.546,12.387,12.387,12.387 s12.387-5.546,12.387-12.387v-25.191C189.935,166.146,180.693,156.903,169.29,156.903z\"/><path style=\"fill:#7D5046;\" d=\"M342.71,231.642L342.71,231.642c-11.402,0-20.645-9.243-20.645-20.645v-33.449 c0-11.402,9.243-20.645,20.645-20.645l0,0c11.402,0,20.645,9.243,20.645,20.645v33.449 C363.355,222.399,354.112,231.642,342.71,231.642z\"/><path style=\"fill:#9C6846;\" d=\"M342.71,156.903c-1.414,0-2.794,0.145-4.129,0.416v45.419c0,6.841,5.546,12.387,12.387,12.387 s12.387-5.546,12.387-12.387v-25.191C363.355,166.146,354.112,156.903,342.71,156.903z\"/><path style=\"fill:#FFFFFF;\" d=\"M367.048,317.428c4.464-7.649,8.199-15.845,11.331-24.377 c-38.384,7.921-79.532,12.253-122.379,12.253c-42.873,0-84.044-4.336-122.448-12.267c3.148,8.573,6.944,16.784,11.438,24.465 c5.195,8.88,13.99,14.56,23.558,15.724c28.649,3.485,57.847,5.354,87.452,5.354c29.599,0,58.79-1.868,87.433-5.352 C353.033,332.061,361.845,326.344,367.048,317.428z\"/><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g></svg></div>",
-      "css": ".ds-face-stage{display:grid;place-items:center;padding:24px;background:linear-gradient(135deg,#E8F5E9,#A5D6A7)}.ds-face{width:160px;height:160px}"
-    },
-    {
-      "name": "Mood Face (neighbor)",
-      "kind": "custom",
-      "description": "Carita vecina: 40% de escala y 50% de opacidad.",
-      "html": "<div class=\"ds-face-stage\"><svg class=\"ds-face\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" viewBox=\"0 0 512 512\" ><circle style=\"fill:#FFE17D;\" cx=\"256\" cy=\"256\" r=\"256\"/><path style=\"fill:#FFD164;\" d=\"M293.161,474.839c-141.385,0-256-114.615-256-256c0-61.227,21.521-117.411,57.376-161.463 C36.863,104.316,0,175.842,0,256c0,141.385,114.615,256,256,256c80.159,0,151.685-36.864,198.626-94.538 C410.573,453.317,354.389,474.839,293.161,474.839z\"/><path style=\"fill:#9C6846;\" d=\"M256,305.305c-49.323,0-96.405-5.727-139.598-16.079c-5.595-1.341-10.417,4.504-8.691,10.596 c19.92,70.324,78.718,121.34,148.29,121.34s128.369-51.016,148.29-121.34c1.726-6.092-3.096-11.937-8.691-10.596 C352.405,299.578,305.323,305.305,256,305.305z\"/><g><path style=\"fill:#7D5046;\" d=\"M395.599,289.226c-43.194,10.352-90.275,16.079-139.599,16.079s-96.405-5.726-139.598-16.079 c-5.595-1.341-10.417,4.504-8.691,10.596c5.214,18.408,13.148,35.443,23.186,50.637c41.04,7.796,82.792,12.085,125.121,12.085 c42.315,0,84.051-4.286,125.079-12.076c10.041-15.196,17.978-32.233,23.193-50.645 C406.015,293.729,401.194,287.885,395.599,289.226z\"/><path style=\"fill:#7D5046;\" d=\"M169.29,231.642L169.29,231.642c-11.402,0-20.645-9.243-20.645-20.645v-33.449 c0-11.402,9.243-20.645,20.645-20.645l0,0c11.402,0,20.645,9.243,20.645,20.645v33.449 C189.935,222.399,180.692,231.642,169.29,231.642z\"/></g><path style=\"fill:#9C6846;\" d=\"M169.29,156.903c-1.414,0-2.794,0.145-4.129,0.416v45.419c0,6.841,5.546,12.387,12.387,12.387 s12.387-5.546,12.387-12.387v-25.191C189.935,166.146,180.693,156.903,169.29,156.903z\"/><path style=\"fill:#7D5046;\" d=\"M342.71,231.642L342.71,231.642c-11.402,0-20.645-9.243-20.645-20.645v-33.449 c0-11.402,9.243-20.645,20.645-20.645l0,0c11.402,0,20.645,9.243,20.645,20.645v33.449 C363.355,222.399,354.112,231.642,342.71,231.642z\"/><path style=\"fill:#9C6846;\" d=\"M342.71,156.903c-1.414,0-2.794,0.145-4.129,0.416v45.419c0,6.841,5.546,12.387,12.387,12.387 s12.387-5.546,12.387-12.387v-25.191C363.355,166.146,354.112,156.903,342.71,156.903z\"/><path style=\"fill:#FFFFFF;\" d=\"M367.048,317.428c4.464-7.649,8.199-15.845,11.331-24.377 c-38.384,7.921-79.532,12.253-122.379,12.253c-42.873,0-84.044-4.336-122.448-12.267c3.148,8.573,6.944,16.784,11.438,24.465 c5.195,8.88,13.99,14.56,23.558,15.724c28.649,3.485,57.847,5.354,87.452,5.354c29.599,0,58.79-1.868,87.433-5.352 C353.033,332.061,361.845,326.344,367.048,317.428z\"/><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g></svg></div>",
-      "css": ".ds-face-stage{display:grid;place-items:center;padding:24px;background:linear-gradient(135deg,#E8F5E9,#A5D6A7)}.ds-face{width:160px;height:160px;transform:scale(.4);opacity:.5}"
+      "refersTo": "mood-cell",
+      "description": "Celda de la cuadrícula de 10 moods gratis: radio nativo, carita de 44 px y nombre; relleno y aro de su tono (data-tone). Se muestra en reposo y elegida.",
+      "html": "<div class=\"ds-cells\"><label class=\"ds-cell\"><svg class=\"ds-cell-face\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" viewBox=\"0 0 512 512\" ><circle style=\"fill:#FFE17D;\" cx=\"256\" cy=\"256\" r=\"256\"/><path style=\"fill:#FFD164;\" d=\"M293.161,474.839c-141.385,0-256-114.615-256-256c0-61.227,21.521-117.411,57.376-161.463 C36.863,104.316,0,175.842,0,256c0,141.385,114.615,256,256,256c80.159,0,151.685-36.864,198.626-94.538 C410.573,453.317,354.389,474.839,293.161,474.839z\"/><path style=\"fill:#9C6846;\" d=\"M256,305.305c-49.323,0-96.405-5.727-139.598-16.079c-5.595-1.341-10.417,4.504-8.691,10.596 c19.92,70.324,78.718,121.34,148.29,121.34s128.369-51.016,148.29-121.34c1.726-6.092-3.096-11.937-8.691-10.596 C352.405,299.578,305.323,305.305,256,305.305z\"/><g><path style=\"fill:#7D5046;\" d=\"M395.599,289.226c-43.194,10.352-90.275,16.079-139.599,16.079s-96.405-5.726-139.598-16.079 c-5.595-1.341-10.417,4.504-8.691,10.596c5.214,18.408,13.148,35.443,23.186,50.637c41.04,7.796,82.792,12.085,125.121,12.085 c42.315,0,84.051-4.286,125.079-12.076c10.041-15.196,17.978-32.233,23.193-50.645 C406.015,293.729,401.194,287.885,395.599,289.226z\"/><path style=\"fill:#7D5046;\" d=\"M169.29,231.642L169.29,231.642c-11.402,0-20.645-9.243-20.645-20.645v-33.449 c0-11.402,9.243-20.645,20.645-20.645l0,0c11.402,0,20.645,9.243,20.645,20.645v33.449 C189.935,222.399,180.692,231.642,169.29,231.642z\"/></g><path style=\"fill:#9C6846;\" d=\"M169.29,156.903c-1.414,0-2.794,0.145-4.129,0.416v45.419c0,6.841,5.546,12.387,12.387,12.387 s12.387-5.546,12.387-12.387v-25.191C189.935,166.146,180.693,156.903,169.29,156.903z\"/><path style=\"fill:#7D5046;\" d=\"M342.71,231.642L342.71,231.642c-11.402,0-20.645-9.243-20.645-20.645v-33.449 c0-11.402,9.243-20.645,20.645-20.645l0,0c11.402,0,20.645,9.243,20.645,20.645v33.449 C363.355,222.399,354.112,231.642,342.71,231.642z\"/><path style=\"fill:#9C6846;\" d=\"M342.71,156.903c-1.414,0-2.794,0.145-4.129,0.416v45.419c0,6.841,5.546,12.387,12.387,12.387 s12.387-5.546,12.387-12.387v-25.191C363.355,166.146,354.112,156.903,342.71,156.903z\"/><path style=\"fill:#FFFFFF;\" d=\"M367.048,317.428c4.464-7.649,8.199-15.845,11.331-24.377 c-38.384,7.921-79.532,12.253-122.379,12.253c-42.873,0-84.044-4.336-122.448-12.267c3.148,8.573,6.944,16.784,11.438,24.465 c5.195,8.88,13.99,14.56,23.558,15.724c28.649,3.485,57.847,5.354,87.452,5.354c29.599,0,58.79-1.868,87.433-5.352 C353.033,332.061,361.845,326.344,367.048,317.428z\"/><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g></svg><span>Happy</span></label><label class=\"ds-cell on\"><svg class=\"ds-cell-face\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" viewBox=\"0 0 512 512\" ><circle style=\"fill:#FFE17D;\" cx=\"256\" cy=\"256\" r=\"256\"/><path style=\"fill:#FFD164;\" d=\"M293.161,474.839c-141.385,0-256-114.615-256-256c0-61.227,21.521-117.411,57.376-161.463 C36.863,104.316,0,175.842,0,256c0,141.385,114.615,256,256,256c80.159,0,151.685-36.864,198.626-94.538 C410.573,453.317,354.389,474.839,293.161,474.839z\"/><path style=\"fill:#9C6846;\" d=\"M256,305.305c-49.323,0-96.405-5.727-139.598-16.079c-5.595-1.341-10.417,4.504-8.691,10.596 c19.92,70.324,78.718,121.34,148.29,121.34s128.369-51.016,148.29-121.34c1.726-6.092-3.096-11.937-8.691-10.596 C352.405,299.578,305.323,305.305,256,305.305z\"/><g><path style=\"fill:#7D5046;\" d=\"M395.599,289.226c-43.194,10.352-90.275,16.079-139.599,16.079s-96.405-5.726-139.598-16.079 c-5.595-1.341-10.417,4.504-8.691,10.596c5.214,18.408,13.148,35.443,23.186,50.637c41.04,7.796,82.792,12.085,125.121,12.085 c42.315,0,84.051-4.286,125.079-12.076c10.041-15.196,17.978-32.233,23.193-50.645 C406.015,293.729,401.194,287.885,395.599,289.226z\"/><path style=\"fill:#7D5046;\" d=\"M169.29,231.642L169.29,231.642c-11.402,0-20.645-9.243-20.645-20.645v-33.449 c0-11.402,9.243-20.645,20.645-20.645l0,0c11.402,0,20.645,9.243,20.645,20.645v33.449 C189.935,222.399,180.692,231.642,169.29,231.642z\"/></g><path style=\"fill:#9C6846;\" d=\"M169.29,156.903c-1.414,0-2.794,0.145-4.129,0.416v45.419c0,6.841,5.546,12.387,12.387,12.387 s12.387-5.546,12.387-12.387v-25.191C189.935,166.146,180.693,156.903,169.29,156.903z\"/><path style=\"fill:#7D5046;\" d=\"M342.71,231.642L342.71,231.642c-11.402,0-20.645-9.243-20.645-20.645v-33.449 c0-11.402,9.243-20.645,20.645-20.645l0,0c11.402,0,20.645,9.243,20.645,20.645v33.449 C363.355,222.399,354.112,231.642,342.71,231.642z\"/><path style=\"fill:#9C6846;\" d=\"M342.71,156.903c-1.414,0-2.794,0.145-4.129,0.416v45.419c0,6.841,5.546,12.387,12.387,12.387 s12.387-5.546,12.387-12.387v-25.191C363.355,166.146,354.112,156.903,342.71,156.903z\"/><path style=\"fill:#FFFFFF;\" d=\"M367.048,317.428c4.464-7.649,8.199-15.845,11.331-24.377 c-38.384,7.921-79.532,12.253-122.379,12.253c-42.873,0-84.044-4.336-122.448-12.267c3.148,8.573,6.944,16.784,11.438,24.465 c5.195,8.88,13.99,14.56,23.558,15.724c28.649,3.485,57.847,5.354,87.452,5.354c29.599,0,58.79-1.868,87.433-5.352 C353.033,332.061,361.845,326.344,367.048,317.428z\"/><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g></svg><span>Happy</span></label></div>",
+      "css": ".ds-cells{display:grid;grid-template-columns:repeat(2,96px);gap:6px;padding:16px;justify-content:center;background:linear-gradient(135deg,#FFF6DE,#E1C78F)}.ds-cell{display:grid;justify-items:center;align-content:center;gap:3px;min-height:84px;padding:6px 2px 5px;border-radius:16px;background:#FFF1CC;border:1px solid rgba(29,29,34,.07);color:#1D1D22;font:500 .75rem/1.1 Poppins,system-ui,sans-serif}.ds-cell-face{width:44px;height:44px}.ds-cell.on{border-color:#9A6500;outline:2px solid #9A6500;outline-offset:-3px}.ds-cell.on .ds-cell-face{transform:scale(1.12)}"
     },
     {
       "name": "Phone Frame",
@@ -272,44 +648,44 @@
       "refersTo": "phone-frame",
       "description": "Marco del teléfono, cortado por abajo, con la única sombra del sistema.",
       "html": "<div class=\"ds-phone\"><div class=\"ds-screen\"></div></div>",
-      "css": ".ds-phone{width:200px;height:240px;overflow:hidden;border:10px solid #0E1B1E;border-bottom:0;border-radius:46px 46px 0 0;background:#0E1B1E;box-shadow:0 36px 60px -28px rgba(0,0,0,.5),0 12px 24px -12px rgba(0,0,0,.3);margin:0 auto}.ds-screen{height:100%;border-radius:36px 36px 0 0;background:#F6FBFB}"
+      "css": ".ds-phone{width:200px;height:240px;overflow:hidden;border:10px solid #17171B;border-bottom:0;border-radius:46px 46px 0 0;background:#17171B;box-shadow:0 36px 60px -28px rgba(0,0,0,.5),0 12px 24px -12px rgba(0,0,0,.3);margin:0 auto}.ds-screen{height:100%;border-radius:36px 36px 0 0;background:#F7F7FA}"
     },
     {
       "name": "Privacy Block",
       "kind": "custom",
       "refersTo": "privacy-block",
-      "description": "Cierre de marca: titular blanco y tres puntos separados por una línea.",
+      "description": "Cierre de privacidad: tinta sólida con filete superior del degradado del Log, titular blanco y tres puntos separados por una línea.",
       "html": "<section class=\"ds-priv\"><h2>Your entries never leave your phone.</h2><ul><li><strong>No account</strong><span>No sign-up and no password.</span></li><li><strong>Everything on your device</strong><span>Export them any time.</span></li></ul></section>",
-      "css": ".ds-priv{padding:32px 20px;background:linear-gradient(135deg,#004A52,#00727D);color:#fff;font:500 1rem/1.55 Poppins,system-ui,sans-serif}.ds-priv h2{margin:0 0 20px;max-width:16ch;font:700 1.9rem/1.15 Poppins,system-ui,sans-serif;letter-spacing:-.02em}.ds-priv ul{list-style:none;margin:0;padding:0}.ds-priv li{padding:14px 0;border-top:1px solid rgba(255,255,255,.28)}.ds-priv strong{display:block;font-weight:600;font-size:1.1875rem}.ds-priv span{color:#DDF3F5}"
+      "css": ".ds-priv{position:relative;padding:36px 20px 32px;background:#1D1D22;color:#fff;font:500 1rem/1.55 Poppins,system-ui,sans-serif}.ds-priv::before{content:\"\";position:absolute;left:0;right:0;top:0;height:4px;background:linear-gradient(90deg,#B9A6FF,#F7B2D9,#FFD3B6)}.ds-priv h2{margin:0 0 20px;max-width:16ch;font:700 1.9rem/1.15 Poppins,system-ui,sans-serif;letter-spacing:-.02em}.ds-priv ul{list-style:none;margin:0;padding:0}.ds-priv li{padding:14px 0;border-top:1px solid rgba(255,255,255,.18)}.ds-priv strong{display:block;font-weight:600;font-size:1.1875rem}.ds-priv span{color:#CFCFDA}"
     },
     {
       "name": "Section Heading",
       "kind": "custom",
       "refersTo": "headline",
-      "description": "Titular de sección en Cian Profundo sobre papel.",
+      "description": "Titular de sección en tinta sobre papel (en oscuro, Titular de Noche).",
       "html": "<div class=\"ds-sec\"><h2>Your month, in full color.</h2><p>See every day at a glance.</p></div>",
-      "css": ".ds-sec{padding:24px 20px;background:#F6FBFB;text-align:center;font:500 1.0625rem/1.65 Poppins,system-ui,sans-serif}.ds-sec h2{margin:0 0 12px;font:700 1.9rem/1.15 Poppins,system-ui,sans-serif;letter-spacing:-.02em;color:#004A52}.ds-sec p{margin:0;color:#4A6468}"
+      "css": ".ds-sec{padding:24px 20px;background:#F7F7FA;text-align:center;font:500 1.0625rem/1.65 Poppins,system-ui,sans-serif}.ds-sec h2{margin:0 0 12px;font:700 1.9rem/1.15 Poppins,system-ui,sans-serif;letter-spacing:-.02em;color:#1D1D22}.ds-sec p{margin:0;color:#575969}"
     }
   ],
   "narrative": {
     "northStar": "El selector de bolsillo",
-    "overview": "La web se comporta como la app: una carita grande al centro, un pastel que cambia con ella y todo lo demás en calma. Tono tranquilo y confiable; las caritas llevan toda la expresividad y el resto es tipografía, espacio y planos de color.",
+    "overview": "La web es el Log de la app hecho página: una cuadrícula con los diez moods gratis y un tinte que sigue lo que eliges, con todo lo demás en calma. Solo se enseñan caritas gratis, así que no se insinúa que todo el catálogo lo sea. Tono tranquilo y confiable.",
     "keyCharacteristics": [
-      "Móvil primero: titular, carita, selector y badges en 390 pt.",
-      "Dos voces de color: pasteles de mood y cian de marca, nunca en la misma superficie.",
+      "Móvil primero: titular, cuadrícula de 10 moods (5x2) y badges en 390x844, también en español.",
+      "Dos voces de color: el tinte de categoría del mood en el héroe y la tinta con filete del Log en la privacidad, nunca en la misma superficie.",
       "Planos y suaves: solo el teléfono lleva sombra.",
-      "Funciona sin JavaScript y sin movimiento.",
+      "Funciona sin JavaScript: la cuadrícula es de radios nativos y el script solo tiñe el héroe; sin movimiento si el sistema lo pide.",
       "Sin recursos de terceros."
     ],
     "rules": [
       {
-        "name": "The Two Voices Rule",
-        "body": "Un pastel de mood y el cian de marca nunca comparten superficie.",
+        "name": "The Tint And Ink Rule",
+        "body": "El tinte de mood pertenece al héroe y la tinta con el filete del degradado del Log pertenece al cierre de privacidad; nunca comparten superficie.",
         "section": "colors"
       },
       {
         "name": "The Mood Owns The Hero Rule",
-        "body": "El fondo del héroe es siempre el degradado del mood seleccionado.",
+        "body": "El fondo del héroe es el degradado del tinte de categoría del mood elegido (menta a lavanda antes de elegir).",
         "section": "colors"
       },
       {
@@ -329,16 +705,18 @@
       }
     ],
     "dos": [
-      "Do dejar que el mood seleccionado tiña todo el héroe con su degradado de la app.",
-      "Do mantener la primera pantalla de 390 pt con titular, carita, selector y los dos badges.",
+      "Do dejar que el mood elegido tiña todo el héroe con el tinte de su categoría en la app.",
+      "Do mantener la primera pantalla de 390x844 con titular, la cuadrícula completa de 10 moods y los dos badges.",
       "Do usar Poppins autoalojada y nada que cargue desde otro dominio.",
       "Do mantener un contraste mínimo de 4.5:1 en texto de cuerpo y 3:1 en grande.",
       "Do mantener la edición en inglés y en español a la vez."
     ],
     "donts": [
-      "Don't mezclar un pastel de mood con el cian de marca en la misma superficie.",
+      "Don't mostrar moods premium ni mencionar la suscripción en el héroe: la cuadrícula solo lleva los 10 moods gratis.",
+      "Don't mezclar un tinte de mood con la tinta del bloque de privacidad en la misma superficie.",
       "Don't poner sombra a nada que no sea el teléfono, ni sombras de color.",
       "Don't usar texto con degradado ni tarjetas idénticas de ícono más título.",
+      "Don't usar el degradado del Log como texto ni como franja lateral: solo es el filete de 4px del bloque de privacidad.",
       "Don't afirmar que todos los moods son gratis ni mostrar precios.",
       "Don't modificar, recolorear ni recortar los badges oficiales.",
       "Don't tocar el texto de las páginas legales por motivos de diseño."
