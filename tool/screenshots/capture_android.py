@@ -10,7 +10,7 @@ Buttons are found by position, like capture.py: `uiautomator dump` lists the cli
 nodes and the four tabs of the bottom bar are the lowest row of four
 ([calendar, insights, log, settings]). The app opens on the Log in the "Saved" state
 (the seed has today's entry): Edit brings the grid back and the note pill sits above Save.
-The language is set per app with `cmd locale set-app-locales`. Put the status bar in demo mode
+The language is forced through the `screenshot_locale` marker next to the Hive files. Put the status bar in demo mode
 first (clock 9:41, full battery, no notifications) with `adb shell am broadcast -a
 com.android.systemui.demo -e command ...`.
 "day" opens the detail of day 15 of the previous month (the seed gives it a note and a time),
@@ -41,13 +41,19 @@ def adb(*args, binary=False):
 def set_lock_marker(on):
     """app_flutter/screenshot_lock makes main.dart start with the note lock on."""
     path = 'app_flutter/screenshot_lock'
-    adb('shell', 'run-as', PACKAGE, 'sh', '-c', f'touch {path}' if on else f'rm -f {path}')
+    adb('shell', 'run-as', PACKAGE, *(['touch', path] if on else ['rm', '-f', path]))
+
+
+def light_theme():
+    """The app follows the system theme and the slides are light."""
+    adb('shell', 'cmd', 'uimode', 'night', 'no')
 
 
 def launch(lock=False):
     adb('shell', 'am', 'force-stop', PACKAGE)
     set_lock_marker(lock)
-    adb('shell', 'cmd', 'locale', 'set-app-locales', PACKAGE, '--locales', LOCALE)
+    # Android 12 has no per-app language: the entrypoint reads it from a marker file.
+    adb('shell', f"run-as {PACKAGE} sh -c 'echo {LOCALE} > app_flutter/screenshot_locale'")
     time.sleep(1)
     adb('shell', 'am', 'start', '-n', PACKAGE + '/.MainActivity')
     time.sleep(6)
@@ -55,7 +61,7 @@ def launch(lock=False):
         if len(tab_buttons()) >= 4:
             break
         time.sleep(1)
-    time.sleep(1.5)
+    time.sleep(4 if lock else 1.5)  # the lock state is resolved asynchronously
 
 
 def buttons():
@@ -174,6 +180,7 @@ def day_cell(day):
 
 
 # 1) log grid: Edit on the Saved card brings back the moods by category.
+light_theme()
 launch()
 tap_button(edit_button())
 time.sleep(1)
@@ -195,15 +202,10 @@ shot('day')
 launch()
 tap_button(tab_buttons()[1])
 time.sleep(2)
-ranges = []
-for _ in range(8):
-    ranges = [g for g in non_tab_rows() if len(g) == 4]
-    if ranges:
-        break
-    time.sleep(1)
-if not ranges:
-    raise RuntimeError('trend range pills not found')
-tap_button(sorted(ranges[0], key=lambda b: b[0])[1])
+# Android does not expose the range pills as clickable: tap the second one by position
+# (calibrated on a 720x1600 phone, where "30 d" sits at x 30%, y 62% of the screen).
+w, h, _ = screen_size()
+tap(w * 0.30, h * 0.62)
 time.sleep(1.5)
 shot('insights')
 
