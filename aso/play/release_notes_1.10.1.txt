@@ -1,0 +1,50 @@
+<en-US>
+A fresh new look for Mood Calendar.
+• New, calmer and more colorful design, in light, dark or system theme
+• A new Log with every mood grouped by category
+• Tap a day to see how it felt, with the time you logged it
+• Insights: trends, streaks, mood by weekday and Year in Pixels
+• A short setup for new users, with your daily reminder
+• Lock your notes with your fingerprint or device passcode (Premium)
+• Fixed the daily reminder not showing on some Android phones
+</en-US>
+<es-419>
+Mood Calendar estrena imagen.
+• Diseño nuevo, más tranquilo y colorido, con tema claro, oscuro o del sistema
+• Un Registro nuevo con los moods agrupados por categoría
+• Toca un día para ver cómo fue y a qué hora lo registraste
+• Insights: tendencias, rachas, ánimo por día de la semana y Year in Pixels
+• Configuración inicial breve con tu recordatorio diario
+• Bloquea tus notas con huella o código del dispositivo (Premium)
+• Corregido: el recordatorio diario no aparecía en algunos Android
+</es-419>
+<de-DE>
+Mood Calendar im neuen Look.
+• Neues, ruhigeres und farbigeres Design, hell, dunkel oder wie das System
+• Ein neuer Eintrag-Tab mit allen Stimmungen nach Kategorie
+• Tippe auf einen Tag und sieh, wie er war – mit Uhrzeit des Eintrags
+• Insights: Verläufe, Serien, Stimmung je Wochentag und Year in Pixels
+• Kurze Einrichtung für neue Nutzer mit täglicher Erinnerung
+• Notizen per Fingerabdruck oder Gerätecode sperren (Premium)
+• Behoben: Die tägliche Erinnerung fehlte auf manchen Android-Geräten
+</de-DE>
+<fr-FR>
+Mood Calendar fait peau neuve.
+• Nouveau design plus calme et coloré, thème clair, sombre ou système
+• Un nouveau Journal avec les humeurs classées par catégorie
+• Touchez un jour pour voir comment il s’est passé et à quelle heure
+• Insights : tendances, séries, humeur par jour et Year in Pixels
+• Courte configuration initiale avec le rappel
+• Verrouillez vos notes par empreinte ou code de l’appareil (Premium)
+• Corrigé : le rappel n’apparaissait pas sur certains Android
+</fr-FR>
+<it-IT>
+Mood Calendar ha un nuovo look.
+• Nuovo design, più calmo e colorato, con tema chiaro, scuro o di sistema
+• Un nuovo Diario con gli stati d’animo divisi per categoria
+• Tocca un giorno per vedere com’è andato e a che ora l’hai registrato
+• Insights: andamenti, serie, umore per giorno e Year in Pixels
+• Breve configurazione iniziale con il promemoria quotidiano
+• Blocca le note con impronta o codice del dispositivo (Premium)
+• Risolto: il promemoria non compariva su alcuni telefoni Android
+</it-IT>

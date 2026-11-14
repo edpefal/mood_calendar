@@ -93,6 +93,10 @@ const Map<String, String> _detailNote = {
 /// reached the app in the simulator, so the marker is looked up from the box.
 bool _noteLockOn = false;
 
+/// A `screenshot_locale` file next to `screenshot_lock` holds a language code that
+/// overrides the device language (Android 12 and older cannot set a language per app).
+String? _forcedLanguage;
+
 /// A device that always has a passcode and always accepts it, so the lock can
 /// be shown without the system prompt.
 class _ScreenshotAuthenticator implements NoteLockAuthenticator {
@@ -137,7 +141,7 @@ class _AllUnlockedEntitlementsRepository implements MoodEntitlementsRepository {
 Future<void> _seed(Box<MoodModel> moodBox, Box<dynamic> settingsBox) async {
   final now = DateTime.now();
   final today = DateTime(now.year, now.month, now.day);
-  final languageCode =
+  final languageCode = _forcedLanguage ??
       WidgetsBinding.instance.platformDispatcher.locale.languageCode;
 
   await moodBox.clear();
@@ -210,8 +214,11 @@ Future<void> main() async {
   final moodBox = await Hive.openBox<MoodModel>('moods');
   final settingsBox =
       await Hive.openBox<dynamic>(AppSettingsLocalDataSource.boxName);
-  _noteLockOn = File('${File(settingsBox.path!).parent.path}/screenshot_lock')
-      .existsSync();
+  final markerDir = File(settingsBox.path!).parent.path;
+  _noteLockOn = File('$markerDir/screenshot_lock').existsSync();
+  final localeMarker = File('$markerDir/screenshot_locale');
+  _forcedLanguage =
+      localeMarker.existsSync() ? localeMarker.readAsStringSync().trim() : null;
   await _seed(moodBox, settingsBox);
 
   final appLogger = LoggerAppLogger();
@@ -317,6 +324,7 @@ class _ScreenshotApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      locale: _forcedLanguage == null ? null : Locale(_forcedLanguage!),
       supportedLocales: AppStrings.supportedLocales,
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
