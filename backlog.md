@@ -1,6 +1,6 @@
 # Backlog
 
-Backlog activo del proyecto, actualizado contra el estado actual del repo.
+Backlog activo del proyecto, actualizado contra el estado actual del repo (2026-11-21).
 
 ## Completado recientemente
 
@@ -47,28 +47,30 @@ Backlog activo del proyecto, actualizado contra el estado actual del repo.
 
 - README y `CLAUDE.md` actualizados con el estado real del proyecto (2026-10-24); todos los cambios de OpenSpec están archivados.
 
+- Rediseño completo (Bloques 1 a 3) publicado en la **1.10.1** en las dos tiendas (comprobado por API el 2026-11-16): App Store build 49 (`READY_FOR_SALE`) y Google Play build 50 en producción (el 49 de la pista interna era un `INTERNAL_TEST_BUILD`, no promovible). Incluye ícono nuevo, capturas y fichas en 5 idiomas, política de privacidad con el bloqueo de notas y el respaldo de Android, y el sitio con la marca nueva.
+
+- Suscripción Premium (1.10.0, 2026-11-03) con la **primera compra real el 2026-11-19**: plan mensual por Google Play, producción, $2,99 brutos y $2,54 netos (RevenueCat).
+
+- ASO con Applyra (2026-11-17 y 18): alta de 12 fichas (iOS y Play en EE. UU., México, España, Alemania, Francia e Italia), simulaciones de metadata, descripción larga de Play reescrita en 5 idiomas y título de Alemania en Play; detalle y seguimiento en "ASO pendiente".
+
+- README, `CLAUDE.md` y el CV actualizados con el estado real (2026-11-16 a 2026-11-19).
+
 ## Alta prioridad
 
-- Publicar la versión del rediseño (Bloques 1 a 3) y cerrar lo que el Bloque 3 deja pendiente.
-  Los tres bloques están en `main` y archivados (2026-11-11); el build 1.10.1 (47) está en la pista interna de Play y listo para subir a TestFlight. Probados en dispositivos reales: onboarding, bloqueo de notas con Face ID y con huella o código, aviso del recordatorio (en Android no llegaba nunca por faltar los receivers del plugin, #139) y su toque, restaurar compras y el caso "ya estás suscrito" (#138). Falta antes de publicar: (1) rehacer capturas y fichas en los 5 idiomas y enviar a revisión (toca las tiendas: pedir permiso); la prueba gratis del mensual y el semanal ya se quitó en App Store Connect y Play el 2026-11-12 (solo el anual la conserva); (2) ver el **texto grande** del paso 2 del onboarding en un Android real tras el #141 (necesita un build 48); el vencimiento de una compra de prueba ya salió bien en un Android real (2026-11-11); (3) la política de privacidad y las fichas ya mencionan el bloqueo de notas, sin decir "cifrado" (2026-11-12); (4) el respaldo automático de Android se dejó activo a propósito y la política de privacidad lo explica (2026-11-12; ver `docs/risks.md`); (5) mejora futura: cifrar la caja de notas y proteger la miniatura del selector de apps (`FLAG_SECURE`/privacy screen); y subir `local_auth` a la 3.x cuando el CI suba a Flutter 3.35 o más, quitando los `dependency_overrides` de `pubspec.yaml`.
+- Conseguir reseñas y calificaciones (es el límite de todo el ASO).
+  La ficha de EE. UU. tiene 1 calificación (1,0) frente a 30 000 a 70 000 de Daylio, How We Feel, EMMO y DailyBean, y la auditoría de Applyra la marca como lo más pesado del atractivo de la ficha. Revisar el momento del pedido de calificación (hoy sale con el 3.er y el 7.º día con entradas, máx. 2 en la vida de la instalación) y responder las reseñas que lleguen. Ningún cambio de textos de las fichas compensa esto.
+
+- Terminar las pruebas del rediseño en dispositivos reales.
+  Falta ver el **texto grande** del paso 2 del onboarding en un Android real (el ajuste #141 solo se verificó en simulador iOS) y la barra de estado oscura en tema claro (#144) en un iPhone real. Probado en dispositivos reales: onboarding, bloqueo de notas con Face ID y con huella o código, aviso del recordatorio y su toque (en Android no llegaba por faltar los receivers, #139), restaurar compras, el caso "ya estás suscrito" (#138) y el vencimiento de una compra de prueba. Mejoras futuras del bloqueo de notas: cifrar la caja de notas y proteger la miniatura del selector de apps (`FLAG_SECURE`/privacy screen); subir `local_auth` a la 3.x cuando el CI suba a Flutter 3.35 o más, quitando los `dependency_overrides` de `pubspec.yaml`.
+
+- Vigilar la suscripción y los ingresos.
+  Hay una suscripción real (Play, mensual, desde 2026-11-19, se renueva el 2026-12-19). RevenueCat muestra además 1 "prueba activa" que no se identificó (el plan mensual no tiene prueba). Seguir Crashlytics y RevenueCat. Fuera de la primera versión: plan vitalicio, ofertas promocionales o de reconquista, Compartir en Familia, paywalls y experimentos de RevenueCat, y avisos dentro de la app por vencimiento o reintento de cobro.
 
 - Palabras frecuentes de las notas y "tu mes en una imagen" (Insights).
   Marcadas Pro en el diseño de referencia (`b968c1cf-8592-4534-8a8c-db17961bb6fc`), quedaron fuera del Bloque 2. Las palabras frecuentes necesitan leer el texto de las notas, que con el bloqueo del Bloque 3 puede estar oculto: hay que decidir si se calculan solo con la sesión desbloqueada y qué se muestra si no (privacidad); la imagen del mes necesita hoja de compartir. Cada una es un change aparte.
 
-- Cerrar el rediseño (Bloques 2 y 3) antes de publicar el Bloque 1.
-  El Bloque 1 (sistema visual, Log por categorías, 4 pestañas, paywall como hoja y Ajustes) está implementado en `feat/redesign-block-1`, pero **no puede publicarse solo**: el paywall anuncia notas protegidas con biometría (Bloque 3) y Insights es un estado vacío (Bloque 2). Requisito previo a publicar, que hay que pedir aparte porque toca las tiendas: quitar la prueba gratis del plan mensual y del semanal en App Store Connect y Google Play (la app solo la ofrece en el anual). Pendiente también: medir la fluidez del vidrio en un iPhone real (iOS 15) y, si se pide, un build de TestFlight; el texto de las fichas de las tiendas (6 moods pasan a gratis) y las capturas se rehacen en el paso de marketing.
-
-- Publicación de la nueva marca en las tiendas (1.10.1 o posterior).
-  iOS: la 1.10.1 (49) está en revisión de Apple desde el 2026-11-12, con el ícono nuevo, las capturas y la ficha. Falta Play: subir el build 49 a producción, el ícono de 512 px, las capturas (hay que actualizar `capture_android.py` al set nuevo) y el gráfico de funciones, ya generado en `aso/play/`. El sitio usa la marca nueva desde el 2026-11-12 (PR de rediseño del sitio); el anillo de selección del reloj sigue en cian.
-
 - Comprobar que el reloj aparece en la ficha pública de la 1.9.0 y revisar el modo oscuro del sitio (`moodcalendar.app`).
   La 1.9.0 está publicada (`READY_FOR_SALE`). Mejoras del reloj para más adelante: complicación en la esfera, notas por dictado, colores pastel por mood, acciones en la notificación del recordatorio y app independiente.
-
-- Vigilar la suscripción publicada (1.10.0).
-  Publicada en las dos tiendas desde el 2026-11-03; los 18 productos de compras sueltas se retiraron el 2026-11-04 (ninguna compra real). Seguir Crashlytics y RevenueCat unos días: que desaparezca el `TypeToken` y que no haya errores nuevos de la tienda. Fuera de la primera versión: plan vitalicio, ofertas promocionales o de reconquista, Compartir en Familia, paywalls y experimentos de RevenueCat, y avisos dentro de la app por vencimiento o reintento de cobro.
-
-- Cerrar el lanzamiento de la 1.8.5 (iOS y Android).
-  Android ya está publicado en Google Play (confirmado el 2026-10-24); falta verificar qué `versionCode` sirve en producción. iOS 1.8.5 (build 36) ya está publicada (`READY_FOR_SALE`, comprobado el 2026-10-31). Falta comprobar en Firebase → Analytics que llegan usuarios reales. Opcional: recapturar los slides en español, que muestran los textos anteriores a la corrección de acentos; al regenerarlos, revisar en `compose.py` que el slide 5 (recordatorios) enmarque bien la captura de Settings a pantalla completa.
 
 - Configurar las notificaciones en tiempo real (RTDN) de Google Play hacia RevenueCat.
   Elegir el tema `play-notifications` en RevenueCat, pegarlo en Play Console → Monetización y enviar una notificación de prueba. No bloquea nada: hace que reembolsos y cancelaciones lleguen más rápido.
@@ -90,6 +92,15 @@ Backlog activo del proyecto, actualizado contra el estado actual del repo.
 
 - Revisar checklist de release.
   Hace falta una checklist operativa compacta para permisos, notificaciones, exportación, validaciones manuales y pasos previos a publicar.
+
+- Poder medir las descargas reales.
+  La llave de App Store Connect responde 403 en los informes de ventas (hace falta un rol de Ventas o Finanzas, o una llave nueva) y Play no expone sus estadísticas a la cuenta de servicio. Hoy solo hay la señal de RevenueCat (clientes que abrieron la app, con instalaciones de prueba).
+
+- Detalles pendientes de la marca nueva.
+  El anillo de selección del reloj sigue en cian (`ios/WatchApp/MoodGridView.swift`); el hook de diseño marca 4 avisos de contraste en `site/index.html` y `site/es/index.html` (sin revisar) y un falso positivo probable de "side-tab" en `.private::before` de `site/style.css`.
+
+- Pagos: añadir un método de pago a RevenueCat y revisar el perfil de pagos de Google Play.
+  RevenueCat no tiene método de pago registrado (plan "pro", facturas en $0) y cobra al pasar su umbral de ingresos; en Play hay que comprobar el perfil de pagos, el umbral de pago y el formulario fiscal de EE. UU. (W-8BEN) para no sufrir retenciones.
 
 ## Prioridad media
 
@@ -130,7 +141,7 @@ Backlog activo del proyecto, actualizado contra el estado actual del repo.
 Sale de `aso/aso_report.md` (auditoría del 2026-10-02). Lo ya hecho está en "Completado recientemente".
 
 - Medir el efecto del cambio de categoría a Lifestyle: comparar impresiones y descargas durante 2 a 4 semanas.
-- Seguir el volumen de calificaciones tras la 1.8.3 (meta del reporte: 25+ con 4.5 o más; al 2026-10-07 seguían US 1×1★, MX 1×5★, ES ninguna) y revisar si llegan reseñas nuevas para responderlas.
+- Seguir el volumen de calificaciones (meta del reporte: 25+ con 4.5 o más; al 2026-11-17 siguen US 1×1★, MX 1×5★ y ES, DE, FR e IT sin ninguna) y responder las reseñas nuevas. Ver también "Conseguir reseñas" en alta prioridad.
 - App Preview de 15 a 25 s sin depender del sonido: registrar un mood, el calendario llenándose y la racha.
 - Product Page Optimization: pruebas A/B de orden de screenshots e ícono.
 - Custom Product Pages por audiencia, junto con Apple Search Ads para términos de nicho.
@@ -146,8 +157,9 @@ Sale de `aso/aso_report.md` (auditoría del 2026-10-02). Lo ya hecho está en "C
 
 ## Orden sugerido de ejecución
 
-1. Hacer el siguiente change visual y publicar la versión con la nueva marca, mantener `CLAUDE.md` al día con cada release y vigilar la suscripción (1.10.0).
-2. Conectar las notificaciones RTDN de Google Play hacia RevenueCat y respaldar `~/my-release-key.jks`.
-3. Cubrir con pruebas el flujo de recordatorios y apertura desde notificaciones.
-4. Mejorar UX y manejo de errores en plataforma y estados offline.
-5. Iterar en producto: historial, edición/borrado, accesibilidad e insights.
+1. Conseguir las primeras reseñas (pedido de calificación y respuestas) y vigilar la suscripción real y RevenueCat.
+2. Cerrar las pruebas del rediseño en dispositivos reales (texto grande en Android, barra de estado en iPhone).
+3. Añadir el método de pago a RevenueCat, revisar el perfil de pagos y la información fiscal de Play, y conectar las notificaciones RTDN de Google Play; respaldar `~/my-release-key.jks`.
+4. Con la próxima versión de iOS: título y subtítulo de Alemania, 10 capturas y el anillo del reloj en la nueva marca; revisar las posiciones de las palabras en Applyra (2 a 3 semanas tras 2026-11-18).
+5. Cubrir con pruebas los recordatorios y la apertura desde notificaciones; mejorar UX y manejo de errores en plataforma y estados offline.
+6. Iterar en producto: historial, edición/borrado, accesibilidad e insights.
