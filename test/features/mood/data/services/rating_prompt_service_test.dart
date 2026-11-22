@@ -39,14 +39,14 @@ void main() {
     await tempDir.delete(recursive: true);
   });
 
-  RatingPromptService buildService({bool isIOS = true}) {
+  RatingPromptService buildService({bool isSupportedPlatform = true}) {
     return RatingPromptService(
       getMoods: GetMoodsUseCase(repository),
       stateDataSource: stateDataSource,
       reviewRequester: requester,
       telemetry: telemetry,
       clock: () => now,
-      isIOS: isIOS,
+      isSupportedPlatform: isSupportedPlatform,
     );
   }
 
@@ -144,10 +144,10 @@ void main() {
       expect(stateDataSource.getState().attempts, 2);
     });
 
-    test('does nothing outside iOS', () async {
+    test('does nothing outside iOS and Android', () async {
       givenEntryDays(10);
 
-      await buildService(isIOS: false).maybeRequestAfterSave();
+      await buildService(isSupportedPlatform: false).maybeRequestAfterSave();
 
       expect(requester.requestCalls, 0);
       expect(stateDataSource.getState().attempts, 0);
