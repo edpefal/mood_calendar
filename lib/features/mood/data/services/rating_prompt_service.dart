@@ -14,23 +14,24 @@ class RatingPromptService {
     required ReviewRequester reviewRequester,
     required AppTelemetry telemetry,
     DateTime Function()? clock,
-    bool? isIOS,
+    bool? isSupportedPlatform,
   })  : _getMoods = getMoods,
         _stateDataSource = stateDataSource,
         _reviewRequester = reviewRequester,
         _telemetry = telemetry,
         _clock = clock ?? DateTime.now,
-        _isIOS = isIOS ?? Platform.isIOS;
+        _isSupportedPlatform =
+            isSupportedPlatform ?? (Platform.isIOS || Platform.isAndroid);
 
   final GetMoodsUseCase _getMoods;
   final RatingPromptLocalDataSource _stateDataSource;
   final ReviewRequester _reviewRequester;
   final AppTelemetry _telemetry;
   final DateTime Function() _clock;
-  final bool _isIOS;
+  final bool _isSupportedPlatform;
 
   Future<void> maybeRequestAfterSave() async {
-    if (!_isIOS) return;
+    if (!_isSupportedPlatform) return;
 
     final entries = await _getMoods();
     final totalEntryDays = entries
